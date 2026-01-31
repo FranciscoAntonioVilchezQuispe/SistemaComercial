@@ -1,0 +1,40 @@
+version: "3.8"
+
+services:
+  # Base de Datos PostgreSQL
+  postgres-db:
+    image: postgres:14-alpine
+    container_name: sistema_comercial_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgrespassword
+      POSTGRES_DB: sistema_comercial
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  # Microservicios (Ejemplo)
+  catalog-api:
+    image: catalog-api
+    build:
+      context: ./Backend
+      dockerfile: src/Catalogo.API/Dockerfile
+    environment:
+      - ConnectionStrings__DefaultConnection=Server=postgres-db;Port=5432;Database=sistema_comercial;User Id=postgres;Password=postgrespassword;
+    depends_on:
+      - postgres-db
+    ports:
+      - "5001:8080"
+
+  # Frontend
+  frontend-web:
+    image: frontend-web
+    build:
+      context: ./Frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+
+volumes:
+  postgres_data:

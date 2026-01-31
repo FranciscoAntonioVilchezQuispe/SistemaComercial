@@ -1,0 +1,17 @@
+Npgsql.PostgresException (0x80004005): 42P01: no existe la relación «empresa»
+   at Npgsql.Internal.NpgsqlConnector.ReadMessageLong(Boolean async, DataRowLoadingMode dataRowLoadingMode, Boolean readingNotifications, Boolean isReadingPrependedMessage)
+   at System.Runtime.CompilerServices.PoolingAsyncValueTaskMethodBuilder`1.StateMachineBox`1.System.Threading.Tasks.Sources.IValueTaskSource<TResult>.GetResult(Int16 token)
+   at Npgsql.NpgsqlDataReader.NextResult(Boolean async, Boolean isConsuming, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlDataReader.NextResult(Boolean async, Boolean isConsuming, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteReader(Boolean async, CommandBehavior behavior, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteReader(Boolean async, CommandBehavior behavior, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteNonQuery(Boolean async, CancellationToken cancellationToken)
+   at Program.ExecuteSqlAsync(String sql) in E:\ProyectosNuevos\SistemaComercial\Codigo\Backend\src\Tools\DbSeeder\Program.cs:line 139
+   at Program.Main(String[] args) in E:\ProyectosNuevos\SistemaComercial\Codigo\Backend\src\Tools\DbSeeder\Program.cs:line 111
+  Exception data:
+    Severity: ERROR
+    SqlState: 42P01
+    MessageText: no existe la relación «empresa»
+    File: namespace.c
+    Line: 639
+    Routine: RangeVarGetRelidExtended

@@ -1,0 +1,141 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    // ============================================
+    // BACKEND BUILD TASKS
+    // ============================================
+    {
+      "label": "build-catalogo-api",
+      "command": "dotnet",
+      "type": "process",
+      "args": [
+        "build",
+        "${workspaceFolder}/Codigo/Backend/src/Catalogo.API/Catalogo.API/Catalogo.API.csproj",
+        "/property:GenerateFullPaths=true",
+        "/consoleloggerparameters:NoSummary"
+      ],
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "build-clientes-api",
+      "command": "dotnet",
+      "type": "process",
+      "args": [
+        "build",
+        "${workspaceFolder}/Codigo/Backend/src/Clientes.API/Clientes.API.API/Clientes.API.API.csproj",
+        "/property:GenerateFullPaths=true",
+        "/consoleloggerparameters:NoSummary"
+      ],
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "build-compras-api",
+      "command": "dotnet",
+      "type": "process",
+      "args": [
+        "build",
+        "${workspaceFolder}/Codigo/Backend/src/Compras.API/Compras.API.API/Compras.API.API.csproj",
+        "/property:GenerateFullPaths=true",
+        "/consoleloggerparameters:NoSummary"
+      ],
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "build-configuracion-api",
+      "command": "dotnet",
+      "type": "process",
+      "args": [
+        "build",
+        "${workspaceFolder}/Codigo/Backend/src/Configuracion.API/Configuracion.API.API/Configuracion.API.API.csproj",
+        "/property:GenerateFullPaths=true",
+        "/consoleloggerparameters:NoSummary"
+      ],
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "build-contabilidad-api",
+      "command": "dotnet",
+      "type": "process",
+      "args": [
+        "build",
+        "${workspaceFolder}/Codigo/Backend/src/Contabilidad.API/Contabilidad.API.API/Contabilidad.API.API.csproj",
+        "/property:GenerateFullPaths=true",
+        "/consoleloggerparameters:NoSummary"
+      ],
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "build-identidad-api",
+      "command": "dotnet",
+      "type": "process",
+      "args": [
+        "build",
+        "${workspaceFolder}/Codigo/Backend/src/Identidad.API/Identidad.API.API/Identidad.API.API.csproj",
+        "/property:GenerateFullPaths=true",
+        "/consoleloggerparameters:NoSummary"
+      ],
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "build-inventario-api",
+      "command": "dotnet",
+      "type": "process",
+      "args": [
+        "build",
+        "${workspaceFolder}/Codigo/Backend/src/Inventario.API/Inventario.API.API/Inventario.API.API.csproj",
+        "/property:GenerateFullPaths=true",
+        "/consoleloggerparameters:NoSummary"
+      ],
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "build-ventas-api",
+      "command": "dotnet",
+      "type": "process",
+      "args": [
+        "build",
+        "${workspaceFolder}/Codigo/Backend/src/Ventas.API/Ventas.API.API/Ventas.API.API.csproj",
+        "/property:GenerateFullPaths=true",
+        "/consoleloggerparameters:NoSummary"
+      ],
+      "problemMatcher": "$msCompile"
+    },
+    // ============================================
+    // FRONTEND TASKS
+    // ============================================
+    {
+      "label": "npm: dev - Frontend",
+      "type": "npm",
+      "script": "dev",
+      "path": "Codigo/Frontend/",
+      "isBackground": true,
+      "problemMatcher": {
+        "owner": "typescript",
+        "pattern": {
+          "regexp": "^([^\\s].*)\\((\\d+|\\d+,\\d+|\\d+,\\d+,\\d+,\\d+)\\):\\s+(error|warning|info)\\s+(TS\\d+)\\s*:\\s*(.*)$",
+          "file": 1,
+          "location": 2,
+          "severity": 3,
+          "code": 4,
+          "message": 5
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": {
+            "regexp": "^\\s*VITE\\s+v"
+          },
+          "endsPattern": {
+            "regexp": "^\\s*➜\\s+Local:\\s+http://localhost:\\d+/"
+          }
+        }
+      }
+    },
+    {
+      "label": "npm: build - Frontend",
+      "type": "npm",
+      "script": "build",
+      "path": "Codigo/Frontend/",
+      "problemMatcher": []
+    }
+  ]
+}

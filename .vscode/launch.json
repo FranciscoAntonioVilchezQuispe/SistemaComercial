@@ -1,0 +1,226 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    // ============================================
+    // BACKEND APIs
+    // ============================================
+    {
+      "name": "Backend: Catalogo.API",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build-catalogo-api",
+      "program": "${workspaceFolder}/Codigo/Backend/src/Catalogo.API/Catalogo.API/bin/Debug/net8.0/Catalogo.API.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/Codigo/Backend/src/Catalogo.API/Catalogo.API",
+      "stopAtEntry": false,
+      "env": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "ASPNETCORE_URLS": "http://localhost:5008"
+      }
+    },
+    {
+      "name": "Backend: Clientes.API",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build-clientes-api",
+      "program": "${workspaceFolder}/Codigo/Backend/src/Clientes.API/Clientes.API.API/bin/Debug/net8.0/Clientes.API.API.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/Codigo/Backend/src/Clientes.API/Clientes.API.API",
+      "stopAtEntry": false,
+      "env": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "ASPNETCORE_URLS": "http://localhost:5009"
+      }
+    },
+    {
+      "name": "Backend: Compras.API",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build-compras-api",
+      "program": "${workspaceFolder}/Codigo/Backend/src/Compras.API/Compras.API.API/bin/Debug/net8.0/Compras.API.API.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/Codigo/Backend/src/Compras.API/Compras.API.API",
+      "stopAtEntry": false,
+      "env": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "ASPNETCORE_URLS": "http://localhost:5010"
+      }
+    },
+    {
+      "name": "Backend: Configuracion.API",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build-configuracion-api",
+      "program": "${workspaceFolder}/Codigo/Backend/src/Configuracion.API/Configuracion.API.API/bin/Debug/net8.0/Configuracion.API.API.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/Codigo/Backend/src/Configuracion.API/Configuracion.API.API",
+      "stopAtEntry": false,
+      "env": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "ASPNETCORE_URLS": "http://localhost:5002"
+      }
+    },
+    {
+      "name": "Backend: Contabilidad.API",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build-contabilidad-api",
+      "program": "${workspaceFolder}/Codigo/Backend/src/Contabilidad.API/Contabilidad.API.API/bin/Debug/net8.0/Contabilidad.API.API.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/Codigo/Backend/src/Contabilidad.API/Contabilidad.API.API",
+      "stopAtEntry": false,
+      "env": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "ASPNETCORE_URLS": "http://localhost:5004"
+      }
+    },
+    {
+      "name": "Backend: Identidad.API",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build-identidad-api",
+      "program": "${workspaceFolder}/Codigo/Backend/src/Identidad.API/Identidad.API.API/bin/Debug/net8.0/Identidad.API.API.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/Codigo/Backend/src/Identidad.API/Identidad.API.API",
+      "stopAtEntry": false,
+      "env": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "ASPNETCORE_URLS": "http://localhost:5001"
+      }
+    },
+    {
+      "name": "Backend: Inventario.API",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build-inventario-api",
+      "program": "${workspaceFolder}/Codigo/Backend/src/Inventario.API/Inventario.API.API/bin/Debug/net8.0/Inventario.API.API.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/Codigo/Backend/src/Inventario.API/Inventario.API.API",
+      "stopAtEntry": false,
+      "env": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "ASPNETCORE_URLS": "http://localhost:5003"
+      }
+    },
+    {
+      "name": "Backend: Ventas.API",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build-ventas-api",
+      "program": "${workspaceFolder}/Codigo/Backend/src/Ventas.API/Ventas.API.API/bin/Debug/net8.0/Ventas.API.API.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/Codigo/Backend/src/Ventas.API/Ventas.API.API",
+      "stopAtEntry": false,
+      "env": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "ASPNETCORE_URLS": "http://localhost:5005"
+      }
+    },
+    // ============================================
+    // FRONTEND
+    // ============================================
+    {
+      "name": "Frontend: Dev Server",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:5180",
+      "webRoot": "${workspaceFolder}/Codigo/Frontend/src",
+      "preLaunchTask": "npm: dev - Frontend"
+    },
+    {
+      "name": "Frontend: Dev Server (Firefox)",
+      "type": "firefox",
+      "request": "launch",
+      "url": "http://localhost:5180",
+      "webRoot": "${workspaceFolder}/Codigo/Frontend/src",
+      "reAttach": true,
+      "preLaunchTask": "npm: dev - Frontend"
+    },
+    {
+      "name": "Firefox: Open Page",
+      "type": "firefox",
+      "request": "launch",
+      "url": "about:blank"
+    },
+    {
+      "name": "Frontend: Debug Chrome",
+      "type": "chrome",
+      "request": "attach",
+      "port": 9222,
+      "url": "http://localhost:5180",
+      "webRoot": "${workspaceFolder}/Codigo/Frontend/src"
+    }
+  ],
+  "compounds": [
+    // ============================================
+    // CONFIGURACIONES COMPUESTAS
+    // ============================================
+    {
+      "name": "🚀 Full Stack: TODO",
+      "configurations": [
+        "Backend: Catalogo.API",
+        "Backend: Clientes.API",
+        "Backend: Compras.API",
+        "Backend: Configuracion.API",
+        "Backend: Contabilidad.API",
+        "Backend: Identidad.API",
+        "Backend: Inventario.API",
+        "Backend: Ventas.API",
+        "Frontend: Dev Server"
+      ],
+      "stopAll": true
+    },
+    {
+      "name": "🚀 Full Stack (Firefox)",
+      "configurations": [
+        "Backend: Catalogo.API",
+        "Backend: Clientes.API",
+        "Backend: Compras.API",
+        "Backend: Configuracion.API",
+        "Backend: Contabilidad.API",
+        "Backend: Identidad.API",
+        "Backend: Inventario.API",
+        "Backend: Ventas.API",
+        "Frontend: Dev Server (Firefox)"
+      ],
+      "stopAll": true
+    },
+    {
+      "name": "🛒 Ventas + Catálogo + Frontend",
+      "configurations": [
+        "Backend: Catalogo.API",
+        "Backend: Clientes.API",
+        "Backend: Ventas.API",
+        "Backend: Configuracion.API",
+        "Backend: Identidad.API",
+        "Frontend: Dev Server"
+      ],
+      "stopAll": true
+    },
+    {
+      "name": "📦 Inventario + Catálogo + Frontend",
+      "configurations": [
+        "Backend: Catalogo.API",
+        "Backend: Inventario.API",
+        "Backend: Configuracion.API",
+        "Backend: Identidad.API",
+        "Frontend: Dev Server"
+      ],
+      "stopAll": true
+    },
+    {
+      "name": "🔧 Solo Backend APIs",
+      "configurations": [
+        "Backend: Catalogo.API",
+        "Backend: Clientes.API",
+        "Backend: Compras.API",
+        "Backend: Configuracion.API",
+        "Backend: Contabilidad.API",
+        "Backend: Identidad.API",
+        "Backend: Inventario.API",
+        "Backend: Ventas.API"
+      ],
+      "stopAll": true
+    }
+  ]
+}
