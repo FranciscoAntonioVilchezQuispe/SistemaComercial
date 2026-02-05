@@ -10,7 +10,7 @@ export const usuarioPermisoService = {
     const response: any = await apiIdentidad.get(
       `/usuarios/${idUsuario}/menus`,
     );
-    return response.data;
+    return response.datos || response.data;
   },
 
   verificarPermiso: async (
@@ -28,7 +28,7 @@ export const usuarioPermisoService = {
     const response: any = await apiIdentidad.get(
       `/usuarios/${idUsuario}/roles`,
     );
-    return response.data;
+    return response.datos || response.data;
   },
 
   asignarRolAUsuario: async (
@@ -42,7 +42,7 @@ export const usuarioPermisoService = {
         idRol,
       },
     );
-    return response.data;
+    return response.datos || response.data;
   },
 
   quitarRolDeUsuario: async (

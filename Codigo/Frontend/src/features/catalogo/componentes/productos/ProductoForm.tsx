@@ -173,7 +173,7 @@ export function ProductoForm({
         className="space-y-4"
       >
         <Tabs defaultValue="general" className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 h-auto">
             <TabsTrigger value="general">General</TabsTrigger>
             <TabsTrigger value="precios">Precios</TabsTrigger>
             <TabsTrigger value="inventario">Inventario</TabsTrigger>

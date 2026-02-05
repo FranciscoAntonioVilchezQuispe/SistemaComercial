@@ -25,7 +25,7 @@ namespace Configuracion.API.Endpoints
             });
 
             // GET /api/catalogos/{codigo}
-            grupo.MapGet("/{codigo}", async (string codigo, [FromQuery] bool incluirInactivos, ObtenerCatalogoPorCodigoManejador manejador) =>
+            grupo.MapGet("/{codigo}", async (string codigo, ObtenerCatalogoPorCodigoManejador manejador, [FromQuery] bool incluirInactivos = false) =>
             {
                 var consulta = new ObtenerCatalogoPorCodigoConsulta(codigo.ToUpper(), incluirInactivos);
                 var respuesta = await manejador.Handle(consulta);
@@ -39,7 +39,7 @@ namespace Configuracion.API.Endpoints
             });
 
             // GET /api/catalogos/{codigo}/valores
-            grupo.MapGet("/{codigo}/valores", async (string codigo, [FromQuery] bool incluirInactivos, ObtenerValoresCatalogoManejador manejador) =>
+            grupo.MapGet("/{codigo}/valores", async (string codigo, ObtenerValoresCatalogoManejador manejador, [FromQuery] bool incluirInactivos = false) =>
             {
                 var consulta = new ObtenerValoresCatalogoConsulta(codigo.ToUpper(), incluirInactivos);
                 var respuesta = await manejador.Handle(consulta);

@@ -1,9 +1,9 @@
 import api from "@/lib/axios";
 import { Almacen, AlmacenFormData } from "../types/almacen.types";
 
-export const obtenerAlmacenes = async (): Promise<any> => {
-  const respuesta = await api.get("/inventario/almacenes");
-  return respuesta;
+export const obtenerAlmacenes = async (): Promise<Almacen[]> => {
+  const respuesta: any = await api.get("/inventario/almacenes");
+  return respuesta.datos || respuesta;
 };
 
 export const obtenerAlmacen = async (id: number): Promise<Almacen> => {

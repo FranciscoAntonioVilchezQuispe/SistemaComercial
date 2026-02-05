@@ -19,6 +19,8 @@ import {
 
 interface PropiedadesSidebar {
   abierto: boolean;
+  onMouseEnter?: () => void;
+  onMouseLeave?: () => void;
 }
 
 interface ItemMenu {
@@ -76,7 +78,7 @@ const menuItems: ItemMenu[] = [
     titulo: "Compras",
     icono: <ShoppingBag className="h-5 w-5" />,
     subItems: [
-      { titulo: "Órdenes", icono: null, ruta: "/compras/ordenes" },
+      { titulo: "Órdenes de Compra", icono: null, ruta: "/compras/ordenes-compra" },
       { titulo: "Compras", icono: null, ruta: "/compras/lista" },
       { titulo: "Proveedores", icono: null, ruta: "/compras/proveedores" },
     ],
@@ -176,13 +178,15 @@ function ItemMenuSidebar({
   );
 }
 
-export function Sidebar({ abierto }: PropiedadesSidebar) {
+export function Sidebar({ abierto, onMouseEnter, onMouseLeave }: PropiedadesSidebar) {
   return (
     <aside
       className={cn(
         "fixed left-0 top-16 z-40 h-[calc(100vh-4rem)] border-r bg-background transition-all duration-300",
         abierto ? "w-64" : "w-16",
       )}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
     >
       <nav className="flex flex-col gap-1 p-4 h-full overflow-y-auto">
         {menuItems.map((item, index) => (

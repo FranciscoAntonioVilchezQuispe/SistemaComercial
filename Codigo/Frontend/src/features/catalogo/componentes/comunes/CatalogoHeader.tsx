@@ -13,7 +13,7 @@ export const CatalogoHeader = () => {
   const location = useLocation();
 
   return (
-    <div className="flex space-x-2 border-b pb-4 mb-6 overflow-x-auto">
+    <div className="flex space-x-2 border-b pb-4 mb-6 flex-wrap gap-y-2">
       {subMenus.map((menu) => {
         const isActive = location.pathname === menu.path;
         return (

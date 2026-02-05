@@ -5,6 +5,20 @@
     // BACKEND APIs
     // ============================================
     {
+      "name": "Backend: Gateway.API",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build-gateway-api",
+      "program": "${workspaceFolder}/Codigo/Backend/src/Gateway.API/bin/Debug/net8.0/Gateway.API.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/Codigo/Backend/src/Gateway.API",
+      "stopAtEntry": false,
+      "env": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "ASPNETCORE_URLS": "http://localhost:5000"
+      }
+    },
+    {
       "name": "Backend: Catalogo.API",
       "type": "coreclr",
       "request": "launch",
@@ -158,6 +172,7 @@
     {
       "name": "🚀 Full Stack: TODO",
       "configurations": [
+        "Backend: Gateway.API",
         "Backend: Catalogo.API",
         "Backend: Clientes.API",
         "Backend: Compras.API",
@@ -173,6 +188,7 @@
     {
       "name": "🚀 Full Stack (Firefox)",
       "configurations": [
+        "Backend: Gateway.API",
         "Backend: Catalogo.API",
         "Backend: Clientes.API",
         "Backend: Compras.API",
@@ -188,6 +204,7 @@
     {
       "name": "🛒 Ventas + Catálogo + Frontend",
       "configurations": [
+        "Backend: Gateway.API",
         "Backend: Catalogo.API",
         "Backend: Clientes.API",
         "Backend: Ventas.API",
@@ -200,6 +217,7 @@
     {
       "name": "📦 Inventario + Catálogo + Frontend",
       "configurations": [
+        "Backend: Gateway.API",
         "Backend: Catalogo.API",
         "Backend: Inventario.API",
         "Backend: Configuracion.API",
@@ -211,6 +229,7 @@
     {
       "name": "🔧 Solo Backend APIs",
       "configurations": [
+        "Backend: Gateway.API",
         "Backend: Catalogo.API",
         "Backend: Clientes.API",
         "Backend: Compras.API",

@@ -35,7 +35,7 @@ export const servicioClientes = {
 
   obtenerClientePorId: async (id: number): Promise<Cliente> => {
     const response: any = await apiClientes.get(`${BASE_URL}/${id}`);
-    return response.data;
+    return response.datos || response.data;
   },
 
   buscarPorDocumento: async (
@@ -44,12 +44,12 @@ export const servicioClientes = {
     const response: any = await apiClientes.get(
       `${BASE_URL}/documento/${numeroDocumento}`,
     );
-    return response.data;
+    return response.datos || response.data;
   },
 
   crearCliente: async (datos: ClienteFormData): Promise<Cliente> => {
     const response: any = await apiClientes.post(BASE_URL, datos);
-    return response.data;
+    return response.datos || response.data;
   },
 
   actualizarCliente: async (
@@ -57,7 +57,7 @@ export const servicioClientes = {
     datos: ClienteFormData,
   ): Promise<Cliente> => {
     const response: any = await apiClientes.put(`${BASE_URL}/${id}`, datos);
-    return response.data;
+    return response.datos || response.data;
   },
 
   eliminarCliente: async (id: number): Promise<void> => {
@@ -66,6 +66,6 @@ export const servicioClientes = {
 
   obtenerHistorialCompras: async (id: number) => {
     const response: any = await apiClientes.get(`${BASE_URL}/${id}/historial`);
-    return response.data;
+    return response.datos || response.data;
   },
 };

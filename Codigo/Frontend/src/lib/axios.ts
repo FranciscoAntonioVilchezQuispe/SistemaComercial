@@ -46,36 +46,21 @@ const createApiInstance = (baseURL: string): AxiosInstance => {
   return instance;
 };
 
-// URL Base dinámica desde variables de entorno
-const getUrl = (port: number, envVar: string) => {
-  return import.meta.env[envVar] || `http://localhost:${port}/api`;
-};
+// Instancias para microservicios específicos (APUNTANDO AL GATEWAY 5000)
+// Todas apuntan a la base /api del Gateway. 
+// Las rutas específicas (ej: /proveedores, /marcas) se definen en los servicios y son rooteadas por YARP.
+const GATEWAY_BASE_URL = "http://localhost:5000/api";
 
-// Instancias para microservicios específicos
-export const apiIdentidad = createApiInstance(
-  getUrl(5001, "VITE_API_IDENTIDAD_URL"),
-);
-export const apiConfiguracion = createApiInstance(
-  getUrl(5002, "VITE_API_CONFIGURACION_URL"),
-);
-export const apiCatalogo = createApiInstance(
-  getUrl(5008, "VITE_API_CATALOGO_URL"),
-);
-export const apiInventario = createApiInstance(
-  getUrl(5003, "VITE_API_INVENTARIO_URL"),
-);
-export const apiVentas = createApiInstance(getUrl(5005, "VITE_API_VENTAS_URL"));
-export const apiCompras = createApiInstance(
-  getUrl(5010, "VITE_API_COMPRAS_URL"),
-);
-export const apiClientes = createApiInstance(
-  getUrl(5009, "VITE_API_CLIENTES_URL"),
-);
-export const apiContabilidad = createApiInstance(
-  getUrl(5004, "VITE_API_CONTABILIDAD_URL"),
-);
+export const apiIdentidad = createApiInstance(GATEWAY_BASE_URL);
+export const apiConfiguracion = createApiInstance(GATEWAY_BASE_URL);
+export const apiCatalogo = createApiInstance(GATEWAY_BASE_URL);
+export const apiInventario = createApiInstance(GATEWAY_BASE_URL);
+export const apiVentas = createApiInstance(GATEWAY_BASE_URL);
+export const apiCompras = createApiInstance(GATEWAY_BASE_URL);
+export const apiClientes = createApiInstance(GATEWAY_BASE_URL);
+export const apiContabilidad = createApiInstance(GATEWAY_BASE_URL);
 
-// Instancia por defecto (apunta a Ventas o Gateway si se requiere)
-const api = apiVentas;
+// Instancia por defecto
+const api = createApiInstance(GATEWAY_BASE_URL);
 
 export default api;

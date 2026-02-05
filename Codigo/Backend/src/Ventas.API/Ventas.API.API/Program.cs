@@ -3,8 +3,10 @@ using Ventas.API.Domain.Interfaces;
 using Ventas.API.Infrastructure.Repositorios;
 using Microsoft.EntityFrameworkCore;
 using Ventas.API.Endpoints;
+using Nucleo.Comun.Application.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.AddCentralizedLogging();
 
 // DbContext e Interfaz
 builder.Services.AddDbContext<VentasDbContext>(options =>
@@ -31,12 +33,15 @@ builder.Services.AddHttpClient<Ventas.API.Application.Interfaces.IInventarioServ
 });
 
 // CORS
+var frontendUrl = builder.Configuration.GetValue<string>("FrontendUrl") ?? "http://localhost:5180";
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend",
-        policy => policy.WithOrigins("http://localhost:5180")
+        policy => policy.SetIsOriginAllowed(_ => true)
                         .AllowAnyMethod()
-                        .AllowAnyHeader());
+                        .AllowAnyHeader()
+                        .AllowCredentials());
 });
 
 builder.Services.AddEndpointsApiExplorer();

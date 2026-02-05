@@ -97,9 +97,9 @@ export function UsuariosRolesPage() {
         </p>
       </div>
 
-      <div className="grid grid-cols-12 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Lista de Usuarios */}
-        <div className="col-span-3">
+        <div className="lg:col-span-3">
           <UsuariosList
             usuarios={usuarios}
             usuarioSeleccionado={usuarioSeleccionado}
@@ -108,7 +108,7 @@ export function UsuariosRolesPage() {
         </div>
 
         {/* Roles Asignados y Vista Previa */}
-        <div className="col-span-9">
+        <div className="lg:col-span-9">
           {usuarioSeleccionado ? (
             <RolesAsignados
               usuario={usuarioSeleccionado}

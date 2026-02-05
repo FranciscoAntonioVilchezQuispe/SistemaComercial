@@ -30,7 +30,7 @@ export default function PaginaDashboard() {
       titulo="Buen día, Administrador"
       descripcion="Aquí tienes el resumen de lo que está ocurriendo en tu negocio hoy."
       acciones={
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
           <Button variant="outline" size="sm" className="hidden sm:flex gap-2">
             <Calendar className="h-4 w-4" />
             Últimos 30 días
@@ -78,9 +78,9 @@ export default function PaginaDashboard() {
         />
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7 mb-8">
+      <div className="grid gap-6 md:grid-cols-2 laptop:grid-cols-7 mb-8">
         {/* Gráfico (Simplificado con Card por ahora) */}
-        <Card className="lg:col-span-4">
+        <Card className="laptop:col-span-4">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <div className="space-y-1">
               <CardTitle>Rendimiento Mensual</CardTitle>
@@ -100,7 +100,7 @@ export default function PaginaDashboard() {
         </Card>
 
         {/* Ventas Recientes */}
-        <Card className="lg:col-span-3">
+        <Card className="laptop:col-span-3">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle>Ventas Recientes</CardTitle>
             <Button variant="link" size="sm" className="h-auto p-0 text-primary">

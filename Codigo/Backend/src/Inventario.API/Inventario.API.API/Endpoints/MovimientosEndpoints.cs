@@ -11,7 +11,7 @@ namespace Inventario.API.Endpoints
     {
         public static void MapMovimientosEndpoints(this IEndpointRouteBuilder app)
         {
-            var grupo = app.MapGroup("/api/movimientos").WithTags("Movimientos");
+            var grupo = app.MapGroup("/api/inventario/movimientos").WithTags("Movimientos");
 
             grupo.MapPost("/", async (CrearMovimientoInventarioComando comando, IMediator mediator) =>
             {

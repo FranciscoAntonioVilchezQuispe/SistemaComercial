@@ -6,13 +6,15 @@ import { Footer } from "./Footer";
 
 export function LayoutPrincipal() {
   const [sidebarAbierto, setSidebarAbierto] = useState(true);
+  const [isHovering, setIsHovering] = useState(false);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const alternarSidebar = () => {
     setSidebarAbierto(!sidebarAbierto);
   };
 
-  // Cerrar sidebar automáticamente después de 5 segundos cuando se abre
+  // Cerrar sidebar automáticamente después de 5 segundos cuando se abre,
+  // pero solo si no se está interactuando con él (hover)
   useEffect(() => {
     // Limpiar timeout anterior si existe
     if (timeoutRef.current) {
@@ -20,20 +22,20 @@ export function LayoutPrincipal() {
       timeoutRef.current = null;
     }
 
-    // Si el sidebar está abierto, programar el cierre automático
-    if (sidebarAbierto) {
+    // Si el sidebar está abierto y NO hay hover, se programa el cierre
+    // Si hay hover, NO se programa (se mantiene abierto)
+    if (sidebarAbierto && !isHovering) {
       timeoutRef.current = setTimeout(() => {
         setSidebarAbierto(false);
-      }, 5000); // 5 segundos
+      }, 5000); 
     }
 
-    // Limpiar timeout al desmontar o cuando cambie el estado
     return () => {
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
       }
     };
-  }, [sidebarAbierto]);
+  }, [sidebarAbierto, isHovering]);
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -43,7 +45,11 @@ export function LayoutPrincipal() {
       {/* Contenido principal con Sidebar */}
       <div className="flex flex-1">
         {/* Sidebar */}
-        <Sidebar abierto={sidebarAbierto} />
+        <Sidebar 
+          abierto={sidebarAbierto} 
+          onMouseEnter={() => setIsHovering(true)}
+          onMouseLeave={() => setIsHovering(false)}
+        />
 
         {/* Área de contenido */}
         <main

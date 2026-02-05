@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus, Edit2, Trash2, Search } from "lucide-react";
+import { Plus, Edit2, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -10,7 +10,7 @@ import {
 import { DataTable } from "@/components/ui/DataTable";
 import { Loading } from "@compartido/componentes/feedback/Loading";
 import { MensajeError } from "@compartido/componentes/feedback/MensajeError";
-import { Input } from "@/components/ui/input";
+
 import {
   Card,
   CardContent,
@@ -35,6 +35,7 @@ export default function PaginaProveedores() {
   const eliminarProveedor = useEliminarProveedor();
 
   const { data: tiposDocumento } = useCatalogo("TIPO_DOCUMENTO");
+  console.log("Tipos de documento cargados:", tiposDocumento);
 
   const handleEliminar = (proveedor: Proveedor) => {
     if (confirm(`¿Estás seguro de eliminar a ${proveedor.razonSocial}?`)) {
@@ -150,27 +151,22 @@ export default function PaginaProveedores() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex justify-between items-center mb-4 gap-4">
-            <div className="relative flex-1 max-w-sm">
-              <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Buscar por razón social o documento..."
-                className="pl-8"
-                value={filtro}
-                onChange={(e) => setFiltro(e.target.value)}
-              />
-            </div>
-            <Button
-              onClick={() => {
-                setProveedorSeleccionado(null);
-                setDialogoOpen(true);
-              }}
-            >
-              <Plus className="mr-2 h-4 w-4" /> Nuevo Proveedor
-            </Button>
-          </div>
-
-          <DataTable data={proveedoresFiltrados} columns={columnas} />
+          <DataTable 
+            data={proveedoresFiltrados} 
+            columns={columnas} 
+            onSearchChange={setFiltro}
+            searchPlaceholder="Buscar por razón social o documento..."
+            actionElement={
+              <Button
+                onClick={() => {
+                  setProveedorSeleccionado(null);
+                  setDialogoOpen(true);
+                }}
+              >
+                <Plus className="mr-2 h-4 w-4" /> Nuevo Proveedor
+              </Button>
+            }
+          />
         </CardContent>
       </Card>
 

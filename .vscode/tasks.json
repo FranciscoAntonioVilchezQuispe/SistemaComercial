@@ -5,6 +5,18 @@
     // BACKEND BUILD TASKS
     // ============================================
     {
+      "label": "build-gateway-api",
+      "command": "dotnet",
+      "type": "process",
+      "args": [
+        "build",
+        "${workspaceFolder}/Codigo/Backend/src/Gateway.API/Gateway.API.csproj",
+        "/property:GenerateFullPaths=true",
+        "/consoleloggerparameters:NoSummary"
+      ],
+      "problemMatcher": "$msCompile"
+    },
+    {
       "label": "build-catalogo-api",
       "command": "dotnet",
       "type": "process",

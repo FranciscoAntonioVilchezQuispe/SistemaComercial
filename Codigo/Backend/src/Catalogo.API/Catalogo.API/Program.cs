@@ -1,8 +1,10 @@
 using Catalogo.Infrastructure.Datos;
 using Microsoft.EntityFrameworkCore;
-using Catalogo.API.Endpoints; // Importar endpoints
+using Catalogo.API.Endpoints;
+using Nucleo.Comun.Application.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.AddCentralizedLogging();
 
 // Fix for Npgsql Timestamp
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
@@ -18,14 +20,17 @@ builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(
 ));
 
 // Enable CORS
+var frontendUrl = builder.Configuration.GetValue<string>("FrontendUrl") ?? "http://localhost:5180";
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend",
         policy =>
         {
-            policy.WithOrigins("http://localhost:5180")
+            policy.SetIsOriginAllowed(_ => true) // Allow any origin
                   .AllowAnyHeader()
-                  .AllowAnyMethod();
+                  .AllowAnyMethod()
+                  .AllowCredentials();
         });
 });
 

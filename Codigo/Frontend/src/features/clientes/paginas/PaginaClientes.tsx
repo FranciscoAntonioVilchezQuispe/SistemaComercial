@@ -150,7 +150,7 @@ export function PaginaClientes() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex justify-between items-center mb-4 gap-4">
+          <div className="flex justify-between items-center mb-4 gap-4 flex-wrap">
             <div className="relative flex-1 max-w-sm">
               <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input

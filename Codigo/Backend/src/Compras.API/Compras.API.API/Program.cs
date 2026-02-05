@@ -3,8 +3,10 @@ using Compras.API.Domain.Interfaces;
 using Compras.API.Infrastructure.Repositorios;
 using Microsoft.EntityFrameworkCore;
 using Compras.API.Endpoints;
+using Nucleo.Comun.Application.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.AddCentralizedLogging();
 
 // DbContext e Interfaz
 builder.Services.AddDbContext<ComprasDbContext>(options =>
@@ -31,12 +33,16 @@ builder.Services.AddHttpClient<Compras.API.Application.Interfaces.IInventarioSer
 });
 
 // CORS
+// CORS
+var frontendUrl = builder.Configuration.GetValue<string>("FrontendUrl") ?? "http://localhost:5180";
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend",
-        policy => policy.WithOrigins("http://localhost:5180")
+        policy => policy.SetIsOriginAllowed(_ => true)
                         .AllowAnyMethod()
-                        .AllowAnyHeader());
+                        .AllowAnyHeader()
+                        .AllowCredentials());
 });
 
 builder.Services.AddEndpointsApiExplorer();

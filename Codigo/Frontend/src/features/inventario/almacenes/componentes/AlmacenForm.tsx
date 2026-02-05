@@ -18,7 +18,7 @@ import { Switch } from "@/components/ui/switch";
 import { useEffect } from "react";
 
 const formSchema = z.object({
-  nombre: z.string().min(1, "El nombre es requerido"),
+  nombreAlmacen: z.string().min(1, "El nombre es requerido"), // Changed from nombre
   direccion: z.string().optional(),
   esPrincipal: z.boolean().default(false),
   activo: z.boolean().default(true),
@@ -41,7 +41,7 @@ export function AlmacenForm({
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      nombre: "",
+      nombreAlmacen: "",
       direccion: "",
       esPrincipal: false,
       activo: true,
@@ -51,7 +51,7 @@ export function AlmacenForm({
   useEffect(() => {
     if (almacen) {
       form.reset({
-        nombre: almacen.nombre,
+        nombreAlmacen: almacen.nombreAlmacen,
         direccion: almacen.direccion || "",
         esPrincipal: almacen.esPrincipal,
         activo: almacen.activo,
@@ -90,7 +90,7 @@ export function AlmacenForm({
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         <FormField
           control={form.control}
-          name="nombre"
+          name="nombreAlmacen"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Nombre del Almacén</FormLabel>

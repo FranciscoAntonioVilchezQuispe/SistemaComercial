@@ -3,8 +3,10 @@ using Identidad.API.Domain.Interfaces;
 using Identidad.API.Infrastructure.Repositorios;
 using Microsoft.EntityFrameworkCore;
 using Identidad.API.Endpoints;
+using Nucleo.Comun.Application.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.AddCentralizedLogging();
 
 // Add services to the container.
 builder.Services.AddDbContext<IdentidadDbContext>(options =>
@@ -26,12 +28,16 @@ builder.Services.AddScoped<IRolMenuPermisoRepositorio, RolMenuPermisoRepositorio
 builder.Services.AddScoped<IUsuarioRolRepositorio, UsuarioRolRepositorio>();
 
 // CORS
+// CORS
+var frontendUrl = builder.Configuration.GetValue<string>("FrontendUrl") ?? "http://localhost:5180";
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend",
-        policy => policy.WithOrigins("http://localhost:5180")
+        policy => policy.SetIsOriginAllowed(_ => true)
                         .AllowAnyMethod()
-                        .AllowAnyHeader());
+                        .AllowAnyHeader()
+                        .AllowCredentials());
 });
 
 builder.Services.AddEndpointsApiExplorer();

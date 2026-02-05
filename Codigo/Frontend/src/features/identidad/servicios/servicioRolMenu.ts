@@ -9,7 +9,7 @@ import type {
 export const rolMenuService = {
   obtenerMenusPorRol: async (idRol: number): Promise<RolMenu[]> => {
     const response: any = await apiIdentidad.get(`/roles/${idRol}/menus`);
-    return response.data;
+    return response.datos || response.data;
   },
 
   asignarMenuARol: async (request: AsignarRolMenuRequest): Promise<RolMenu> => {
@@ -18,7 +18,7 @@ export const rolMenuService = {
       idRol,
       idMenu,
     });
-    return response.data;
+    return response.datos || response.data;
   },
 
   quitarMenuDeRol: async (idRol: number, idRolMenu: number): Promise<void> => {
@@ -32,7 +32,7 @@ export const rolMenuService = {
     const response: any = await apiIdentidad.get(
       `/roles/${idRol}/menus/${idMenu}/permisos`,
     );
-    return response.data;
+    return response.datos || response.data;
   },
 
   asignarPermisoARolMenu: async (
@@ -44,7 +44,7 @@ export const rolMenuService = {
       `/roles/${idRol}/menus/${idMenu}/permisos`,
       request,
     );
-    return response.data;
+    return response.datos || response.data;
   },
 
   quitarPermisoDeRolMenu: async (

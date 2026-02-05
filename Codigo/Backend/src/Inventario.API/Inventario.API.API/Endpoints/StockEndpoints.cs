@@ -12,7 +12,7 @@ namespace Inventario.API.Endpoints
     {
         public static void MapStockEndpoints(this IEndpointRouteBuilder app)
         {
-            var grupo = app.MapGroup("/api/stock").WithTags("Stock");
+            var grupo = app.MapGroup("/api/inventario/stock").WithTags("Stock");
 
             grupo.MapGet("/producto/{idProducto}/almacen/{idAlmacen}", async (long idProducto, long idAlmacen, IStockRepositorio repo) =>
             {

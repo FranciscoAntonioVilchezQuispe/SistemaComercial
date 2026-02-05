@@ -38,30 +38,30 @@ export const servicioVentas = {
 
   obtenerVentaPorId: async (id: number): Promise<Venta> => {
     const response: any = await apiVentas.get(`${BASE_URL}/${id}`);
-    return response.data;
+    return response.datos || response.data;
   },
 
   crearVenta: async (datos: VentaFormData): Promise<Venta> => {
     const response: any = await apiVentas.post(BASE_URL, datos);
-    return response.data;
+    return response.datos || response.data;
   },
 
   anularVenta: async (id: number, motivo: string): Promise<Venta> => {
     const response: any = await apiVentas.patch(`${BASE_URL}/${id}/anular`, {
       motivo,
     });
-    return response.data;
+    return response.datos || response.data;
   },
 
   obtenerVentasDelDia: async (): Promise<Venta[]> => {
     const response: any = await apiVentas.get(`${BASE_URL}/hoy`);
-    return response.data;
+    return response.datos || response.data;
   },
 
   obtenerEstadisticas: async (fechaInicio: string, fechaFin: string) => {
     const response: any = await apiVentas.get(`${BASE_URL}/estadisticas`, {
       params: { fechaInicio, fechaFin },
     });
-    return response.data;
+    return response.datos || response.data;
   },
 };

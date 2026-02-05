@@ -1,7 +1,8 @@
+import React from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { CalendarIcon, Trash2, Plus } from "lucide-react";
+import { CalendarIcon, Trash2, Plus, Check } from "lucide-react";
 import { format } from "date-fns";
 
 import { cn } from "@/lib/utils";
@@ -20,6 +21,13 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
 import { Calendar } from "@/components/ui/calendar";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
@@ -59,6 +67,93 @@ interface CompraFormProps {
   onSuccess: () => void;
   onCancel: () => void;
 }
+
+// Componente Input Autocomplete para Productos
+const ProductInput = ({
+  value,
+  onChange,
+  productos,
+  placeholder = "Buscar producto...",
+}: {
+  value: number;
+  onChange: (id: number) => void;
+  productos: any[]; // Usar tipo correcto si está disponible
+  placeholder?: string;
+}) => {
+  const [open, setOpen] = React.useState(false);
+  const [inputValue, setInputValue] = React.useState("");
+
+  // Sincronizar input con valor seleccionado
+  React.useEffect(() => {
+    if (value) {
+      const selected = productos.find((p) => p.id === value);
+      if (selected) {
+        setInputValue(selected.nombre);
+      }
+    } else {
+       setInputValue("");
+    }
+  }, [value, productos]);
+
+  const filtered = productos.filter((p) =>
+    p.nombre.toLowerCase().includes(inputValue.toLowerCase())
+  );
+
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <FormControl>
+           <div className="relative">
+            <Input
+              placeholder={placeholder}
+              value={inputValue}
+              onChange={(e) => {
+                setInputValue(e.target.value);
+                setOpen(true);
+                // Si borra todo, reseteamos el valor
+                if (e.target.value === "") {
+                   onChange(0);
+                }
+              }}
+              onFocus={() => setOpen(true)}
+              className="pr-8" // Espacio para icono si se desea
+            />
+            {/* Optional: Icono de búsqueda o chevron */}
+           </div>
+        </FormControl>
+      </PopoverTrigger>
+      <PopoverContent className="w-[300px] p-0" align="start">
+        <Command>
+           {/* No CommandInput here, we use the external Input */}
+          <CommandList>
+            <CommandEmpty>No se encontraron productos.</CommandEmpty>
+            <CommandGroup>
+              {filtered.map((producto) => (
+                <CommandItem
+                  key={producto.id}
+                  value={producto.nombre}
+                  onSelect={() => {
+                    onChange(producto.id);
+                    setInputValue(producto.nombre);
+                    setOpen(false);
+                  }}
+                >
+                  <Check
+                    className={cn(
+                      "mr-2 h-4 w-4",
+                      value === producto.id ? "opacity-100" : "opacity-0"
+                    )}
+                  />
+                  {producto.nombre}
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          </CommandList>
+        </Command>
+      </PopoverContent>
+    </Popover>
+  );
+};
 
 export function CompraForm({ onSuccess, onCancel }: CompraFormProps) {
   const registrar = useRegistrarCompra();
@@ -273,38 +368,28 @@ export function CompraForm({ onSuccess, onCancel }: CompraFormProps) {
                 key={field.id}
                 className="grid grid-cols-12 gap-2 mb-2 items-end"
               >
-                <div className="col-span-5">
-                  <FormField
-                    control={form.control}
-                    name={`detalles.${index}.idProducto`}
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className={index !== 0 ? "sr-only" : ""}>
-                          Producto
-                        </FormLabel>
-                        <FormControl>
-                          {/* TODO: Reemplazar con SelectorProducto con búsqueda */}
-                          <select
-                            className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm"
-                            value={field.value}
-                            onChange={(e) => {
-                              field.onChange(Number(e.target.value));
-                              // Auto-fill price logic could go here
-                            }}
-                          >
-                            <option value={0}>Seleccionar Producto...</option>
-                            {productos.map((p) => (
-                              <option key={p.id} value={p.id}>
-                                {p.nombre}
-                              </option>
-                            ))}
-                          </select>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
+                  <div className="col-span-5">
+                    <FormField
+                      control={form.control}
+                      name={`detalles.${index}.idProducto`}
+                      render={({ field }) => (
+                        <FormItem className="flex flex-col">
+                          <FormLabel className={index !== 0 ? "sr-only" : ""}>
+                            Producto
+                          </FormLabel>
+                          <ProductInput
+                             value={field.value}
+                             onChange={(id) => {
+                               field.onChange(id);
+                               // Lógica adicional si es necesario
+                             }}
+                             productos={productos}
+                          />
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
 
                 <div className="col-span-2">
                   <FormField
@@ -343,17 +428,22 @@ export function CompraForm({ onSuccess, onCancel }: CompraFormProps) {
                 </div>
 
                 <div className="col-span-2">
-                  <FormItem>
-                    <FormLabel className={index !== 0 ? "sr-only" : ""}>
+                  <div className="space-y-2">
+                    <label
+                      className={cn(
+                        "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
+                        index !== 0 ? "sr-only" : "",
+                      )}
+                    >
                       Subtotal
-                    </FormLabel>
+                    </label>
                     <div className="h-9 flex items-center px-3 text-sm font-medium">
                       {(
                         form.watch(`detalles.${index}.cantidad`) *
                         form.watch(`detalles.${index}.precioUnitario`)
                       ).toFixed(2)}
                     </div>
-                  </FormItem>
+                  </div>
                 </div>
 
                 <div className="col-span-1">

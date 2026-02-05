@@ -1,6 +1,6 @@
 export interface Almacen {
   id: number;
-  nombre: string;
+  nombreAlmacen: string; // Changed from nombre
   direccion?: string;
   esPrincipal: boolean;
   activo: boolean;
@@ -9,7 +9,7 @@ export interface Almacen {
 
 export interface AlmacenFormData {
   id?: number;
-  nombre: string;
+  nombreAlmacen: string; // Changed from nombre
   direccion?: string;
   esPrincipal?: boolean;
   activo?: boolean;

@@ -40,7 +40,7 @@ export function PaginaStock() {
 
   return (
     <div className="p-6 space-y-6">
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center flex-wrap gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">
             Stock de Inventario
@@ -49,7 +49,7 @@ export function PaginaStock() {
             Consulta y gestiona las existencias en tiempo real por almacén.
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           <ExportadorTabla
             datos={data?.datos || []}
             nombreArchivo="stock_inventario"

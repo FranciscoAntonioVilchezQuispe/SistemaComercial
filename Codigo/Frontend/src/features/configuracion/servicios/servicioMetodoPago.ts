@@ -6,12 +6,12 @@ const BASE_URL = "/metodos-pago";
 export const servicioMetodoPago = {
   obtenerTodos: async (): Promise<MetodoPago[]> => {
     const response: any = await apiConfiguracion.get(BASE_URL);
-    return response.data || response;
+    return response.datos || response.data || response;
   },
 
   crear: async (datos: MetodoPagoFormData): Promise<MetodoPago> => {
     const response: any = await apiConfiguracion.post(BASE_URL, datos);
-    return response.data;
+    return response.datos || response.data;
   },
 
   actualizar: async (
@@ -22,7 +22,7 @@ export const servicioMetodoPago = {
       `${BASE_URL}/${id}`,
       datos,
     );
-    return response.data;
+    return response.datos || response.data;
   },
 
   eliminar: async (id: number): Promise<void> => {

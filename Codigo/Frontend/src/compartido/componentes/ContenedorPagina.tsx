@@ -26,7 +26,7 @@ export function ContenedorPagina({
     >
       <div className="flex flex-col gap-1">
         <Breadcrumbs />
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 flex-wrap">
           <div className="space-y-1">
             <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
               {titulo}

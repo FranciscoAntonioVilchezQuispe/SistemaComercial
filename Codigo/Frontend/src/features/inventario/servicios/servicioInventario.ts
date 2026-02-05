@@ -26,7 +26,7 @@ export const servicioInventario = {
     const response: any = await apiInventario.get(
       `${API_URL}/stock/producto/${idProducto}`,
     );
-    return response.data;
+    return response.datos || response.data;
   },
 
   /**
@@ -51,7 +51,7 @@ export const servicioInventario = {
       `${API_URL}/movimientos`,
       movimiento,
     );
-    return response.data;
+    return response.datos || response.data;
   },
 
   /**
@@ -62,7 +62,7 @@ export const servicioInventario = {
       `${API_URL}/stock/ajuste`,
       ajuste,
     );
-    return response.data;
+    return response.datos || response.data;
   },
 
   /**
@@ -80,7 +80,7 @@ export const servicioInventario = {
         params: { idAlmacen, fechaInicio, fechaFin },
       },
     );
-    return response.data;
+    return response.datos || response.data;
   },
 
   /**
@@ -90,7 +90,7 @@ export const servicioInventario = {
     const response: any = await apiInventario.get(
       `${API_URL}/catalogos/tipos-movimiento`,
     );
-    return response.data;
+    return response.datos || response.data;
   },
 
   /**
@@ -100,6 +100,6 @@ export const servicioInventario = {
     const response: any = await apiInventario.get(
       `${API_URL}/catalogos/almacenes`,
     );
-    return response.data;
+    return response.datos || response.data;
   },
 };

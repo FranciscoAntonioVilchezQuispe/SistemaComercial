@@ -1,0 +1,17 @@
+﻿  Determinando los proyectos que se van a restaurar...
+  Todos los proyectos est├ín actualizados para la restauraci├│n.
+D:\Proyectos\SistemaComercial\Codigo\Backend\src\Gateway.API\Program.cs(6,18): error CS1061: "IServiceCollection" no contiene una definici├│n para "AddSwaggerGen" ni un m├®todo de extensi├│n accesible "AddSwaggerGen" que acepte un primer argumento del tipo "IServiceCollection" (┬┐falta alguna directiva using o una referencia de ensamblado?) [D:\Proyectos\SistemaComercial\Codigo\Backend\src\Gateway.API\Gateway.API.csproj]
+D:\Proyectos\SistemaComercial\Codigo\Backend\src\Gateway.API\Program.cs(29,9): error CS1061: "WebApplication" no contiene una definici├│n para "UseSwagger" ni un m├®todo de extensi├│n accesible "UseSwagger" que acepte un primer argumento del tipo "WebApplication" (┬┐falta alguna directiva using o una referencia de ensamblado?) [D:\Proyectos\SistemaComercial\Codigo\Backend\src\Gateway.API\Gateway.API.csproj]
+D:\Proyectos\SistemaComercial\Codigo\Backend\src\Gateway.API\Program.cs(30,9): error CS1061: "WebApplication" no contiene una definici├│n para "UseSwaggerUI" ni un m├®todo de extensi├│n accesible "UseSwaggerUI" que acepte un primer argumento del tipo "WebApplication" (┬┐falta alguna directiva using o una referencia de ensamblado?) [D:\Proyectos\SistemaComercial\Codigo\Backend\src\Gateway.API\Gateway.API.csproj]
+
+ERROR al compilar.
+
+D:\Proyectos\SistemaComercial\Codigo\Backend\src\Gateway.API\Program.cs(6,18): error CS1061: "IServiceCollection" no contiene una definici├│n para "AddSwaggerGen" ni un m├®todo de extensi├│n accesible "AddSwaggerGen" que acepte un primer argumento del tipo "IServiceCollection" (┬┐falta alguna directiva using o una referencia de ensamblado?) [D:\Proyectos\SistemaComercial\Codigo\Backend\src\Gateway.API\Gateway.API.csproj]
+D:\Proyectos\SistemaComercial\Codigo\Backend\src\Gateway.API\Program.cs(29,9): error CS1061: "WebApplication" no contiene una definici├│n para "UseSwagger" ni un m├®todo de extensi├│n accesible "UseSwagger" que acepte un primer argumento del tipo "WebApplication" (┬┐falta alguna directiva using o una referencia de ensamblado?) [D:\Proyectos\SistemaComercial\Codigo\Backend\src\Gateway.API\Gateway.API.csproj]
+D:\Proyectos\SistemaComercial\Codigo\Backend\src\Gateway.API\Program.cs(30,9): error CS1061: "WebApplication" no contiene una definici├│n para "UseSwaggerUI" ni un m├®todo de extensi├│n accesible "UseSwaggerUI" que acepte un primer argumento del tipo "WebApplication" (┬┐falta alguna directiva using o una referencia de ensamblado?) [D:\Proyectos\SistemaComercial\Codigo\Backend\src\Gateway.API\Gateway.API.csproj]
+    0 Advertencia(s)
+    3 Errores
+
+Tiempo transcurrido 00:00:01.57
+
+Hay actualizaciones de carga de trabajo disponibles. Ejecute "dotnet workload list" para obtener m├ís informaci├│n.

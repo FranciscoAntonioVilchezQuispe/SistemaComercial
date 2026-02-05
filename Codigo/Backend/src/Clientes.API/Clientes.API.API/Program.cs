@@ -3,8 +3,10 @@ using Clientes.API.Domain.Interfaces;
 using Clientes.API.Infrastructure.Repositorios;
 using Microsoft.EntityFrameworkCore;
 using Clientes.API.Endpoints;
+using Nucleo.Comun.Application.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.AddCentralizedLogging();
 
 // Add services to the container.
 builder.Services.AddDbContext<ClientesDbContext>(options =>
@@ -18,12 +20,16 @@ builder.Services.AddScoped<IClienteRepositorio, ClienteRepositorio>();
 builder.Services.AddScoped<IContactoClienteRepositorio, ContactoClienteRepositorio>();
 
 // CORS
+// CORS
+var frontendUrl = builder.Configuration.GetValue<string>("FrontendUrl") ?? "http://localhost:5180";
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend",
-        policy => policy.WithOrigins("http://localhost:5180")
+        policy => policy.SetIsOriginAllowed(_ => true)
                         .AllowAnyMethod()
-                        .AllowAnyHeader());
+                        .AllowAnyHeader()
+                        .AllowCredentials());
 });
 
 builder.Services.AddEndpointsApiExplorer();

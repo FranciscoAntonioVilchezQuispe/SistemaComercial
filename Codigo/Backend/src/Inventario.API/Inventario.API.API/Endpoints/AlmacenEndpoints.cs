@@ -12,7 +12,7 @@ namespace Inventario.API.Endpoints
     {
         public static void MapAlmacenEndpoints(this IEndpointRouteBuilder app)
         {
-            var grupo = app.MapGroup("/api/almacenes").WithTags("Almacenes");
+            var grupo = app.MapGroup("/api/inventario/almacenes").WithTags("Almacenes");
 
             grupo.MapGet("/", async (IAlmacenRepositorio repo) =>
             {

@@ -45,18 +45,18 @@ export default function PaginaAlmacenes() {
 
   const almacenesFiltrados =
     almacenes?.filter((a) =>
-      a.nombre.toLowerCase().includes(filtro.toLowerCase()),
+      a.nombreAlmacen.toLowerCase().includes(filtro.toLowerCase()),
     ) || [];
 
   const columnas = [
     {
       header: "Nombre",
-      accessorKey: "nombre" as keyof Almacen,
+      accessorKey: "nombreAlmacen" as keyof Almacen,
       className: "font-semibold",
       cell: (row: Almacen) => (
         <div className="flex items-center gap-2">
           <Store className="h-4 w-4 text-muted-foreground" />
-          <span>{row.nombre}</span>
+          <span>{row.nombreAlmacen}</span>
           {row.esPrincipal && (
             <Badge variant="default" className="ml-2 text-[10px] px-1 py-0 h-4">
               Principal

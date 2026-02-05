@@ -5,8 +5,10 @@ using Configuracion.API.Infrastructure.Repositorios;
 using Microsoft.EntityFrameworkCore;
 using Configuracion.API.Domain.Interfaces;
 using Configuracion.API.Endpoints;
+using Nucleo.Comun.Application.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.AddCentralizedLogging();
 
 // Configuración de DbContext
 builder.Services.AddDbContext<ConfiguracionDbContext>(options =>
@@ -36,13 +38,17 @@ builder.Services.ConfigureHttpJsonOptions(options =>
 });
 
 // Configuración de CORS
+// Configuración de CORS
+var frontendUrl = builder.Configuration.GetValue<string>("FrontendUrl") ?? "http://localhost:5180";
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.WithOrigins("http://localhost:5180", "http://localhost:3000")
+        policy.WithOrigins(frontendUrl)
               .AllowAnyHeader()
-              .AllowAnyMethod();
+              .AllowAnyMethod()
+              .AllowCredentials();
     });
 });
 

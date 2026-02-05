@@ -7,23 +7,23 @@ export const obtenerClientes = async (): Promise<any> => {
 };
 
 export const obtenerCliente = async (id: number): Promise<Cliente> => {
-  const response = await api.get(`/clientes/${id}`);
-  return response.data;
+  const response: any = await api.get(`/clientes/${id}`);
+  return response.datos || response.data;
 };
 
 export const crearCliente = async (
   cliente: ClienteFormData,
 ): Promise<Cliente> => {
-  const response = await api.post("/clientes", cliente);
-  return response.data;
+  const response: any = await api.post("/clientes", cliente);
+  return response.datos || response.data;
 };
 
 export const actualizarCliente = async (
   id: number,
   cliente: ClienteFormData,
 ): Promise<Cliente> => {
-  const response = await api.put(`/clientes/${id}`, cliente);
-  return response.data;
+  const response: any = await api.put(`/clientes/${id}`, cliente);
+  return response.datos || response.data;
 };
 
 export const eliminarCliente = async (id: number): Promise<void> => {

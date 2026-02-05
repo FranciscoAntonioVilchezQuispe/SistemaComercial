@@ -71,6 +71,11 @@ const PaginaCompras = lazy(() =>
     default: m.default,
   })),
 );
+const PaginaOrdenesCompra = lazy(() =>
+  import("@/features/compras/ordenes-compra/paginas/OrdenCompraPage").then((m) => ({
+    default: m.default,
+  })),
+);
 const PaginaVentas = lazy(() =>
   import("@/features/ventas/paginas/PaginaVentas").then((m) => ({
     default: m.PaginaVentas,
@@ -224,6 +229,14 @@ export const ruteador = createBrowserRouter([
         element: (
           <Suspense fallback={<CargandoPagina />}>
             <PaginaCompras />
+          </Suspense>
+        ),
+      },
+      {
+        path: "compras/ordenes-compra",
+        element: (
+          <Suspense fallback={<CargandoPagina />}>
+            <PaginaOrdenesCompra />
           </Suspense>
         ),
       },

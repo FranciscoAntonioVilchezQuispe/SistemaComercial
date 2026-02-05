@@ -6,7 +6,10 @@ using Inventario.API.Endpoints;
 using Inventario.API.Application.Interfaces;
 using Microsoft.OpenApi;
 
+using Nucleo.Comun.Application.Extensions;
+
 var builder = WebApplication.CreateBuilder(args);
+builder.AddCentralizedLogging();
 
 // Add services to the container.
 // builder.Services.AddControllers();
@@ -34,14 +37,18 @@ builder.Services.AddScoped<IStockRepositorio, StockRepositorio>();
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Inventario.API.Application.Comandos.CrearMovimientoInventarioComando).Assembly));
 
 // CORS
+// CORS
+var frontendUrl = builder.Configuration.GetValue<string>("FrontendUrl") ?? "http://localhost:5180";
+
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAll",
+    options.AddPolicy("AllowFrontend",
         builder =>
         {
-            builder.AllowAnyOrigin()
+            builder.SetIsOriginAllowed(_ => true)
                    .AllowAnyMethod()
-                   .AllowAnyHeader();
+                   .AllowAnyHeader()
+                   .AllowCredentials();
         });
 });
 
@@ -58,7 +65,7 @@ if (app.Environment.IsDevelopment())
 }
 
 // app.UseHttpsRedirection(); // Opcional en dev local
-app.UseCors("AllowAll");
+app.UseCors("AllowFrontend");
 app.UseAuthorization();
 // app.MapControllers();
 
