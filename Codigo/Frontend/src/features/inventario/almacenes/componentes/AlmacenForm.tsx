@@ -18,10 +18,10 @@ import { Switch } from "@/components/ui/switch";
 import { useEffect } from "react";
 
 const formSchema = z.object({
-  nombreAlmacen: z.string().min(1, "El nombre es requerido"), // Changed from nombre
+  nombreAlmacen: z.string().min(1, "El nombre es requerido"),
   direccion: z.string().optional(),
   esPrincipal: z.boolean().default(false),
-  activo: z.boolean().default(true),
+  activado: z.boolean().default(true),
 });
 
 interface AlmacenFormProps {
@@ -44,7 +44,7 @@ export function AlmacenForm({
       nombreAlmacen: "",
       direccion: "",
       esPrincipal: false,
-      activo: true,
+      activado: true,
     },
   });
 
@@ -54,7 +54,7 @@ export function AlmacenForm({
         nombreAlmacen: almacen.nombreAlmacen,
         direccion: almacen.direccion || "",
         esPrincipal: almacen.esPrincipal,
-        activo: almacen.activo,
+        activado: almacen.activado,
       });
     }
   }, [almacen, form]);
@@ -140,11 +140,11 @@ export function AlmacenForm({
 
           <FormField
             control={form.control}
-            name="activo"
+            name="activado"
             render={({ field }) => (
               <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
                 <div className="space-y-0.5">
-                  <FormLabel>Activo</FormLabel>
+                  <FormLabel>Activado</FormLabel>
                   <FormDescription>
                     Disponible para operaciones.
                   </FormDescription>

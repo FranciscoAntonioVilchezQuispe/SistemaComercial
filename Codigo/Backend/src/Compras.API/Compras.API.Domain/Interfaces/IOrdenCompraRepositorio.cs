@@ -11,5 +11,6 @@ namespace Compras.API.Domain.Interfaces
         Task ActualizarAsync(OrdenCompra orden);
         Task<IEnumerable<OrdenCompra>> ObtenerTodosAsync();
         Task<IEnumerable<OrdenCompra>> ObtenerPorProveedorAsync(long idProveedor);
+        Task ActualizarEstadoAsync(long id, long idEstado);
     }
 }

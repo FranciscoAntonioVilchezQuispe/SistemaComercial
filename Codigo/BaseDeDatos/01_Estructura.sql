@@ -649,7 +649,12 @@ CREATE TABLE compras.detalle_compra (
     descripcion character varying(255),
     cantidad numeric(10,3) NOT NULL,
     precio_unitario_compra numeric(12,2) NOT NULL,
-    subtotal numeric(12,2) NOT NULL
+    subtotal numeric(12,2) NOT NULL,
+    activado boolean DEFAULT true NOT NULL,
+    fecha_creacion timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    usuario_creacion character varying(100) NOT NULL,
+    fecha_modificacion timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+    usuario_modificacion character varying(100)
 );
 
 
@@ -692,7 +697,12 @@ CREATE TABLE compras.detalle_orden_compra (
     cantidad_solicitada numeric(10,3) NOT NULL,
     precio_unitario_pactado numeric(12,2) NOT NULL,
     subtotal numeric(12,2) NOT NULL,
-    cantidad_recibida numeric(10,3) DEFAULT 0
+    cantidad_recibida numeric(10,3) DEFAULT 0,
+    activado boolean DEFAULT true NOT NULL,
+    fecha_creacion timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    usuario_creacion character varying(100) NOT NULL,
+    fecha_modificacion timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+    usuario_modificacion character varying(100)
 );
 
 

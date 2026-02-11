@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus, Edit2, Trash2, Search, Store } from "lucide-react";
+import { Plus, Edit2, Trash2, Store } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -10,7 +10,6 @@ import {
 import { DataTable } from "@/components/ui/DataTable";
 import { Loading } from "@compartido/componentes/feedback/Loading";
 import { MensajeError } from "@compartido/componentes/feedback/MensajeError";
-import { Input } from "@/components/ui/input";
 import {
   Card,
   CardContent,
@@ -33,9 +32,11 @@ export default function PaginaAlmacenes() {
 
   const { data: almacenes, isLoading, error } = useAlmacenes();
   const eliminarAlmacen = useEliminarAlmacen();
-
+ 
   const handleEliminar = (almacen: Almacen) => {
-    if (confirm(`¿Estás seguro de eliminar el almacén ${almacen.nombre}?`)) {
+    if (
+      confirm(`¿Estás seguro de eliminar el almacén ${almacen.nombreAlmacen}?`)
+    ) {
       eliminarAlmacen.mutate(almacen.id, {
         onSuccess: () => toast.success("Almacén eliminado correctamente"),
         onError: () => toast.error("Error al eliminar el almacén"),
@@ -73,7 +74,7 @@ export default function PaginaAlmacenes() {
       header: "Estado",
       accessorKey: "activo" as keyof Almacen,
       cell: (row: Almacen) =>
-        row.activo ? (
+        row.activado  === true ? (
           <Badge
             variant="outline"
             className="bg-green-50 text-green-700 border-green-200"
@@ -122,42 +123,33 @@ export default function PaginaAlmacenes() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">Gestión de Almacenes</h1>
-        <p className="text-muted-foreground">
-          Configuración de almacenes y depósitos de la empresa.
-        </p>
-      </div>
-
       <Card>
-        <CardHeader>
-          <CardTitle>Listado de Almacenes</CardTitle>
-          <CardDescription>
-            Administre las ubicaciones donde se gestiona el inventario.
-          </CardDescription>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+          <div>
+            <CardTitle className="text-2xl font-bold">
+              Gestión de Almacenes
+            </CardTitle>
+            <CardDescription>
+              Administre las ubicaciones donde se gestiona el inventario.
+            </CardDescription>
+          </div>
+          <Button
+            onClick={() => {
+              setAlmacenSeleccionado(null);
+              setDialogoOpen(true);
+            }}
+            className="shadow-sm"
+          >
+            <Plus className="mr-2 h-4 w-4" /> Nuevo Almacén
+          </Button>
         </CardHeader>
         <CardContent>
-          <div className="flex justify-between items-center mb-4 gap-4">
-            <div className="relative flex-1 max-w-sm">
-              <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Buscar almacén..."
-                className="pl-8"
-                value={filtro}
-                onChange={(e) => setFiltro(e.target.value)}
-              />
-            </div>
-            <Button
-              onClick={() => {
-                setAlmacenSeleccionado(null);
-                setDialogoOpen(true);
-              }}
-            >
-              <Plus className="mr-2 h-4 w-4" /> Nuevo Almacén
-            </Button>
-          </div>
-
-          <DataTable data={almacenesFiltrados} columns={columnas} />
+          <DataTable
+            data={almacenesFiltrados}
+            columns={columnas}
+            onSearchChange={setFiltro}
+            searchPlaceholder="Buscar por nombre..."
+          />
         </CardContent>
       </Card>
 

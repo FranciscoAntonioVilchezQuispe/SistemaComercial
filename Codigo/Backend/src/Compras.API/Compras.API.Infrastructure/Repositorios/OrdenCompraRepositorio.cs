@@ -43,9 +43,22 @@ namespace Compras.API.Infrastructure.Repositorios
             await _context.SaveChangesAsync();
         }
 
+        public async Task ActualizarEstadoAsync(long id, long idEstado)
+        {
+            var orden = await _context.OrdenesCompra.FindAsync(id);
+            if (orden != null)
+            {
+                orden.IdEstado = idEstado;
+                await _context.SaveChangesAsync();
+            }
+        }
+
         public async Task<IEnumerable<OrdenCompra>> ObtenerTodosAsync()
         {
-            return await _context.OrdenesCompra.Include(o => o.Proveedor).ToListAsync();
+            return await _context.OrdenesCompra
+                .Include(o => o.Proveedor)
+                .Include(o => o.Detalles)
+                .ToListAsync();
         }
 
         public async Task<IEnumerable<OrdenCompra>> ObtenerPorProveedorAsync(long idProveedor)

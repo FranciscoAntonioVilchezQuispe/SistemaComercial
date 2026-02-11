@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { CalendarIcon, Trash2, Plus, Check } from "lucide-react";
 import { format } from "date-fns";
+import { es } from "date-fns/locale";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -66,6 +67,7 @@ type CompraFormValues = z.infer<typeof compraSchema>;
 interface CompraFormProps {
   onSuccess: () => void;
   onCancel: () => void;
+  datosIniciales?: Partial<CompraFormValues>;
 }
 
 // Componente Input Autocomplete para Productos
@@ -91,19 +93,19 @@ const ProductInput = ({
         setInputValue(selected.nombre);
       }
     } else {
-       setInputValue("");
+      setInputValue("");
     }
   }, [value, productos]);
 
   const filtered = productos.filter((p) =>
-    p.nombre.toLowerCase().includes(inputValue.toLowerCase())
+    p.nombre.toLowerCase().includes(inputValue.toLowerCase()),
   );
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <FormControl>
-           <div className="relative">
+          <div className="relative">
             <Input
               placeholder={placeholder}
               value={inputValue}
@@ -112,19 +114,19 @@ const ProductInput = ({
                 setOpen(true);
                 // Si borra todo, reseteamos el valor
                 if (e.target.value === "") {
-                   onChange(0);
+                  onChange(0);
                 }
               }}
               onFocus={() => setOpen(true)}
               className="pr-8" // Espacio para icono si se desea
             />
             {/* Optional: Icono de búsqueda o chevron */}
-           </div>
+          </div>
         </FormControl>
       </PopoverTrigger>
       <PopoverContent className="w-[300px] p-0" align="start">
         <Command>
-           {/* No CommandInput here, we use the external Input */}
+          {/* No CommandInput here, we use the external Input */}
           <CommandList>
             <CommandEmpty>No se encontraron productos.</CommandEmpty>
             <CommandGroup>
@@ -141,7 +143,7 @@ const ProductInput = ({
                   <Check
                     className={cn(
                       "mr-2 h-4 w-4",
-                      value === producto.id ? "opacity-100" : "opacity-0"
+                      value === producto.id ? "opacity-100" : "opacity-0",
                     )}
                   />
                   {producto.nombre}
@@ -155,7 +157,11 @@ const ProductInput = ({
   );
 };
 
-export function CompraForm({ onSuccess, onCancel }: CompraFormProps) {
+export function CompraForm({
+  onSuccess,
+  onCancel,
+  datosIniciales,
+}: CompraFormProps) {
   const registrar = useRegistrarCompra();
 
   // Data for selectors
@@ -173,6 +179,7 @@ export function CompraForm({ onSuccess, onCancel }: CompraFormProps) {
       fechaEmision: new Date(),
       tipoCambio: 1.0,
       detalles: [{ idProducto: 0, cantidad: 1, precioUnitario: 0 }],
+      ...datosIniciales,
     },
   });
 
@@ -240,7 +247,7 @@ export function CompraForm({ onSuccess, onCancel }: CompraFormProps) {
                     <option value={0}>Seleccione Almacén</option>
                     {almacenes?.map((a) => (
                       <option key={a.id} value={a.id}>
-                        {a.nombre}
+                        {a.nombreAlmacen}
                       </option>
                     ))}
                   </select>
@@ -267,7 +274,7 @@ export function CompraForm({ onSuccess, onCancel }: CompraFormProps) {
                         )}
                       >
                         {field.value ? (
-                          format(field.value, "PPP")
+                          format(field.value, "PPP", { locale: es })
                         ) : (
                           <span>Seleccione fecha</span>
                         )}
@@ -368,28 +375,28 @@ export function CompraForm({ onSuccess, onCancel }: CompraFormProps) {
                 key={field.id}
                 className="grid grid-cols-12 gap-2 mb-2 items-end"
               >
-                  <div className="col-span-5">
-                    <FormField
-                      control={form.control}
-                      name={`detalles.${index}.idProducto`}
-                      render={({ field }) => (
-                        <FormItem className="flex flex-col">
-                          <FormLabel className={index !== 0 ? "sr-only" : ""}>
-                            Producto
-                          </FormLabel>
-                          <ProductInput
-                             value={field.value}
-                             onChange={(id) => {
-                               field.onChange(id);
-                               // Lógica adicional si es necesario
-                             }}
-                             productos={productos}
-                          />
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
+                <div className="col-span-5">
+                  <FormField
+                    control={form.control}
+                    name={`detalles.${index}.idProducto`}
+                    render={({ field }) => (
+                      <FormItem className="flex flex-col">
+                        <FormLabel className={index !== 0 ? "sr-only" : ""}>
+                          Producto
+                        </FormLabel>
+                        <ProductInput
+                          value={field.value}
+                          onChange={(id) => {
+                            field.onChange(id);
+                            // Lógica adicional si es necesario
+                          }}
+                          productos={productos}
+                        />
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
 
                 <div className="col-span-2">
                   <FormField

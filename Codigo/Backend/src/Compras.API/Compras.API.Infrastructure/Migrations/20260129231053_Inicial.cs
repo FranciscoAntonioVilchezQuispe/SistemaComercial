@@ -12,7 +12,6 @@ namespace Compras.API.Infrastructure.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            /*
             migrationBuilder.EnsureSchema(
                 name: "compras");
 
@@ -220,7 +219,7 @@ namespace Compras.API.Infrastructure.Migrations
                 schema: "compras",
                 table: "ordenes_compra",
                 column: "id_proveedor");
-            */
+
         }
 
         /// <inheritdoc />

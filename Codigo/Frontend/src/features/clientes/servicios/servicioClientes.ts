@@ -1,9 +1,9 @@
 import api from "@/lib/axios";
 import { Cliente, ClienteFormData } from "../types/cliente.types";
 
-export const obtenerClientes = async (): Promise<any> => {
-  const response = await api.get("/clientes");
-  return response;
+export const obtenerClientes = async (): Promise<Cliente[]> => {
+  const response: any = await api.get("/clientes");
+  return response.datos || response.data || [];
 };
 
 export const obtenerCliente = async (id: number): Promise<Cliente> => {

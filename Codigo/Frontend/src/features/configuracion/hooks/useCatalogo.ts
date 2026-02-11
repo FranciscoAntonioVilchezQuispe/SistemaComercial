@@ -14,7 +14,6 @@ export const useCatalogo = (codigo: string) => {
     select: (response: any) => {
       // Intenta obtener el array de varias ubicaciones posibles
       const data = response.datos || response.data || (Array.isArray(response) ? response : []);
-      console.log(`Catalogo [${codigo}] raw data:`, data); 
 
       return data.map((item: any, index: number) => {
         // Mapeo exhaustivo de posibles nombres de propiedad para ID y Nombre

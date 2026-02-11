@@ -63,7 +63,7 @@ export default function PaginaProveedores() {
         );
         return (
           <span className="text-xs font-medium text-muted-foreground">
-            {tipo?.nombre || row.idTipoDocumento}
+            {tipo?.codigo || row.idTipoDocumento}
           </span>
         );
       },

@@ -1,12 +1,11 @@
 import { apiCompras } from "@/lib/axios";
 import { Proveedor, ProveedorFormData } from "../types/proveedor.types";
 
-
 const BASE_URL = "/proveedores";
 
 export const obtenerProveedores = async (): Promise<Proveedor[]> => {
   const respuesta: any = await apiCompras.get(BASE_URL);
-  console.log("Respuesta Proveedores:", respuesta); 
+  console.log("Respuesta Proveedores:", respuesta);
   const data = respuesta.datos || respuesta.data || [];
   return data.map((p: any) => ({
     ...p,
@@ -33,7 +32,7 @@ export const crearProveedor = async (
   data: ProveedorFormData,
 ): Promise<Proveedor> => {
   const respuesta: any = await apiCompras.post(BASE_URL, data);
-  return respuesta.data;
+  return respuesta.data || respuesta.datos || respuesta;
 };
 
 export const actualizarProveedor = async (

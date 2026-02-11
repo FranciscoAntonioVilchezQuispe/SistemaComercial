@@ -5,12 +5,12 @@ import { OrdenCompra, OrdenCompraFormData } from "../types/ordenCompra.types";
 // Checking existing service: servicioCompras.ts uses api.get("/compras") which implies axios base url has /api or similar or direct.
 // OrdenCompraEndpoints.cs: group = app.MapGroup("/api/ordenes-compra").
 // servicioCompras.ts: api.get("/compras").
-// If axios baseURL is "...", we usually just append path. 
+// If axios baseURL is "...", we usually just append path.
 // Assuming api instance is configured correctly. If previous service used "/compras", and backend has `/api/ordenes-compra`, I should verify if axios instance adds `/api` prefix automatically or not.
 // Looking at `servicioCompras.ts` again: `api.get("/compras")`.
 // Looking at `OrdenCompraEndpoints.cs`: `app.MapGroup("/api/ordenes-compra")`.
-// If `servicioCompras` works with `/compras`, then there must be an endpoint mapped to `/compras` or `/api/compras`. 
-// Safest bet: Use the full relative path if unsure, or follow convention. 
+// If `servicioCompras` works with `/compras`, then there must be an endpoint mapped to `/compras` or `/api/compras`.
+// Safest bet: Use the full relative path if unsure, or follow convention.
 // However, `servicioCompras.ts` imports `api` from `@/lib/axios`.
 // Let's assume `api.get("/ordenes-compra")` hits `/api/ordenes-compra` if baseURL ends in `/api`, OR I should provide `/ordenes-compra` if baseURL is root.
 // BUT `OrdenCompraEndpoints.cs` maps to `/api/ordenes-compra`.
@@ -31,7 +31,7 @@ export const obtenerOrdenCompra = async (id: number): Promise<OrdenCompra> => {
 };
 
 export const registrarOrdenCompra = async (
-  data: OrdenCompraFormData
+  data: OrdenCompraFormData,
 ): Promise<OrdenCompra> => {
   // Convertir fechas a string si es necesario, o dejar que axios/JSON.stringify lo maneje.
   // El backend espera `OrdenCompraDto`.
@@ -44,17 +44,32 @@ export const registrarOrdenCompra = async (
     // date-fns o native date toISOString
     fechaEmision: data.fechaEmision.toISOString(),
     fechaEntregaEstimada: data.fechaEntregaEstimada?.toISOString(),
-    
-    detalles: data.detalles.map(d => ({
-        idProducto: Number(d.idProducto),
-        cantidadSolicitada: Number(d.cantidadSolicitada),
-        precioUnitarioPactado: Number(d.precioUnitarioPactado),
-        subtotal: Number(d.cantidadSolicitada) * Number(d.precioUnitarioPactado)
+
+    detalles: data.detalles.map((d) => ({
+      idProducto: Number(d.idProducto),
+      cantidadSolicitada: Number(d.cantidadSolicitada),
+      precioUnitarioPactado: Number(d.precioUnitarioPactado),
+      subtotal: Number(d.cantidadSolicitada) * Number(d.precioUnitarioPactado),
     })),
-    
-    totalImporte: data.detalles.reduce((acc, curr) => acc + (Number(curr.cantidadSolicitada) * Number(curr.precioUnitarioPactado)), 0)
+
+    totalImporte: data.detalles.reduce(
+      (acc, curr) =>
+        acc +
+        Number(curr.cantidadSolicitada) * Number(curr.precioUnitarioPactado),
+      0,
+    ),
   };
 
+  console.log("Payload enviado al servidor:", payload);
   const respuesta: any = await api.post("/ordenes-compra", payload);
   return respuesta.datos || respuesta.data;
+};
+
+export const cambiarEstadoOrdenCompra = async (
+  id: number,
+  idEstado: number,
+): Promise<void> => {
+  await api.patch(`/ordenes-compra/${id}/estado`, null, {
+    params: { idEstado },
+  });
 };

@@ -1,24 +1,7 @@
 {
   "Version": 1,
   "WorkspaceRootPath": "E:\\ProyectosNuevos\\SistemaComercial\\Codigo\\Backend\\",
-  "Documents": [
-    {
-      "AbsoluteMoniker": "D:0:0:{0D846B10-689E-4066-892D-D0A064E109DB}|src\\Compras.API\\Compras.API.API\\Compras.API.API.csproj|e:\\proyectosnuevos\\sistemacomercial\\codigo\\backend\\src\\compras.api\\compras.api.api\\compras.api.api.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
-      "RelativeMoniker": "D:0:0:{0D846B10-689E-4066-892D-D0A064E109DB}|src\\Compras.API\\Compras.API.API\\Compras.API.API.csproj|solutionrelative:src\\compras.api\\compras.api.api\\compras.api.api.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{967716CF-AD0A-4597-99FC-E7E58974368C}|src\\Inventario.API\\Inventario.API.Infrastructure\\Inventario.API.Infrastructure.csproj|e:\\proyectosnuevos\\sistemacomercial\\codigo\\backend\\src\\inventario.api\\inventario.api.infrastructure\\inventario.api.infrastructure.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
-      "RelativeMoniker": "D:0:0:{967716CF-AD0A-4597-99FC-E7E58974368C}|src\\Inventario.API\\Inventario.API.Infrastructure\\Inventario.API.Infrastructure.csproj|solutionrelative:src\\inventario.api\\inventario.api.infrastructure\\inventario.api.infrastructure.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{C4FEA3CE-4727-46F0-9E4F-1AB2FF4A5F28}|src\\Inventario.API\\Inventario.API.Application\\Inventario.API.Application.csproj|e:\\proyectosnuevos\\sistemacomercial\\codigo\\backend\\src\\inventario.api\\inventario.api.application\\inventario.api.application.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
-      "RelativeMoniker": "D:0:0:{C4FEA3CE-4727-46F0-9E4F-1AB2FF4A5F28}|src\\Inventario.API\\Inventario.API.Application\\Inventario.API.Application.csproj|solutionrelative:src\\inventario.api\\inventario.api.application\\inventario.api.application.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{19E142A3-C89E-40FB-B656-EEB21DB45260}|src\\Compras.API\\Compras.API.Application\\Compras.API.Application.csproj|e:\\proyectosnuevos\\sistemacomercial\\codigo\\backend\\src\\compras.api\\compras.api.application\\compras.api.application.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
-      "RelativeMoniker": "D:0:0:{19E142A3-C89E-40FB-B656-EEB21DB45260}|src\\Compras.API\\Compras.API.Application\\Compras.API.Application.csproj|solutionrelative:src\\compras.api\\compras.api.application\\compras.api.application.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
-    }
-  ],
+  "Documents": [],
   "DocumentGroupContainers": [
     {
       "Orientation": 0,
@@ -26,7 +9,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 272,
-          "SelectedChildIndex": 7,
+          "SelectedChildIndex": -1,
           "Children": [
             {
               "$type": "Bookmark",
@@ -55,58 +38,6 @@
             {
               "$type": "Bookmark",
               "Name": "ST:128:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "Compras.API.API",
-              "DocumentMoniker": "E:\\ProyectosNuevos\\SistemaComercial\\Codigo\\Backend\\src\\Compras.API\\Compras.API.API\\Compras.API.API.csproj",
-              "RelativeDocumentMoniker": "src\\Compras.API\\Compras.API.API\\Compras.API.API.csproj",
-              "ToolTip": "E:\\ProyectosNuevos\\SistemaComercial\\Codigo\\Backend\\src\\Compras.API\\Compras.API.API\\Compras.API.API.csproj",
-              "RelativeToolTip": "src\\Compras.API\\Compras.API.API\\Compras.API.API.csproj",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
-              "WhenOpened": "2026-01-29T12:07:30.718Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "Inventario.API.Infrastructure",
-              "DocumentMoniker": "E:\\ProyectosNuevos\\SistemaComercial\\Codigo\\Backend\\src\\Inventario.API\\Inventario.API.Infrastructure\\Inventario.API.Infrastructure.csproj",
-              "RelativeDocumentMoniker": "src\\Inventario.API\\Inventario.API.Infrastructure\\Inventario.API.Infrastructure.csproj",
-              "ToolTip": "E:\\ProyectosNuevos\\SistemaComercial\\Codigo\\Backend\\src\\Inventario.API\\Inventario.API.Infrastructure\\Inventario.API.Infrastructure.csproj",
-              "RelativeToolTip": "src\\Inventario.API\\Inventario.API.Infrastructure\\Inventario.API.Infrastructure.csproj",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
-              "WhenOpened": "2026-01-29T12:07:28.688Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "Inventario.API.Application",
-              "DocumentMoniker": "E:\\ProyectosNuevos\\SistemaComercial\\Codigo\\Backend\\src\\Inventario.API\\Inventario.API.Application\\Inventario.API.Application.csproj",
-              "RelativeDocumentMoniker": "src\\Inventario.API\\Inventario.API.Application\\Inventario.API.Application.csproj",
-              "ToolTip": "E:\\ProyectosNuevos\\SistemaComercial\\Codigo\\Backend\\src\\Inventario.API\\Inventario.API.Application\\Inventario.API.Application.csproj",
-              "RelativeToolTip": "src\\Inventario.API\\Inventario.API.Application\\Inventario.API.Application.csproj",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
-              "WhenOpened": "2026-01-29T12:07:24.694Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "Compras.API.Application",
-              "DocumentMoniker": "E:\\ProyectosNuevos\\SistemaComercial\\Codigo\\Backend\\src\\Compras.API\\Compras.API.Application\\Compras.API.Application.csproj",
-              "RelativeDocumentMoniker": "src\\Compras.API\\Compras.API.Application\\Compras.API.Application.csproj",
-              "ToolTip": "E:\\ProyectosNuevos\\SistemaComercial\\Codigo\\Backend\\src\\Compras.API\\Compras.API.Application\\Compras.API.Application.csproj",
-              "RelativeToolTip": "src\\Compras.API\\Compras.API.Application\\Compras.API.Application.csproj",
-              "ViewState": "AgIAAAwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
-              "WhenOpened": "2026-01-29T12:06:59.033Z",
-              "EditorCaption": ""
             }
           ]
         },

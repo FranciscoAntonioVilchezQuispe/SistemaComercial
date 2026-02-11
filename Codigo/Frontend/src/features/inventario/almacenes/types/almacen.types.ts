@@ -3,14 +3,14 @@ export interface Almacen {
   nombreAlmacen: string; // Changed from nombre
   direccion?: string;
   esPrincipal: boolean;
-  activo: boolean;
+  activado: boolean;
   fechaCreacion: string;
 }
 
 export interface AlmacenFormData {
   id?: number;
-  nombreAlmacen: string; // Changed from nombre
+  nombreAlmacen: string;
   direccion?: string;
   esPrincipal?: boolean;
-  activo?: boolean;
+  activado?: boolean;
 }

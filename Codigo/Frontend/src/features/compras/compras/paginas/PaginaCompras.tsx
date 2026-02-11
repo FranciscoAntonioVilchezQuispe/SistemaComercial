@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Plus, Eye, ShoppingBag } from "lucide-react";
-import { format } from "date-fns";
+import { useLocation } from "react-router-dom";
+import { formatFecha } from "@/lib/i18n";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -29,21 +30,50 @@ import { Compra } from "../types/compra.types";
 import { CompraForm } from "../componentes/CompraForm"; // Form component for creating
 
 export default function PaginaCompras() {
-  const [dialogoOpen, setDialogoOpen] = useState(false);
+  const location = useLocation();
+  const [dialogoOpen, setDialogoOpen] = setDistate(false);
   const [compraSeleccionada, setCompraSeleccionada] = useState<Compra | null>(
     null,
   ); // For viewing details
   const [modoCreacion, setModoCreacion] = useState(false);
+  const [datosIniciales, setDatosIniciales] = useState<any>(null);
   const [filtro, setFiltro] = useState("");
 
   const { data: compras, isLoading, error } = useCompras();
+
+  useEffect(() => {
+    const state = location.state as { orden?: any };
+    if (state?.orden) {
+      const orden = state.orden;
+      // Mapear OrdenCompra a CompraFormValues
+      const iniciales = {
+        idProveedor: orden.idProveedor,
+        idAlmacen: orden.idAlmacenDestino,
+        observaciones: `Carga desde Orden ${orden.codigoOrden}. ${orden.observaciones || ""}`,
+        detalles: orden.detalles.map((d: any) => ({
+          idProducto: d.idProducto,
+          cantidad: d.cantidadSolicitada,
+          precioUnitario: d.precioUnitarioPactado,
+        })),
+      };
+      setDatosIniciales(iniciales);
+      setModoCreacion(true);
+      setDialogoOpen(true);
+      // Limpiar el estado para no re-abrir al refrescar o navegar
+      window.history.replaceState({}, document.title);
+    }
+  }, [location]);
+
+  // Fix typo in setDialogoOpen
+  function setDistate(val: boolean) {
+    setDialogoOpen(val);
+  }
 
   const comprasFiltradas =
     compras?.filter(
       (c) =>
         c.serieComprobante.includes(filtro) ||
         c.numeroComprobante.includes(filtro) ||
-        // Assuming we might have expanded data or filtering by ID
         c.id.toString().includes(filtro),
     ) || [];
 
@@ -51,14 +81,11 @@ export default function PaginaCompras() {
     {
       header: "Fecha",
       accessorKey: "fechaEmision" as keyof Compra,
-      cell: (row: Compra) => format(new Date(row.fechaEmision), "dd/MM/yyyy"),
+      cell: (row: Compra) =>
+        formatFecha(new Date(row.fechaEmision), "dd/MM/yyyy"),
     },
     {
       header: "Proveedor",
-      // accessorKey: "idProveedor", // We ideally want the name.
-      // If the backend returns expanded DTOs (razonSocialProveedor), use that.
-      // If not, we need to fetch providers or just show ID for now.
-      // The type definition had `razonSocialProveedor?: string`. Let's assume it's populated for the list.
       accessorKey: "razonSocialProveedor" as keyof Compra,
       cell: (row: Compra) =>
         row.razonSocialProveedor || `Prov. #${row.idProveedor}`,
@@ -101,8 +128,6 @@ export default function PaginaCompras() {
             variant="ghost"
             size="icon"
             onClick={() => {
-              // TODO: Implement View Detail Mode
-              // For now, maybe just show JSON or a readonly form
               setCompraSeleccionada(row);
               setModoCreacion(false);
               setDialogoOpen(true);
@@ -148,6 +173,7 @@ export default function PaginaCompras() {
             <Button
               onClick={() => {
                 setCompraSeleccionada(null);
+                setDatosIniciales(null);
                 setModoCreacion(true);
                 setDialogoOpen(true);
               }}
@@ -170,6 +196,7 @@ export default function PaginaCompras() {
 
           {modoCreacion ? (
             <CompraForm
+              datosIniciales={datosIniciales}
               onSuccess={() => {
                 toast.success("Compra registrada exitosamente");
                 setDialogoOpen(false);
@@ -178,9 +205,32 @@ export default function PaginaCompras() {
             />
           ) : (
             <div className="p-4 bg-muted/20 rounded text-sm">
-              <h4 className="font-bold">Resumen Documento</h4>
-              <pre>{JSON.stringify(compraSeleccionada, null, 2)}</pre>
-              {/* TODO: Create CompraDetail component */}
+              <h4 className="font-bold border-b pb-2 mb-4">
+                Resumen Documento
+              </h4>
+              {/* Simple display for now, ideally a detail view component */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <strong>Comprobante:</strong>{" "}
+                  {compraSeleccionada?.serieComprobante}-
+                  {compraSeleccionada?.numeroComprobante}
+                </div>
+                <div>
+                  <strong>Fecha:</strong>{" "}
+                  {compraSeleccionada?.fechaEmision &&
+                    formatFecha(
+                      new Date(compraSeleccionada.fechaEmision),
+                      "PPPP",
+                    )}
+                </div>
+                <div>
+                  <strong>Proveedor:</strong>{" "}
+                  {compraSeleccionada?.razonSocialProveedor}
+                </div>
+                <div>
+                  <strong>Total:</strong> {compraSeleccionada?.total.toFixed(2)}
+                </div>
+              </div>
             </div>
           )}
         </DialogContent>

@@ -30,29 +30,48 @@ namespace Compras.API.Endpoints
 
             grupo.MapPost("/", async (OrdenCompraDto dto, IOrdenCompraRepositorio repo) =>
             {
-                var orden = new OrdenCompra
+                try
                 {
-                    CodigoOrden = dto.CodigoOrden,
-                    IdProveedor = dto.IdProveedor,
-                    IdAlmacenDestino = dto.IdAlmacenDestino,
-                    FechaEmision = dto.FechaEmision,
-                    FechaEntregaEstimada = dto.FechaEntregaEstimada,
-                    IdEstado = dto.IdEstado,
-                    TotalImporte = dto.TotalImporte,
-                    Observaciones = dto.Observaciones,
-                    UsuarioCreacion = "SISTEMA",
-                    Detalles = dto.Detalles.Select(d => new DetalleOrdenCompra
+                    var orden = new OrdenCompra
                     {
-                        IdProducto = d.IdProducto,
-                        IdVariante = d.IdVariante,
-                        CantidadSolicitada = d.CantidadSolicitada,
-                        PrecioUnitarioPactado = d.PrecioUnitarioPactado,
-                        Subtotal = d.Subtotal,
-                        UsuarioCreacion = "SISTEMA"
-                    }).ToList()
-                };
-                var creado = await repo.AgregarAsync(orden);
-                return Results.Created($"/api/ordenes-compra/{creado.Id}", new ToReturn<OrdenCompra>(creado));
+                        CodigoOrden = dto.CodigoOrden,
+                        IdProveedor = dto.IdProveedor,
+                        IdAlmacenDestino = dto.IdAlmacenDestino,
+                        FechaEmision = DateTime.SpecifyKind(dto.FechaEmision, DateTimeKind.Utc),
+                        FechaEntregaEstimada = dto.FechaEntregaEstimada.HasValue
+                            ? DateTime.SpecifyKind(dto.FechaEntregaEstimada.Value, DateTimeKind.Utc)
+                            : null,
+                        IdEstado = dto.IdEstado,
+                        TotalImporte = dto.TotalImporte,
+                        Observaciones = dto.Observaciones,
+                        UsuarioCreacion = "SISTEMA",
+                        Detalles = dto.Detalles.Select(d => new DetalleOrdenCompra
+                        {
+                            IdProducto = d.IdProducto,
+                            IdVariante = d.IdVariante,
+                            CantidadSolicitada = d.CantidadSolicitada,
+                            PrecioUnitarioPactado = d.PrecioUnitarioPactado,
+                            Subtotal = d.Subtotal,
+                            CantidadRecibida = 0,
+                            UsuarioCreacion = "SISTEMA"
+                        }).ToList()
+                    };
+                    var creado = await repo.AgregarAsync(orden);
+                    // Retornar objeto simplificado para evitar ciclos de serialización
+                    var resultado = new { creado.Id, creado.CodigoOrden };
+                    return Results.Created($"/api/ordenes-compra/{creado.Id}", new ToReturn<object>(resultado));
+                }
+                catch (System.Exception ex)
+                {
+                    var mensaje = ex.InnerException?.Message ?? ex.Message;
+                    return Results.Json(new { error = mensaje, detalle = ex.ToString() }, statusCode: 500);
+                }
+            });
+
+            grupo.MapPatch("/{id}/estado", async (long id, long idEstado, IOrdenCompraRepositorio repo) =>
+            {
+                await repo.ActualizarEstadoAsync(id, idEstado);
+                return Results.NoContent();
             });
         }
     }

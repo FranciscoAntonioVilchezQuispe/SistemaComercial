@@ -66,7 +66,7 @@ export const SelectorCatalogo: React.FC<SelectorCatalogoProps> = ({
               No hay opciones disponibles
             </SelectItem>
           )}
-          {valores?.map((item) => (
+          {(valores as any[])?.map((item: any) => (
             <SelectItem key={item.id} value={item.id.toString()}>
               {item.nombre}
             </SelectItem>
