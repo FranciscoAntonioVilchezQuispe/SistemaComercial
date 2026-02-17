@@ -17,12 +17,15 @@ import { Loader2 } from "lucide-react";
 
 interface SelectorCatalogoProps {
   codigo: string;
-  label: string;
+  label?: string;
   placeholder?: string;
+
   value?: string | number;
   onChange: (value: string) => void;
   error?: string;
   disabled?: boolean;
+  hideLabel?: boolean;
+  soloCodigo?: boolean;
 }
 
 export const SelectorCatalogo: React.FC<SelectorCatalogoProps> = ({
@@ -32,12 +35,15 @@ export const SelectorCatalogo: React.FC<SelectorCatalogoProps> = ({
   value,
   onChange,
   disabled = false,
+  hideLabel = false,
+  soloCodigo = false,
 }) => {
   const { data: valores, isLoading, isError } = useCatalogo(codigo);
 
   return (
     <FormItem>
-      <FormLabel>{label}</FormLabel>
+      {!hideLabel && <FormLabel>{label}</FormLabel>}
+
       <Select
         onValueChange={onChange}
         value={value?.toString()}
@@ -48,7 +54,11 @@ export const SelectorCatalogo: React.FC<SelectorCatalogoProps> = ({
             {isLoading ? (
               <div className="flex items-center gap-2">
                 <Loader2 className="h-4 w-4 animate-spin" />
-                <span>Cargando...</span>
+                <span>...</span>
+              </div>
+            ) : soloCodigo ? (
+              <div className="flex items-center justify-center w-full">
+                <span>{value || ""}</span>
               </div>
             ) : (
               <SelectValue placeholder={placeholder} />

@@ -23,6 +23,119 @@ namespace Configuracion.API.Infrastructure.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("Configuracion.API.Domain.Entidades.DocumentoComprobanteRelacion", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_relacion");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<bool>("Activado")
+                        .HasColumnType("boolean")
+                        .HasColumnName("activado");
+
+                    b.Property<string>("CodigoDocumento")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)")
+                        .HasColumnName("codigo_documento");
+
+                    b.Property<DateTime?>("FechaActualizacion")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fecha_modificacion");
+
+                    b.Property<DateTime>("FechaCreacion")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fecha_creacion");
+
+                    b.Property<long>("IdTipoComprobante")
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_tipo_comprobante");
+
+                    b.Property<string>("UsuarioActualizacion")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("usuario_modificacion");
+
+                    b.Property<string>("UsuarioCreacion")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("usuario_creacion");
+
+                    b.HasKey("Id")
+                        .HasName("pk_regla_documento_comprobante");
+
+                    b.HasIndex("IdTipoComprobante")
+                        .HasDatabaseName("ix_regla_documento_comprobante_id_tipo_comprobante");
+
+                    b.ToTable("regla_documento_comprobante", "configuracion");
+                });
+
+            modelBuilder.Entity("Configuracion.API.Domain.Entidades.DocumentoIdentidadRegla", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_regla");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<bool>("Activado")
+                        .HasColumnType("boolean")
+                        .HasColumnName("activado");
+
+                    b.Property<string>("Codigo")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)")
+                        .HasColumnName("codigo");
+
+                    b.Property<bool>("EsNumerico")
+                        .HasColumnType("boolean")
+                        .HasColumnName("es_numerico");
+
+                    b.Property<bool>("Estado")
+                        .HasColumnType("boolean")
+                        .HasColumnName("estado");
+
+                    b.Property<DateTime?>("FechaActualizacion")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fecha_modificacion");
+
+                    b.Property<DateTime>("FechaCreacion")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fecha_creacion");
+
+                    b.Property<int>("Longitud")
+                        .HasColumnType("integer")
+                        .HasColumnName("longitud");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("nombre");
+
+                    b.Property<string>("UsuarioActualizacion")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("usuario_modificacion");
+
+                    b.Property<string>("UsuarioCreacion")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("usuario_creacion");
+
+                    b.HasKey("Id")
+                        .HasName("pk_tipo_documento");
+
+                    b.ToTable("tipo_documento", "configuracion");
+                });
+
             modelBuilder.Entity("Configuracion.API.Domain.Entidades.Empresa", b =>
                 {
                     b.Property<long>("Id")
@@ -163,9 +276,9 @@ namespace Configuracion.API.Infrastructure.Migrations
                         .HasColumnName("usuario_creacion");
 
                     b.HasKey("Id")
-                        .HasName("pk_impuestos");
+                        .HasName("pk_impuesto");
 
-                    b.ToTable("impuestos", "configuracion");
+                    b.ToTable("impuesto", "configuracion");
                 });
 
             modelBuilder.Entity("Configuracion.API.Domain.Entidades.MetodoPago", b =>
@@ -221,9 +334,9 @@ namespace Configuracion.API.Infrastructure.Migrations
                         .HasColumnName("usuario_creacion");
 
                     b.HasKey("Id")
-                        .HasName("pk_metodos_pago");
+                        .HasName("pk_metodo_pago");
 
-                    b.ToTable("metodos_pago", "configuracion");
+                    b.ToTable("metodo_pago", "configuracion");
                 });
 
             modelBuilder.Entity("Configuracion.API.Domain.Entidades.ParametroConfiguracion", b =>
@@ -401,12 +514,12 @@ namespace Configuracion.API.Infrastructure.Migrations
                         .HasColumnName("usuario_creacion");
 
                     b.HasKey("Id")
-                        .HasName("pk_sucursales");
+                        .HasName("pk_sucursal");
 
                     b.HasIndex("IdEmpresa")
-                        .HasDatabaseName("ix_sucursales_id_empresa");
+                        .HasDatabaseName("ix_sucursal_id_empresa");
 
-                    b.ToTable("sucursales", "configuracion");
+                    b.ToTable("sucursal", "configuracion");
                 });
 
             modelBuilder.Entity("Configuracion.API.Domain.Entidades.TablaGeneral", b =>
@@ -588,9 +701,21 @@ namespace Configuracion.API.Infrastructure.Migrations
                         .HasColumnName("usuario_creacion");
 
                     b.HasKey("Id")
-                        .HasName("pk_tipos_comprobantes");
+                        .HasName("pk_tipo_comprobante");
 
-                    b.ToTable("tipos_comprobantes", "configuracion");
+                    b.ToTable("tipo_comprobante", "configuracion");
+                });
+
+            modelBuilder.Entity("Configuracion.API.Domain.Entidades.DocumentoComprobanteRelacion", b =>
+                {
+                    b.HasOne("Configuracion.API.Domain.Entidades.TipoComprobante", "TipoComprobante")
+                        .WithMany()
+                        .HasForeignKey("IdTipoComprobante")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_regla_documento_comprobante_tipo_comprobante_id_tipo_compro");
+
+                    b.Navigation("TipoComprobante");
                 });
 
             modelBuilder.Entity("Configuracion.API.Domain.Entidades.SerieComprobante", b =>
@@ -600,7 +725,7 @@ namespace Configuracion.API.Infrastructure.Migrations
                         .HasForeignKey("IdTipoComprobante")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("fk_series_comprobantes_tipos_comprobantes_id_tipo_comprobante");
+                        .HasConstraintName("fk_series_comprobantes_tipo_comprobante_id_tipo_comprobante");
 
                     b.Navigation("TipoComprobante");
                 });
@@ -612,7 +737,7 @@ namespace Configuracion.API.Infrastructure.Migrations
                         .HasForeignKey("IdEmpresa")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("fk_sucursales_empresa_id_empresa");
+                        .HasConstraintName("fk_sucursal_empresa_id_empresa");
 
                     b.Navigation("Empresa");
                 });

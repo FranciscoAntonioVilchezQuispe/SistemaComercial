@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Configuracion.API.Domain.Entidades
 {
-    [Table("metodos_pago", Schema = "configuracion")]
+    [Table("metodo_pago", Schema = "configuracion")]
     public class MetodoPago : EntidadBase
     {
         [Column("id_metodo_pago")]

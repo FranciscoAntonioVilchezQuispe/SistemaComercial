@@ -26,6 +26,9 @@ export interface MovimientoInventario {
   tipoMovimiento?: string; // Entrada, Salida, Ajuste, Traslado
   cantidad: number;
   precioCosto?: number;
+  saldoCantidad: number;
+  saldoValorizado: number;
+  costoPromedioActual: number;
   fecha: string;
   idUsuario: number;
   usuario?: string;

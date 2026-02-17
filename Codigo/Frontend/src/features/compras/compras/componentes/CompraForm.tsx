@@ -34,13 +34,17 @@ import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 
 import { useRegistrarCompra } from "../hooks/useCompras";
+import { SelectorTipoComprobante } from "@/compartido/componentes/formularios/SelectorTipoComprobante";
 import { SelectorCatalogo } from "@/compartido/componentes/formularios/SelectorCatalogo";
 // Importamos los hooks de los otros módulos para los selectores
 import { useProveedores } from "@/features/compras/proveedores/hooks/useProveedores";
 import { useAlmacenes } from "@/features/inventario/almacenes/hooks/useAlmacenes";
 import { useProductos } from "@/features/catalogo/hooks/useProductos";
 
+import { limpiarSoloNumeros, padIzquierda } from "@/lib/i18n";
+
 // Schema de validación
+
 const compraSchema = z.object({
   idProveedor: z.coerce.number().min(1, "Seleccione un proveedor"),
   idAlmacen: z.coerce.number().min(1, "Seleccione un almacén"),
@@ -157,12 +161,31 @@ const ProductInput = ({
   );
 };
 
+import { SelectorProveedorV2 } from "@/compartido/componentes/formularios/SelectorProveedorV2";
+import { useReglasDocumentos } from "@/configuracion/hooks/useReglasDocumentos";
+
+import { obtenerOrdenesCompra } from "@/features/compras/ordenes-compra/servicios/ordenCompraService";
+
+import {
+  EstadoOrdenCompra,
+  ComprasConstantes,
+} from "@/features/compras/constantes";
+import { toast } from "sonner";
+import { Search } from "lucide-react";
+import { CrearCompraPayload } from "../types/compra.types";
+
+// Eliminamos ProviderSelector local que estaba aquí
+
+// ... (imports existentes)
+
 export function CompraForm({
   onSuccess,
   onCancel,
   datosIniciales,
 }: CompraFormProps) {
   const registrar = useRegistrarCompra();
+  const [busquedaOrden, setBusquedaOrden] = React.useState("");
+  const [buscandoOrden, setBuscandoOrden] = React.useState(false);
 
   // Data for selectors
   const { data: proveedores } = useProveedores();
@@ -170,29 +193,188 @@ export function CompraForm({
   const { data: productosData } = useProductos({
     pageNumber: 1,
     pageSize: 1000,
-  }); // Carga simplificada por ahora
+  });
   const productos = productosData?.datos || [];
 
   const form = useForm<CompraFormValues>({
     resolver: zodResolver(compraSchema),
     defaultValues: {
+      idProveedor: 0,
+      idAlmacen: 0,
+      idMoneda: 1, // Soles por defecto
+
+      tipoComprobante: "",
+      serieComprobante: "",
+      numeroComprobante: "",
       fechaEmision: new Date(),
       tipoCambio: 1.0,
+      observaciones: "",
       detalles: [{ idProducto: 0, cantidad: 1, precioUnitario: 0 }],
       ...datosIniciales,
     },
   });
 
-  const { fields, append, remove } = useFieldArray({
+  const { fields, append, remove, replace } = useFieldArray({
     control: form.control,
     name: "detalles",
   });
 
+  // Efecto para cargar datosIniciales si cambian (por ejemplo, al venir de redirección)
+  React.useEffect(() => {
+    if (datosIniciales) {
+      form.reset({
+        fechaEmision: new Date(),
+        tipoCambio: 1.0,
+        ...datosIniciales,
+      });
+    }
+  }, [datosIniciales, form]);
+
+  const handleBuscarOrden = async (
+    e: React.KeyboardEvent<HTMLInputElement>,
+  ) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      if (!busquedaOrden.trim()) return;
+
+      setBuscandoOrden(true);
+      try {
+        // Obtenemos todas las órdenes (idealmente habría un endpoint de búsqueda directa)
+        const ordenes = await obtenerOrdenesCompra();
+        const ordenEncontrada = ordenes.find(
+          (o) =>
+            o.codigoOrden.toLowerCase() === busquedaOrden.toLowerCase().trim(),
+        );
+
+        if (!ordenEncontrada) {
+          toast.error("No se encontró ninguna orden con ese código.");
+          setBuscandoOrden(false);
+          return;
+        }
+
+        if (ordenEncontrada.idEstado !== EstadoOrdenCompra.Aprobada) {
+          toast.warning("La orden encontrada no está aprobada.");
+          setBuscandoOrden(false);
+          return;
+        }
+
+        // Llenar el formulario
+        form.setValue("idProveedor", ordenEncontrada.idProveedor);
+        form.setValue("idAlmacen", ordenEncontrada.idAlmacenDestino);
+        form.setValue(
+          "observaciones",
+          `Orden de Compra: ${ordenEncontrada.codigoOrden}`,
+        );
+
+        // Mapear detalles
+        const nuevosDetalles = ordenEncontrada.detalles.map((d) => ({
+          idProducto: d.idProducto,
+          cantidad: d.cantidadSolicitada,
+          precioUnitario: d.precioUnitarioPactado,
+        }));
+
+        replace(nuevosDetalles);
+        toast.success(
+          `Datos cargados de la Orden ${ordenEncontrada.codigoOrden}`,
+        );
+      } catch (error) {
+        console.error(error);
+        toast.error("Error al buscar la orden de compra.");
+      } finally {
+        setBuscandoOrden(false);
+      }
+    }
+  };
+
   const onSubmit = (values: CompraFormValues) => {
-    registrar.mutate(values, {
+    // Calcular totales
+    const subtotal = values.detalles.reduce((acc, curr) => {
+      return (
+        acc + (Number(curr.cantidad) || 0) * (Number(curr.precioUnitario) || 0)
+      );
+    }, 0);
+
+    const impuesto = subtotal * 0.18; // Asumiendo 18%
+    const total = subtotal + impuesto;
+
+    // Construir payload que coincida con CompraDto del backend
+    const payload: CrearCompraPayload = {
+      idProveedor: values.idProveedor,
+      idAlmacen: values.idAlmacen,
+      idOrdenCompraRef: null, // O mapearlo si existe
+      idTipoComprobante: Number(values.tipoComprobante), // Convertir a number
+      serieComprobante: values.serieComprobante,
+      numeroComprobante: values.numeroComprobante,
+      fechaEmision: values.fechaEmision,
+      fechaContable: values.fechaEmision, // Usar misma fecha por defecto
+      moneda: "PEN", // TODO: Mapear idMoneda a código si es necesario. Por ahora default 'PEN'
+      tipoCambio: values.tipoCambio,
+      subtotal: subtotal,
+      impuesto: impuesto,
+      total: total,
+      saldoPendiente: total, // Inicialmente el saldo es el total
+      idEstadoPago: 1, // 1: Pendiente (Asumiendo ID)
+      observaciones: values.observaciones,
+      detalles: values.detalles.map((d) => ({
+        idProducto: d.idProducto,
+        idVariante: null,
+        descripcion: "", // Backend lo puede llenar o dejar vacío
+        cantidad: d.cantidad,
+        precioUnitarioCompra: d.precioUnitario, // Mapeo clave
+        subtotal: d.cantidad * d.precioUnitario,
+      })),
+    };
+
+    registrar.mutate(payload, {
       onSuccess: () => onSuccess(),
     });
   };
+
+  const [busquedaProv, setBusquedaProv] = React.useState("");
+  const proveedoresFiltrados = React.useMemo(() => {
+    if (!busquedaProv) return [];
+    return (
+      proveedores?.filter(
+        (p) =>
+          p.razonSocial.toLowerCase().includes(busquedaProv.toLowerCase()) ||
+          p.numeroDocumento.includes(busquedaProv),
+      ) || []
+    );
+  }, [proveedores, busquedaProv]);
+
+  // Reglas de Negocio SUNAT y Bloqueos
+  const idProveedor = form.watch("idProveedor");
+  const { data: configReglas } = useReglasDocumentos();
+
+  const proveedorSeleccionado = React.useMemo(
+    () => proveedores?.find((p) => p.id === idProveedor),
+    [proveedores, idProveedor],
+  );
+
+  const seccionBloqueada = !idProveedor || idProveedor === 0;
+
+  // Relaciones dinámicas
+  const relacionesDoc = React.useMemo(() => {
+    if (!configReglas?.relaciones) return {};
+    return configReglas.relaciones.reduce((acc: any, curr) => {
+      if (!acc[curr.codigoDocumento]) acc[curr.codigoDocumento] = [];
+      acc[curr.codigoDocumento].push(curr.idTipoComprobante.toString());
+      return acc;
+    }, {});
+  }, [configReglas]);
+
+  // Forzar Factura si es RUC (6) o aplicar regla de relación
+  React.useEffect(() => {
+    if (proveedorSeleccionado) {
+      const tipoDoc = proveedorSeleccionado.idTipoDocumento.toString();
+      const permitidos = relacionesDoc[tipoDoc] || [];
+
+      // Si solo permite uno (ej. RUC -> Factura), lo forzamos
+      if (permitidos.length === 1) {
+        form.setValue("tipoComprobante", permitidos[0]);
+      }
+    }
+  }, [proveedorSeleccionado, relacionesDoc, form]);
 
   // Calcular totales en tiempo real
   const valoresDetalles = form.watch("detalles");
@@ -205,27 +387,50 @@ export function CompraForm({
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        {/* Buscador de Orden de Compra */}
+        <div className="bg-blue-50/50 p-4 rounded-lg border border-blue-100 flex items-center gap-4">
+          <div className="flex-1 max-w-md relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Escriba código de Orden de Compra y presione Enter (ej. OC-001)..."
+              className="pl-9 bg-white"
+              value={busquedaOrden}
+              onChange={(e) => setBusquedaOrden(e.target.value)}
+              onKeyDown={handleBuscarOrden}
+              disabled={buscandoOrden}
+            />
+          </div>
+          {buscandoOrden && (
+            <span className="text-sm text-muted-foreground animate-pulse">
+              Buscando...
+            </span>
+          )}
+          <div className="text-sm text-muted-foreground">
+            <span className="font-semibold text-blue-700">Tip:</span> Presione
+            Enter para cargar los datos automáticamente.
+          </div>
+        </div>
+
         {/* Cabecera del Documento */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <FormField
             control={form.control}
             name="idProveedor"
             render={({ field }) => (
-              <FormItem className="col-span-2">
+              <FormItem className="col-span-3">
                 <FormLabel>Proveedor</FormLabel>
                 <FormControl>
-                  <select
-                    className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                  <SelectorProveedorV2
                     value={field.value}
-                    onChange={(e) => field.onChange(Number(e.target.value))}
-                  >
-                    <option value={0}>Seleccione Proveedor</option>
-                    {proveedores?.map((p) => (
-                      <option key={p.id} value={p.id}>
-                        {p.razonSocial}
-                      </option>
-                    ))}
-                  </select>
+                    onChange={(p) => {
+                      field.onChange(p?.id || 0);
+                      if (!p) {
+                        form.setValue("tipoComprobante", "");
+                      }
+                    }}
+                    proveedores={proveedoresFiltrados}
+                    onSearch={setBusquedaProv}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -236,7 +441,7 @@ export function CompraForm({
             control={form.control}
             name="idAlmacen"
             render={({ field }) => (
-              <FormItem>
+              <FormItem className="col-span-1">
                 <FormLabel>Almacén Destino</FormLabel>
                 <FormControl>
                   <select
@@ -306,23 +511,22 @@ export function CompraForm({
             control={form.control}
             name="tipoComprobante"
             render={({ field }) => (
-              <SelectorCatalogo
-                codigo="TIPO_COMPROBANTE"
+              <SelectorTipoComprobante
                 label="Tipo Comprobante"
-                value={field.value} // SelectorCatalogo expects number usually but string here?
-                // Wait, SelectorCatalogo usually returns ID (number).
-                // Let's assume TIPO_COMPROBANTE is a table and returns ID.
-                // But our schema expects string?
-                // Let's adjust schema if needed or just use input for now.
-                // Actually, let's use a simple Select or Input for simplicity first iteration.
-                // Or reuse SelectorCatalogo and change input to number.
-                // To keep it simple and robust, let's use a standard select hardcoded or Input.
+                value={field.value}
                 onChange={(val) => field.onChange(val.toString())}
                 placeholder="Tipo (Factura)"
+                disabled={
+                  seccionBloqueada ||
+                  (proveedorSeleccionado &&
+                    relacionesDoc[
+                      proveedorSeleccionado.idTipoDocumento.toString()
+                    ]?.length === 1)
+                }
               />
             )}
           />
-          {/* NOTE: SelectorCatalogo might be strict on types. Let's use Input for simplicity if catalog not ready */}
+
           <FormField
             control={form.control}
             name="serieComprobante"
@@ -330,12 +534,17 @@ export function CompraForm({
               <FormItem>
                 <FormLabel>Serie</FormLabel>
                 <FormControl>
-                  <Input {...field} placeholder="F001" />
+                  <Input
+                    {...field}
+                    placeholder="F001"
+                    disabled={seccionBloqueada}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
+
           <FormField
             control={form.control}
             name="numeroComprobante"
@@ -343,22 +552,32 @@ export function CompraForm({
               <FormItem>
                 <FormLabel>Número</FormLabel>
                 <FormControl>
-                  <Input {...field} placeholder="000123" />
+                  <Input
+                    {...field}
+                    placeholder="000123"
+                    onChange={(e) =>
+                      field.onChange(limpiarSoloNumeros(e.target.value))
+                    }
+                    onBlur={() => field.onChange(padIzquierda(field.value))}
+                    disabled={seccionBloqueada}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
+
           <FormField
             control={form.control}
             name="idMoneda"
             render={({ field }) => (
               <SelectorCatalogo
-                codigo="MONEDA"
+                codigo={ComprasConstantes.TablasGenerales.TIPO_MONEDA}
                 label="Moneda"
                 value={field.value}
-                onChange={(val) => field.onChange(Number(val))}
+                onChange={(val: string) => field.onChange(Number(val))}
                 placeholder="Soles/Dólares"
+                disabled={seccionBloqueada}
               />
             )}
           />
@@ -423,8 +642,9 @@ export function CompraForm({
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel className={index !== 0 ? "sr-only" : ""}>
-                          Precio Unit.
+                          Precio Unit. (Sin IGV)
                         </FormLabel>
+
                         <FormControl>
                           <Input type="number" step="0.01" {...field} />
                         </FormControl>

@@ -53,6 +53,10 @@ namespace Inventario.API.Infrastructure.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("fecha_creacion");
 
+                    b.Property<long>("IdSucursal")
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_sucursal");
+
                     b.Property<string>("NombreAlmacen")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -101,6 +105,10 @@ namespace Inventario.API.Infrastructure.Migrations
                         .HasColumnType("decimal(10,3)")
                         .HasColumnName("cantidad_nueva");
 
+                    b.Property<decimal>("CostoPromedioActual")
+                        .HasColumnType("decimal(12,4)")
+                        .HasColumnName("costo_promedio_actual");
+
                     b.Property<decimal?>("CostoUnitarioMovimiento")
                         .HasColumnType("decimal(12,4)")
                         .HasColumnName("costo_unitario_movimiento");
@@ -133,6 +141,14 @@ namespace Inventario.API.Infrastructure.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)")
                         .HasColumnName("referencia_modulo");
+
+                    b.Property<decimal>("SaldoCantidad")
+                        .HasColumnType("decimal(10,3)")
+                        .HasColumnName("saldo_cantidad");
+
+                    b.Property<decimal>("SaldoValorizado")
+                        .HasColumnType("decimal(12,2)")
+                        .HasColumnName("saldo_valorizado");
 
                     b.Property<string>("UsuarioActualizacion")
                         .HasMaxLength(50)
@@ -200,6 +216,10 @@ namespace Inventario.API.Infrastructure.Migrations
                         .HasColumnType("decimal(10,3)")
                         .HasColumnName("cantidad_reservada");
 
+                    b.Property<decimal>("CostoPromedio")
+                        .HasColumnType("decimal(12,4)")
+                        .HasColumnName("costo_promedio");
+
                     b.Property<DateTime?>("FechaActualizacion")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("fecha_modificacion");
@@ -235,6 +255,10 @@ namespace Inventario.API.Infrastructure.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)")
                         .HasColumnName("usuario_creacion");
+
+                    b.Property<decimal>("ValorTotal")
+                        .HasColumnType("decimal(12,2)")
+                        .HasColumnName("valor_total");
 
                     b.HasKey("Id")
                         .HasName("pk_stock");

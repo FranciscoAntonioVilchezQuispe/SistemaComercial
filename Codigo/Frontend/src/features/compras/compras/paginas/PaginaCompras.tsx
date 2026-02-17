@@ -31,7 +31,7 @@ import { CompraForm } from "../componentes/CompraForm"; // Form component for cr
 
 export default function PaginaCompras() {
   const location = useLocation();
-  const [dialogoOpen, setDialogoOpen] = setDistate(false);
+  const [dialogoOpen, setDialogoOpen] = useState(false);
   const [compraSeleccionada, setCompraSeleccionada] = useState<Compra | null>(
     null,
   ); // For viewing details
@@ -63,11 +63,6 @@ export default function PaginaCompras() {
       window.history.replaceState({}, document.title);
     }
   }, [location]);
-
-  // Fix typo in setDialogoOpen
-  function setDistate(val: boolean) {
-    setDialogoOpen(val);
-  }
 
   const comprasFiltradas =
     compras?.filter(

@@ -288,6 +288,10 @@ namespace Compras.API.Infrastructure.Migrations
                         .HasColumnType("character varying(20)")
                         .HasColumnName("codigo_orden");
 
+                    b.Property<long?>("CompraId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("compra_id");
+
                     b.Property<DateTime?>("FechaActualizacion")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("fecha_modificacion");

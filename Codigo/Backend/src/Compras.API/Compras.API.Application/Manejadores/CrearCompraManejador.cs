@@ -58,11 +58,24 @@ namespace Compras.API.Application.Manejadores
             _context.Compras.Add(compra);
             await _context.SaveChangesAsync(cancellationToken);
 
+            // 3.1 Actualizar Orden de Compra si existe referencia
+            if (dto.IdOrdenCompraRef.HasValue && dto.IdOrdenCompraRef.Value > 0)
+            {
+                var orden = await _context.OrdenesCompra.FirstOrDefaultAsync(o => o.Id == dto.IdOrdenCompraRef.Value, cancellationToken);
+                if (orden != null)
+                {
+                    orden.CompraId = compra.Id;
+                    _context.OrdenesCompra.Update(orden);
+                    await _context.SaveChangesAsync(cancellationToken);
+                }
+            }
+
             // 4. Publicar evento para actualizar inventario
             var evento = new CompraCreadaEvento(
                 compra.Id,
                 compra.IdAlmacen,
-                compra.Detalles.Select(d => new CompraItemDetalle(d.IdProducto, d.Cantidad)).ToList()
+                compra.Detalles.Select(d => new CompraItemDetalle(d.IdProducto, d.Cantidad, d.PrecioUnitarioCompra)).ToList()
+
             );
 
             await _mediator.Publish(evento, cancellationToken);

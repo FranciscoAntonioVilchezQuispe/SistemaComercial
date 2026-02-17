@@ -5,7 +5,7 @@ import {
   UseQueryResult,
   UseMutationResult,
 } from "@tanstack/react-query";
-import { Compra, CompraFormData } from "../types/compra.types";
+import { Compra, CrearCompraPayload } from "../types/compra.types";
 import * as servicio from "../servicios/servicioCompras";
 
 export const useCompras = (): UseQueryResult<Compra[], Error> => {
@@ -26,7 +26,7 @@ export const useCompra = (id: number): UseQueryResult<Compra, Error> => {
 export const useRegistrarCompra = (): UseMutationResult<
   Compra,
   Error,
-  CompraFormData
+  CrearCompraPayload
 > => {
   const queryClient = useQueryClient();
   return useMutation({

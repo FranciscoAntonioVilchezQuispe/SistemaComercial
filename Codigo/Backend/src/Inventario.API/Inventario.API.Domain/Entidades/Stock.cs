@@ -25,6 +25,12 @@ namespace Inventario.API.Domain.Entidades
         [Column("cantidad_reservada", TypeName = "decimal(10,3)")]
         public decimal? CantidadReservada { get; set; } = 0;
 
+        [Column("costo_promedio", TypeName = "decimal(12,4)")]
+        public decimal CostoPromedio { get; set; } = 0;
+
+        [Column("valor_total", TypeName = "decimal(12,2)")]
+        public decimal ValorTotal { get; set; } = 0;
+
         [MaxLength(50)]
         [Column("ubicacion_fisica")]
         public string? UbicacionFisica { get; set; }

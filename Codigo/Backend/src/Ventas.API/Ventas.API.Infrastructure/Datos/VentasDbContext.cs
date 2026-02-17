@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Ventas.API.Application.Interfaces;
 using System.Reflection;
 using Ventas.API.Domain.Entidades;
+using Ventas.API.Domain.Entidades.Referencias;
 
 namespace Ventas.API.Infrastructure.Datos
 {
@@ -21,6 +22,9 @@ namespace Ventas.API.Infrastructure.Datos
         public DbSet<MetodoPago> MetodosPago { get; set; }
         public DbSet<Cliente> Clientes { get; set; }
         public DbSet<Ventas.API.Domain.Entidades.Referencias.CatalogoReferencia> Catalogos { get; set; }
+        public DbSet<SeriesComprobante> SeriesComprobantes { get; set; } = null!;
+        public DbSet<Nota> Notas { get; set; } = null!;
+        public DbSet<DetalleNota> DetallesNota { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

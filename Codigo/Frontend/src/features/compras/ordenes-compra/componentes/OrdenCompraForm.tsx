@@ -35,11 +35,11 @@ import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 
 import { useRegistrarOrdenCompra } from "../hooks/useOrdenesCompra";
-// Reusing hooks from other modules
 import { useProveedores } from "@/features/compras/proveedores/hooks/useProveedores";
 import { useAlmacenes } from "@/features/inventario/almacenes/hooks/useAlmacenes";
 import { useProductos } from "@/features/catalogo/hooks/useProductos";
 import { APP_LOCALE, limpiarDecimal } from "@/lib/i18n";
+import { SelectorProveedorV2 } from "@/compartido/componentes/formularios/SelectorProveedorV2";
 import { EstadoOrdenCompra } from "../../constantes";
 
 const ordenCompraSchema = z.object({
@@ -48,7 +48,7 @@ const ordenCompraSchema = z.object({
   idAlmacenDestino: z.coerce.number().min(1, "Seleccione un almacén"),
   fechaEmision: z.date(),
   fechaEntregaEstimada: z.date().optional(),
-  idEstado: z.coerce.number().optional().default(EstadoOrdenCompra.Pendiente), // Default to Pendiente
+  idEstado: z.coerce.number().optional().default(EstadoOrdenCompra.Pendiente),
   observaciones: z.string().optional(),
   detalles: z
     .array(
@@ -68,116 +68,6 @@ interface OrdenCompraFormProps {
   onCancel: () => void;
 }
 
-// Componente Input Autocomplete para Proveedores
-const ProviderInput = ({
-  value,
-  onChange,
-  proveedores = [],
-  placeholder = "Buscar proveedor...",
-  onSearch,
-}: {
-  value: number;
-  onChange: (id: number) => void;
-  proveedores: any[];
-  placeholder?: string;
-  onSearch: (term: string) => void;
-}) => {
-  const [open, setOpen] = React.useState(false);
-  const [inputValue, setInputValue] = React.useState("");
-
-  // Update input text when external value changes
-  React.useEffect(() => {
-    if (value && proveedores.length > 0) {
-      const selected = proveedores.find((p) => p.id === value);
-      if (selected) {
-        setInputValue(selected.razonSocial);
-      }
-    }
-  }, [value, proveedores]);
-
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      if (open) return; // Let Command handle selection
-      e.preventDefault();
-      if (inputValue.length >= 4) {
-        onSearch(inputValue);
-        setOpen(true);
-      } else {
-        toast.info("Ingresa al menos 4 caracteres para buscar");
-      }
-    }
-    if (e.key === "ArrowDown" && !open && inputValue.length >= 4) {
-      setOpen(true);
-    }
-  };
-
-  return (
-    <Command className="overflow-visible bg-transparent" shouldFilter={false}>
-      <Popover open={open} onOpenChange={setOpen}>
-        <PopoverAnchor asChild>
-          <div className="relative w-full">
-            <Input
-              placeholder={placeholder}
-              value={inputValue}
-              onChange={(e) => {
-                setInputValue(e.target.value);
-                if (e.target.value === "") {
-                  onChange(0);
-                  setOpen(false);
-                }
-              }}
-              onKeyDown={handleKeyDown}
-              onClick={() => {
-                if (!open && inputValue.length >= 4 && proveedores.length > 0) {
-                  setOpen(true);
-                }
-              }}
-            />
-          </div>
-        </PopoverAnchor>
-        <PopoverContent
-          className="w-[400px] p-0"
-          align="start"
-          onOpenAutoFocus={(e) => e.preventDefault()}
-        >
-          <CommandList>
-            <CommandEmpty>
-              No se encontraron resultados. Presiona Enter para buscar.
-            </CommandEmpty>
-            <CommandGroup>
-              {proveedores.map((p) => (
-                <CommandItem
-                  key={p.id}
-                  value={p.id.toString()}
-                  onSelect={() => {
-                    onChange(p.id);
-                    setInputValue(p.razonSocial);
-                    setOpen(false);
-                  }}
-                >
-                  <Check
-                    className={cn(
-                      "mr-2 h-4 w-4",
-                      value === p.id ? "opacity-100" : "opacity-0",
-                    )}
-                  />
-                  <div className="flex flex-col">
-                    <span>{p.razonSocial}</span>
-                    <span className="text-xs text-muted-foreground">
-                      {p.numeroDocumento}
-                    </span>
-                  </div>
-                </CommandItem>
-              ))}
-            </CommandGroup>
-          </CommandList>
-        </PopoverContent>
-      </Popover>
-    </Command>
-  );
-};
-
-// Componente Input Autocomplete para Productos
 const ProductInput = ({
   value,
   onChange,
@@ -194,7 +84,6 @@ const ProductInput = ({
   const [open, setOpen] = React.useState(false);
   const [inputValue, setInputValue] = React.useState("");
 
-  // Update input text when external value changes
   React.useEffect(() => {
     if (value) {
       const selected = productos.find((p) => p.id === value);
@@ -209,9 +98,6 @@ const ProductInput = ({
       if (open) return;
       e.preventDefault();
       onSearch(inputValue);
-      setOpen(true);
-    }
-    if (e.key === "ArrowDown" && !open && inputValue.length > 0) {
       setOpen(true);
     }
   };
@@ -233,11 +119,6 @@ const ProductInput = ({
                 }
               }}
               onKeyDown={handleKeyDown}
-              onClick={() => {
-                if (!open && productos.length > 0) {
-                  setOpen(true);
-                }
-              }}
               className="pr-8"
             />
           </div>
@@ -279,17 +160,14 @@ const ProductInput = ({
 
 export function OrdenCompraForm({ onSuccess, onCancel }: OrdenCompraFormProps) {
   const registrar = useRegistrarOrdenCompra();
-
-  // State for product search
   const [terminoBusqueda, setTerminoBusqueda] = React.useState("");
   const [busquedaProveedor, setBusquedaProveedor] = React.useState("");
 
   const { data: proveedores } = useProveedores();
   const { data: almacenes } = useAlmacenes();
-  // Fetch products reacting to search term
   const { data: productosData } = useProductos({
     pageNumber: 1,
-    pageSize: 50, // Limit results
+    pageSize: 50,
     search: terminoBusqueda,
   });
   const productos = productosData?.datos || [];
@@ -320,7 +198,6 @@ export function OrdenCompraForm({ onSuccess, onCancel }: OrdenCompraFormProps) {
     },
   });
 
-  // Auto-select warehouse if only one exists
   React.useEffect(() => {
     if (almacenes && almacenes.length === 1) {
       form.setValue("idAlmacenDestino", almacenes[0].id);
@@ -333,35 +210,16 @@ export function OrdenCompraForm({ onSuccess, onCancel }: OrdenCompraFormProps) {
   });
 
   const onSubmit = (values: OrdenCompraFormValues) => {
-    console.log("Enviando Pedido:", values);
     registrar.mutate(values, {
       onSuccess: () => {
         toast.success("Orden de compra guardada exitosamente");
-        form.reset({
-          codigoOrden: "",
-          fechaEmision: new Date(),
-          idEstado: EstadoOrdenCompra.Pendiente,
-          idAlmacenDestino:
-            almacenes && almacenes.length === 1 ? almacenes[0].id : 0,
-          idProveedor: 0,
-          detalles: [
-            { idProducto: 0, cantidadSolicitada: 1, precioUnitarioPactado: 0 },
-          ],
-          observaciones: "",
-        });
-        setBusquedaProveedor("");
-        setTerminoBusqueda("");
+        form.reset();
         onSuccess();
-      },
-      onError: (error: any) => {
-        console.error("Error al guardar:", error);
-        toast.error("Error al guardar la orden de compra");
       },
     });
   };
 
-  const valoresDetalles = form.watch("detalles");
-  const totalCalculado = valoresDetalles.reduce((acc, curr) => {
+  const totalCalculado = form.watch("detalles").reduce((acc, curr) => {
     return (
       acc +
       (Number(curr.cantidadSolicitada) || 0) *
@@ -391,11 +249,11 @@ export function OrdenCompraForm({ onSuccess, onCancel }: OrdenCompraFormProps) {
             control={form.control}
             name="idProveedor"
             render={({ field }) => (
-              <FormItem className="col-span-2">
+              <FormItem className="col-span-3">
                 <FormLabel>Proveedor</FormLabel>
-                <ProviderInput
+                <SelectorProveedorV2
                   value={field.value}
-                  onChange={field.onChange}
+                  onChange={(p) => field.onChange(p?.id || 0)}
                   proveedores={filtradosProveedor}
                   onSearch={setBusquedaProveedor}
                 />
@@ -463,7 +321,6 @@ export function OrdenCompraForm({ onSuccess, onCancel }: OrdenCompraFormProps) {
                       disabled={(date) =>
                         date > new Date() || date < new Date("1900-01-01")
                       }
-                      initialFocus
                     />
                   </PopoverContent>
                 </Popover>
@@ -503,7 +360,6 @@ export function OrdenCompraForm({ onSuccess, onCancel }: OrdenCompraFormProps) {
                       selected={field.value}
                       onSelect={field.onChange}
                       locale={APP_LOCALE}
-                      initialFocus
                     />
                   </PopoverContent>
                 </Popover>
@@ -562,12 +418,7 @@ export function OrdenCompraForm({ onSuccess, onCancel }: OrdenCompraFormProps) {
                         productos.find(
                           (p) =>
                             p.id === form.watch(`detalles.${index}.idProducto`),
-                        )?.unidadMedida?.simbolo ||
-                        productos.find(
-                          (p) =>
-                            p.id === form.watch(`detalles.${index}.idProducto`),
-                        )?.unidadMedida?.codigo ||
-                        "-"
+                        )?.unidadMedida?.simbolo || "-"
                       }
                     />
                   </div>

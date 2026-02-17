@@ -29,6 +29,15 @@ namespace Inventario.API.Domain.Entidades
         [Column("costo_unitario_movimiento", TypeName = "decimal(12,4)")]
         public decimal? CostoUnitarioMovimiento { get; set; }
 
+        [Column("saldo_cantidad", TypeName = "decimal(10,3)")]
+        public decimal SaldoCantidad { get; set; }
+
+        [Column("saldo_valorizado", TypeName = "decimal(12,2)")]
+        public decimal SaldoValorizado { get; set; }
+
+        [Column("costo_promedio_actual", TypeName = "decimal(12,4)")]
+        public decimal CostoPromedioActual { get; set; }
+
         [MaxLength(50)]
         [Column("referencia_modulo")]
         public string? ReferenciaModulo { get; set; }

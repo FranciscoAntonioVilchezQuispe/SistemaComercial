@@ -7,8 +7,10 @@ namespace Inventario.API.Application.Comandos
         long IdAlmacen,
         long IdTipoMovimiento,
         decimal Cantidad,
+        decimal? CostoUnitario,
         string? ReferenciaModulo,
         long? IdReferencia,
         string? Observaciones
     ) : IRequest<long>;
+
 }

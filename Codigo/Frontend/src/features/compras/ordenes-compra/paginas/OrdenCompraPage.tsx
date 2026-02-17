@@ -177,15 +177,15 @@ export default function OrdenCompraPage() {
 
           {row.idEstado === EstadoOrdenCompra.Aprobada && (
             <Button
-              variant="ghost"
-              size="icon"
-              className="text-blue-600"
+              variant="outline"
+              size="sm"
+              className="text-blue-600 border-blue-200 hover:bg-blue-50"
               title="Generar Compra"
               onClick={() =>
                 navigate("/compras/lista", { state: { orden: row } })
               }
             >
-              <ShoppingBag className="h-4 w-4" />
+              <ShoppingBag className="h-3 w-3 mr-1" />
             </Button>
           )}
 

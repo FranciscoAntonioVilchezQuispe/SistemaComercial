@@ -22,7 +22,7 @@ namespace Inventario.API.Application.Manejadores
             // Usamos la tabla de referencia readonly
             var tipoMovimiento = await _context.TiposMovimiento
                 .FirstOrDefaultAsync(t => t.Id == request.IdTipoMovimiento, cancellationToken);
-            
+
             if (tipoMovimiento == null)
                 throw new Exception($"El tipo de movimiento con ID {request.IdTipoMovimiento} no existe.");
 
@@ -63,36 +63,82 @@ namespace Inventario.API.Application.Manejadores
                     IdAlmacen = request.IdAlmacen,
                     CantidadActual = 0,
                     CantidadReservada = 0,
-                    UsuarioCreacion = "SISTEMA", 
+                    UsuarioCreacion = "SISTEMA",
                     FechaCreacion = DateTime.UtcNow
                 };
                 _context.Stocks.Add(stock);
             }
 
             decimal cantidadAnterior = stock.CantidadActual;
+            decimal valorTotalAnterior = stock.ValorTotal;
+            decimal costoPromedioAnterior = stock.CostoPromedio;
+
             decimal cantidadCambio = request.Cantidad * factor;
             decimal cantidadNueva = cantidadAnterior + cantidadCambio;
 
             if (cantidadNueva < 0)
             {
-                 // Regla de negocio: no permitir negativo
-                 throw new Exception($"Stock insuficiente. Stock actual: {cantidadAnterior}, Salida requerida: {request.Cantidad}");
+                throw new Exception($"Stock insuficiente. Stock actual: {cantidadAnterior}, Salida requerida: {request.Cantidad}");
             }
 
+            // --- LÓGICA DE VALORIZACIÓN (CPP) ---
+            decimal costoUnitarioMovimiento = request.CostoUnitario ?? 0;
+            decimal valorMovimiento = 0;
+            decimal nuevoValorTotal = valorTotalAnterior;
+            decimal nuevoCostoPromedio = costoPromedioAnterior;
+
+            if (factor > 0) // ENTRADA (Compra, Ajuste POS, Inv Inicial)
+            {
+                // Si no se provee costo en una entrada, usamos el anterior (o 0 si es nuevo)
+                costoUnitarioMovimiento = request.CostoUnitario ?? costoPromedioAnterior;
+                valorMovimiento = request.Cantidad * costoUnitarioMovimiento;
+                nuevoValorTotal = valorTotalAnterior + valorMovimiento;
+
+                // Nueva fórmula CPP: Valor Total / Cantidad Total
+                if (cantidadNueva > 0)
+                {
+                    nuevoCostoPromedio = nuevoValorTotal / cantidadNueva;
+                }
+            }
+            else // SALIDA (Venta, Ajuste NEG)
+            {
+                // En salidas, SIEMPRE usamos el costo promedio actual del stock
+                costoUnitarioMovimiento = costoPromedioAnterior;
+                valorMovimiento = request.Cantidad * costoUnitarioMovimiento;
+                nuevoValorTotal = valorTotalAnterior - valorMovimiento;
+
+                // El costo promedio NO cambia en las salidas (regla contable CPP)
+                nuevoCostoPromedio = costoPromedioAnterior;
+
+                // Ajuste de redondeo: si la cantidad queda en 0, el valor total debe ser 0
+                if (cantidadNueva == 0)
+                {
+                    nuevoValorTotal = 0;
+                }
+            }
+
+            // Actualizar el Stock con los nuevos valores
             stock.CantidadActual = cantidadNueva;
+            stock.ValorTotal = nuevoValorTotal;
+            stock.CostoPromedio = nuevoCostoPromedio;
             stock.UsuarioActualizacion = "SISTEMA";
             stock.FechaActualizacion = DateTime.UtcNow;
 
-            // 4. Crear Movimiento
+            // 4. Crear Movimiento con datos de valorización
             var movimiento = new MovimientoInventario
             {
                 IdTipoMovimiento = request.IdTipoMovimiento,
-                // Stock aún no tiene ID si es nuevo, pero EF Core lo vincula por navegación
-                Stock = stock, 
-                // IdStock se llenará automáticamente
+                Stock = stock,
                 Cantidad = request.Cantidad,
                 CantidadAnterior = cantidadAnterior,
                 CantidadNueva = cantidadNueva,
+
+                // Campos de valorización para el Kardex
+                CostoUnitarioMovimiento = costoUnitarioMovimiento,
+                SaldoCantidad = cantidadNueva,
+                SaldoValorizado = nuevoValorTotal,
+                CostoPromedioActual = nuevoCostoPromedio,
+
                 ReferenciaModulo = request.ReferenciaModulo,
                 IdReferencia = request.IdReferencia,
                 Observaciones = request.Observaciones,
@@ -101,6 +147,7 @@ namespace Inventario.API.Application.Manejadores
             };
 
             _context.MovimientosInventario.Add(movimiento);
+
 
             await _context.SaveChangesAsync(cancellationToken);
 

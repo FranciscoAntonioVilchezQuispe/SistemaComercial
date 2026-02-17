@@ -78,7 +78,11 @@ const menuItems: ItemMenu[] = [
     titulo: "Compras",
     icono: <ShoppingBag className="h-5 w-5" />,
     subItems: [
-      { titulo: "Órdenes de Compra", icono: null, ruta: "/compras/ordenes-compra" },
+      {
+        titulo: "Órdenes de Compra",
+        icono: null,
+        ruta: "/compras/ordenes-compra",
+      },
       { titulo: "Compras", icono: null, ruta: "/compras/lista" },
       { titulo: "Proveedores", icono: null, ruta: "/compras/proveedores" },
     ],
@@ -95,6 +99,23 @@ const menuItems: ItemMenu[] = [
       { titulo: "Usuarios", icono: null, ruta: "/configuracion/usuarios" },
       { titulo: "Roles", icono: null, ruta: "/configuracion/roles" },
       { titulo: "Empresa", icono: null, ruta: "/configuracion/empresa" },
+      { titulo: "Sucursales", icono: null, ruta: "/configuracion/sucursales" },
+      { titulo: "Impuestos", icono: null, ruta: "/configuracion/impuestos" },
+      {
+        titulo: "Métodos de Pago",
+        icono: null,
+        ruta: "/configuracion/metodos-pago",
+      },
+      {
+        titulo: "Comprobantes",
+        icono: null,
+        ruta: "/configuracion/comprobantes",
+      },
+      {
+        titulo: "Tipos de Documento",
+        icono: null,
+        ruta: "/configuracion/reglas-sunat",
+      },
       {
         titulo: "Tablas Generales",
         icono: null,
@@ -178,7 +199,11 @@ function ItemMenuSidebar({
   );
 }
 
-export function Sidebar({ abierto, onMouseEnter, onMouseLeave }: PropiedadesSidebar) {
+export function Sidebar({
+  abierto,
+  onMouseEnter,
+  onMouseLeave,
+}: PropiedadesSidebar) {
   return (
     <aside
       className={cn(

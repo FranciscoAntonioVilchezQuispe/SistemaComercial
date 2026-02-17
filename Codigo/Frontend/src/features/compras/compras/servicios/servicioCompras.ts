@@ -1,5 +1,5 @@
 import api from "@/lib/axios";
-import { Compra, CompraFormData } from "../types/compra.types";
+import { Compra, CrearCompraPayload } from "../types/compra.types";
 
 export const obtenerCompras = async (): Promise<Compra[]> => {
   const respuesta: any = await api.get("/compras");
@@ -13,7 +13,7 @@ export const obtenerCompra = async (id: number): Promise<Compra> => {
 };
 
 export const registrarCompra = async (
-  data: CompraFormData,
+  data: CrearCompraPayload,
 ): Promise<Compra> => {
   const respuesta: any = await api.post("/compras", data);
   return respuesta.datos || respuesta.data;

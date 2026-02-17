@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Configuracion.API.Domain.Entidades
 {
-    [Table("sucursales", Schema = "configuracion")]
+    [Table("sucursal", Schema = "configuracion")]
     public class Sucursal : EntidadBase
     {
         [Column("id_sucursal")]

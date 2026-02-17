@@ -70,7 +70,11 @@ export function CarritoCompras() {
     setDialogoOpen(true);
   };
 
-  const handleConfirmarVenta = async (tipoComprobante: string) => {
+  const handleConfirmarVenta = async (
+    tipoComprobante: string,
+    serie: string,
+    numero: number,
+  ) => {
     try {
       // Mapear tipo de comprobante a ID
       const tipoComprobanteMap: Record<string, number> = {
@@ -91,6 +95,11 @@ export function CarritoCompras() {
       const ventaData: VentaFormData = {
         idCliente: clienteSeleccionado?.id || 0, // 0 = Público General
         idTipoComprobante: tipoComprobanteMap[tipoComprobante] || 1,
+        idAlmacen: 1, // TODO: Obtener del contexto de usuario/sucursal. Por ahora 1.
+        idMoneda: 1, // TODO: Selector de moneda. Por ahora 1 (Soles).
+        serie: serie,
+        numero: numero,
+        tipoCambio: 1, // TODO: Obtener tipo de cambio actual.
         observaciones: `Método de pago: ${metodoPagoSeleccionado.nombre}`,
         detalles,
       };

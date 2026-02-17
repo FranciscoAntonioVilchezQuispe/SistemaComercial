@@ -14,6 +14,9 @@ namespace Ventas.API.Application.Interfaces
         DbSet<Ventas.API.Domain.Entidades.MetodoPago> MetodosPago { get; set; }
         DbSet<Ventas.API.Domain.Entidades.Cliente> Clientes { get; set; }
         DbSet<Ventas.API.Domain.Entidades.Referencias.CatalogoReferencia> Catalogos { get; set; }
+        DbSet<Ventas.API.Domain.Entidades.Referencias.SeriesComprobante> SeriesComprobantes { get; set; }
+        DbSet<Ventas.API.Domain.Entidades.Nota> Notas { get; set; }
+        DbSet<Ventas.API.Domain.Entidades.DetalleNota> DetallesNota { get; set; }
 
         Task<int> SaveChangesAsync(CancellationToken cancellationToken);
     }

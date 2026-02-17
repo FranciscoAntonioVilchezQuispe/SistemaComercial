@@ -33,15 +33,8 @@ namespace Compras.API.Endpoints
 
             grupo.MapPost("/", async (CompraDto dto, IMediator mediator) =>
             {
-                try
-                {
-                    var id = await mediator.Send(new CrearCompraComando(dto));
-                    return Results.Created($"/api/compras/{id}", new ToReturn<long>(id));
-                }
-                catch (Exception ex)
-                {
-                    return Results.BadRequest(new ToReturnError<long>(ex.Message, 400));
-                }
+                var id = await mediator.Send(new CrearCompraComando(dto));
+                return Results.Created($"/api/compras/{id}", new ToReturn<long>(id));
             });
         }
 

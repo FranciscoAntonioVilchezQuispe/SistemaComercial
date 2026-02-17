@@ -13,7 +13,7 @@ export function useVentas(
   filtros?: VentaFiltros,
   pagina: number = 1,
   elementosPorPagina: number = 10,
-) {
+): any {
   return useQuery({
     queryKey: [QUERY_KEY, filtros, pagina, elementosPorPagina],
     queryFn: () =>
@@ -24,7 +24,7 @@ export function useVentas(
 /**
  * Hook para obtener una venta por ID
  */
-export function useVenta(id: number) {
+export function useVenta(id: number): any {
   return useQuery({
     queryKey: [QUERY_KEY, id],
     queryFn: () => servicioVentas.obtenerVentaPorId(id),
@@ -35,7 +35,7 @@ export function useVenta(id: number) {
 /**
  * Hook para obtener ventas del día
  */
-export function useVentasDelDia() {
+export function useVentasDelDia(): any {
   return useQuery({
     queryKey: [QUERY_KEY, "hoy"],
     queryFn: () => servicioVentas.obtenerVentasDelDia(),
@@ -46,7 +46,7 @@ export function useVentasDelDia() {
 /**
  * Hook para crear una venta
  */
-export function useCrearVenta() {
+export function useCrearVenta(): any {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -64,7 +64,7 @@ export function useCrearVenta() {
 /**
  * Hook para anular una venta
  */
-export function useAnularVenta() {
+export function useAnularVenta(): any {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -83,10 +83,24 @@ export function useAnularVenta() {
 /**
  * Hook para obtener estadísticas de ventas
  */
-export function useEstadisticasVentas(fechaInicio: string, fechaFin: string) {
+export function useEstadisticasVentas(
+  fechaInicio: string,
+  fechaFin: string,
+): any {
   return useQuery({
     queryKey: [QUERY_KEY, "estadisticas", fechaInicio, fechaFin],
     queryFn: () => servicioVentas.obtenerEstadisticas(fechaInicio, fechaFin),
     enabled: !!fechaInicio && !!fechaFin,
+  });
+}
+
+/**
+ * Hook para obtener series por tipo de comprobante y almacén
+ */
+export function useSeries(idTipoComprobante: number, idAlmacen?: number): any {
+  return useQuery({
+    queryKey: ["series", idTipoComprobante, idAlmacen],
+    queryFn: () => servicioVentas.obtenerSeries(idTipoComprobante, idAlmacen),
+    enabled: !!idTipoComprobante,
   });
 }

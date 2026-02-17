@@ -15,7 +15,8 @@ namespace Compras.API.Application.Integracion
             _logger = logger;
         }
 
-        public async Task<bool> RegistrarEntradaCompraAsync(long idProducto, long idAlmacen, decimal cantidad, long idCompra)
+        public async Task<bool> RegistrarEntradaCompraAsync(long idProducto, long idAlmacen, decimal cantidad, decimal costoUnitario, long idCompra)
+
         {
             try
             {
@@ -25,7 +26,9 @@ namespace Compras.API.Application.Integracion
                     IdAlmacen = idAlmacen,
                     IdTipoMovimiento = 19, // ING_COM (Ingreso por Compra)
                     Cantidad = cantidad,
+                    CostoUnitario = costoUnitario,
                     ReferenciaModulo = "COMPRAS",
+
                     IdReferencia = idCompra,
                     Observaciones = $"Ingreso automático por Compra #" + idCompra
                 };

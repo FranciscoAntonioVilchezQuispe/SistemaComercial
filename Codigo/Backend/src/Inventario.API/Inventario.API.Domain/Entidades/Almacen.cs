@@ -19,7 +19,11 @@ namespace Inventario.API.Domain.Entidades
         [Column("direccion")]
         public string? Direccion { get; set; }
 
+        [Column("id_sucursal")]
+        public long IdSucursal { get; set; }
+
         [Column("es_principal")]
+
         public bool EsPrincipal { get; set; } = false;
     }
 }

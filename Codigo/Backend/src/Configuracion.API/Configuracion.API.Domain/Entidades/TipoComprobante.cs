@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Configuracion.API.Domain.Entidades
 {
-    [Table("tipos_comprobantes", Schema = "configuracion")]
+    [Table("tipo_comprobante", Schema = "configuracion")]
     public class TipoComprobante : EntidadBase
     {
         [Column("id_tipo_comprobante")]
@@ -28,7 +28,7 @@ namespace Configuracion.API.Domain.Entidades
         // Valores: "ENTRADA", "SALIDA", "NEUTRO", "DEPENDIENTE"
         [MaxLength(20)]
         [Column("tipo_movimiento_stock")]
-        public string TipoMovimientoStock { get; set; } = "DEPENDIENTE"; 
+        public string TipoMovimientoStock { get; set; } = "DEPENDIENTE";
 
         [Column("activado")]
         public bool Activado { get; set; } = true;

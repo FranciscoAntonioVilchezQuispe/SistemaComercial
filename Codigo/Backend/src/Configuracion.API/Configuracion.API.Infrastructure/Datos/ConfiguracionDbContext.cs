@@ -9,6 +9,8 @@ namespace Configuracion.API.Infrastructure.Datos
         {
         }
 
+
+
         public DbSet<TablaGeneral> TablasGenerales { get; set; }
         public DbSet<TablaGeneralDetalle> TablasGeneralesDetalles { get; set; }
         public DbSet<ParametroConfiguracion> Configuraciones { get; set; }
@@ -18,12 +20,15 @@ namespace Configuracion.API.Infrastructure.Datos
         public DbSet<MetodoPago> MetodosPago { get; set; }
         public DbSet<SerieComprobante> SeriesComprobantes { get; set; }
         public DbSet<TipoComprobante> TiposComprobante { get; set; }
+        public DbSet<DocumentoIdentidadRegla> DocumentoIdentidadReglas { get; set; }
+        public DbSet<DocumentoComprobanteRelacion> DocumentoComprobanteRelaciones { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-            
-            
+
+
             // Esquema por defecto para Configuración
             modelBuilder.HasDefaultSchema("configuracion");
 
@@ -33,6 +38,13 @@ namespace Configuracion.API.Infrastructure.Datos
             modelBuilder.Entity<ParametroConfiguracion>().ToTable("configuraciones", "configuracion");
             modelBuilder.Entity<Empresa>().ToTable("empresa", "configuracion");
             modelBuilder.Entity<SerieComprobante>().ToTable("series_comprobantes", "configuracion");
+            modelBuilder.Entity<TipoComprobante>().ToTable("tipo_comprobante", "configuracion");
+            modelBuilder.Entity<Impuesto>().ToTable("impuesto", "configuracion");
+            modelBuilder.Entity<Sucursal>().ToTable("sucursal", "configuracion");
+            modelBuilder.Entity<MetodoPago>().ToTable("metodo_pago", "configuracion");
+            modelBuilder.Entity<DocumentoIdentidadRegla>().ToTable("tipo_documento", "configuracion");
+            modelBuilder.Entity<DocumentoComprobanteRelacion>().ToTable("regla_documento_comprobante", "configuracion");
         }
+
     }
 }

@@ -4,6 +4,7 @@ using Ventas.API.Infrastructure.Repositorios;
 using Microsoft.EntityFrameworkCore;
 using Ventas.API.Endpoints;
 using Nucleo.Comun.Application.Extensions;
+using Nucleo.Comun.API.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.AddCentralizedLogging();
@@ -50,6 +51,8 @@ builder.Services.AddSwaggerGen();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
+app.UseManejoExcepcionesGlobal();
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

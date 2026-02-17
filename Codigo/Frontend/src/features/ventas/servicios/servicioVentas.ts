@@ -64,4 +64,14 @@ export const servicioVentas = {
     });
     return response.datos || response.data;
   },
+
+  obtenerSeries: async (
+    idTipoComprobante: number,
+    idAlmacen?: number,
+  ): Promise<any[]> => {
+    const response: any = await apiVentas.get(`${BASE_URL}/series`, {
+      params: { idTipoComprobante, idAlmacen },
+    });
+    return response.datos || response.data || [];
+  },
 };

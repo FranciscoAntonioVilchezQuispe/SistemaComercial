@@ -43,7 +43,7 @@ namespace Compras.API.Infrastructure.Repositorios
             await _context.SaveChangesAsync();
         }
 
-        public async Task ActualizarEstadoAsync(long id, long idEstado)
+        public async Task<OrdenCompra?> ActualizarEstadoAsync(long id, long idEstado)
         {
             var orden = await _context.OrdenesCompra.FindAsync(id);
             if (orden != null)
@@ -51,6 +51,7 @@ namespace Compras.API.Infrastructure.Repositorios
                 orden.IdEstado = idEstado;
                 await _context.SaveChangesAsync();
             }
+            return orden;
         }
 
         public async Task<IEnumerable<OrdenCompra>> ObtenerTodosAsync()

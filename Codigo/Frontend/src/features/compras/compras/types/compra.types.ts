@@ -49,3 +49,32 @@ export interface CompraFormData {
     precioUnitario: number;
   }[];
 }
+
+export interface DetalleCompraPayload {
+  idProducto: number;
+  idVariante?: number | null;
+  descripcion?: string;
+  cantidad: number;
+  precioUnitarioCompra: number;
+  subtotal: number;
+}
+
+export interface CrearCompraPayload {
+  idProveedor: number;
+  idAlmacen: number;
+  idOrdenCompraRef?: number | null;
+  idTipoComprobante: number;
+  serieComprobante: string;
+  numeroComprobante: string;
+  fechaEmision: Date;
+  fechaContable: Date;
+  moneda: string;
+  tipoCambio: number;
+  subtotal: number;
+  impuesto: number;
+  total: number;
+  saldoPendiente: number;
+  idEstadoPago: number;
+  observaciones?: string;
+  detalles: DetalleCompraPayload[];
+}

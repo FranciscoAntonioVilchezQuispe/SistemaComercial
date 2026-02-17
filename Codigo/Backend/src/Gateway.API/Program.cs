@@ -1,3 +1,6 @@
+using Yarp.ReverseProxy.Transforms;
+using Nucleo.Comun.API.Extensions;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -7,14 +10,29 @@ builder.Services.AddSwaggerGen();
 
 // Add YARP
 builder.Services.AddReverseProxy()
-    .LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"));
+    .LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"))
+    .AddTransforms(builderContext =>
+    {
+        builderContext.AddResponseTransform(transformContext =>
+        {
+            if (transformContext.ProxyResponse != null)
+            {
+                transformContext.ProxyResponse.Headers.Remove("Access-Control-Allow-Origin");
+                transformContext.ProxyResponse.Headers.Remove("Access-Control-Allow-Credentials");
+                transformContext.ProxyResponse.Headers.Remove("Access-Control-Allow-Methods");
+                transformContext.ProxyResponse.Headers.Remove("Access-Control-Allow-Headers");
+            }
+            return ValueTask.CompletedTask;
+        });
+    });
 
+// Add Global CORS
 // Add Global CORS
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAll", policy =>
+    options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.SetIsOriginAllowed(_ => true)
+        policy.SetIsOriginAllowed(_ => true) // Allow any origin
               .AllowAnyMethod()
               .AllowAnyHeader()
               .AllowCredentials();
@@ -24,6 +42,8 @@ builder.Services.AddCors(options =>
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
+app.UseManejoExcepcionesGlobal();
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -33,7 +53,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 // Use Global CORS
-app.UseCors("AllowAll");
+app.UseCors("AllowFrontend");
 
 app.UseAuthorization();
 

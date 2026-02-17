@@ -53,6 +53,12 @@ const PaginaComprobantes = lazy(() =>
     default: m.PaginaComprobantes,
   })),
 );
+const PaginaReglasDocumento = lazy(() =>
+  import("@/features/configuracion/paginas/ReglasDocumentoPage").then((m) => ({
+    default: m.ReglasDocumentoPage,
+  })),
+);
+
 const PaginaPOS = lazy(() => import("@/features/ventas/paginas/PaginaPOS"));
 const PaginaClientes = lazy(() =>
   import("@/features/clientes/paginas/PaginaClientes").then((m) => ({
@@ -72,9 +78,11 @@ const PaginaCompras = lazy(() =>
   })),
 );
 const PaginaOrdenesCompra = lazy(() =>
-  import("@/features/compras/ordenes-compra/paginas/OrdenCompraPage").then((m) => ({
-    default: m.default,
-  })),
+  import("@/features/compras/ordenes-compra/paginas/OrdenCompraPage").then(
+    (m) => ({
+      default: m.default,
+    }),
+  ),
 );
 const PaginaVentas = lazy(() =>
   import("@/features/ventas/paginas/PaginaVentas").then((m) => ({
@@ -111,177 +119,193 @@ const CargandoPagina = () => (
   </div>
 );
 
-export const ruteador = createBrowserRouter([
+export const ruteador = createBrowserRouter(
+  [
+    {
+      path: "/",
+      element: <LayoutPrincipal />,
+      children: [
+        {
+          index: true,
+          element: <Navigate to="/dashboard" replace />,
+        },
+        {
+          path: "dashboard",
+          element: (
+            <Suspense fallback={<CargandoPagina />}>
+              <PaginaDashboard />
+            </Suspense>
+          ),
+        },
+        {
+          path: "catalogo/productos",
+          element: (
+            <Suspense fallback={<CargandoPagina />}>
+              <PaginaProductos />
+            </Suspense>
+          ),
+        },
+        {
+          path: "catalogo/categorias",
+          element: (
+            <Suspense fallback={<CargandoPagina />}>
+              <PaginaCategorias />
+            </Suspense>
+          ),
+        },
+        {
+          path: "catalogo/marcas",
+          element: (
+            <Suspense fallback={<CargandoPagina />}>
+              <PaginaMarcas />
+            </Suspense>
+          ),
+        },
+        {
+          path: "catalogo/unidades-medida",
+          element: (
+            <Suspense fallback={<CargandoPagina />}>
+              <PaginaUnidadesMedida />
+            </Suspense>
+          ),
+        },
+        {
+          path: "catalogo/listas-precios",
+          element: (
+            <Suspense fallback={<CargandoPagina />}>
+              <PaginaListasPrecios />
+            </Suspense>
+          ),
+        },
+        {
+          path: "configuracion/tablas-generales",
+          element: (
+            <Suspense fallback={<CargandoPagina />}>
+              <PaginaTablasGenerales />
+            </Suspense>
+          ),
+        },
+        {
+          path: "configuracion/empresa",
+          element: (
+            <Suspense fallback={<CargandoPagina />}>
+              <PaginaEmpresa />
+            </Suspense>
+          ),
+        },
+        {
+          path: "configuracion/sucursales",
+          element: (
+            <Suspense fallback={<CargandoPagina />}>
+              <PaginaSucursales />
+            </Suspense>
+          ),
+        },
+        {
+          path: "configuracion/impuestos",
+          element: (
+            <Suspense fallback={<CargandoPagina />}>
+              <PaginaImpuestos />
+            </Suspense>
+          ),
+        },
+        {
+          path: "configuracion/metodos-pago",
+          element: (
+            <Suspense fallback={<CargandoPagina />}>
+              <PaginaMetodosPago />
+            </Suspense>
+          ),
+        },
+        {
+          path: "configuracion/comprobantes",
+          element: (
+            <Suspense fallback={<CargandoPagina />}>
+              <PaginaComprobantes />
+            </Suspense>
+          ),
+        },
+        {
+          path: "configuracion/reglas-sunat",
+          element: (
+            <Suspense fallback={<CargandoPagina />}>
+              <PaginaReglasDocumento />
+            </Suspense>
+          ),
+        },
+
+        {
+          path: "clientes",
+          element: (
+            <Suspense fallback={<CargandoPagina />}>
+              <PaginaClientes />
+            </Suspense>
+          ),
+        },
+        {
+          path: "compras/lista",
+          element: (
+            <Suspense fallback={<CargandoPagina />}>
+              <PaginaCompras />
+            </Suspense>
+          ),
+        },
+        {
+          path: "compras/ordenes-compra",
+          element: (
+            <Suspense fallback={<CargandoPagina />}>
+              <PaginaOrdenesCompra />
+            </Suspense>
+          ),
+        },
+        {
+          path: "compras/proveedores",
+          element: (
+            <Suspense fallback={<CargandoPagina />}>
+              <PaginaProveedores />
+            </Suspense>
+          ),
+        },
+        {
+          path: "inventario/almacenes",
+          element: (
+            <Suspense fallback={<CargandoPagina />}>
+              <PaginaAlmacenes />
+            </Suspense>
+          ),
+        },
+        {
+          path: "ventas/lista",
+          element: (
+            <Suspense fallback={<CargandoPagina />}>
+              <PaginaVentas />
+            </Suspense>
+          ),
+        },
+        {
+          path: "ventas/pos",
+          element: (
+            <Suspense fallback={<CargandoPagina />}>
+              <PaginaPOS />
+            </Suspense>
+          ),
+        },
+        {
+          path: "*",
+          element: (
+            <div className="flex flex-col items-center justify-center h-screen gap-4">
+              <h1 className="text-4xl font-bold">404</h1>
+              <p className="text-muted-foreground">Página no encontrada</p>
+              <Navigate to="/dashboard" />
+            </div>
+          ),
+        },
+      ],
+    },
+  ],
   {
-    path: "/",
-    element: <LayoutPrincipal />,
-    children: [
-      {
-        index: true,
-        element: <Navigate to="/dashboard" replace />,
-      },
-      {
-        path: "dashboard",
-        element: (
-          <Suspense fallback={<CargandoPagina />}>
-            <PaginaDashboard />
-          </Suspense>
-        ),
-      },
-      {
-        path: "catalogo/productos",
-        element: (
-          <Suspense fallback={<CargandoPagina />}>
-            <PaginaProductos />
-          </Suspense>
-        ),
-      },
-      {
-        path: "catalogo/categorias",
-        element: (
-          <Suspense fallback={<CargandoPagina />}>
-            <PaginaCategorias />
-          </Suspense>
-        ),
-      },
-      {
-        path: "catalogo/marcas",
-        element: (
-          <Suspense fallback={<CargandoPagina />}>
-            <PaginaMarcas />
-          </Suspense>
-        ),
-      },
-      {
-        path: "catalogo/unidades-medida",
-        element: (
-          <Suspense fallback={<CargandoPagina />}>
-            <PaginaUnidadesMedida />
-          </Suspense>
-        ),
-      },
-      {
-        path: "catalogo/listas-precios",
-        element: (
-          <Suspense fallback={<CargandoPagina />}>
-            <PaginaListasPrecios />
-          </Suspense>
-        ),
-      },
-      {
-        path: "configuracion/tablas-generales",
-        element: (
-          <Suspense fallback={<CargandoPagina />}>
-            <PaginaTablasGenerales />
-          </Suspense>
-        ),
-      },
-      {
-        path: "configuracion/empresa",
-        element: (
-          <Suspense fallback={<CargandoPagina />}>
-            <PaginaEmpresa />
-          </Suspense>
-        ),
-      },
-      {
-        path: "configuracion/sucursales",
-        element: (
-          <Suspense fallback={<CargandoPagina />}>
-            <PaginaSucursales />
-          </Suspense>
-        ),
-      },
-      {
-        path: "configuracion/impuestos",
-        element: (
-          <Suspense fallback={<CargandoPagina />}>
-            <PaginaImpuestos />
-          </Suspense>
-        ),
-      },
-      {
-        path: "configuracion/metodos-pago",
-        element: (
-          <Suspense fallback={<CargandoPagina />}>
-            <PaginaMetodosPago />
-          </Suspense>
-        ),
-      },
-      {
-        path: "configuracion/comprobantes",
-        element: (
-          <Suspense fallback={<CargandoPagina />}>
-            <PaginaComprobantes />
-          </Suspense>
-        ),
-      },
-      {
-        path: "clientes",
-        element: (
-          <Suspense fallback={<CargandoPagina />}>
-            <PaginaClientes />
-          </Suspense>
-        ),
-      },
-      {
-        path: "compras/lista",
-        element: (
-          <Suspense fallback={<CargandoPagina />}>
-            <PaginaCompras />
-          </Suspense>
-        ),
-      },
-      {
-        path: "compras/ordenes-compra",
-        element: (
-          <Suspense fallback={<CargandoPagina />}>
-            <PaginaOrdenesCompra />
-          </Suspense>
-        ),
-      },
-      {
-        path: "compras/proveedores",
-        element: (
-          <Suspense fallback={<CargandoPagina />}>
-            <PaginaProveedores />
-          </Suspense>
-        ),
-      },
-      {
-        path: "inventario/almacenes",
-        element: (
-          <Suspense fallback={<CargandoPagina />}>
-            <PaginaAlmacenes />
-          </Suspense>
-        ),
-      },
-      {
-        path: "ventas/lista",
-        element: (
-          <Suspense fallback={<CargandoPagina />}>
-            <PaginaVentas />
-          </Suspense>
-        ),
-      },
-      {
-        path: "ventas/pos",
-        element: (
-          <Suspense fallback={<CargandoPagina />}>
-            <PaginaPOS />
-          </Suspense>
-        ),
-      },
-      {
-        path: "*",
-        element: (
-          <div className="flex flex-col items-center justify-center h-screen gap-4">
-            <h1 className="text-4xl font-bold">404</h1>
-            <p className="text-muted-foreground">Página no encontrada</p>
-            <Navigate to="/dashboard" />
-          </div>
-        ),
-      },
-    ],
+    future: {
+      v7_startTransition: true,
+    },
   },
-]);
+);

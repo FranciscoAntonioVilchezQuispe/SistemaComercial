@@ -23,14 +23,17 @@ namespace Compras.API.Application.Manejadores
             foreach (var item in notification.Items)
             {
                 var success = await _inventarioServicio.RegistrarEntradaCompraAsync(
-                    item.IdProducto, 
-                    notification.IdAlmacen, 
-                    item.Cantidad, 
+                    item.IdProducto,
+                    notification.IdAlmacen,
+                    item.Cantidad,
+                    item.CostoUnitario,
                     notification.CompraId);
+
+
 
                 if (!success)
                 {
-                    _logger.LogWarning("No se pudo actualizar el stock para el Producto {ProductoId} de la Compra {CompraId}", 
+                    _logger.LogWarning("No se pudo actualizar el stock para el Producto {ProductoId} de la Compra {CompraId}",
                         item.IdProducto, notification.CompraId);
                 }
             }

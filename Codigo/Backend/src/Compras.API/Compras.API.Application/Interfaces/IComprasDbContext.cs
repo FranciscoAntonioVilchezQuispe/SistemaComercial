@@ -10,6 +10,8 @@ namespace Compras.API.Application.Interfaces
         DbSet<Compras.API.Domain.Entidades.DetalleOrdenCompra> DetallesOrdenCompra { get; set; }
         DbSet<Compras.API.Domain.Entidades.Proveedor> Proveedores { get; set; }
         DbSet<Compras.API.Domain.Entidades.Referencias.CatalogoReferencia> Catalogos { get; set; }
+        DbSet<Compras.API.Domain.Entidades.Nota> Notas { get; set; }
+        DbSet<Compras.API.Domain.Entidades.DetalleNota> DetallesNota { get; set; }
 
         Task<int> SaveChangesAsync(CancellationToken cancellationToken);
     }

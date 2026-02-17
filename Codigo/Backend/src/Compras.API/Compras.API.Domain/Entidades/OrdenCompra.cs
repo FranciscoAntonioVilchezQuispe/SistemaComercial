@@ -39,6 +39,9 @@ namespace Compras.API.Domain.Entidades
         [Column("observaciones", TypeName = "text")]
         public string? Observaciones { get; set; }
 
+        [Column("compra_id")]
+        public long? CompraId { get; set; }
+
         [ForeignKey("IdProveedor")]
         public virtual Proveedor Proveedor { get; set; } = null!;
 

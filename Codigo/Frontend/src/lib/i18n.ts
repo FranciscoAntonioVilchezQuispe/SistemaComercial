@@ -27,6 +27,8 @@ export const formatDecimal = (cantidad: number, decimales: number = 2) => {
 // Funciones de limpieza de inputs con Regex
 export const limpiarSoloNumeros = (val: string) => val.replace(/\D/g, "");
 
+export const limpiarGuiones = (val: string) => val.replace(/-/g, "");
+
 export const limpiarDecimal = (val: string) => {
   // Permite solo números y un punto decimal
   let cleaned = val.replace(/[^0-9.]/g, "");
@@ -38,4 +40,7 @@ export const limpiarDecimal = (val: string) => {
   return cleaned;
 };
 
-export const limpiarGuiones = (val: string) => val.replace(/[^0-9-]/g, "");
+export const padIzquierda = (val: string, largo: number = 8) => {
+  if (!val) return "";
+  return val.padStart(largo, "0");
+};

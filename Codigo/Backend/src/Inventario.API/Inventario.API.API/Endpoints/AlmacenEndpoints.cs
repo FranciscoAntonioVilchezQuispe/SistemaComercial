@@ -16,22 +16,118 @@ namespace Inventario.API.Endpoints
 
             grupo.MapGet("/", async (IAlmacenRepositorio repo) =>
             {
-                var almacenes = await repo.ObtenerTodosAsync();
-                return Results.Ok(new ToReturnList<Almacen>(almacenes));
+                try
+                {
+                    var almacenes = await repo.ObtenerTodosAsync();
+                    return Results.Ok(new ToReturnList<Almacen>(almacenes));
+                }
+                catch (Exception ex)
+                {
+                    return Results.Json(new ToReturnError<Almacen>(ex.Message), statusCode: 500);
+                }
+            });
+
+            grupo.MapGet("/{id}", async (long id, IAlmacenRepositorio repo) =>
+            {
+                try
+                {
+                    var almacen = await repo.ObtenerPorIdAsync(id);
+                    if (almacen == null) return Results.NotFound(new ToReturnNoEncontrado<Almacen>());
+                    return Results.Ok(new ToReturn<Almacen>(almacen));
+                }
+                catch (Exception ex)
+                {
+                    return Results.Json(new ToReturnError<Almacen>(ex.Message), statusCode: 500);
+                }
             });
 
             grupo.MapPost("/", async (AlmacenDto dto, IAlmacenRepositorio repo) =>
             {
-                var almacen = new Almacen
+                try
                 {
-                    NombreAlmacen = dto.NombreAlmacen,
-                    Direccion = dto.Direccion,
-                    EsPrincipal = dto.EsPrincipal,
-                    UsuarioCreacion = "SISTEMA"
-                };
-                var creado = await repo.AgregarAsync(almacen);
-                return Results.Created($"/api/almacenes/{creado.Id}", new ToReturn<Almacen>(creado));
+                    var almacen = new Almacen
+                    {
+                        NombreAlmacen = dto.NombreAlmacen,
+                        Direccion = dto.Direccion,
+                        IdSucursal = dto.IdSucursal,
+                        EsPrincipal = dto.EsPrincipal,
+                        Activado = true,
+                        UsuarioCreacion = "SISTEMA"
+                    };
+                    var creado = await repo.AgregarAsync(almacen);
+                    return Results.Created($"/api/inventario/almacenes/{creado.Id}", new ToReturn<Almacen>(creado));
+                }
+                catch (Exception ex)
+                {
+                    return Results.Json(new ToReturnError<Almacen>(ex.Message), statusCode: 500);
+                }
+            });
+
+            grupo.MapPut("/{id}", async (long id, AlmacenDto dto, IAlmacenRepositorio repo) =>
+            {
+                try
+                {
+                    var existencial = await repo.ObtenerPorIdAsync(id);
+                    if (existencial == null) return Results.NotFound(new ToReturnNoEncontrado<Almacen>());
+
+                    existencial.NombreAlmacen = dto.NombreAlmacen;
+                    existencial.Direccion = dto.Direccion;
+                    existencial.IdSucursal = dto.IdSucursal;
+                    existencial.EsPrincipal = dto.EsPrincipal;
+                    existencial.Activado = dto.Activado;
+                    existencial.FechaActualizacion = DateTime.UtcNow;
+                    existencial.UsuarioActualizacion = "SISTEMA";
+
+                    await repo.ActualizarAsync(existencial);
+                    return Results.Ok(new ToReturn<Almacen>(existencial));
+                }
+                catch (Exception ex)
+                {
+                    return Results.Json(new ToReturnError<Almacen>(ex.Message), statusCode: 500);
+                }
+            });
+
+            grupo.MapPatch("/{id}/estado", async (long id, IAlmacenRepositorio repo) =>
+            {
+                try
+                {
+                    var existencial = await repo.ObtenerPorIdAsync(id);
+                    if (existencial == null) return Results.NotFound(new ToReturnNoEncontrado<Almacen>());
+
+                    existencial.Activado = !existencial.Activado;
+                    existencial.FechaActualizacion = DateTime.UtcNow;
+                    existencial.UsuarioActualizacion = "SISTEMA";
+
+                    await repo.ActualizarAsync(existencial);
+                    return Results.Ok(new ToReturn<Almacen>(existencial));
+                }
+                catch (Exception ex)
+                {
+                    return Results.Json(new ToReturnError<Almacen>(ex.Message), statusCode: 500);
+                }
+            });
+
+            grupo.MapDelete("/{id}", async (long id, IAlmacenRepositorio repo) =>
+            {
+                try
+                {
+                    var existencial = await repo.ObtenerPorIdAsync(id);
+                    if (existencial == null) return Results.NotFound(new ToReturnNoEncontrado<Almacen>());
+
+                    existencial.Activado = false;
+                    existencial.FechaActualizacion = DateTime.UtcNow;
+                    existencial.UsuarioActualizacion = "SISTEMA";
+
+                    await repo.ActualizarAsync(existencial);
+                    return Results.Ok(new ToReturn<Almacen>(existencial));
+                }
+                catch (Exception ex)
+                {
+                    var msg = ex.InnerException != null ? $"{ex.Message} | Detail: {ex.InnerException.Message}" : ex.Message;
+                    return Results.Json(new ToReturnError<Almacen>(msg), statusCode: 500);
+                }
             });
         }
     }
 }
+

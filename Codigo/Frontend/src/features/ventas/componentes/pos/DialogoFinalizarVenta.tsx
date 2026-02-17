@@ -1,5 +1,6 @@
-import { useState } from "react";
-import { Receipt, Printer } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Receipt, Printer, LayoutGrid } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -16,6 +17,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Cliente } from "@/features/clientes/types/cliente.types";
 import { ItemCarrito } from "../../tipos/ventas.types";
 import { MetodoPago } from "./SelectorMetodoPago";
+import { useSeries } from "../../hooks/useVentas";
 import { formatearMoneda } from "@compartido/utilidades/formateo/formatearMoneda";
 
 interface DialogoFinalizarVentaProps {
@@ -29,7 +31,11 @@ interface DialogoFinalizarVentaProps {
   igv: number;
   total: number;
   montoPagado?: number;
-  onConfirmar: (tipoComprobante: string) => Promise<void>;
+  onConfirmar: (
+    tipoComprobante: string,
+    serie: string,
+    numero: number,
+  ) => Promise<void>;
 }
 
 const tiposComprobante = [
@@ -57,11 +63,33 @@ export function DialogoFinalizarVenta({
 }: DialogoFinalizarVentaProps) {
   const [tipoComprobante, setTipoComprobante] = useState("BOLETA");
   const [procesando, setProcesando] = useState(false);
+  const [serieSeleccionada, setSerieSeleccionada] = useState<any>(null);
+
+  // Mapear string a ID de tipo de comprobante para el hook
+  const tipoComprobanteId =
+    tipoComprobante === "BOLETA" ? 1 : tipoComprobante === "FACTURA" ? 2 : 3;
+  const { data: series, isLoading: cargandoSeries } =
+    useSeries(tipoComprobanteId);
+
+  useEffect(() => {
+    if (series && series.length > 0) {
+      setSerieSeleccionada(series[0]);
+    } else {
+      setSerieSeleccionada(null);
+    }
+  }, [series]);
 
   const handleConfirmar = async () => {
+    if (!serieSeleccionada) {
+      return;
+    }
     setProcesando(true);
     try {
-      await onConfirmar(tipoComprobante);
+      await onConfirmar(
+        tipoComprobante,
+        serieSeleccionada.serie,
+        serieSeleccionada.correlativoActual + 1,
+      );
       onOpenChange(false);
     } catch (error) {
       console.error("Error al procesar venta:", error);
@@ -156,31 +184,78 @@ export function DialogoFinalizarVenta({
 
           <Separator />
 
-          {/* Tipo de Comprobante */}
-          <div>
-            <Label className="text-sm font-medium">Tipo de Comprobante</Label>
-            <RadioGroup
-              value={tipoComprobante}
-              onValueChange={setTipoComprobante}
-              className="mt-2 space-y-2"
-            >
-              {tiposComprobante.map((tipo) => (
-                <div
-                  key={tipo.id}
-                  className="flex items-center space-x-2 border rounded-lg p-3 hover:bg-accent cursor-pointer"
-                >
-                  <RadioGroupItem value={tipo.id} id={tipo.id} />
-                  <Label htmlFor={tipo.id} className="flex-1 cursor-pointer">
-                    <div>
-                      <p className="font-medium">{tipo.nombre}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {tipo.descripcion}
-                      </p>
+          {/* Tipo de Comprobante y Serie */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <Label className="text-sm font-medium">Tipo de Comprobante</Label>
+              <RadioGroup
+                value={tipoComprobante}
+                onValueChange={setTipoComprobante}
+                className="mt-2 space-y-2"
+              >
+                {tiposComprobante.map((tipo) => (
+                  <div
+                    key={tipo.id}
+                    className="flex items-center space-x-2 border rounded-lg p-2 hover:bg-accent cursor-pointer"
+                  >
+                    <RadioGroupItem value={tipo.id} id={tipo.id} />
+                    <Label htmlFor={tipo.id} className="flex-1 cursor-pointer">
+                      <p className="text-sm font-medium">{tipo.nombre}</p>
+                    </Label>
+                  </div>
+                ))}
+              </RadioGroup>
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">Serie y Correlativo</Label>
+              <div className="border rounded-lg p-3 bg-muted/30 h-[100px] flex flex-col justify-center">
+                {cargandoSeries ? (
+                  <p className="text-sm text-center animate-pulse">
+                    Cargando series...
+                  </p>
+                ) : series && series.length > 0 ? (
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2">
+                      <LayoutGrid className="h-4 w-4 text-primary" />
+                      <select
+                        className="flex-1 bg-transparent text-sm font-medium outline-none"
+                        value={serieSeleccionada?.id}
+                        onChange={(e) =>
+                          setSerieSeleccionada(
+                            series.find(
+                              (s: any) => s.id === Number(e.target.value),
+                            ),
+                          )
+                        }
+                      >
+                        {series.map((s: any) => (
+                          <option key={s.id} value={s.id}>
+                            {s.serie}
+                          </option>
+                        ))}
+                      </select>
                     </div>
-                  </Label>
-                </div>
-              ))}
-            </RadioGroup>
+                    <div className="flex justify-between items-center text-xs">
+                      <span className="text-muted-foreground">
+                        Siguiente número:
+                      </span>
+                      <span className="font-mono font-bold text-primary text-base">
+                        {serieSeleccionada
+                          ? (serieSeleccionada.correlativoActual + 1)
+                              .toString()
+                              .padStart(8, "0")
+                          : "-"}
+                      </span>
+                    </div>
+                  </div>
+                ) : (
+                  <p className="text-sm text-destructive text-center">
+                    No hay series configuradas para este tipo.
+                  </p>
+                )}
+              </div>
+            </div>
           </div>
         </div>
 

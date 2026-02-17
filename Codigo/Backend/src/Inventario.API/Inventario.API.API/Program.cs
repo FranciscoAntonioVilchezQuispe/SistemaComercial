@@ -7,6 +7,9 @@ using Inventario.API.Application.Interfaces;
 using Microsoft.OpenApi;
 
 using Nucleo.Comun.Application.Extensions;
+using Nucleo.Comun.API.Extensions;
+
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
 var builder = WebApplication.CreateBuilder(args);
 builder.AddCentralizedLogging();
@@ -58,6 +61,8 @@ builder.Services.AddAuthorization();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
+app.UseManejoExcepcionesGlobal();
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

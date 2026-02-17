@@ -4,6 +4,7 @@ import axios, {
   AxiosResponse,
   InternalAxiosRequestConfig,
 } from "axios";
+import { toast } from "sonner";
 
 // Función factory para crear instancias con interceptores comunes
 const createApiInstance = (baseURL: string): AxiosInstance => {
@@ -39,6 +40,19 @@ const createApiInstance = (baseURL: string): AxiosInstance => {
           window.location.href = "/login";
         }
       }
+
+      // Manejo de alertas automáticas
+      const errorData = error.response?.data;
+      const mensaje =
+        errorData?.message ||
+        errorData?.Message ||
+        error.message ||
+        "Ocurrió un error inesperado";
+
+      toast.error(mensaje, {
+        description: `Código: ${error.response?.status || 500}`,
+      });
+
       return Promise.reject(error);
     },
   );
@@ -47,7 +61,7 @@ const createApiInstance = (baseURL: string): AxiosInstance => {
 };
 
 // Instancias para microservicios específicos (APUNTANDO AL GATEWAY 5000)
-// Todas apuntan a la base /api del Gateway. 
+// Todas apuntan a la base /api del Gateway.
 // Las rutas específicas (ej: /proveedores, /marcas) se definen en los servicios y son rooteadas por YARP.
 const GATEWAY_BASE_URL = "http://localhost:5000/api";
 

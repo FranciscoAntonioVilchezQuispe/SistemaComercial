@@ -45,6 +45,11 @@ export interface DetalleVenta {
 export interface VentaFormData {
   idCliente: number;
   idTipoComprobante: number;
+  idAlmacen: number;
+  idMoneda: number;
+  serie: string;
+  numero: number;
+  tipoCambio: number;
   observaciones?: string;
   detalles: DetalleVentaFormData[];
 }

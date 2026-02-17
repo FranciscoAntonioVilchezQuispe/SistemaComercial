@@ -1,0 +1,21 @@
+# Tareas de Implementación - Fase 1
+
+- [x] Analizar base de datos actual para Fase 1
+- [x] Implementar tabla `SeriesComprobante` y gestión de correlativos
+- [x] Ajustar entidades de Compras y Ventas para Kardex Valorizado
+- [x] Implementar lógica de Costo Promedio Ponderado
+- [x] Crear entidades de Notas de Crédito/Débito
+- [x] Reorganizar scripts SQL (09_Migracion_Fase1.sql)
+- [x] Detallar cambios requeridos en el Frontend
+- [x] Actualizar Vista de Kardex con valorización (CPP)
+- [x] Implementar Selector de Series en formulario de Ventas
+- [x] Ajustar formulario de Compras para envío de costo real
+- [x] Unificar archivos de tipos de Ventas (ventas.types.ts)
+- [x] Integrar envío de costos desde Compras a Inventario
+- [x] Mejorar usabilidad de formularios de Compras y Órdenes de Compra (formateo, búsqueda y creación rápida)
+- [x] Migrar reglas de documentos y comprobantes (SUNAT) a Base de Datos y Backend
+  - [x] Generar y aplicar migración EF Core (`dotnet ef database update`)
+  - [x] Implementar CRUD en Backend para reglas y relaciones
+  - [x] Crear módulo de mantenimiento (Mantenedor) en el Frontend
+  - [x] Corregir rutas de API en Gateway.API (registrando nuevos endpoints)
+- [x] Restaurar tablas de configuración faltantes (`tipos_comprobantes`, `impuestos`, etc.) y sembrar datos de SUNAT

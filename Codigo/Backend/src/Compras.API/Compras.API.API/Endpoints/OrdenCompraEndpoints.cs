@@ -15,6 +15,8 @@ namespace Compras.API.Endpoints
         {
             var grupo = app.MapGroup("/api/ordenes-compra").WithTags("Ordenes de Compra");
 
+            grupo.MapGet("/ping", () => Results.Ok("pong"));
+
             grupo.MapGet("/", async (IOrdenCompraRepositorio repo) =>
             {
                 var ordenes = await repo.ObtenerTodosAsync();
@@ -64,14 +66,15 @@ namespace Compras.API.Endpoints
                 catch (System.Exception ex)
                 {
                     var mensaje = ex.InnerException?.Message ?? ex.Message;
-                    return Results.Json(new { error = mensaje, detalle = ex.ToString() }, statusCode: 500);
+                    return Results.Json(new ToReturnError<object>(mensaje, 500), statusCode: 500);
                 }
             });
 
             grupo.MapPatch("/{id}/estado", async (long id, long idEstado, IOrdenCompraRepositorio repo) =>
             {
-                await repo.ActualizarEstadoAsync(id, idEstado);
-                return Results.NoContent();
+                var orden = await repo.ActualizarEstadoAsync(id, idEstado);
+                if (orden == null) return Results.NotFound(new ToReturnError<OrdenCompra>("Orden de compra no encontrada", 404));
+                return Results.Ok(new ToReturn<OrdenCompra>(orden));
             });
         }
     }

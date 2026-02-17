@@ -4,6 +4,8 @@ using Compras.API.Infrastructure.Repositorios;
 using Microsoft.EntityFrameworkCore;
 using Compras.API.Endpoints;
 using Nucleo.Comun.Application.Extensions;
+using Nucleo.Comun.API.Extensions;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.AddCentralizedLogging();
@@ -45,12 +47,20 @@ builder.Services.AddCors(options =>
                         .AllowCredentials());
 });
 
+// Configurar JSON para ignorar ciclos (Minimal APIs)
+builder.Services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(options =>
+{
+    options.SerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+});
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
+app.UseManejoExcepcionesGlobal();
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

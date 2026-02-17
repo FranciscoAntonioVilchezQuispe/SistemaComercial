@@ -6,6 +6,8 @@ using Microsoft.EntityFrameworkCore;
 using Configuracion.API.Domain.Interfaces;
 using Configuracion.API.Endpoints;
 using Nucleo.Comun.Application.Extensions;
+using Nucleo.Comun.API.Extensions;
+using Configuracion.API.Infrastructure.Servicios; // Added for IReglasDocumentoServicio
 
 var builder = WebApplication.CreateBuilder(args);
 builder.AddCentralizedLogging();
@@ -64,6 +66,9 @@ builder.Services.AddScoped<IMetodoPagoRepositorio, MetodoPagoRepositorio>();
 builder.Services.AddScoped<ISerieComprobanteRepositorio, SerieComprobanteRepositorio>();
 builder.Services.AddScoped<ITipoComprobanteRepositorio, TipoComprobanteRepositorio>();
 
+builder.Services.AddScoped<IReglasDocumentoServicio, ReglasDocumentoServicio>();
+
+
 // Registro de Manejadores
 builder.Services.AddScoped<ObtenerTodosCatalogosManejador>();
 builder.Services.AddScoped<ObtenerCatalogoPorCodigoManejador>();
@@ -72,6 +77,8 @@ builder.Services.AddScoped<ObtenerValoresCatalogoManejador>();
 var app = builder.Build();
 
 // Configuración del pipeline HTTP
+app.UseManejoExcepcionesGlobal();
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -85,9 +92,14 @@ app.UseAuthorization();
 app.MapEmpresaEndpoints();
 app.MapSucursalEndpoints();
 app.MapImpuestoEndpoints();
+
 app.MapMetodoPagoEndpoints();
+
 app.MapSerieComprobanteEndpoints();
 app.MapTipoComprobanteEndpoints();
+app.MapTipoDocumentoEndpoints();
+app.MapReglasDocumentoEndpoints();
+
 app.MapTablaGeneralEndpoints();
 
 app.MapGet("/", () => "Configuracion API Running - v1.0");

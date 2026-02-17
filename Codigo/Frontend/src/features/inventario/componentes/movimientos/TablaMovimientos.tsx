@@ -50,22 +50,53 @@ export function TablaMovimientos({ movimientos, isLoading }: Props) {
       ),
     },
     {
-      clave: "cantidad",
-      titulo: "Cant.",
+      clave: "entrada",
+      titulo: "Entradas",
+      renderizar: (m: MovimientoInventario) =>
+        m.idTipoMovimiento === 1 || m.idTipoMovimiento === 3 ? (
+          <div className="flex flex-col text-right">
+            <span className="text-green-600 font-bold">+{m.cantidad}</span>
+            <span className="text-xs text-muted-foreground">
+              {m.precioCosto ? `S/ ${m.precioCosto.toFixed(2)}` : "-"}
+            </span>
+          </div>
+        ) : (
+          "-"
+        ),
+    },
+    {
+      clave: "salida",
+      titulo: "Salidas",
+      renderizar: (m: MovimientoInventario) =>
+        m.idTipoMovimiento === 2 ? (
+          <div className="flex flex-col text-right">
+            <span className="text-destructive font-bold">-{m.cantidad}</span>
+            <span className="text-xs text-muted-foreground">
+              {m.costoPromedioActual
+                ? `S/ ${m.costoPromedioActual.toFixed(2)}`
+                : "-"}
+            </span>
+          </div>
+        ) : (
+          "-"
+        ),
+    },
+    {
+      clave: "saldo",
+      titulo: "Saldos (Kardex)",
       renderizar: (m: MovimientoInventario) => (
-        <span
-          className={
-            m.idTipoMovimiento === 1
-              ? "text-green-600 font-bold"
-              : m.idTipoMovimiento === 2
-                ? "text-destructive font-bold"
-                : "font-bold"
-          }
-        >
-          {m.idTipoMovimiento === 2 ? `-${m.cantidad}` : `+${m.cantidad}`}
-        </span>
+        <div className="flex flex-col text-right bg-blue-50/50 p-1 rounded">
+          <span className="font-bold">{m.saldoCantidad}</span>
+          <span className="text-xs font-medium text-blue-700">
+            CP: S/ {m.costoPromedioActual.toFixed(4)}
+          </span>
+          <span className="text-[10px] text-muted-foreground">
+            Val: S/ {m.saldoValorizado.toFixed(2)}
+          </span>
+        </div>
       ),
     },
+
     {
       clave: "almacen",
       titulo: "Almacén",
