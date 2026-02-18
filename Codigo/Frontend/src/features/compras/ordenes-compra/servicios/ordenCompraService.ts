@@ -25,6 +25,11 @@ export const obtenerOrdenesCompra = async (): Promise<OrdenCompra[]> => {
   return data;
 };
 
+export const obtenerSiguienteNumero = async (): Promise<string> => {
+  const respuesta: any = await api.get("/ordenes-compra/siguiente-numero");
+  return respuesta.datos || respuesta.data;
+};
+
 export const obtenerOrdenCompra = async (id: number): Promise<OrdenCompra> => {
   const respuesta: any = await api.get(`/ordenes-compra/${id}`);
   return respuesta.datos || respuesta.data;

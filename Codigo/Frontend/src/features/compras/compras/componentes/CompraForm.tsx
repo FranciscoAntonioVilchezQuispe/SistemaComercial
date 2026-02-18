@@ -37,7 +37,10 @@ import { useRegistrarCompra } from "../hooks/useCompras";
 import { SelectorTipoComprobante } from "@/compartido/componentes/formularios/SelectorTipoComprobante";
 import { SelectorCatalogo } from "@/compartido/componentes/formularios/SelectorCatalogo";
 // Importamos los hooks de los otros módulos para los selectores
-import { useProveedores } from "@/features/compras/proveedores/hooks/useProveedores";
+import {
+  useProveedores,
+  useProveedor,
+} from "@/features/compras/proveedores/hooks/useProveedores";
 import { useAlmacenes } from "@/features/inventario/almacenes/hooks/useAlmacenes";
 import { useProductos } from "@/features/catalogo/hooks/useProductos";
 
@@ -187,8 +190,19 @@ export function CompraForm({
   const [busquedaOrden, setBusquedaOrden] = React.useState("");
   const [buscandoOrden, setBuscandoOrden] = React.useState(false);
 
-  // Data for selectors
-  const { data: proveedores } = useProveedores();
+  // Provider search state
+  const [busquedaProv, setBusquedaProv] = React.useState("");
+
+  const { data: proveedores = [], refetch: buscarProveedores } = useProveedores(
+    busquedaProv,
+    false,
+  );
+
+  const handleSearchProveedor = (term: string) => {
+    setBusquedaProv(term);
+    setTimeout(() => buscarProveedores(), 0);
+  };
+
   const { data: almacenes } = useAlmacenes();
   const { data: productosData } = useProductos({
     pageNumber: 1,
@@ -213,6 +227,25 @@ export function CompraForm({
       ...datosIniciales,
     },
   });
+
+  // Fetch selected provider data explicitly if ID exists (for pre-fill)
+  const idProveedorWatch = form.watch("idProveedor");
+  const { data: proveedorSeleccionadoData } = useProveedor(
+    idProveedorWatch || 0,
+  );
+
+  // Merge search results with selected provider to ensure it appears in the list
+  const listaProveedores = React.useMemo(() => {
+    const lista = [...proveedores];
+    // If we have a selected provider and it's not in the current list, add it
+    if (
+      proveedorSeleccionadoData &&
+      !lista.some((p) => p.id === proveedorSeleccionadoData.id)
+    ) {
+      lista.push(proveedorSeleccionadoData);
+    }
+    return lista;
+  }, [proveedores, proveedorSeleccionadoData]);
 
   const { fields, append, remove, replace } = useFieldArray({
     control: form.control,
@@ -330,51 +363,53 @@ export function CompraForm({
     });
   };
 
-  const [busquedaProv, setBusquedaProv] = React.useState("");
-  const proveedoresFiltrados = React.useMemo(() => {
-    if (!busquedaProv) return [];
-    return (
-      proveedores?.filter(
-        (p) =>
-          p.razonSocial.toLowerCase().includes(busquedaProv.toLowerCase()) ||
-          p.numeroDocumento.includes(busquedaProv),
-      ) || []
-    );
-  }, [proveedores, busquedaProv]);
-
   // Reglas de Negocio SUNAT y Bloqueos
   const idProveedor = form.watch("idProveedor");
   const { data: configReglas } = useReglasDocumentos();
 
   const proveedorSeleccionado = React.useMemo(
-    () => proveedores?.find((p) => p.id === idProveedor),
-    [proveedores, idProveedor],
+    () => listaProveedores?.find((p) => p.id === idProveedor),
+    [listaProveedores, idProveedor],
   );
 
   const seccionBloqueada = !idProveedor || idProveedor === 0;
 
-  // Relaciones dinámicas
-  const relacionesDoc = React.useMemo(() => {
-    if (!configReglas?.relaciones) return {};
-    return configReglas.relaciones.reduce((acc: any, curr) => {
-      if (!acc[curr.codigoDocumento]) acc[curr.codigoDocumento] = [];
-      acc[curr.codigoDocumento].push(curr.idTipoComprobante.toString());
-      return acc;
-    }, {});
-  }, [configReglas]);
+  const [codigoDocumentoProv, setCodigoDocumentoProv] = React.useState<
+    string | undefined
+  >();
+
+  // Sincronizar código cuando el proveedor ya viene cargado (ej. edición o búsqueda)
+  React.useEffect(() => {
+    if (proveedorSeleccionado && configReglas?.reglas) {
+      const regla = configReglas.reglas.find(
+        (r) => r.id === proveedorSeleccionado.idTipoDocumento,
+      );
+      if (regla) setCodigoDocumentoProv(regla.codigo);
+    }
+  }, [proveedorSeleccionado, configReglas]);
+
+  const idsPermitidos = React.useMemo(() => {
+    if (!codigoDocumentoProv || !configReglas?.relaciones) return [];
+    return configReglas.relaciones
+      .filter((r) => r.codigoDocumento === codigoDocumentoProv)
+      .map((r) => r.idTipoComprobante.toString());
+  }, [codigoDocumentoProv, configReglas]);
 
   // Forzar Factura si es RUC (6) o aplicar regla de relación
   React.useEffect(() => {
     if (proveedorSeleccionado) {
-      const tipoDoc = proveedorSeleccionado.idTipoDocumento.toString();
-      const permitidos = relacionesDoc[tipoDoc] || [];
-
       // Si solo permite uno (ej. RUC -> Factura), lo forzamos
-      if (permitidos.length === 1) {
-        form.setValue("tipoComprobante", permitidos[0]);
+      if (idsPermitidos.length === 1) {
+        form.setValue("tipoComprobante", idsPermitidos[0]);
+      } else if (
+        idsPermitidos.length > 1 &&
+        !idsPermitidos.includes(form.getValues("tipoComprobante"))
+      ) {
+        // Si el actual no es válido, limpiamos
+        form.setValue("tipoComprobante", "");
       }
     }
-  }, [proveedorSeleccionado, relacionesDoc, form]);
+  }, [proveedorSeleccionado, idsPermitidos, form]);
 
   // Calcular totales en tiempo real
   const valoresDetalles = form.watch("detalles");
@@ -428,8 +463,9 @@ export function CompraForm({
                         form.setValue("tipoComprobante", "");
                       }
                     }}
-                    proveedores={proveedoresFiltrados}
-                    onSearch={setBusquedaProv}
+                    proveedores={listaProveedores}
+                    onSearch={handleSearchProveedor}
+                    onTipoDocChange={setCodigoDocumentoProv}
                   />
                 </FormControl>
                 <FormMessage />
@@ -518,11 +554,10 @@ export function CompraForm({
                 placeholder="Tipo (Factura)"
                 disabled={
                   seccionBloqueada ||
-                  (proveedorSeleccionado &&
-                    relacionesDoc[
-                      proveedorSeleccionado.idTipoDocumento.toString()
-                    ]?.length === 1)
+                  (proveedorSeleccionado && idsPermitidos.length === 1)
                 }
+                codigoDocumento={codigoDocumentoProv}
+                modulo="COMPRA"
               />
             )}
           />

@@ -20,6 +20,8 @@ import { MetodoPago } from "./SelectorMetodoPago";
 import { useSeries } from "../../hooks/useVentas";
 import { formatearMoneda } from "@compartido/utilidades/formateo/formatearMoneda";
 
+import { useTipoComprobante } from "@/features/configuracion/hooks/useTipoComprobante";
+
 interface DialogoFinalizarVentaProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -38,16 +40,6 @@ interface DialogoFinalizarVentaProps {
   ) => Promise<void>;
 }
 
-const tiposComprobante = [
-  { id: "BOLETA", nombre: "Boleta", descripcion: "Para consumidor final" },
-  {
-    id: "FACTURA",
-    nombre: "Factura",
-    descripcion: "Para empresas (requiere RUC)",
-  },
-  { id: "TICKET", nombre: "Ticket", descripcion: "Comprobante simple" },
-];
-
 export function DialogoFinalizarVenta({
   open,
   onOpenChange,
@@ -61,15 +53,22 @@ export function DialogoFinalizarVenta({
   montoPagado,
   onConfirmar,
 }: DialogoFinalizarVentaProps) {
-  const [tipoComprobante, setTipoComprobante] = useState("BOLETA");
+  const { data: tiposComprobante = [], isLoading: cargandoTipos } =
+    useTipoComprobante("VENTA");
+  const [tipoComprobante, setTipoComprobante] = useState("");
   const [procesando, setProcesando] = useState(false);
   const [serieSeleccionada, setSerieSeleccionada] = useState<any>(null);
 
-  // Mapear string a ID de tipo de comprobante para el hook
-  const tipoComprobanteId =
-    tipoComprobante === "BOLETA" ? 1 : tipoComprobante === "FACTURA" ? 2 : 3;
-  const { data: series, isLoading: cargandoSeries } =
-    useSeries(tipoComprobanteId);
+  // Seleccionar el primero por defecto
+  useEffect(() => {
+    if (tiposComprobante.length > 0 && !tipoComprobante) {
+      setTipoComprobante(tiposComprobante[0].id.toString());
+    }
+  }, [tiposComprobante, tipoComprobante]);
+
+  const { data: series, isLoading: cargandoSeries } = useSeries(
+    Number(tipoComprobante) || 0,
+  );
 
   useEffect(() => {
     if (series && series.length > 0) {
@@ -193,17 +192,29 @@ export function DialogoFinalizarVenta({
                 onValueChange={setTipoComprobante}
                 className="mt-2 space-y-2"
               >
-                {tiposComprobante.map((tipo) => (
-                  <div
-                    key={tipo.id}
-                    className="flex items-center space-x-2 border rounded-lg p-2 hover:bg-accent cursor-pointer"
-                  >
-                    <RadioGroupItem value={tipo.id} id={tipo.id} />
-                    <Label htmlFor={tipo.id} className="flex-1 cursor-pointer">
-                      <p className="text-sm font-medium">{tipo.nombre}</p>
-                    </Label>
-                  </div>
-                ))}
+                {cargandoTipos ? (
+                  <p className="text-sm text-muted-foreground animate-pulse">
+                    Cargando tipos...
+                  </p>
+                ) : (
+                  tiposComprobante.map((tipo) => (
+                    <div
+                      key={tipo.id}
+                      className="flex items-center space-x-2 border rounded-lg p-2 hover:bg-accent cursor-pointer"
+                    >
+                      <RadioGroupItem
+                        value={tipo.id.toString()}
+                        id={tipo.id.toString()}
+                      />
+                      <Label
+                        htmlFor={tipo.id.toString()}
+                        className="flex-1 cursor-pointer"
+                      >
+                        <p className="text-sm font-medium">{tipo.nombre}</p>
+                      </Label>
+                    </div>
+                  ))
+                )}
               </RadioGroup>
             </div>
 

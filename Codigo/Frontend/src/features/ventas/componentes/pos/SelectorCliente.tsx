@@ -22,20 +22,26 @@ export function SelectorCliente({
 }: SelectorClienteProps) {
   const [open, setOpen] = useState(false);
   const [busqueda, setBusqueda] = useState("");
+  const [terminoBusqueda, setTerminoBusqueda] = useState("");
 
-  const { data: clientes } = useClientes();
+  const { data: clientes = [], refetch: buscarClientes } = useClientes(
+    terminoBusqueda,
+    false,
+  );
 
-  const clientesFiltrados =
-    clientes?.filter(
-      (c) =>
-        c.razonSocial.toLowerCase().includes(busqueda.toLowerCase()) ||
-        c.numeroDocumento.includes(busqueda),
-    ) || [];
+  const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      setTerminoBusqueda(busqueda);
+      setTimeout(() => buscarClientes(), 0);
+    }
+  };
 
   const handleSeleccionar = (cliente: Cliente) => {
     onSeleccionar(cliente);
     setOpen(false);
     setBusqueda("");
+    setTerminoBusqueda("");
   };
 
   const clientePorDefecto: Cliente = {
@@ -79,9 +85,10 @@ export function SelectorCliente({
             <div className="relative">
               <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Buscar por nombre o documento..."
+                placeholder="Buscar por nombre o documento (Enter)..."
                 value={busqueda}
                 onChange={(e) => setBusqueda(e.target.value)}
+                onKeyDown={handleSearch}
                 className="pl-8"
               />
             </div>
@@ -103,7 +110,7 @@ export function SelectorCliente({
               </Button>
 
               {/* Clientes filtrados */}
-              {clientesFiltrados.map((cliente) => (
+              {clientes.map((cliente) => (
                 <Button
                   key={cliente.id}
                   variant="ghost"
@@ -119,7 +126,7 @@ export function SelectorCliente({
                 </Button>
               ))}
 
-              {clientesFiltrados.length === 0 && busqueda && (
+              {clientes.length === 0 && busqueda && (
                 <div className="p-4 text-center text-sm text-muted-foreground">
                   No se encontraron clientes
                 </div>

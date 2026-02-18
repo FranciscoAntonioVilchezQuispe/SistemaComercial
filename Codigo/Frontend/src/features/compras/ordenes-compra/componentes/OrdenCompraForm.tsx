@@ -163,7 +163,12 @@ export function OrdenCompraForm({ onSuccess, onCancel }: OrdenCompraFormProps) {
   const [terminoBusqueda, setTerminoBusqueda] = React.useState("");
   const [busquedaProveedor, setBusquedaProveedor] = React.useState("");
 
-  const { data: proveedores } = useProveedores();
+  // Only fetch when search term is present or initial load if needed
+  const { data: proveedores = [], refetch: buscarProveedores } = useProveedores(
+    busquedaProveedor,
+    false,
+  );
+
   const { data: almacenes } = useAlmacenes();
   const { data: productosData } = useProductos({
     pageNumber: 1,
@@ -172,23 +177,15 @@ export function OrdenCompraForm({ onSuccess, onCancel }: OrdenCompraFormProps) {
   });
   const productos = productosData?.datos || [];
 
-  const filtradosProveedor = React.useMemo(() => {
-    if (!busquedaProveedor) return [];
-    return (
-      proveedores?.filter(
-        (p) =>
-          p.razonSocial
-            .toLowerCase()
-            .includes(busquedaProveedor.toLowerCase()) ||
-          p.numeroDocumento.includes(busquedaProveedor),
-      ) || []
-    );
-  }, [proveedores, busquedaProveedor]);
+  const handleSearchProveedor = (term: string) => {
+    setBusquedaProveedor(term);
+    setTimeout(() => buscarProveedores(), 0);
+  };
 
   const form = useForm<OrdenCompraFormValues>({
     resolver: zodResolver(ordenCompraSchema),
     defaultValues: {
-      codigoOrden: "",
+      codigoOrden: "[AUTOGENERADO]",
       fechaEmision: new Date(),
       idEstado: EstadoOrdenCompra.Pendiente,
       idAlmacenDestino: 0,
@@ -238,7 +235,12 @@ export function OrdenCompraForm({ onSuccess, onCancel }: OrdenCompraFormProps) {
               <FormItem>
                 <FormLabel>Código Orden</FormLabel>
                 <FormControl>
-                  <Input {...field} placeholder="OC-2024-001" />
+                  <Input
+                    {...field}
+                    placeholder="OC-00000000"
+                    disabled
+                    className="bg-muted font-bold"
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -254,8 +256,8 @@ export function OrdenCompraForm({ onSuccess, onCancel }: OrdenCompraFormProps) {
                 <SelectorProveedorV2
                   value={field.value}
                   onChange={(p) => field.onChange(p?.id || 0)}
-                  proveedores={filtradosProveedor}
-                  onSearch={setBusquedaProveedor}
+                  proveedores={proveedores}
+                  onSearch={handleSearchProveedor}
                 />
                 <FormMessage />
               </FormItem>

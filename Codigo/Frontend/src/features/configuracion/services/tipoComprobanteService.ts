@@ -1,17 +1,12 @@
 import { apiConfiguracion } from "@/lib/axios";
 import { ToReturnList } from "@/types/api.types";
 
-export interface TipoComprobante {
-  id: number;
-  codigo: string;
-  nombre: string;
-  mueveStock: boolean;
-  tipoMovimientoStock: string;
-  activado: boolean;
-}
+import { TipoComprobante } from "../tipos/tipoComprobante.types";
 
 export const tipoComprobanteService = {
-  getAll: async (): Promise<ToReturnList<TipoComprobante>> => {
-    return await apiConfiguracion.get("/tipos-comprobante");
+  getAll: async (modulo?: string): Promise<ToReturnList<TipoComprobante>> => {
+    return await apiConfiguracion.get("/tipos-comprobante", {
+      params: { modulo },
+    });
   },
 };

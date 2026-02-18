@@ -3,8 +3,11 @@ import { Proveedor, ProveedorFormData } from "../types/proveedor.types";
 
 const BASE_URL = "/proveedores";
 
-export const obtenerProveedores = async (): Promise<Proveedor[]> => {
-  const respuesta: any = await apiCompras.get(BASE_URL);
+export const obtenerProveedores = async (
+  busqueda?: string,
+): Promise<Proveedor[]> => {
+  const params = busqueda ? { busqueda } : {};
+  const respuesta: any = await apiCompras.get(BASE_URL, { params });
   console.log("Respuesta Proveedores:", respuesta);
   const data = respuesta.datos || respuesta.data || [];
   return data.map((p: any) => ({

@@ -6,6 +6,9 @@ export interface TipoComprobante {
   // "ENTRADA", "SALIDA", "DEPENDIENTE"
   tipoMovimientoStock: string;
   activado: boolean;
+  esCompra: boolean;
+  esVenta: boolean;
+  esOrdenCompra: boolean;
 }
 
 export type TipoComprobanteFormData = Omit<TipoComprobante, "id" | "activado">;

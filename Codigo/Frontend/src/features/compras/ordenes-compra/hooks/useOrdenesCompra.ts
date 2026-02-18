@@ -10,6 +10,7 @@ import {
   obtenerOrdenCompra,
   registrarOrdenCompra,
   cambiarEstadoOrdenCompra,
+  obtenerSiguienteNumero,
 } from "../servicios/ordenCompraService";
 import { OrdenCompra, OrdenCompraFormData } from "../types/ordenCompra.types";
 
@@ -17,6 +18,17 @@ export const useOrdenesCompra = (): UseQueryResult<OrdenCompra[], Error> => {
   return useQuery({
     queryKey: ["ordenes-compra"],
     queryFn: obtenerOrdenesCompra,
+  });
+};
+
+export const useSiguienteNumeroOrdenCompra = (): UseQueryResult<
+  string,
+  Error
+> => {
+  return useQuery({
+    queryKey: ["ordenes-compra", "siguiente-numero"],
+    queryFn: obtenerSiguienteNumero,
+    staleTime: 0, // Siempre obtener el más reciente al abrir el form
   });
 };
 

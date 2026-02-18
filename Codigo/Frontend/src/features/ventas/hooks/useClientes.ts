@@ -1,7 +1,18 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  useQuery,
+  useMutation,
+  useQueryClient,
+  UseQueryResult,
+  UseMutationResult,
+} from "@tanstack/react-query";
 import { toast } from "sonner";
 import { servicioClientes } from "../servicios/servicioClientes";
-import { ClienteFormData, ClienteFiltros } from "../tipos/ventas.types";
+import {
+  Cliente,
+  ClienteFormData,
+  ClienteFiltros,
+  RespuestaClientes,
+} from "../tipos/ventas.types";
 import { manejadorErrores } from "@/lib/axios/manejadorErrores";
 
 const QUERY_KEY = "clientes";
@@ -13,18 +24,20 @@ export function useClientes(
   filtros?: ClienteFiltros,
   pagina: number = 1,
   elementosPorPagina: number = 10,
-) {
+  enabled: boolean = true,
+): UseQueryResult<RespuestaClientes, Error> {
   return useQuery({
     queryKey: [QUERY_KEY, filtros, pagina, elementosPorPagina],
     queryFn: () =>
       servicioClientes.obtenerClientes(filtros, pagina, elementosPorPagina),
+    enabled: enabled,
   });
 }
 
 /**
  * Hook para obtener un cliente por ID
  */
-export function useCliente(id: number) {
+export function useCliente(id: number): UseQueryResult<Cliente, Error> {
   return useQuery({
     queryKey: [QUERY_KEY, id],
     queryFn: () => servicioClientes.obtenerClientePorId(id),
@@ -35,7 +48,9 @@ export function useCliente(id: number) {
 /**
  * Hook para buscar cliente por documento
  */
-export function useBuscarClientePorDocumento(numeroDocumento: string) {
+export function useBuscarClientePorDocumento(
+  numeroDocumento: string,
+): UseQueryResult<Cliente | null, Error> {
   return useQuery({
     queryKey: [QUERY_KEY, "documento", numeroDocumento],
     queryFn: () => servicioClientes.buscarPorDocumento(numeroDocumento),
@@ -46,7 +61,11 @@ export function useBuscarClientePorDocumento(numeroDocumento: string) {
 /**
  * Hook para crear un cliente
  */
-export function useCrearCliente() {
+export function useCrearCliente(): UseMutationResult<
+  Cliente,
+  Error,
+  ClienteFormData
+> {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -65,7 +84,11 @@ export function useCrearCliente() {
 /**
  * Hook para actualizar un cliente
  */
-export function useActualizarCliente() {
+export function useActualizarCliente(): UseMutationResult<
+  Cliente,
+  Error,
+  { id: number; datos: ClienteFormData }
+> {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -84,7 +107,7 @@ export function useActualizarCliente() {
 /**
  * Hook para eliminar un cliente
  */
-export function useEliminarCliente() {
+export function useEliminarCliente(): UseMutationResult<void, Error, number> {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -102,7 +125,9 @@ export function useEliminarCliente() {
 /**
  * Hook para obtener historial de compras
  */
-export function useHistorialCompras(idCliente: number) {
+export function useHistorialCompras(
+  idCliente: number,
+): UseQueryResult<any, Error> {
   return useQuery({
     queryKey: [QUERY_KEY, idCliente, "historial"],
     queryFn: () => servicioClientes.obtenerHistorialCompras(idCliente),

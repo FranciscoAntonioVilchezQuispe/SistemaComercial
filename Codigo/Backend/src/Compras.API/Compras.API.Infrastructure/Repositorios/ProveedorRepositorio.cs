@@ -44,9 +44,28 @@ namespace Compras.API.Infrastructure.Repositorios
             }
         }
 
-        public async Task<IEnumerable<Proveedor>> ObtenerTodosAsync()
+        public async Task<IEnumerable<Proveedor>> ObtenerTodosAsync(string? busqueda = null)
         {
-            return await _context.Proveedores.ToListAsync();
+            var query = _context.Proveedores.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(busqueda))
+            {
+                var term = busqueda.Trim().ToLower();
+                query = query.Where(p =>
+                    p.RazonSocial.ToLower().Contains(term) ||
+                    p.NumeroDocumento.Contains(term));
+            }
+
+            // Limit results to avoid performance issues if no search term, or just limit generally
+            if (string.IsNullOrWhiteSpace(busqueda))
+            {
+                // Optional: Return empty or limited list if no search to prevent massive load
+                // For now, we will return empty list if no search to force user to search
+                // Or limit to top 20
+                return await query.Take(20).ToListAsync();
+            }
+
+            return await query.ToListAsync();
         }
     }
 }

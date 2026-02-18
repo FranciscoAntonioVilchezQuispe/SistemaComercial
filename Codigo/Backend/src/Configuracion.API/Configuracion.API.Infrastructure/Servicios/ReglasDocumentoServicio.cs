@@ -85,6 +85,20 @@ namespace Configuracion.API.Infrastructure.Servicios
                 .ToListAsync();
         }
 
+        public async Task<IEnumerable<TipoComprobante>> ListarComprobantesPorDocumentoAsync(string codigoDocumento)
+        {
+            var relations = await _context.DocumentoComprobanteRelaciones
+                .AsNoTracking()
+                .Where(r => r.CodigoDocumento == codigoDocumento && r.Activado)
+                .Select(r => r.IdTipoComprobante)
+                .ToListAsync();
+
+            return await _context.TiposComprobante
+                .AsNoTracking()
+                .Where(tc => relations.Contains(tc.Id) && tc.Activado)
+                .ToListAsync();
+        }
+
         public async Task<bool> ActualizarRelacionesAsync(string codigoDocumento, List<long> idsTiposComprobante)
         {
             if (string.IsNullOrEmpty(codigoDocumento)) return false;

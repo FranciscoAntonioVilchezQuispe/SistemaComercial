@@ -13,4 +13,10 @@
     <ProjectReference Include="..\Compras.API.Infrastructure\Compras.API.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\Configuracion.API\Configuracion.API.Infrastructure\Configuracion.API.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\Inventario.API\Inventario.API.Infrastructure\Inventario.API.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\Catalogo.API\Catalogo.Infrastructure\Catalogo.Infrastructure.csproj" />
+  </ItemGroup>
+
 </Project>

@@ -10,6 +10,6 @@ namespace Compras.API.Domain.Interfaces
         Task<Proveedor> AgregarAsync(Proveedor proveedor);
         Task ActualizarAsync(Proveedor proveedor);
         Task EliminarAsync(long id);
-        Task<IEnumerable<Proveedor>> ObtenerTodosAsync();
+        Task<IEnumerable<Proveedor>> ObtenerTodosAsync(string? busqueda = null);
     }
 }

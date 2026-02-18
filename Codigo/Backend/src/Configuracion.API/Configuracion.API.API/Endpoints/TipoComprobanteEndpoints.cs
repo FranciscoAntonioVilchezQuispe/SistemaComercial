@@ -16,6 +16,9 @@ public class TipoComprobanteDto
     public string Nombre { get; set; } = null!;
     public bool MueveStock { get; set; }
     public string TipoMovimientoStock { get; set; } = "DEPENDIENTE";
+    public bool EsCompra { get; set; }
+    public bool EsVenta { get; set; }
+    public bool EsOrdenCompra { get; set; }
 }
 
 namespace Configuracion.API.Endpoints
@@ -26,9 +29,18 @@ namespace Configuracion.API.Endpoints
         {
             var grupo = app.MapGroup("/api/tipos-comprobante").WithTags("Tipos de Comprobante");
 
-            grupo.MapGet("/", async (ITipoComprobanteRepositorio repo) =>
+            grupo.MapGet("/", async (string? modulo, ITipoComprobanteRepositorio repo) =>
             {
                 var tipos = await repo.ObtenerTodosAsync();
+
+                if (!string.IsNullOrEmpty(modulo))
+                {
+                    modulo = modulo.ToUpper();
+                    if (modulo == "COMPRA") tipos = tipos.Where(t => t.EsCompra);
+                    else if (modulo == "VENTA") tipos = tipos.Where(t => t.EsVenta);
+                    else if (modulo == "ORDEN_COMPRA") tipos = tipos.Where(t => t.EsOrdenCompra);
+                }
+
                 return Results.Ok(new ToReturnList<TipoComprobante>(tipos));
             });
 
@@ -47,6 +59,9 @@ namespace Configuracion.API.Endpoints
                     Nombre = dto.Nombre,
                     MueveStock = dto.MueveStock,
                     TipoMovimientoStock = dto.TipoMovimientoStock,
+                    EsCompra = dto.EsCompra,
+                    EsVenta = dto.EsVenta,
+                    EsOrdenCompra = dto.EsOrdenCompra,
                     UsuarioCreacion = "SISTEMA",
                     Activado = true
                 };
@@ -63,6 +78,9 @@ namespace Configuracion.API.Endpoints
                 tipo.Nombre = dto.Nombre;
                 tipo.MueveStock = dto.MueveStock;
                 tipo.TipoMovimientoStock = dto.TipoMovimientoStock;
+                tipo.EsCompra = dto.EsCompra;
+                tipo.EsVenta = dto.EsVenta;
+                tipo.EsOrdenCompra = dto.EsOrdenCompra;
                 tipo.UsuarioActualizacion = "SISTEMA";
                 tipo.FechaActualizacion = DateTime.UtcNow;
 

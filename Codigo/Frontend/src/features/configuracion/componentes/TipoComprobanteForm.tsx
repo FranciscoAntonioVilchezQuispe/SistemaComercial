@@ -104,6 +104,45 @@ export function TipoComprobanteForm({
         )}
       </div>
 
+      <div className="border rounded-md p-4 space-y-4">
+        <label className={labelClass}>Módulos donde es visible</label>
+        <div className="flex flex-col space-y-2">
+          <div className="flex items-center space-x-2">
+            <input
+              type="checkbox"
+              id="esCompra"
+              className={checkboxClass}
+              {...register("esCompra")}
+            />
+            <label htmlFor="esCompra" className={labelClass}>
+              Compras
+            </label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <input
+              type="checkbox"
+              id="esVenta"
+              className={checkboxClass}
+              {...register("esVenta")}
+            />
+            <label htmlFor="esVenta" className={labelClass}>
+              Ventas
+            </label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <input
+              type="checkbox"
+              id="esOrdenCompra"
+              className={checkboxClass}
+              {...register("esOrdenCompra")}
+            />
+            <label htmlFor="esOrdenCompra" className={labelClass}>
+              Orden de Compra
+            </label>
+          </div>
+        </div>
+      </div>
+
       <div className="flex justify-end gap-2 pt-4">
         <Button type="button" variant="outline" onClick={alCancelar}>
           Cancelar

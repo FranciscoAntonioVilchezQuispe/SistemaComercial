@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Plus, Eye, ShoppingBag } from "lucide-react";
+import { Plus, Eye, ShoppingCart } from "lucide-react";
 import { useLocation } from "react-router-dom";
 import { formatFecha } from "@/lib/i18n";
 
@@ -13,7 +13,6 @@ import {
 import { DataTable } from "@/components/ui/DataTable";
 import { Loading } from "@compartido/componentes/feedback/Loading";
 import { MensajeError } from "@compartido/componentes/feedback/MensajeError";
-import { Input } from "@/components/ui/input";
 import {
   Card,
   CardContent,
@@ -155,29 +154,24 @@ export default function PaginaCompras() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex justify-between items-center mb-4 gap-4 flex-wrap">
-            <div className="relative flex-1 max-w-sm">
-              <ShoppingBag className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Buscar por número..."
-                className="pl-8"
-                value={filtro}
-                onChange={(e) => setFiltro(e.target.value)}
-              />
-            </div>
-            <Button
-              onClick={() => {
-                setCompraSeleccionada(null);
-                setDatosIniciales(null);
-                setModoCreacion(true);
-                setDialogoOpen(true);
-              }}
-            >
-              <Plus className="mr-2 h-4 w-4" /> Registrar Compra
-            </Button>
-          </div>
-
-          <DataTable data={comprasFiltradas} columns={columnas} />
+          <DataTable
+            data={comprasFiltradas}
+            columns={columnas}
+            onSearchChange={setFiltro}
+            searchPlaceholder="Buscar por número o proveedor..."
+            actionElement={
+              <Button
+                onClick={() => {
+                  setCompraSeleccionada(null);
+                  setDatosIniciales(null);
+                  setModoCreacion(true);
+                  setDialogoOpen(true);
+                }}
+              >
+                <Plus className="mr-2 h-4 w-4" /> Registrar Compra
+              </Button>
+            }
+          />
         </CardContent>
       </Card>
 
@@ -199,31 +193,112 @@ export default function PaginaCompras() {
               onCancel={() => setDialogoOpen(false)}
             />
           ) : (
-            <div className="p-4 bg-muted/20 rounded text-sm">
-              <h4 className="font-bold border-b pb-2 mb-4">
-                Resumen Documento
-              </h4>
-              {/* Simple display for now, ideally a detail view component */}
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <strong>Comprobante:</strong>{" "}
-                  {compraSeleccionada?.serieComprobante}-
-                  {compraSeleccionada?.numeroComprobante}
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 p-4 bg-muted/20 rounded-lg">
+                <div className="space-y-1">
+                  <span className="text-xs text-muted-foreground uppercase font-bold tracking-wider">
+                    Proveedor
+                  </span>
+                  <p className="font-medium text-sm">
+                    {compraSeleccionada?.razonSocialProveedor ||
+                      `ID: ${compraSeleccionada?.idProveedor}`}
+                  </p>
                 </div>
-                <div>
-                  <strong>Fecha:</strong>{" "}
-                  {compraSeleccionada?.fechaEmision &&
-                    formatFecha(
-                      new Date(compraSeleccionada.fechaEmision),
-                      "PPPP",
-                    )}
+                <div className="space-y-1">
+                  <span className="text-xs text-muted-foreground uppercase font-bold tracking-wider">
+                    Almacén
+                  </span>
+                  <p className="font-medium text-sm">
+                    {compraSeleccionada?.nombreAlmacen ||
+                      `ID: ${compraSeleccionada?.idAlmacen}`}
+                  </p>
                 </div>
-                <div>
-                  <strong>Proveedor:</strong>{" "}
-                  {compraSeleccionada?.razonSocialProveedor}
+                <div className="space-y-1">
+                  <span className="text-xs text-muted-foreground uppercase font-bold tracking-wider">
+                    Fecha Emisión
+                  </span>
+                  <p className="font-medium text-sm">
+                    {compraSeleccionada?.fechaEmision &&
+                      formatFecha(
+                        new Date(compraSeleccionada.fechaEmision),
+                        "PPPP",
+                      )}
+                  </p>
                 </div>
-                <div>
-                  <strong>Total:</strong> {compraSeleccionada?.total.toFixed(2)}
+                <div className="space-y-1">
+                  <span className="text-xs text-muted-foreground uppercase font-bold tracking-wider">
+                    Total
+                  </span>
+                  <p className="font-bold text-lg text-primary">
+                    S/ {compraSeleccionada?.total.toFixed(2)}
+                  </p>
+                </div>
+              </div>
+
+              {compraSeleccionada?.observaciones && (
+                <div className="p-3 bg-blue-50 border border-blue-100 rounded text-sm text-blue-800">
+                  <strong className="block mb-1">Observaciones:</strong>
+                  {compraSeleccionada.observaciones}
+                </div>
+              )}
+
+              <div className="space-y-3">
+                <h4 className="font-bold text-lg border-b pb-2 flex items-center gap-2">
+                  <ShoppingCart className="h-4 w-4" /> Detalles de la Compra
+                </h4>
+                <div className="border rounded-lg overflow-hidden">
+                  <table className="w-full text-sm">
+                    <thead className="bg-muted/50 text-muted-foreground">
+                      <tr className="text-left">
+                        <th className="p-3 font-semibold">Producto</th>
+                        <th className="p-3 font-semibold text-right">
+                          Cantidad
+                        </th>
+                        <th className="p-3 font-semibold text-right">
+                          Precio Unit.
+                        </th>
+                        <th className="p-3 font-semibold text-right text-primary">
+                          Subtotal
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y">
+                      {compraSeleccionada?.detalles?.map((d, i) => (
+                        <tr
+                          key={i}
+                          className="hover:bg-muted/30 transition-colors"
+                        >
+                          <td className="p-3">
+                            <div className="font-medium">
+                              {d.nombreProducto || `Prod. #${d.idProducto}`}
+                            </div>
+                          </td>
+                          <td className="p-3 text-right tabular-nums">
+                            {d.cantidad.toFixed(3)}
+                          </td>
+                          <td className="p-3 text-right tabular-nums">
+                            {d.precioUnitario.toFixed(2)}
+                          </td>
+                          <td className="p-3 text-right font-bold tabular-nums">
+                            {d.subtotal.toFixed(2)}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                    <tfoot className="bg-muted/20 font-bold">
+                      <tr>
+                        <td
+                          colSpan={3}
+                          className="p-3 text-right uppercase tracking-wider text-xs text-muted-foreground"
+                        >
+                          Total Final
+                        </td>
+                        <td className="p-3 text-right text-base text-primary">
+                          S/ {compraSeleccionada?.total.toFixed(2)}
+                        </td>
+                      </tr>
+                    </tfoot>
+                  </table>
                 </div>
               </div>
             </div>

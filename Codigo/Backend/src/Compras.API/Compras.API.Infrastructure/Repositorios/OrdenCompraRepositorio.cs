@@ -10,11 +10,13 @@ namespace Compras.API.Infrastructure.Repositorios
 {
     public class OrdenCompraRepositorio : IOrdenCompraRepositorio
     {
+        private readonly Configuracion.API.Infrastructure.Datos.ConfiguracionDbContext _configContext;
         private readonly ComprasDbContext _context;
 
-        public OrdenCompraRepositorio(ComprasDbContext context)
+        public OrdenCompraRepositorio(ComprasDbContext context, Configuracion.API.Infrastructure.Datos.ConfiguracionDbContext configContext)
         {
             _context = context;
+            _configContext = configContext;
         }
 
         public async Task<OrdenCompra?> ObtenerPorIdAsync(long id)
@@ -27,9 +29,51 @@ namespace Compras.API.Infrastructure.Repositorios
 
         public async Task<OrdenCompra> AgregarAsync(OrdenCompra orden)
         {
-            _context.OrdenesCompra.Add(orden);
-            await _context.SaveChangesAsync();
-            return orden;
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                // 1. Obtener la serie de comprobante para Orden de Compra
+                // Unimos series_comprobantes con tipo_comprobante
+                var serieComprobante = await _configContext.SeriesComprobantes
+                    .Include(s => s.TipoComprobante)
+                    .Where(s => s.TipoComprobante != null && s.TipoComprobante.EsOrdenCompra && s.TipoComprobante.Activado)
+                    .OrderByDescending(s => s.FechaCreacion)
+                    .FirstOrDefaultAsync();
+
+                if (serieComprobante == null)
+                {
+                    throw new System.Exception("No se encontró una serie configurada para el tipo de comprobante 'Orden de Compra'.");
+                }
+
+                // 2. Incrementar y formatear correlativo
+                serieComprobante.CorrelativoActual++;
+                string numeroFormateado = serieComprobante.CorrelativoActual.ToString().PadLeft(8, '0');
+
+                // 3. Asignar valores a la orden
+                orden.IdTipoComprobante = serieComprobante.IdTipoComprobante;
+                orden.Serie = serieComprobante.Serie;
+                orden.Numero = numeroFormateado;
+                orden.CodigoOrden = $"{orden.Serie}-{orden.Numero}";
+
+                // 4. Validar duplicados para evitar conflictos
+                if (await _context.OrdenesCompra.AnyAsync(o => o.CodigoOrden == orden.CodigoOrden))
+                {
+                    throw new System.Exception($"Ya existe una orden de compra con el código {orden.CodigoOrden}. Reintente la operación.");
+                }
+
+                // 5. Guardar cambios en ambos contextos
+                _context.OrdenesCompra.Add(orden);
+                await _context.SaveChangesAsync();
+                await _configContext.SaveChangesAsync();
+
+                await transaction.CommitAsync();
+                return orden;
+            }
+            catch (System.Exception)
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
         }
 
         public async Task ActualizarAsync(OrdenCompra orden)
@@ -67,6 +111,20 @@ namespace Compras.API.Infrastructure.Repositorios
             return await _context.OrdenesCompra
                 .Where(o => o.IdProveedor == idProveedor)
                 .ToListAsync();
+        }
+
+        public async Task<string> ObtenerSiguienteNumeroAsync()
+        {
+            var serieComprobante = await _configContext.SeriesComprobantes
+                .Include(s => s.TipoComprobante)
+                .Where(s => s.TipoComprobante != null && s.TipoComprobante.EsOrdenCompra && s.TipoComprobante.Activado)
+                .OrderByDescending(s => s.FechaCreacion)
+                .FirstOrDefaultAsync();
+
+            if (serieComprobante == null) return "S/N";
+
+            string numeroFormateado = (serieComprobante.CorrelativoActual + 1).ToString().PadLeft(8, '0');
+            return $"{serieComprobante.Serie}{numeroFormateado}";
         }
     }
 }

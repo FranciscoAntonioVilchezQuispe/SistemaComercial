@@ -14,9 +14,9 @@ namespace Clientes.API.Endpoints
         {
             var grupo = app.MapGroup("/api/clientes").WithTags("Clientes");
 
-            grupo.MapGet("/", async (IClienteRepositorio repo) =>
+            grupo.MapGet("/", async (string? busqueda, IClienteRepositorio repo) =>
             {
-                var clientes = await repo.ObtenerTodosAsync();
+                var clientes = await repo.ObtenerTodosAsync(busqueda);
                 return Results.Ok(new ToReturnList<Cliente>(clientes));
             });
 

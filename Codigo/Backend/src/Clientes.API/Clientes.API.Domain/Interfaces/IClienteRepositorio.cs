@@ -10,6 +10,6 @@ namespace Clientes.API.Domain.Interfaces
         Task<Cliente> AgregarAsync(Cliente cliente);
         Task ActualizarAsync(Cliente cliente);
         Task EliminarAsync(long id);
-        Task<IEnumerable<Cliente>> ObtenerTodosAsync();
+        Task<IEnumerable<Cliente>> ObtenerTodosAsync(string? busqueda = null);
     }
 }

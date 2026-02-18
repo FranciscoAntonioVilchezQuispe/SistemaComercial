@@ -23,6 +23,12 @@ namespace Compras.API.Endpoints
                 return Results.Ok(new ToReturnList<OrdenCompra>(ordenes));
             });
 
+            grupo.MapGet("/siguiente-numero", async (IOrdenCompraRepositorio repo) =>
+            {
+                var siguiente = await repo.ObtenerSiguienteNumeroAsync();
+                return Results.Ok(new ToReturn<string>(siguiente));
+            });
+
             grupo.MapGet("/{id}", async (long id, IOrdenCompraRepositorio repo) =>
             {
                 var orden = await repo.ObtenerPorIdAsync(id);
@@ -36,7 +42,7 @@ namespace Compras.API.Endpoints
                 {
                     var orden = new OrdenCompra
                     {
-                        CodigoOrden = dto.CodigoOrden,
+                        CodigoOrden = dto.CodigoOrden ?? string.Empty,
                         IdProveedor = dto.IdProveedor,
                         IdAlmacenDestino = dto.IdAlmacenDestino,
                         FechaEmision = DateTime.SpecifyKind(dto.FechaEmision, DateTimeKind.Utc),

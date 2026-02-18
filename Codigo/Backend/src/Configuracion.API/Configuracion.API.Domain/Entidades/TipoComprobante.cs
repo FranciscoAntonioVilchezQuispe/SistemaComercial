@@ -32,5 +32,14 @@ namespace Configuracion.API.Domain.Entidades
 
         [Column("activado")]
         public bool Activado { get; set; } = true;
+
+        [Column("es_compra")]
+        public bool EsCompra { get; set; }
+
+        [Column("es_venta")]
+        public bool EsVenta { get; set; }
+
+        [Column("es_orden_compra")]
+        public bool EsOrdenCompra { get; set; }
     }
 }

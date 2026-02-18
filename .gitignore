@@ -8,6 +8,8 @@ obj/
 *.user
 *.useros
 *.sln.docstates
+.vs/
+
 
 # Visual Studio Code
 .vscode/*
@@ -16,6 +18,10 @@ obj/
 !.vscode/launch.json
 !.vscode/extensions.json
 *.code-workspace
+Codigo/LogErrores/
+Codigo/BuildErrors/
+*LogErrores/*
+*BuildErrors/*
 
 # Node.js / React
 node_modules/

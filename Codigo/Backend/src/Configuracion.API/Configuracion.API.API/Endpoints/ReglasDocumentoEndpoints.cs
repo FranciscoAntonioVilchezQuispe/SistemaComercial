@@ -62,6 +62,20 @@ namespace Configuracion.API.Endpoints
                 return Results.Ok(new ToReturn<string>("Relaciones actualizadas con éxito"));
             })
             .WithName("ActualizarRelaciones");
+
+            group.MapGet("/relaciones/{codigoDocumento}", async (string codigoDocumento, IReglasDocumentoServicio servicio) =>
+            {
+                var relaciones = await servicio.ListarRelacionesPorDocumentoAsync(codigoDocumento);
+                return Results.Ok(new ToReturnList<DocumentoComprobanteRelacion>(relaciones));
+            })
+            .WithName("ListarRelacionesPorDocumento");
+
+            group.MapGet("/comprobantes/{codigoDocumento}", async (string codigoDocumento, IReglasDocumentoServicio servicio) =>
+            {
+                var comprobantes = await servicio.ListarComprobantesPorDocumentoAsync(codigoDocumento);
+                return Results.Ok(new ToReturnList<TipoComprobante>(comprobantes));
+            })
+            .WithName("ListarComprobantesPorDocumento");
         }
     }
 }

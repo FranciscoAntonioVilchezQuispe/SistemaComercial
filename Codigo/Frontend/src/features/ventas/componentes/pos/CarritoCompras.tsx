@@ -77,12 +77,6 @@ export function CarritoCompras() {
   ) => {
     try {
       // Mapear tipo de comprobante a ID
-      const tipoComprobanteMap: Record<string, number> = {
-        BOLETA: 1,
-        FACTURA: 2,
-        TICKET: 3,
-      };
-
       // Preparar detalles de venta
       const detalles: DetalleVentaFormData[] = items.map((item) => ({
         idProducto: item.producto.id,
@@ -94,7 +88,7 @@ export function CarritoCompras() {
       // Preparar datos de venta
       const ventaData: VentaFormData = {
         idCliente: clienteSeleccionado?.id || 0, // 0 = Público General
-        idTipoComprobante: tipoComprobanteMap[tipoComprobante] || 1,
+        idTipoComprobante: Number(tipoComprobante),
         idAlmacen: 1, // TODO: Obtener del contexto de usuario/sucursal. Por ahora 1.
         idMoneda: 1, // TODO: Selector de moneda. Por ahora 1 (Soles).
         serie: serie,

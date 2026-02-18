@@ -12,8 +12,9 @@ import {
   FormLabel,
   FormMessage,
 } from "@/componentes/ui/form";
+import { useComprobantesPorDocumento } from "@/configuracion/hooks/useComprobantesPorDocumento";
 import { useTipoComprobante } from "@/features/configuracion/hooks/useTipoComprobante";
-import { TipoComprobante } from "@/features/configuracion/services/tipoComprobanteService";
+import { TipoComprobante } from "@/features/configuracion/tipos/tipoComprobante.types";
 import { Loader2 } from "lucide-react";
 
 interface SelectorTipoComprobanteProps {
@@ -23,6 +24,8 @@ interface SelectorTipoComprobanteProps {
   onChange: (value: string) => void;
   disabled?: boolean;
   hideLabel?: boolean;
+  modulo?: string;
+  codigoDocumento?: string;
 }
 
 export const SelectorTipoComprobante: React.FC<
@@ -34,15 +37,35 @@ export const SelectorTipoComprobante: React.FC<
   onChange,
   disabled = false,
   hideLabel = false,
+  modulo,
+  codigoDocumento,
 }) => {
-  const { data: tipos, isLoading, isError } = useTipoComprobante();
+  // Siempre cargamos todos los tipos si no hay código de documento, o los filtrados si lo hay
+  const {
+    data: todosLosTipos,
+    isLoading: loadingTodos,
+    isError: errorTodos,
+  } = useTipoComprobante(modulo);
+  const {
+    data: tiposFiltradosQuery,
+    isLoading: loadingFiltrados,
+    isError: errorFiltrados,
+  } = useComprobantesPorDocumento(codigoDocumento);
+
+  const isLoading = loadingTodos || (!!codigoDocumento && loadingFiltrados);
+  const isError = errorTodos || (!!codigoDocumento && errorFiltrados);
+
+  const tiposAMostrar = React.useMemo(() => {
+    if (!codigoDocumento) return todosLosTipos || [];
+    return tiposFiltradosQuery || [];
+  }, [todosLosTipos, tiposFiltradosQuery, codigoDocumento]);
 
   return (
     <FormItem>
       {!hideLabel && <FormLabel>{label}</FormLabel>}
       <Select
         onValueChange={onChange}
-        value={value?.toString()}
+        value={value ? value.toString() : ""}
         disabled={disabled || isLoading}
       >
         <FormControl>
@@ -63,12 +86,12 @@ export const SelectorTipoComprobante: React.FC<
               Error al cargar datos
             </SelectItem>
           )}
-          {!isLoading && !isError && tipos?.length === 0 && (
+          {!isLoading && tiposAMostrar?.length === 0 && (
             <SelectItem value="none" disabled>
               No hay opciones disponibles
             </SelectItem>
           )}
-          {tipos?.map((tipo: TipoComprobante) => (
+          {tiposAMostrar?.map((tipo: TipoComprobante) => (
             <SelectItem key={tipo.id} value={tipo.id.toString()}>
               {tipo.nombre}
             </SelectItem>

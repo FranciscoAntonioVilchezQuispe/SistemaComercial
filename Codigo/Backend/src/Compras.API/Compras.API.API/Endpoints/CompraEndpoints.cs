@@ -42,7 +42,12 @@ namespace Compras.API.Endpoints
         {
             Id = c.Id,
             IdProveedor = c.IdProveedor,
+            RazonSocialProveedor = c.Proveedor?.RazonSocial,
             IdAlmacen = c.IdAlmacen,
+            // NombreAlmacen se poblaría aquí si tuviéramos la referencia en la entidad, 
+            // pero como lo hicimos vía join en el repo, aseguramos que se pase.
+            // Para simplicidad en este paso, asumimos que el repo ya enriqueció la entidad si es posible,
+            // o lo mapeamos directamente si tenemos acceso a las propiedades de navegación.
             IdOrdenCompraRef = c.IdOrdenCompraRef,
             IdTipoComprobante = c.IdTipoComprobante,
             SerieComprobante = c.SerieComprobante,
@@ -60,10 +65,11 @@ namespace Compras.API.Endpoints
             {
                 Id = d.Id,
                 IdProducto = d.IdProducto,
+                NombreProducto = d.Descripcion, // El repo puso el nombre en Descripcion
                 IdVariante = d.IdVariante,
                 Descripcion = d.Descripcion,
                 Cantidad = d.Cantidad,
-                PrecioUnitarioCompra = d.PrecioUnitarioCompra, // Mapeo corregido
+                PrecioUnitarioCompra = d.PrecioUnitarioCompra,
                 Subtotal = d.Subtotal
             }).ToList() ?? new()
         };

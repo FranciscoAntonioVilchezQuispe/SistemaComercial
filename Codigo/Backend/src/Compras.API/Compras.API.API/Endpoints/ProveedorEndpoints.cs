@@ -14,9 +14,9 @@ namespace Compras.API.Endpoints
         {
             var grupo = app.MapGroup("/api/proveedores").WithTags("Proveedores");
 
-            grupo.MapGet("/", async (IProveedorRepositorio repo) =>
+            grupo.MapGet("/", async (string? busqueda, IProveedorRepositorio repo) =>
             {
-                var proveedores = await repo.ObtenerTodosAsync();
+                var proveedores = await repo.ObtenerTodosAsync(busqueda);
                 return Results.Ok(new ToReturnList<Proveedor>(proveedores));
             });
 

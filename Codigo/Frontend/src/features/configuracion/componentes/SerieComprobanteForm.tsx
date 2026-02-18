@@ -6,6 +6,8 @@ import {
   SerieComprobanteFormData,
 } from "../tipos/serieComprobante.types";
 import { useTiposComprobante } from "../hooks/useTiposComprobante";
+import { useAlmacenes } from "../../inventario/almacenes/hooks/useAlmacenes";
+import { padIzquierda, limpiarSoloNumeros } from "../../../lib/i18n";
 
 interface SerieComprobanteFormProps {
   datosIniciales?: SerieComprobante;
@@ -23,11 +25,13 @@ export function SerieComprobanteForm({
   cargando,
 }: SerieComprobanteFormProps) {
   const { data: tipos } = useTiposComprobante();
+  const { data: almacenes } = useAlmacenes();
 
   const {
     register,
     handleSubmit,
     reset,
+    setValue,
     formState: { errors },
   } = useForm<SerieComprobanteFormData>({
     defaultValues: {
@@ -97,25 +101,32 @@ export function SerieComprobanteForm({
       <div className="space-y-2">
         <label className={labelClass}>Correlativo Actual</label>
         <input
-          type="number"
+          type="text"
           className={inputClass}
           {...register("correlativoActual", {
             required: true,
-            valueAsNumber: true,
-            min: 0,
+            onBlur: (e) => {
+              const val = limpiarSoloNumeros(e.target.value);
+              setValue("correlativoActual", padIzquierda(val) as any);
+            },
           })}
+          defaultValue={0}
         />
       </div>
 
       <div className="space-y-2">
-        {/* Placeholder for Almacen selection later */}
-        <label className={labelClass}>ID Almacén (Opcional)</label>
-        <input
-          type="number"
+        <label className={labelClass}>Almacén pertecene (Opcional)</label>
+        <select
           className={inputClass}
           {...register("idAlmacen", { valueAsNumber: true })}
-          placeholder="Ej: 1"
-        />
+        >
+          <option value="">Seleccione un almacén...</option>
+          {almacenes?.map((almacen: any) => (
+            <option key={almacen.id} value={almacen.id}>
+              {almacen.nombreAlmacen}
+            </option>
+          ))}
+        </select>
       </div>
 
       <div className="flex justify-end gap-2 pt-4">

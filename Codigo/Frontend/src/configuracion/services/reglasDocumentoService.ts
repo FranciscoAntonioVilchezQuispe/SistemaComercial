@@ -1,4 +1,5 @@
 import { apiConfiguracion } from "@/lib/axios";
+import { TipoComprobante } from "@/features/configuracion/tipos/tipoComprobante.types";
 
 export interface ReglaDocumento {
   id?: number;
@@ -62,5 +63,23 @@ export const reglasDocumentoService = {
       `/reglasdocumentos/relaciones/${codigoDocumento}`,
       idsTiposComprobante,
     );
+  },
+
+  listarRelacionesPorDocumento: async (
+    codigoDocumento: string,
+  ): Promise<RelacionDocComprobante[]> => {
+    const respuesta: any = await apiConfiguracion.get(
+      `/reglasdocumentos/relaciones/${codigoDocumento}`,
+    );
+    return respuesta.datos || respuesta.data || [];
+  },
+
+  listarComprobantesPorDocumento: async (
+    codigoDocumento: string,
+  ): Promise<TipoComprobante[]> => {
+    const respuesta: any = await apiConfiguracion.get(
+      `/reglasdocumentos/comprobantes/${codigoDocumento}`,
+    );
+    return respuesta.datos || respuesta.data || [];
   },
 };

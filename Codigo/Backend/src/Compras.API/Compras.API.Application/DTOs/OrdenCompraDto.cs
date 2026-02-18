@@ -19,7 +19,7 @@ namespace Compras.API.Application.DTOs
     public class OrdenCompraDto
     {
         public long Id { get; set; }
-        public string CodigoOrden { get; set; } = null!;
+        public string? CodigoOrden { get; set; }
         public long IdProveedor { get; set; }
         public long IdAlmacenDestino { get; set; }
         public DateTime FechaEmision { get; set; }
@@ -27,6 +27,9 @@ namespace Compras.API.Application.DTOs
         public long IdEstado { get; set; } // Catalog ID
         public decimal TotalImporte { get; set; }
         public string? Observaciones { get; set; }
+        public long? IdTipoComprobante { get; set; }
+        public string? Serie { get; set; }
+        public string? Numero { get; set; }
         public List<DetalleOrdenCompraDto> Detalles { get; set; } = new();
     }
 }

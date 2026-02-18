@@ -19,6 +19,7 @@ namespace Configuracion.API.Application.Interfaces
         Task<bool> EliminarReglaAsync(long id);
 
         Task<IEnumerable<DocumentoComprobanteRelacion>> ListarRelacionesPorDocumentoAsync(string codigoDocumento);
+        Task<IEnumerable<TipoComprobante>> ListarComprobantesPorDocumentoAsync(string codigoDocumento);
         Task<bool> ActualizarRelacionesAsync(string codigoDocumento, List<long> idsTiposComprobante);
     }
 }

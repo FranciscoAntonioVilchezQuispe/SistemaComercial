@@ -14,10 +14,14 @@ import {
 } from "../servicios/servicioClientes";
 import { Cliente, ClienteFormData } from "../types/cliente.types";
 
-export const useClientes = (): UseQueryResult<Cliente[], Error> => {
+export const useClientes = (
+  busqueda?: string,
+  enabled: boolean = true,
+): UseQueryResult<Cliente[], Error> => {
   return useQuery({
-    queryKey: ["clientes"],
-    queryFn: obtenerClientes,
+    queryKey: ["clientes", busqueda],
+    queryFn: () => obtenerClientes(busqueda),
+    enabled: enabled,
   });
 };
 

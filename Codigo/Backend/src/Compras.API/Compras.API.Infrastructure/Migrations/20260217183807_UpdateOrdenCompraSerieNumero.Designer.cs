@@ -3,6 +3,7 @@ using System;
 using Compras.API.Infrastructure.Datos;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Compras.API.Infrastructure.Migrations
 {
     [DbContext(typeof(ComprasDbContext))]
-    partial class ComprasDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260217183807_UpdateOrdenCompraSerieNumero")]
+    partial class UpdateOrdenCompraSerieNumero
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -463,23 +466,9 @@ namespace Compras.API.Infrastructure.Migrations
                         .HasColumnType("bigint")
                         .HasColumnName("id_proveedor");
 
-                    b.Property<long?>("IdTipoComprobante")
-                        .HasColumnType("bigint")
-                        .HasColumnName("id_tipo_comprobante");
-
-                    b.Property<string>("Numero")
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)")
-                        .HasColumnName("numero");
-
                     b.Property<string>("Observaciones")
                         .HasColumnType("text")
                         .HasColumnName("observaciones");
-
-                    b.Property<string>("Serie")
-                        .HasMaxLength(10)
-                        .HasColumnType("character varying(10)")
-                        .HasColumnName("serie");
 
                     b.Property<decimal>("TotalImporte")
                         .HasColumnType("decimal(12,2)")

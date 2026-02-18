@@ -47,9 +47,24 @@ namespace Clientes.API.Infrastructure.Repositorios
             }
         }
 
-        public async Task<IEnumerable<Cliente>> ObtenerTodosAsync()
+        public async Task<IEnumerable<Cliente>> ObtenerTodosAsync(string? busqueda = null)
         {
-            return await _context.Clientes.ToListAsync();
+            var query = _context.Clientes.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(busqueda))
+            {
+                var term = busqueda.Trim().ToLower();
+                query = query.Where(c =>
+                    c.RazonSocial.ToLower().Contains(term) ||
+                    c.NumeroDocumento.Contains(term));
+            }
+
+            if (string.IsNullOrWhiteSpace(busqueda))
+            {
+                return await query.Take(20).ToListAsync();
+            }
+
+            return await query.ToListAsync();
         }
     }
 }
