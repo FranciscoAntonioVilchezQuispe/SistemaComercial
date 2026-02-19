@@ -29,6 +29,7 @@ namespace Compras.API.Application.DTOs
         public string NumeroComprobante { get; set; } = null!;
         public DateTime FechaEmision { get; set; }
         public DateTime FechaContable { get; set; }
+        public long IdMoneda { get; set; }
         public string Moneda { get; set; } = "PEN";
         public decimal TipoCambio { get; set; }
         public decimal Subtotal { get; set; }
@@ -36,6 +37,10 @@ namespace Compras.API.Application.DTOs
         public decimal Total { get; set; }
         public decimal? SaldoPendiente { get; set; }
         public long IdEstadoPago { get; set; }
+
+        public string? Observaciones { get; set; }
+        public string? NumeroDocumentoProveedor { get; set; }
+        public string? NombreTipoDocumentoProveedor { get; set; }
 
         public List<DetalleCompraDto> Detalles { get; set; } = new();
     }

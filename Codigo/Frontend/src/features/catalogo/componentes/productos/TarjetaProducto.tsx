@@ -3,7 +3,7 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Producto } from "../../tipos/catalogo.types";
-import { formatearMoneda } from "@compartido/utilidades/formateo/formatearMoneda";
+import { formatearMoneda } from "@compartido/utilidades/moneda";
 
 interface PropiedadesTarjetaProducto {
   producto: Producto;

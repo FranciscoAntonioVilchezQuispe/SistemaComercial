@@ -2,7 +2,7 @@ import { TablaPaginada } from "@compartido/componentes/tablas/TablaPaginada";
 import { ColumnaAcciones } from "@compartido/componentes/tablas/ColumnaAcciones";
 import { Badge } from "@/components/ui/badge";
 import { Producto } from "../../tipos/catalogo.types";
-import { formatearMoneda } from "@compartido/utilidades/formateo/formatearMoneda";
+import { formatearMoneda } from "@compartido/utilidades/moneda";
 
 interface PropiedadesTablaProductos {
   productos: Producto[];

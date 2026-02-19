@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { useProductos } from "@features/catalogo";
 import { useCarrito } from "../../hooks/useCarrito";
 import { useDebounce } from "@compartido/hooks/useDebounce";
-import { formatearMoneda } from "@compartido/utilidades/formateo/formatearMoneda";
+import { formatearMoneda } from "@compartido/utilidades/moneda";
 import { Loading } from "@compartido/componentes/feedback/Loading";
 
 export function GridProductosPOS() {

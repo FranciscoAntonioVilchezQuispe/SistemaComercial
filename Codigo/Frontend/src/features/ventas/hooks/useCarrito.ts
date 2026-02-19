@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { Producto } from "@features/catalogo";
 import { ItemCarrito, Carrito } from "../tipos/ventas.types";
-import { calcularTotalesVenta } from "@compartido/utilidades/calculos/calculos";
+import { calcularTotalesVenta } from "@compartido/utilidades/calculos";
 
 interface EstadoCarrito extends Carrito {
   agregarProducto: (

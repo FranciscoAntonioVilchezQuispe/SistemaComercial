@@ -1,7 +1,7 @@
 /**
  * Formatea un número como moneda en soles peruanos
  */
-export const formatearMoneda = (
+export const formatMoneda = (
   valor: number,
   opciones?: {
     mostrarSimbolo?: boolean;
@@ -19,16 +19,28 @@ export const formatearMoneda = (
 };
 
 /**
+ * Alias de formatMoneda para compatibilidad
+ */
+export const formatearMoneda = formatMoneda;
+
+/**
+ * Formatea un número con separadores de miles y decimales fijos
+ */
+export const formatDecimal = (valor: number, decimales: number = 2): string => {
+  return new Intl.NumberFormat("es-PE", {
+    minimumFractionDigits: decimales,
+    maximumFractionDigits: decimales,
+  }).format(valor);
+};
+
+/**
  * Formatea un número con separadores de miles
  */
 export const formatearNumero = (
   valor: number,
   decimales: number = 0,
 ): string => {
-  return new Intl.NumberFormat("es-PE", {
-    minimumFractionDigits: decimales,
-    maximumFractionDigits: decimales,
-  }).format(valor);
+  return formatDecimal(valor, decimales);
 };
 
 /**
@@ -38,7 +50,7 @@ export const formatearPorcentaje = (
   valor: number,
   decimales: number = 2,
 ): string => {
-  return `${formatearNumero(valor, decimales)}%`;
+  return `${formatDecimal(valor, decimales)}%`;
 };
 
 /**
@@ -46,7 +58,7 @@ export const formatearPorcentaje = (
  */
 export const parsearMoneda = (valor: string): number => {
   // Eliminar símbolos de moneda y espacios
-  const valorLimpio = valor.replace(/[S/\s]/g, "");
+  const valorLimpio = valor.replace(/[S/\s]/g, "").replace(/,/g, "");
   // Convertir a número
   return parseFloat(valorLimpio) || 0;
 };

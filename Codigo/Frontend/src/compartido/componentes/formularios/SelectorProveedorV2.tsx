@@ -21,11 +21,11 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { toast } from "sonner";
+// import { toast } from "sonner";
 import { SelectorTipoDocumento } from "./SelectorTipoDocumento";
 import { useCrearProveedor } from "@/features/compras/proveedores/hooks/useProveedores";
 import { useReglasDocumentos } from "@/configuracion/hooks/useReglasDocumentos";
-import { limpiarSoloNumeros } from "@/lib/i18n";
+import { limpiarSoloNumeros } from "@compartido/utilidades";
 
 interface SelectorProveedorProps {
   value: number;
@@ -33,6 +33,7 @@ interface SelectorProveedorProps {
   proveedores: any[];
   onSearch: (term: string) => void;
   onTipoDocChange?: (codigo: string) => void;
+  disabled?: boolean;
 }
 
 export const SelectorProveedorV2: React.FC<SelectorProveedorProps> = ({
@@ -41,6 +42,7 @@ export const SelectorProveedorV2: React.FC<SelectorProveedorProps> = ({
   proveedores = [],
   onSearch,
   onTipoDocChange,
+  disabled = false,
 }) => {
   const [open, setOpen] = React.useState(false);
   const [tipoDoc, setTipoDoc] = React.useState("1"); // 1: DNI
@@ -101,6 +103,7 @@ export const SelectorProveedorV2: React.FC<SelectorProveedorProps> = ({
               }
             }}
             hideLabel
+            disabled={disabled}
           />
         </div>
 
@@ -119,6 +122,7 @@ export const SelectorProveedorV2: React.FC<SelectorProveedorProps> = ({
               }
             }}
             className="text-center font-mono"
+            disabled={disabled}
           />
         </div>
 
@@ -141,6 +145,7 @@ export const SelectorProveedorV2: React.FC<SelectorProveedorProps> = ({
                     }
                   }}
                   className="pl-9"
+                  disabled={disabled}
                 />
               </div>
             </PopoverTrigger>
@@ -188,7 +193,7 @@ export const SelectorProveedorV2: React.FC<SelectorProveedorProps> = ({
                   size="icon"
                   className="h-9 w-9"
                   onClick={handleCrearRapido}
-                  disabled={crearProveedor.isPending}
+                  disabled={crearProveedor.isPending || disabled}
                 >
                   <Plus className="h-5 w-5" />
                 </Button>

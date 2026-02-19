@@ -36,6 +36,13 @@ namespace Compras.API.Endpoints
                 var id = await mediator.Send(new CrearCompraComando(dto));
                 return Results.Created($"/api/compras/{id}", new ToReturn<long>(id));
             });
+
+            grupo.MapDelete("/{id}", async (long id, IMediator mediator) =>
+            {
+                var exito = await mediator.Send(new EliminarCompraComando(id));
+                if (!exito) return Results.NotFound(new ToReturnError<bool>("Compra no encontrada", 404));
+                return Results.Ok(new ToReturn<bool>(true));
+            });
         }
 
         private static CompraDto MapToDto(Compra c) => new CompraDto
@@ -54,6 +61,7 @@ namespace Compras.API.Endpoints
             NumeroComprobante = c.NumeroComprobante,
             FechaEmision = c.FechaEmision,
             FechaContable = c.FechaContable,
+            IdMoneda = c.Moneda == "USD" ? 2 : 1,
             Moneda = c.Moneda,
             TipoCambio = c.TipoCambio,
             Subtotal = c.Subtotal,
@@ -61,6 +69,11 @@ namespace Compras.API.Endpoints
             Total = c.Total,
             SaldoPendiente = c.SaldoPendiente,
             IdEstadoPago = c.IdEstadoPago,
+            Observaciones = c.Observaciones,
+            NombreAlmacen = c.NombreAlmacen,
+            NombreTipoComprobante = c.NombreTipoComprobante,
+            NumeroDocumentoProveedor = c.Proveedor?.NumeroDocumento,
+            NombreTipoDocumentoProveedor = c.NombreTipoDocumentoProveedor,
             Detalles = c.Detalles?.Select(d => new DetalleCompraDto
             {
                 Id = d.Id,

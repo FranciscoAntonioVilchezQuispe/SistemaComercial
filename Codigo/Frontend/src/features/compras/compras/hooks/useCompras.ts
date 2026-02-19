@@ -52,3 +52,14 @@ export const useConfirmarCompra = (): UseMutationResult<
     },
   });
 };
+
+export const useEliminarCompra = (): UseMutationResult<void, Error, number> => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: servicio.eliminarCompra,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["compras"] });
+      queryClient.invalidateQueries({ queryKey: ["productos"] });
+    },
+  });
+};

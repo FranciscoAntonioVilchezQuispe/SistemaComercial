@@ -63,8 +63,19 @@ namespace Compras.API.Domain.Entidades
         [Column("id_estado_pago")]
         public long IdEstadoPago { get; set; }
 
+        [MaxLength(500)]
+        [Column("observaciones")]
+        public string? Observaciones { get; set; }
+
         [ForeignKey("IdProveedor")]
         public virtual Proveedor Proveedor { get; set; } = null!;
+
+        [NotMapped]
+        public string? NombreAlmacen { get; set; }
+        [NotMapped]
+        public string? NombreTipoComprobante { get; set; }
+        [NotMapped]
+        public string? NombreTipoDocumentoProveedor { get; set; }
 
         public virtual ICollection<DetalleCompra> Detalles { get; set; } = new List<DetalleCompra>();
     }

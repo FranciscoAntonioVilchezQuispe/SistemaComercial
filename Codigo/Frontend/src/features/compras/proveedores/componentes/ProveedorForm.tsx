@@ -26,7 +26,7 @@ import {
 } from "@/features/clientes/hooks/useClientes";
 import { ClienteFormData } from "@/features/clientes/types/cliente.types";
 import { toast } from "sonner";
-import { limpiarSoloNumeros, limpiarGuiones } from "@/lib/i18n";
+import { limpiarSoloNumeros, limpiarGuiones } from "@compartido/utilidades";
 
 const formSchema = z.object({
   idTipoDocumento: z.coerce

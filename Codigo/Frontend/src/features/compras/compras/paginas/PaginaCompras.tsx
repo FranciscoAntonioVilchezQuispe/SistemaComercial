@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import { Plus, Eye, ShoppingCart } from "lucide-react";
+import { Plus, Eye, Trash2 } from "lucide-react";
 import { useLocation } from "react-router-dom";
-import { formatFecha } from "@/lib/i18n";
+import { formatFecha } from "@compartido/utilidades";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -24,7 +24,17 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 
 // Correction: imports for specific hooks
-import { useCompras } from "../hooks/useCompras";
+import { useCompras, useCompra, useEliminarCompra } from "../hooks/useCompras";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Compra } from "../types/compra.types";
 import { CompraForm } from "../componentes/CompraForm"; // Form component for creating
 
@@ -37,8 +47,29 @@ export default function PaginaCompras() {
   const [modoCreacion, setModoCreacion] = useState(false);
   const [datosIniciales, setDatosIniciales] = useState<any>(null);
   const [filtro, setFiltro] = useState("");
+  const [idAVisualizar, setIdAVisualizar] = useState<number | null>(null);
+  const [eliminarId, setEliminarId] = useState<number | null>(null);
 
   const { data: compras, isLoading, error } = useCompras();
+  const { data: compraDetalle, isLoading: cargandoDetalle } = useCompra(
+    idAVisualizar || 0,
+  );
+  const eliminarMutation = useEliminarCompra();
+
+  useEffect(() => {
+    if (compraDetalle && !modoCreacion) {
+      setCompraSeleccionada(compraDetalle);
+    }
+  }, [compraDetalle, modoCreacion]);
+
+  useEffect(() => {
+    if (!dialogoOpen) {
+      setIdAVisualizar(null);
+      if (!modoCreacion) {
+        setCompraSeleccionada(null);
+      }
+    }
+  }, [dialogoOpen, modoCreacion]);
 
   useEffect(() => {
     const state = location.state as { orden?: any };
@@ -122,12 +153,23 @@ export default function PaginaCompras() {
             variant="ghost"
             size="icon"
             onClick={() => {
-              setCompraSeleccionada(row);
+              setIdAVisualizar(row.id);
               setModoCreacion(false);
               setDialogoOpen(true);
             }}
           >
             <Eye className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="text-destructive hover:text-destructive hover:bg-destructive/10"
+            onClick={(e) => {
+              e.stopPropagation();
+              setEliminarId(row.id);
+            }}
+          >
+            <Trash2 className="h-4 w-4" />
           </Button>
         </div>
       ),
@@ -183,7 +225,9 @@ export default function PaginaCompras() {
             </DialogTitle>
           </DialogHeader>
 
-          {modoCreacion ? (
+          {cargandoDetalle ? (
+            <Loading mensaje="Cargando detalle de compra..." />
+          ) : modoCreacion ? (
             <CompraForm
               datosIniciales={datosIniciales}
               onSuccess={() => {
@@ -193,118 +237,70 @@ export default function PaginaCompras() {
               onCancel={() => setDialogoOpen(false)}
             />
           ) : (
-            <div className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 p-4 bg-muted/20 rounded-lg">
-                <div className="space-y-1">
-                  <span className="text-xs text-muted-foreground uppercase font-bold tracking-wider">
-                    Proveedor
-                  </span>
-                  <p className="font-medium text-sm">
-                    {compraSeleccionada?.razonSocialProveedor ||
-                      `ID: ${compraSeleccionada?.idProveedor}`}
-                  </p>
-                </div>
-                <div className="space-y-1">
-                  <span className="text-xs text-muted-foreground uppercase font-bold tracking-wider">
-                    Almacén
-                  </span>
-                  <p className="font-medium text-sm">
-                    {compraSeleccionada?.nombreAlmacen ||
-                      `ID: ${compraSeleccionada?.idAlmacen}`}
-                  </p>
-                </div>
-                <div className="space-y-1">
-                  <span className="text-xs text-muted-foreground uppercase font-bold tracking-wider">
-                    Fecha Emisión
-                  </span>
-                  <p className="font-medium text-sm">
-                    {compraSeleccionada?.fechaEmision &&
-                      formatFecha(
-                        new Date(compraSeleccionada.fechaEmision),
-                        "PPPP",
-                      )}
-                  </p>
-                </div>
-                <div className="space-y-1">
-                  <span className="text-xs text-muted-foreground uppercase font-bold tracking-wider">
-                    Total
-                  </span>
-                  <p className="font-bold text-lg text-primary">
-                    S/ {compraSeleccionada?.total.toFixed(2)}
-                  </p>
-                </div>
-              </div>
-
-              {compraSeleccionada?.observaciones && (
-                <div className="p-3 bg-blue-50 border border-blue-100 rounded text-sm text-blue-800">
-                  <strong className="block mb-1">Observaciones:</strong>
-                  {compraSeleccionada.observaciones}
-                </div>
-              )}
-
-              <div className="space-y-3">
-                <h4 className="font-bold text-lg border-b pb-2 flex items-center gap-2">
-                  <ShoppingCart className="h-4 w-4" /> Detalles de la Compra
-                </h4>
-                <div className="border rounded-lg overflow-hidden">
-                  <table className="w-full text-sm">
-                    <thead className="bg-muted/50 text-muted-foreground">
-                      <tr className="text-left">
-                        <th className="p-3 font-semibold">Producto</th>
-                        <th className="p-3 font-semibold text-right">
-                          Cantidad
-                        </th>
-                        <th className="p-3 font-semibold text-right">
-                          Precio Unit.
-                        </th>
-                        <th className="p-3 font-semibold text-right text-primary">
-                          Subtotal
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y">
-                      {compraSeleccionada?.detalles?.map((d, i) => (
-                        <tr
-                          key={i}
-                          className="hover:bg-muted/30 transition-colors"
-                        >
-                          <td className="p-3">
-                            <div className="font-medium">
-                              {d.nombreProducto || `Prod. #${d.idProducto}`}
-                            </div>
-                          </td>
-                          <td className="p-3 text-right tabular-nums">
-                            {d.cantidad.toFixed(3)}
-                          </td>
-                          <td className="p-3 text-right tabular-nums">
-                            {d.precioUnitario.toFixed(2)}
-                          </td>
-                          <td className="p-3 text-right font-bold tabular-nums">
-                            {d.subtotal.toFixed(2)}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                    <tfoot className="bg-muted/20 font-bold">
-                      <tr>
-                        <td
-                          colSpan={3}
-                          className="p-3 text-right uppercase tracking-wider text-xs text-muted-foreground"
-                        >
-                          Total Final
-                        </td>
-                        <td className="p-3 text-right text-base text-primary">
-                          S/ {compraSeleccionada?.total.toFixed(2)}
-                        </td>
-                      </tr>
-                    </tfoot>
-                  </table>
-                </div>
-              </div>
-            </div>
+            compraSeleccionada && (
+              <CompraForm
+                readOnly
+                datosIniciales={
+                  {
+                    idProveedor: compraSeleccionada.idProveedor,
+                    idAlmacen: compraSeleccionada.idAlmacen,
+                    idMoneda: compraSeleccionada.idMoneda,
+                    tipoComprobante:
+                      compraSeleccionada.idTipoComprobante.toString(),
+                    serieComprobante: compraSeleccionada.serieComprobante,
+                    numeroComprobante: compraSeleccionada.numeroComprobante,
+                    fechaEmision: new Date(compraSeleccionada.fechaEmision),
+                    observaciones: compraSeleccionada.observaciones,
+                    detalles: compraDetalle?.detalles.map((d) => ({
+                      idProducto: d.idProducto,
+                      cantidad: d.cantidad,
+                      precioUnitario: d.precioUnitarioCompra,
+                    })),
+                  } as any
+                }
+                onSuccess={() => setDialogoOpen(false)}
+                onCancel={() => setDialogoOpen(false)}
+              />
+            )
           )}
         </DialogContent>
       </Dialog>
+
+      <AlertDialog
+        open={eliminarId !== null}
+        onOpenChange={(open) => !open && setEliminarId(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Está absolutamente seguro?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta acción desactivará la compra y revertirá los movimientos de
+              inventario asociados. Las órdenes de compra vinculadas serán
+              liberadas.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={async () => {
+                if (eliminarId) {
+                  try {
+                    await eliminarMutation.mutateAsync(eliminarId);
+                    toast.success("Compra eliminada correctamente");
+                  } catch (err) {
+                    toast.error("Error al eliminar la compra");
+                  } finally {
+                    setEliminarId(null);
+                  }
+                }
+              }}
+            >
+              {eliminarMutation.isPending ? "Eliminando..." : "Sí, eliminar"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

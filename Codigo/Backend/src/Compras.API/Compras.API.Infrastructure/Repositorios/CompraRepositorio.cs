@@ -14,29 +14,19 @@ namespace Compras.API.Infrastructure.Repositorios
     public class CompraRepositorio : ICompraRepositorio
     {
         private readonly ComprasDbContext _context;
-        private readonly ConfiguracionDbContext _configContext;
-        private readonly InventarioDbContext _inventarioContext;
-        private readonly CatalogoDbContext _catalogoContext;
 
-        public CompraRepositorio(
-            ComprasDbContext context,
-            ConfiguracionDbContext configContext,
-            InventarioDbContext inventarioContext,
-            CatalogoDbContext catalogoContext)
+        public CompraRepositorio(ComprasDbContext context)
         {
             _context = context;
-            _configContext = configContext;
-            _inventarioContext = inventarioContext;
-            _catalogoContext = catalogoContext;
         }
 
         public async Task<Compra?> ObtenerPorIdAsync(long id)
         {
             var query = from c in _context.Compras
                         join p in _context.Proveedores on c.IdProveedor equals p.Id
-                        join td in _configContext.DocumentoIdentidadReglas on p.IdTipoDocumento equals td.Id
-                        join tc in _configContext.TiposComprobante on c.IdTipoComprobante equals tc.Id
-                        join a in _inventarioContext.Almacenes on c.IdAlmacen equals a.Id
+                        join td in _context.TiposDocumentoRef on p.IdTipoDocumento equals td.Id
+                        join tc in _context.TiposComprobanteRef on c.IdTipoComprobante equals tc.Id
+                        join a in _context.AlmacenesRef on c.IdAlmacen equals a.Id
                         where c.Id == id
                         select new { c, p, td, tc, a };
 
@@ -45,19 +35,19 @@ namespace Compras.API.Infrastructure.Repositorios
 
             var compra = resultado.c;
             compra.Proveedor = resultado.p;
-            // Nota: Aquí asignamos los nombres al DTO en el endpoint o mapeador, 
-            // pero para mantener la compatibilidad con el repositorio devolvemos la entidad.
-            // Para el detalle también hacemos join:
+            compra.NombreAlmacen = resultado.a.NombreAlmacen;
+            compra.NombreTipoComprobante = resultado.tc.Nombre;
+            compra.NombreTipoDocumentoProveedor = resultado.td.Nombre;
 
             var detallesQuery = from dc in _context.DetallesCompra
-                                join prod in _catalogoContext.Productos on dc.IdProducto equals prod.Id
+                                join prod in _context.ProductosRef on dc.IdProducto equals prod.Id
                                 where dc.IdCompra == id
                                 select new { dc, prod };
 
             var detalles = await detallesQuery.ToListAsync();
             compra.Detalles = detalles.Select(x =>
             {
-                x.dc.Descripcion = x.prod.NombreProducto; // Usamos el nombre del producto
+                x.dc.Descripcion = x.prod.NombreProducto;
                 return x.dc;
             }).ToList();
 
@@ -75,9 +65,9 @@ namespace Compras.API.Infrastructure.Repositorios
         {
             var query = from c in _context.Compras
                         join p in _context.Proveedores on c.IdProveedor equals p.Id
-                        join td in _configContext.DocumentoIdentidadReglas on p.IdTipoDocumento equals td.Id
-                        join tc in _configContext.TiposComprobante on c.IdTipoComprobante equals tc.Id
-                        join a in _inventarioContext.Almacenes on c.IdAlmacen equals a.Id
+                        join td in _context.TiposDocumentoRef on p.IdTipoDocumento equals td.Id
+                        join tc in _context.TiposComprobanteRef on c.IdTipoComprobante equals tc.Id
+                        join a in _context.AlmacenesRef on c.IdAlmacen equals a.Id
                         select new { c, p, td, tc, a };
 
             var resultados = await query.ToListAsync();
@@ -86,7 +76,9 @@ namespace Compras.API.Infrastructure.Repositorios
             {
                 var c = r.c;
                 c.Proveedor = r.p;
-                // Almacenamos temporalmente los nombres en propiedades virtuales o el DTO se encargará
+                c.NombreAlmacen = r.a.NombreAlmacen;
+                c.NombreTipoComprobante = r.tc.Nombre;
+                c.NombreTipoDocumentoProveedor = r.td.Nombre;
                 return c;
             }).ToList();
         }

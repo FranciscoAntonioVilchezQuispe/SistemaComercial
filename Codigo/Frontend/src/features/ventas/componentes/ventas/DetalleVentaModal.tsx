@@ -9,8 +9,7 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { formatearMoneda } from "@/compartido/utilidades/formateo/formatearMoneda";
-import { formatearFechaHora } from "@/compartido/utilidades/formateo/formatearFecha";
+import { formatearMoneda, formatearFechaHora } from "@compartido/utilidades";
 
 interface Props {
   venta: Venta;

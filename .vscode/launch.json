@@ -16,6 +16,13 @@
       "env": {
         "ASPNETCORE_ENVIRONMENT": "Development",
         "ASPNETCORE_URLS": "http://localhost:5000"
+      },
+      "serverReadyAction": {
+        "action": "debugWithChrome",
+        "pattern": "\\\\bNow listening on:\\\\s+(https?://\\\\S+)",
+        "uriFormat": "%s/swagger",
+        "webRoot": "${workspaceFolder}/Codigo/Backend/src/Gateway.API",
+        "runtimeExecutable": "C:\\Program Files\\BraveSoftware\\Brave-Browser\\Application\\brave.exe"
       }
     },
     {
@@ -30,6 +37,13 @@
       "env": {
         "ASPNETCORE_ENVIRONMENT": "Development",
         "ASPNETCORE_URLS": "http://localhost:5008"
+      },
+      "serverReadyAction": {
+        "action": "debugWithChrome",
+        "pattern": "\\\\bNow listening on:\\\\s+(https?://\\\\S+)",
+        "uriFormat": "%s/swagger",
+        "webRoot": "${workspaceFolder}/Codigo/Backend/src/Catalogo.API/Catalogo.API",
+        "runtimeExecutable": "C:\\Program Files\\BraveSoftware\\Brave-Browser\\Application\\brave.exe"
       }
     },
     {
@@ -44,6 +58,13 @@
       "env": {
         "ASPNETCORE_ENVIRONMENT": "Development",
         "ASPNETCORE_URLS": "http://localhost:5009"
+      },
+      "serverReadyAction": {
+        "action": "debugWithChrome",
+        "pattern": "\\\\bNow listening on:\\\\s+(https?://\\\\S+)",
+        "uriFormat": "%s/swagger",
+        "webRoot": "${workspaceFolder}/Codigo/Backend/src/Clientes.API/Clientes.API.API",
+        "runtimeExecutable": "C:\\Program Files\\BraveSoftware\\Brave-Browser\\Application\\brave.exe"
       }
     },
     {
@@ -58,6 +79,13 @@
       "env": {
         "ASPNETCORE_ENVIRONMENT": "Development",
         "ASPNETCORE_URLS": "http://localhost:5010"
+      },
+      "serverReadyAction": {
+        "action": "debugWithChrome",
+        "pattern": "\\\\bNow listening on:\\\\s+(https?://\\\\S+)",
+        "uriFormat": "%s/swagger",
+        "webRoot": "${workspaceFolder}/Codigo/Backend/src/Compras.API/Compras.API.API",
+        "runtimeExecutable": "C:\\Program Files\\BraveSoftware\\Brave-Browser\\Application\\brave.exe"
       }
     },
     {
@@ -72,6 +100,13 @@
       "env": {
         "ASPNETCORE_ENVIRONMENT": "Development",
         "ASPNETCORE_URLS": "http://localhost:5002"
+      },
+      "serverReadyAction": {
+        "action": "debugWithChrome",
+        "pattern": "\\\\bNow listening on:\\\\s+(https?://\\\\S+)",
+        "uriFormat": "%s/swagger",
+        "webRoot": "${workspaceFolder}/Codigo/Backend/src/Configuracion.API/Configuracion.API.API",
+        "runtimeExecutable": "C:\\Program Files\\BraveSoftware\\Brave-Browser\\Application\\brave.exe"
       }
     },
     {
@@ -86,6 +121,13 @@
       "env": {
         "ASPNETCORE_ENVIRONMENT": "Development",
         "ASPNETCORE_URLS": "http://localhost:5004"
+      },
+      "serverReadyAction": {
+        "action": "debugWithChrome",
+        "pattern": "\\\\bNow listening on:\\\\s+(https?://\\\\S+)",
+        "uriFormat": "%s/swagger",
+        "webRoot": "${workspaceFolder}/Codigo/Backend/src/Contabilidad.API/Contabilidad.API.API",
+        "runtimeExecutable": "C:\\Program Files\\BraveSoftware\\Brave-Browser\\Application\\brave.exe"
       }
     },
     {
@@ -100,6 +142,13 @@
       "env": {
         "ASPNETCORE_ENVIRONMENT": "Development",
         "ASPNETCORE_URLS": "http://localhost:5001"
+      },
+      "serverReadyAction": {
+        "action": "debugWithChrome",
+        "pattern": "\\\\bNow listening on:\\\\s+(https?://\\\\S+)",
+        "uriFormat": "%s/swagger",
+        "webRoot": "${workspaceFolder}/Codigo/Backend/src/Identidad.API/Identidad.API.API",
+        "runtimeExecutable": "C:\\Program Files\\BraveSoftware\\Brave-Browser\\Application\\brave.exe"
       }
     },
     {
@@ -114,6 +163,13 @@
       "env": {
         "ASPNETCORE_ENVIRONMENT": "Development",
         "ASPNETCORE_URLS": "http://localhost:5003"
+      },
+      "serverReadyAction": {
+        "action": "debugWithChrome",
+        "pattern": "\\\\bNow listening on:\\\\s+(https?://\\\\S+)",
+        "uriFormat": "%s/swagger",
+        "webRoot": "${workspaceFolder}/Codigo/Backend/src/Inventario.API/Inventario.API.API",
+        "runtimeExecutable": "C:\\Program Files\\BraveSoftware\\Brave-Browser\\Application\\brave.exe"
       }
     },
     {
@@ -128,6 +184,13 @@
       "env": {
         "ASPNETCORE_ENVIRONMENT": "Development",
         "ASPNETCORE_URLS": "http://localhost:5005"
+      },
+      "serverReadyAction": {
+        "action": "debugWithChrome",
+        "pattern": "\\\\bNow listening on:\\\\s+(https?://\\\\S+)",
+        "uriFormat": "%s/swagger",
+        "webRoot": "${workspaceFolder}/Codigo/Backend/src/Ventas.API/Ventas.API.API",
+        "runtimeExecutable": "C:\\Program Files\\BraveSoftware\\Brave-Browser\\Application\\brave.exe"
       }
     },
     // ============================================
@@ -139,30 +202,17 @@
       "request": "launch",
       "url": "http://localhost:5180",
       "webRoot": "${workspaceFolder}/Codigo/Frontend/src",
+      "runtimeExecutable": "C:\\Program Files\\BraveSoftware\\Brave-Browser\\Application\\brave.exe",
       "preLaunchTask": "npm: dev - Frontend"
     },
     {
-      "name": "Frontend: Dev Server (Firefox)",
-      "type": "firefox",
-      "request": "launch",
-      "url": "http://localhost:5180",
-      "webRoot": "${workspaceFolder}/Codigo/Frontend/src",
-      "reAttach": true,
-      "preLaunchTask": "npm: dev - Frontend"
-    },
-    {
-      "name": "Firefox: Open Page",
-      "type": "firefox",
-      "request": "launch",
-      "url": "about:blank"
-    },
-    {
-      "name": "Frontend: Debug Chrome",
+      "name": "Frontend: Debug Brave",
       "type": "chrome",
       "request": "attach",
       "port": 9222,
       "url": "http://localhost:5180",
-      "webRoot": "${workspaceFolder}/Codigo/Frontend/src"
+      "webRoot": "${workspaceFolder}/Codigo/Frontend/src",
+      "runtimeExecutable": "C:\\Program Files\\BraveSoftware\\Brave-Browser\\Application\\brave.exe"
     }
   ],
   "compounds": [
@@ -182,22 +232,6 @@
         "Backend: Inventario.API",
         "Backend: Ventas.API",
         "Frontend: Dev Server"
-      ],
-      "stopAll": true
-    },
-    {
-      "name": "🚀 Full Stack (Firefox)",
-      "configurations": [
-        "Backend: Gateway.API",
-        "Backend: Catalogo.API",
-        "Backend: Clientes.API",
-        "Backend: Compras.API",
-        "Backend: Configuracion.API",
-        "Backend: Contabilidad.API",
-        "Backend: Identidad.API",
-        "Backend: Inventario.API",
-        "Backend: Ventas.API",
-        "Frontend: Dev Server (Firefox)"
       ],
       "stopAll": true
     },

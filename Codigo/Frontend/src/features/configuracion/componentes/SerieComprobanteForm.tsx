@@ -7,7 +7,7 @@ import {
 } from "../tipos/serieComprobante.types";
 import { useTiposComprobante } from "../hooks/useTiposComprobante";
 import { useAlmacenes } from "../../inventario/almacenes/hooks/useAlmacenes";
-import { padIzquierda, limpiarSoloNumeros } from "../../../lib/i18n";
+import { padIzquierda, limpiarSoloNumeros } from "@compartido/utilidades";
 
 interface SerieComprobanteFormProps {
   datosIniciales?: SerieComprobante;

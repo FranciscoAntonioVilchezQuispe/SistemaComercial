@@ -11,8 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { formatearMoneda } from "@/compartido/utilidades/formateo/formatearMoneda";
-import { formatearFechaHora } from "@/compartido/utilidades/formateo/formatearFecha";
+import { formatearMoneda, formatearFechaHora } from "@compartido/utilidades";
 
 interface Props {
   ventas: Venta[];

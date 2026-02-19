@@ -50,5 +50,27 @@ namespace Compras.API.Application.Integracion
                 return false;
             }
         }
+
+        public async Task<bool> EliminarMovimientosCompraAsync(long idCompra)
+        {
+            try
+            {
+                var response = await _httpClient.DeleteAsync($"inventario/movimientos/referencia/COMPRAS/{idCompra}");
+
+                if (response.IsSuccessStatusCode)
+                {
+                    return true;
+                }
+
+                var errorMsg = await response.Content.ReadAsStringAsync();
+                _logger.LogError("Error al eliminar movimientos en inventario: {Error}", errorMsg);
+                return false;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error de conexión con Inventario.API para eliminar movimientos");
+                return false;
+            }
+        }
     }
 }

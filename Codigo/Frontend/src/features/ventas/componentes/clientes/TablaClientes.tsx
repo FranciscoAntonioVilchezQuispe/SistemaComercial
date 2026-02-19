@@ -3,7 +3,7 @@ import { Cliente } from "../../tipos/ventas.types";
 import { TablaPaginada } from "@/compartido/componentes/tablas/TablaPaginada";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { formatearMoneda } from "@/compartido/utilidades/formateo/formatearMoneda";
+import { formatearMoneda } from "@compartido/utilidades";
 
 interface Props {
   clientes: Cliente[];

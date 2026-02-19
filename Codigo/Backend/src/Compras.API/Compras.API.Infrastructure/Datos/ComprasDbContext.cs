@@ -20,10 +20,26 @@ namespace Compras.API.Infrastructure.Datos
         public DbSet<Nota> Notas { get; set; } = null!;
         public DbSet<DetalleNota> DetallesNota { get; set; } = null!;
 
+        // Entidades de Referencia para JOINS entre esquemas
+        public DbSet<Compras.API.Domain.Entidades.Referencias.TipoDocumentoReferencia> TiposDocumentoRef { get; set; } = null!;
+        public DbSet<Compras.API.Domain.Entidades.Referencias.TipoComprobanteReferencia> TiposComprobanteRef { get; set; } = null!;
+        public DbSet<Compras.API.Domain.Entidades.Referencias.AlmacenReferencia> AlmacenesRef { get; set; } = null!;
+        public DbSet<Compras.API.Domain.Entidades.Referencias.ProductoReferencia> ProductosRef { get; set; } = null!;
+        public DbSet<Compras.API.Domain.Entidades.Referencias.SerieComprobanteReferencia> SeriesComprobantesRef { get; set; } = null!;
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
             modelBuilder.HasDefaultSchema("compras");
+
+            // Configurar Entidades de Referencia como de solo lectura (Exclude from Migrations)
+            modelBuilder.Entity<Compras.API.Domain.Entidades.Referencias.TipoDocumentoReferencia>().ToTable("tipo_documento", "configuracion", t => t.ExcludeFromMigrations());
+            modelBuilder.Entity<Compras.API.Domain.Entidades.Referencias.TipoComprobanteReferencia>().ToTable("tipo_comprobante", "configuracion", t => t.ExcludeFromMigrations());
+            modelBuilder.Entity<Compras.API.Domain.Entidades.Referencias.AlmacenReferencia>().ToTable("almacenes", "inventario", t => t.ExcludeFromMigrations());
+            modelBuilder.Entity<Compras.API.Domain.Entidades.Referencias.ProductoReferencia>().ToTable("productos", "catalogo", t => t.ExcludeFromMigrations());
+            modelBuilder.Entity<Compras.API.Domain.Entidades.Referencias.SerieComprobanteReferencia>().ToTable("series_comprobantes", "configuracion", t => t.ExcludeFromMigrations());
+            modelBuilder.Entity<Compras.API.Domain.Entidades.Referencias.CatalogoReferencia>().ToTable("tablas_generales_detalle", "configuracion", t => t.ExcludeFromMigrations());
+
             modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
         }
 

@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useCarrito } from "../../hooks/useCarrito";
-import { formatearMoneda } from "@compartido/utilidades/formateo/formatearMoneda";
+import { formatearMoneda } from "@compartido/utilidades/moneda";
 import { SelectorCliente } from "./SelectorCliente";
 import { SelectorMetodoPago, MetodoPago } from "./SelectorMetodoPago";
 import { DialogoFinalizarVenta } from "./DialogoFinalizarVenta";

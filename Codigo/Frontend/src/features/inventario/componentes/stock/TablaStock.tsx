@@ -3,7 +3,7 @@ import { StockProducto } from "../../tipos/inventario.types";
 import { TablaPaginada } from "@/compartido/componentes/tablas/TablaPaginada";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { formatearFecha } from "@/compartido/utilidades/formateo/formatearFecha";
+import { formatearFecha } from "@compartido/utilidades";
 
 interface Props {
   stock: StockProducto[];

@@ -1,7 +1,7 @@
 import { MoveDown, MoveUp, RefreshCw, ArrowLeftRight } from "lucide-react";
 import { MovimientoInventario } from "../../tipos/inventario.types";
 import { TablaPaginada } from "@/compartido/componentes/tablas/TablaPaginada";
-import { formatearFechaHora } from "@/compartido/utilidades/formateo/formatearFecha";
+import { formatearFechaHora } from "@compartido/utilidades";
 
 interface Props {
   movimientos: MovimientoInventario[];

@@ -7,7 +7,7 @@ import {
   ShoppingBag,
   CheckCircle,
 } from "lucide-react";
-import { formatFecha } from "@/lib/i18n";
+import { formatFecha } from "@compartido/utilidades";
 import { useNavigate } from "react-router-dom";
 
 import { Button } from "@/components/ui/button";

@@ -43,6 +43,7 @@ namespace Compras.API.Application.Manejadores
                 Total = dto.Total,
                 SaldoPendiente = dto.SaldoPendiente,
                 IdEstadoPago = dto.IdEstadoPago,
+                Observaciones = dto.Observaciones,
                 Detalles = dto.Detalles.Select(d => new DetalleCompra
                 {
                     IdProducto = d.IdProducto,

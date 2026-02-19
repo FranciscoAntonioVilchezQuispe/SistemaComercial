@@ -18,7 +18,7 @@ import { Cliente } from "@/features/clientes/types/cliente.types";
 import { ItemCarrito } from "../../tipos/ventas.types";
 import { MetodoPago } from "./SelectorMetodoPago";
 import { useSeries } from "../../hooks/useVentas";
-import { formatearMoneda } from "@compartido/utilidades/formateo/formatearMoneda";
+import { formatearMoneda } from "@compartido/utilidades/moneda";
 
 import { useTipoComprobante } from "@/features/configuracion/hooks/useTipoComprobante";
 

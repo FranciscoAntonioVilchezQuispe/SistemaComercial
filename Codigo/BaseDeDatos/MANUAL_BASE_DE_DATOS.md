@@ -24,25 +24,29 @@ Este script realizará los siguientes pasos secuenciales:
 3.  **Menús y Permisos**: Carga la configuración inicial de seguridad.
 4.  **Datos de Configuración**: Inserta tipos de comprobantes, impuestos y parámetros que faltaban en el dump original.
 5.  **Restauración de Datos**: Limpia las tablas e inserta los datos históricos recuperados del dump (excluyendo registros obsoletos como el `TIPO_COMPROBANTE` antiguo).
-6.  **Migración Fase 1**: Aplica los cambios para Kardex Valorizado y Notas Electrónicas.
-7.  **Verificación**: Muestra un reporte del conteo de registros por esquema.
+6.  **Migración Fase 1**: Aplica los cambios para Kardex Valorizado y Notas Electrónicas (Script 09).
+7.  **Actualización FKs**: Vincula proveedores, clientes y trabajadores con la nueva tabla de tipos de documento (Script 10).
+8.  **Configuración Módulos**: Define los alcances (Compra/Venta) para los tipos de comprobante (Script 11).
+9.  **Verificación**: Muestra un reporte del conteo de registros por esquema.
 
 ## 3. Scripts Individuales (`BaseDeDatos\`)
 
 Si desea ejecutar pasos específicos, puede usar `dotnet run` con la herramienta `SqlRunner`:
 
-| Archivo                          | Descripción                                                                 |
-| :------------------------------- | :-------------------------------------------------------------------------- |
-| `00_CrearBase.sql`               | Crea la base de datos vacía.                                                |
-| `01_Estructura.sql`              | Define esquemas, tablas, secuencias y funciones.                            |
-| `02_Datos_Menus.sql`             | Inserta menús del sistema.                                                  |
-| `03_Permisos.sql`                | Configura el sistema de permisos granulares.                                |
-| `04_Datos_Semilla.sql`           | Inserta datos de prueba básicos (Categorías, Marcas). Útil para desarrollo. |
-| `06_Faltantes_Configuracion.sql` | Crea tablas nuevas como `sucursales` y `tipos_comprobantes`.                |
-| `07_Datos_Configuracion.sql`     | Inserta datos base para las tablas de configuración.                        |
-| `08_Datos_Restaurados.sql`       | Restaura los datos del dump histórico (limpiando tablas primero).           |
-| `09_Migracion_Fase1.sql`         | Ajustes de Kardex Valorizado y creación de tablas de Notas.                 |
-| `99_Verificacion.sql`            | Consulta el estado actual de las tablas.                                    |
+| Archivo                                    | Descripción                                                                 |
+| :----------------------------------------- | :-------------------------------------------------------------------------- |
+| `00_CrearBase.sql`                         | Crea la base de datos vacía.                                                |
+| `01_Estructura.sql`                        | Define esquemas, tablas, secuencias y funciones.                            |
+| `02_Datos_Menus.sql`                       | Inserta menús del sistema.                                                  |
+| `03_Permisos.sql`                          | Configura el sistema de permisos granulares.                                |
+| `04_Datos_Semilla.sql`                     | Inserta datos de prueba básicos (Categorías, Marcas). Útil para desarrollo. |
+| `06_Faltantes_Configuracion.sql`           | Crea tablas nuevas como `sucursales` y `tipos_comprobantes`.                |
+| `07_Datos_Configuracion.sql`               | Inserta datos base para las tablas de configuración.                        |
+| `08_Datos_Restaurados.sql`                 | Restaura los datos del dump histórico (limpiando tablas primero).           |
+| `09_Migracion_Fase1.sql`                   | Ajustes de Kardex Valorizado y creación de tablas de Notas.                 |
+| `10_Migracion_TipoDocumento_FK.sql`        | Actualiza llaves foráneas de tipo documento en el negocio.                  |
+| `11_Migracion_TipoComprobante_Modulos.sql` | Define módulos (Compra/Venta/OC) para tipos de comprobante.                 |
+| `99_Verificacion.sql`                      | Consulta el estado actual de las tablas.                                    |
 
 **Ejemplo de ejecución manual:**
 

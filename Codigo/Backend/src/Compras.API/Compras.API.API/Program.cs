@@ -17,24 +17,6 @@ builder.Services.AddDbContext<ComprasDbContext>(options =>
     options.UseSnakeCaseNamingConvention();
 });
 
-builder.Services.AddDbContext<Configuracion.API.Infrastructure.Datos.ConfiguracionDbContext>(options =>
-{
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
-    options.UseSnakeCaseNamingConvention();
-});
-
-builder.Services.AddDbContext<Inventario.API.Infrastructure.Datos.InventarioDbContext>(options =>
-{
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
-    options.UseSnakeCaseNamingConvention();
-});
-
-builder.Services.AddDbContext<Catalogo.Infrastructure.Datos.CatalogoDbContext>(options =>
-{
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
-    options.UseSnakeCaseNamingConvention();
-});
-
 // Registrar la interfaz para los manejadores de MediatR
 builder.Services.AddScoped<Compras.API.Application.Interfaces.IComprasDbContext>(provider => provider.GetRequiredService<ComprasDbContext>());
 

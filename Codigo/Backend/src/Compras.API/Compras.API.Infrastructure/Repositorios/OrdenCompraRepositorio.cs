@@ -10,13 +10,11 @@ namespace Compras.API.Infrastructure.Repositorios
 {
     public class OrdenCompraRepositorio : IOrdenCompraRepositorio
     {
-        private readonly Configuracion.API.Infrastructure.Datos.ConfiguracionDbContext _configContext;
         private readonly ComprasDbContext _context;
 
-        public OrdenCompraRepositorio(ComprasDbContext context, Configuracion.API.Infrastructure.Datos.ConfiguracionDbContext configContext)
+        public OrdenCompraRepositorio(ComprasDbContext context)
         {
             _context = context;
-            _configContext = configContext;
         }
 
         public async Task<OrdenCompra?> ObtenerPorIdAsync(long id)
@@ -33,8 +31,7 @@ namespace Compras.API.Infrastructure.Repositorios
             try
             {
                 // 1. Obtener la serie de comprobante para Orden de Compra
-                // Unimos series_comprobantes con tipo_comprobante
-                var serieComprobante = await _configContext.SeriesComprobantes
+                var serieComprobante = await _context.SeriesComprobantesRef
                     .Include(s => s.TipoComprobante)
                     .Where(s => s.TipoComprobante != null && s.TipoComprobante.EsOrdenCompra && s.TipoComprobante.Activado)
                     .OrderByDescending(s => s.FechaCreacion)
@@ -61,10 +58,9 @@ namespace Compras.API.Infrastructure.Repositorios
                     throw new System.Exception($"Ya existe una orden de compra con el código {orden.CodigoOrden}. Reintente la operación.");
                 }
 
-                // 5. Guardar cambios en ambos contextos
+                // 5. Guardar cambios
                 _context.OrdenesCompra.Add(orden);
                 await _context.SaveChangesAsync();
-                await _configContext.SaveChangesAsync();
 
                 await transaction.CommitAsync();
                 return orden;
@@ -115,9 +111,9 @@ namespace Compras.API.Infrastructure.Repositorios
 
         public async Task<string> ObtenerSiguienteNumeroAsync()
         {
-            var serieComprobante = await _configContext.SeriesComprobantes
+            var serieComprobante = await _context.SeriesComprobantesRef
                 .Include(s => s.TipoComprobante)
-                .Where(s => s.TipoComprobante != null && s.TipoComprobante.EsOrdenCompra && s.TipoComprobante.Activado)
+                .Where(s => s.TipoComprobante != null && s.TipoComprobante.EsOrdenCompra)
                 .OrderByDescending(s => s.FechaCreacion)
                 .FirstOrDefaultAsync();
 

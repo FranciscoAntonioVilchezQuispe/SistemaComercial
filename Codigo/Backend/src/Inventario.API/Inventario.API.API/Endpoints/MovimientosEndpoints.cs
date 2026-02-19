@@ -31,6 +31,12 @@ namespace Inventario.API.Endpoints
 
                 return Results.Ok(resultado);
             });
+
+            grupo.MapDelete("/referencia/{modulo}/{idReferencia}", async (string modulo, long idReferencia, IMediator mediator) =>
+            {
+                var exito = await mediator.Send(new EliminarMovimientosPorReferenciaComando(modulo, idReferencia));
+                return exito ? Results.Ok(true) : Results.NotFound(false);
+            });
         }
     }
 }

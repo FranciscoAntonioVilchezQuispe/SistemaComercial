@@ -3,6 +3,7 @@ using System;
 using Compras.API.Infrastructure.Datos;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Compras.API.Infrastructure.Migrations
 {
     [DbContext(typeof(ComprasDbContext))]
-    partial class ComprasDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260219175334_AddObservacionesToCompra")]
+    partial class AddObservacionesToCompra
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

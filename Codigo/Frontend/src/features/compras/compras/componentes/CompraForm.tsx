@@ -2,9 +2,9 @@ import React from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { CalendarIcon, Trash2, Plus, Check } from "lucide-react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
+import { Search, CalendarIcon, Trash2, Plus, Check } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -32,19 +32,28 @@ import {
 import { Calendar } from "@/components/ui/calendar";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
+import { toast } from "sonner";
 
 import { useRegistrarCompra } from "../hooks/useCompras";
 import { SelectorTipoComprobante } from "@/compartido/componentes/formularios/SelectorTipoComprobante";
 import { SelectorCatalogo } from "@/compartido/componentes/formularios/SelectorCatalogo";
-// Importamos los hooks de los otros módulos para los selectores
+import { SelectorProveedorV2 } from "@/compartido/componentes/formularios/SelectorProveedorV2";
+
 import {
   useProveedores,
   useProveedor,
 } from "@/features/compras/proveedores/hooks/useProveedores";
 import { useAlmacenes } from "@/features/inventario/almacenes/hooks/useAlmacenes";
 import { useProductos } from "@/features/catalogo/hooks/useProductos";
+import { useReglasDocumentos } from "@/configuracion/hooks/useReglasDocumentos";
 
-import { limpiarSoloNumeros, padIzquierda } from "@/lib/i18n";
+import { limpiarSoloNumeros, padIzquierda } from "@compartido/utilidades";
+import { obtenerOrdenesCompra } from "@/features/compras/ordenes-compra/servicios/ordenCompraService";
+import {
+  EstadoOrdenCompra,
+  ComprasConstantes,
+} from "@/features/compras/constantes";
+import { CrearCompraPayload } from "../types/compra.types";
 
 // Schema de validación
 
@@ -75,6 +84,7 @@ interface CompraFormProps {
   onSuccess: () => void;
   onCancel: () => void;
   datosIniciales?: Partial<CompraFormValues>;
+  readOnly?: boolean;
 }
 
 // Componente Input Autocomplete para Productos
@@ -83,11 +93,13 @@ const ProductInput = ({
   onChange,
   productos,
   placeholder = "Buscar producto...",
+  disabled = false,
 }: {
   value: number;
   onChange: (id: number) => void;
   productos: any[]; // Usar tipo correcto si está disponible
   placeholder?: string;
+  disabled?: boolean;
 }) => {
   const [open, setOpen] = React.useState(false);
   const [inputValue, setInputValue] = React.useState("");
@@ -109,7 +121,7 @@ const ProductInput = ({
   );
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover open={open && !disabled} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <FormControl>
           <div className="relative">
@@ -117,6 +129,7 @@ const ProductInput = ({
               placeholder={placeholder}
               value={inputValue}
               onChange={(e) => {
+                if (disabled) return;
                 setInputValue(e.target.value);
                 setOpen(true);
                 // Si borra todo, reseteamos el valor
@@ -124,8 +137,9 @@ const ProductInput = ({
                   onChange(0);
                 }
               }}
-              onFocus={() => setOpen(true)}
+              onFocus={() => !disabled && setOpen(true)}
               className="pr-8" // Espacio para icono si se desea
+              disabled={disabled}
             />
             {/* Optional: Icono de búsqueda o chevron */}
           </div>
@@ -164,18 +178,7 @@ const ProductInput = ({
   );
 };
 
-import { SelectorProveedorV2 } from "@/compartido/componentes/formularios/SelectorProveedorV2";
-import { useReglasDocumentos } from "@/configuracion/hooks/useReglasDocumentos";
-
-import { obtenerOrdenesCompra } from "@/features/compras/ordenes-compra/servicios/ordenCompraService";
-
-import {
-  EstadoOrdenCompra,
-  ComprasConstantes,
-} from "@/features/compras/constantes";
-import { toast } from "sonner";
-import { Search } from "lucide-react";
-import { CrearCompraPayload } from "../types/compra.types";
+// ... (imports consolidados arriba)
 
 // Eliminamos ProviderSelector local que estaba aquí
 
@@ -185,6 +188,7 @@ export function CompraForm({
   onSuccess,
   onCancel,
   datosIniciales,
+  readOnly = false,
 }: CompraFormProps) {
   const registrar = useRegistrarCompra();
   const [busquedaOrden, setBusquedaOrden] = React.useState("");
@@ -340,7 +344,7 @@ export function CompraForm({
       numeroComprobante: values.numeroComprobante,
       fechaEmision: values.fechaEmision,
       fechaContable: values.fechaEmision, // Usar misma fecha por defecto
-      moneda: "PEN", // TODO: Mapear idMoneda a código si es necesario. Por ahora default 'PEN'
+      moneda: values.idMoneda === 2 ? "USD" : "PEN", // Mapeo dinámico
       tipoCambio: values.tipoCambio,
       subtotal: subtotal,
       impuesto: impuesto,
@@ -353,7 +357,7 @@ export function CompraForm({
         idVariante: null,
         descripcion: "", // Backend lo puede llenar o dejar vacío
         cantidad: d.cantidad,
-        precioUnitarioCompra: d.precioUnitario, // Mapeo clave
+        precioUnitarioCompra: d.precioUnitario, // Mapeo clave para que el backend lo reciba bien
         subtotal: d.cantidad * d.precioUnitario,
       })),
     };
@@ -422,29 +426,31 @@ export function CompraForm({
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        {/* Buscador de Orden de Compra */}
-        <div className="bg-blue-50/50 p-4 rounded-lg border border-blue-100 flex items-center gap-4">
-          <div className="flex-1 max-w-md relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Escriba código de Orden de Compra y presione Enter (ej. OC-001)..."
-              className="pl-9 bg-white"
-              value={busquedaOrden}
-              onChange={(e) => setBusquedaOrden(e.target.value)}
-              onKeyDown={handleBuscarOrden}
-              disabled={buscandoOrden}
-            />
+        {/* Buscador de Orden de Compra - Ocular en modo lectura */}
+        {!readOnly && (
+          <div className="bg-blue-50/50 p-4 rounded-lg border border-blue-100 flex items-center gap-4">
+            <div className="flex-1 max-w-md relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Escriba código de Orden de Compra y presione Enter (ej. OC-001)..."
+                className="pl-9 bg-white"
+                value={busquedaOrden}
+                onChange={(e) => setBusquedaOrden(e.target.value)}
+                onKeyDown={handleBuscarOrden}
+                disabled={buscandoOrden}
+              />
+            </div>
+            {buscandoOrden && (
+              <span className="text-sm text-muted-foreground animate-pulse">
+                Buscando...
+              </span>
+            )}
+            <div className="text-sm text-muted-foreground">
+              <span className="font-semibold text-blue-700">Tip:</span> Presione
+              Enter para cargar los datos automáticamente.
+            </div>
           </div>
-          {buscandoOrden && (
-            <span className="text-sm text-muted-foreground animate-pulse">
-              Buscando...
-            </span>
-          )}
-          <div className="text-sm text-muted-foreground">
-            <span className="font-semibold text-blue-700">Tip:</span> Presione
-            Enter para cargar los datos automáticamente.
-          </div>
-        </div>
+        )}
 
         {/* Cabecera del Documento */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -466,6 +472,7 @@ export function CompraForm({
                     proveedores={listaProveedores}
                     onSearch={handleSearchProveedor}
                     onTipoDocChange={setCodigoDocumentoProv}
+                    disabled={readOnly}
                   />
                 </FormControl>
                 <FormMessage />
@@ -484,6 +491,7 @@ export function CompraForm({
                     className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
                     value={field.value}
                     onChange={(e) => field.onChange(Number(e.target.value))}
+                    disabled={readOnly}
                   >
                     <option value={0}>Seleccione Almacén</option>
                     {almacenes?.map((a) => (
@@ -523,17 +531,19 @@ export function CompraForm({
                       </Button>
                     </FormControl>
                   </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={field.value}
-                      onSelect={field.onChange}
-                      disabled={(date) =>
-                        date > new Date() || date < new Date("1900-01-01")
-                      }
-                      initialFocus
-                    />
-                  </PopoverContent>
+                  {!readOnly && (
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={field.value}
+                        onSelect={field.onChange}
+                        disabled={(date) =>
+                          date > new Date() || date < new Date("1900-01-01")
+                        }
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  )}
                 </Popover>
                 <FormMessage />
               </FormItem>
@@ -553,6 +563,7 @@ export function CompraForm({
                 onChange={(val) => field.onChange(val.toString())}
                 placeholder="Tipo (Factura)"
                 disabled={
+                  readOnly ||
                   seccionBloqueada ||
                   (proveedorSeleccionado && idsPermitidos.length === 1)
                 }
@@ -572,7 +583,7 @@ export function CompraForm({
                   <Input
                     {...field}
                     placeholder="F001"
-                    disabled={seccionBloqueada}
+                    disabled={seccionBloqueada || readOnly}
                   />
                 </FormControl>
                 <FormMessage />
@@ -594,7 +605,7 @@ export function CompraForm({
                       field.onChange(limpiarSoloNumeros(e.target.value))
                     }
                     onBlur={() => field.onChange(padIzquierda(field.value))}
-                    disabled={seccionBloqueada}
+                    disabled={seccionBloqueada || readOnly}
                   />
                 </FormControl>
                 <FormMessage />
@@ -612,7 +623,7 @@ export function CompraForm({
                 value={field.value}
                 onChange={(val: string) => field.onChange(Number(val))}
                 placeholder="Soles/Dólares"
-                disabled={seccionBloqueada}
+                disabled={seccionBloqueada || readOnly}
               />
             )}
           />
@@ -645,6 +656,7 @@ export function CompraForm({
                             // Lógica adicional si es necesario
                           }}
                           productos={productos}
+                          disabled={readOnly}
                         />
                         <FormMessage />
                       </FormItem>
@@ -662,7 +674,12 @@ export function CompraForm({
                           Cant.
                         </FormLabel>
                         <FormControl>
-                          <Input type="number" step="1" {...field} />
+                          <Input
+                            type="number"
+                            step="1"
+                            {...field}
+                            disabled={readOnly}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -681,7 +698,12 @@ export function CompraForm({
                         </FormLabel>
 
                         <FormControl>
-                          <Input type="number" step="0.01" {...field} />
+                          <Input
+                            type="number"
+                            step="0.01"
+                            {...field}
+                            disabled={readOnly}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -708,30 +730,34 @@ export function CompraForm({
                   </div>
                 </div>
 
-                <div className="col-span-1">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    type="button"
-                    onClick={() => remove(index)}
-                  >
-                    <Trash2 className="h-4 w-4 text-destructive" />
-                  </Button>
-                </div>
+                {!readOnly && (
+                  <div className="col-span-1">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      type="button"
+                      onClick={() => remove(index)}
+                    >
+                      <Trash2 className="h-4 w-4 text-destructive" />
+                    </Button>
+                  </div>
+                )}
               </div>
             ))}
 
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() =>
-                append({ idProducto: 0, cantidad: 1, precioUnitario: 0 })
-              }
-              className="mt-2"
-            >
-              <Plus className="h-4 w-4 mr-2" /> Agregar Item
-            </Button>
+            {!readOnly && (
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() =>
+                  append({ idProducto: 0, cantidad: 1, precioUnitario: 0 })
+                }
+                className="mt-2"
+              >
+                <Plus className="h-4 w-4 mr-2" /> Agregar Item
+              </Button>
+            )}
           </div>
 
           <div className="flex justify-end gap-4 text-xl font-bold">
@@ -749,7 +775,7 @@ export function CompraForm({
             <FormItem>
               <FormLabel>Observaciones</FormLabel>
               <FormControl>
-                <Textarea {...field} />
+                <Textarea {...field} disabled={readOnly} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -758,11 +784,13 @@ export function CompraForm({
 
         <div className="flex justify-end gap-2 pt-4">
           <Button type="button" variant="outline" onClick={onCancel}>
-            Cancelar
+            {readOnly ? "Cerrar" : "Cancelar"}
           </Button>
-          <Button type="submit" disabled={registrar.isPending}>
-            {registrar.isPending ? "Registrando..." : "Registrar Compra"}
-          </Button>
+          {!readOnly && (
+            <Button type="submit" disabled={registrar.isPending}>
+              {registrar.isPending ? "Registrando..." : "Registrar Compra"}
+            </Button>
+          )}
         </div>
       </form>
     </Form>

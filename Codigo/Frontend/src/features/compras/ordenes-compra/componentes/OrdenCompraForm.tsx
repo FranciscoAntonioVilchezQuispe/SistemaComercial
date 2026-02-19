@@ -38,7 +38,7 @@ import { useRegistrarOrdenCompra } from "../hooks/useOrdenesCompra";
 import { useProveedores } from "@/features/compras/proveedores/hooks/useProveedores";
 import { useAlmacenes } from "@/features/inventario/almacenes/hooks/useAlmacenes";
 import { useProductos } from "@/features/catalogo/hooks/useProductos";
-import { APP_LOCALE, limpiarDecimal } from "@/lib/i18n";
+import { APP_LOCALE, limpiarDecimal } from "@compartido/utilidades";
 import { SelectorProveedorV2 } from "@/compartido/componentes/formularios/SelectorProveedorV2";
 import { EstadoOrdenCompra } from "../../constantes";
 

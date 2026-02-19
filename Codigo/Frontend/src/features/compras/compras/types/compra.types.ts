@@ -1,8 +1,11 @@
 export interface DetalleCompra {
+  id: number;
   idProducto: number;
-  nombreProducto: string; // Para visualización
+  nombreProducto?: string;
+  idVariante?: number | null;
+  descripcion?: string;
   cantidad: number;
-  precioUnitario: number;
+  precioUnitarioCompra: number;
   subtotal: number;
 }
 
@@ -11,6 +14,7 @@ export interface Compra {
   idProveedor: number;
   idAlmacen: number;
   idMoneda: number;
+  idTipoComprobante: number;
   tipoComprobante: string; // 'FACTURA', 'BOLETA', etc.
   serieComprobante: string;
   numeroComprobante: string;
@@ -24,12 +28,16 @@ export interface Compra {
   subtotal: number;
   impuesto: number;
   total: number;
+  saldoPendiente?: number;
+  idEstadoPago: number;
 
   detalles: DetalleCompra[];
 
   // Datos expandidos (opcional, depende del backend)
   razonSocialProveedor?: string;
   nombreAlmacen?: string;
+  numeroDocumentoProveedor?: string;
+  nombreTipoDocumentoProveedor?: string;
 }
 
 export interface CompraFormData {
