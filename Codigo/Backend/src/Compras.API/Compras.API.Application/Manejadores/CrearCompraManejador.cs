@@ -36,9 +36,13 @@ namespace Compras.API.Application.Manejadores
                 NumeroComprobante = dto.NumeroComprobante,
                 FechaEmision = dto.FechaEmision == default ? DateTime.UtcNow : dto.FechaEmision,
                 FechaContable = dto.FechaContable == default ? DateTime.UtcNow : dto.FechaContable,
+                FechaVencimiento = dto.FechaVencimiento,
                 Moneda = dto.Moneda,
                 TipoCambio = dto.TipoCambio,
                 Subtotal = dto.Subtotal,
+                BaseGravada = dto.BaseGravada,
+                BaseExonerada = dto.BaseExonerada,
+                BaseInafecta = dto.BaseInafecta,
                 Impuesto = dto.Impuesto,
                 Total = dto.Total,
                 SaldoPendiente = dto.SaldoPendiente,
@@ -51,7 +55,8 @@ namespace Compras.API.Application.Manejadores
                     Descripcion = d.Descripcion,
                     Cantidad = d.Cantidad,
                     PrecioUnitarioCompra = d.PrecioUnitarioCompra,
-                    Subtotal = d.Subtotal
+                    Subtotal = d.Subtotal,
+                    AfectacionIgv = d.AfectacionIgv
                 }).ToList()
             };
 
@@ -75,8 +80,10 @@ namespace Compras.API.Application.Manejadores
             var evento = new CompraCreadaEvento(
                 compra.Id,
                 compra.IdAlmacen,
+                compra.IdTipoComprobante,
+                compra.SerieComprobante ?? string.Empty,
+                compra.NumeroComprobante ?? string.Empty,
                 compra.Detalles.Select(d => new CompraItemDetalle(d.IdProducto, d.Cantidad, d.PrecioUnitarioCompra)).ToList()
-
             );
 
             await _mediator.Publish(evento, cancellationToken);

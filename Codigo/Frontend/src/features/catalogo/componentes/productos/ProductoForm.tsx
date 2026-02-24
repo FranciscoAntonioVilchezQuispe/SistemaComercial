@@ -168,10 +168,7 @@ export function ProductoForm({
 
   return (
     <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit((data) => alEnviar(data as any))}
-        className="space-y-4"
-      >
+      <form onSubmit={form.handleSubmit(alEnviar)} className="space-y-4">
         <Tabs defaultValue="general" className="w-full">
           <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 h-auto">
             <TabsTrigger value="general">General</TabsTrigger>
@@ -633,7 +630,11 @@ export function ProductoForm({
             Cancelar
           </Button>
           <Button type="submit" disabled={cargando}>
-            {datosIniciales ? "Actualizar" : "Crear"}
+            {cargando
+              ? "Guardando..."
+              : datosIniciales
+                ? "Actualizar"
+                : "Crear"}
           </Button>
         </div>
       </form>

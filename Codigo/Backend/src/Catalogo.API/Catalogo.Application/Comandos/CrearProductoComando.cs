@@ -31,6 +31,7 @@ namespace Catalogo.Application.Comandos
         // Configuración de inventario
         bool TieneVariantes,
         bool PermiteInventarioNegativo,
+        string MetodoValuacion,
 
         // Configuración fiscal
         bool GravadoImpuesto,

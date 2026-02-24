@@ -30,8 +30,18 @@ import {
 import { useTiposComprobante } from "../hooks/useTiposComprobante";
 import { ReglaDocumentoForm } from "../componentes/ReglaDocumentoForm";
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
-export function ReglasDocumentoPage() {
+export function PaginaReglasDocumento() {
   const [dialogoReglaOpen, setDialogoReglaOpen] = useState(false);
   const [reglaSeleccionada, setReglaSeleccionada] =
     useState<ReglaDocumento | null>(null);
@@ -49,6 +59,7 @@ export function ReglasDocumentoPage() {
   const guardarRegla = useGuardarRegla();
   const eliminarRegla = useEliminarRegla();
   const actualizarRelaciones = useActualizarRelaciones();
+  const [eliminarId, setEliminarId] = useState<number | null>(null);
 
   const handleGuardarRegla = (datos: any) => {
     guardarRegla.mutate(datos, {
@@ -64,17 +75,9 @@ export function ReglasDocumentoPage() {
     });
   };
 
+  // Ahora la eliminación se realiza mediante AlertDialog: abrir con setEliminarId
   const handleEliminarRegla = (regla: ReglaDocumento) => {
-    if (confirm(`¿Eliminar regla para ${regla.nombre}?`)) {
-      eliminarRegla.mutate(regla.id!, {
-        onSuccess: () => toast.success("Regla eliminada"),
-        onError: (e: any) =>
-          toast.error(
-            "Error: " +
-              (e.response?.data?.message || e.message || "Error desconocido"),
-          ),
-      });
-    }
+    setEliminarId(regla.id ?? null);
   };
 
   const handleOpenRelaciones = (regla: ReglaDocumento) => {
@@ -291,6 +294,44 @@ export function ReglasDocumentoPage() {
           </div>
         </DialogContent>
       </Dialog>
+      <AlertDialog
+        open={eliminarId !== null}
+        onOpenChange={(open) => !open && setEliminarId(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Está absolutamente seguro?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta acción no se puede deshacer. La regla de documento será
+              eliminada.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={() => {
+                if (eliminarId) {
+                  eliminarRegla.mutate(eliminarId, {
+                    onSuccess: () => {
+                      toast.success("Regla eliminada");
+                      setEliminarId(null);
+                    },
+                    onError: (e: any) => {
+                      toast.error(
+                        "Error: " +
+                          (e.response?.data?.message || e.message || "Error desconocido"),
+                      );
+                    },
+                  });
+                }
+              }}
+            >
+              {eliminarRegla.isPending ? "Eliminando..." : "Sí, eliminar"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

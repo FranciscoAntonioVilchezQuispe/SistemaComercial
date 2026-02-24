@@ -7,6 +7,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { DataTable } from "@/components/ui/DataTable";
 import { toast } from "sonner";
 import { ListaPrecio } from "../tipos/catalogo.types";
@@ -21,6 +31,7 @@ export function PaginaListasPrecios() {
   const [dialogoOpen, setDialogoOpen] = useState(false);
   const [listaSeleccionada, setListaSeleccionada] =
     useState<ListaPrecio | null>(null);
+  const [eliminarId, setEliminarId] = useState<number | null>(null);
 
   const { data: listas, isLoading } = useListasPrecios();
   const eliminarMutation = useEliminarListaPrecio();
@@ -36,9 +47,7 @@ export function PaginaListasPrecios() {
   };
 
   const handleEliminar = async (lista: ListaPrecio) => {
-    if (confirm(`¿Está seguro de eliminar la lista "${lista.nombre}"?`)) {
-      eliminarMutation.mutate(lista.id);
-    }
+    setEliminarId(lista.id);
   };
 
   const columnas = [
@@ -94,12 +103,8 @@ export function PaginaListasPrecios() {
         isLoading={isLoading}
         searchPlaceholder="Buscar lista..."
         actionElement={
-          <Button
-            onClick={handleNuevo}
-            className="bg-blue-600 hover:bg-blue-700 text-white rounded-full px-6"
-          >
-            <Plus className="mr-2 h-4 w-4" />
-            Nuevo
+          <Button onClick={handleNuevo}>
+            <Plus className="mr-2 h-4 w-4" /> Nuevo
           </Button>
         }
       />
@@ -125,6 +130,39 @@ export function PaginaListasPrecios() {
           />
         </DialogContent>
       </Dialog>
+      <AlertDialog open={eliminarId !== null} onOpenChange={(open) => !open && setEliminarId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Está absolutamente seguro?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta acción eliminará la lista de precios seleccionada y no se
+              podrá deshacer.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={() => {
+                if (eliminarId) {
+                  eliminarMutation.mutate(eliminarId, {
+                    onSuccess: () => {
+                      toast.success("Lista eliminada");
+                      setEliminarId(null);
+                    },
+                    onError: (e: any) => {
+                      toast.error("Error: " + e.message);
+                      setEliminarId(null);
+                    },
+                  });
+                }
+              }}
+            >
+              Sí, eliminar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

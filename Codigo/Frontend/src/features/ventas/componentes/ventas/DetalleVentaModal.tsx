@@ -50,7 +50,7 @@ export function DetalleVentaModal({ venta }: Props) {
             </p>
             <p className="text-base">
               {venta.cliente?.razonSocial ||
-                venta.cliente?.nombres ||
+                venta.cliente?.razonSocial ||
                 "Cliente General"}
             </p>
           </div>

@@ -7,8 +7,9 @@ const BASE_URL = "/marcas";
 export const servicioMarcas = {
   obtenerMarcas: async (req?: PagedRequest): Promise<PagedResponse<Marca>> => {
     const params = new URLSearchParams();
-    if (req?.pageNumber) params.append("pageNumber", req.pageNumber.toString());
-    if (req?.pageSize) params.append("pageSize", req.pageSize.toString());
+    params.append("pageNumber", (req?.pageNumber || 1).toString());
+    params.append("pageSize", (req?.pageSize || 10).toString());
+
     if (req?.search) params.append("search", req.search);
     if (req?.activo !== undefined && req?.activo !== null)
       params.append("activo", req.activo.toString());

@@ -36,6 +36,18 @@ namespace Compras.API.Infrastructure.Migrations
                         .HasColumnType("boolean")
                         .HasColumnName("activado");
 
+                    b.Property<decimal>("BaseExonerada")
+                        .HasColumnType("decimal(12,2)")
+                        .HasColumnName("base_exonerada");
+
+                    b.Property<decimal>("BaseGravada")
+                        .HasColumnType("decimal(12,2)")
+                        .HasColumnName("base_gravada");
+
+                    b.Property<decimal>("BaseInafecta")
+                        .HasColumnType("decimal(12,2)")
+                        .HasColumnName("base_inafecta");
+
                     b.Property<DateTime?>("FechaActualizacion")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("fecha_modificacion");
@@ -51,6 +63,10 @@ namespace Compras.API.Infrastructure.Migrations
                     b.Property<DateTime>("FechaEmision")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("fecha_emision");
+
+                    b.Property<DateTime?>("FechaVencimiento")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fecha_vencimiento");
 
                     b.Property<long>("IdAlmacen")
                         .HasColumnType("bigint")
@@ -147,6 +163,12 @@ namespace Compras.API.Infrastructure.Migrations
                     b.Property<bool>("Activado")
                         .HasColumnType("boolean")
                         .HasColumnName("activado");
+
+                    b.Property<string>("AfectacionIgv")
+                        .IsRequired()
+                        .HasMaxLength(1)
+                        .HasColumnType("character varying(1)")
+                        .HasColumnName("afectacion_igv");
 
                     b.Property<decimal>("Cantidad")
                         .HasColumnType("decimal(10,3)")

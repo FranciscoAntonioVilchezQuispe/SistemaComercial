@@ -61,10 +61,14 @@ namespace Compras.API.Endpoints
             NumeroComprobante = c.NumeroComprobante,
             FechaEmision = c.FechaEmision,
             FechaContable = c.FechaContable,
-            IdMoneda = c.Moneda == "USD" ? 2 : 1,
+            FechaVencimiento = c.FechaVencimiento,
+            IdMoneda = c.Moneda == "USD" ? 52 : 51,
             Moneda = c.Moneda,
             TipoCambio = c.TipoCambio,
             Subtotal = c.Subtotal,
+            BaseGravada = c.BaseGravada,
+            BaseExonerada = c.BaseExonerada,
+            BaseInafecta = c.BaseInafecta,
             Impuesto = c.Impuesto,
             Total = c.Total,
             SaldoPendiente = c.SaldoPendiente,
@@ -74,6 +78,7 @@ namespace Compras.API.Endpoints
             NombreTipoComprobante = c.NombreTipoComprobante,
             NumeroDocumentoProveedor = c.Proveedor?.NumeroDocumento,
             NombreTipoDocumentoProveedor = c.NombreTipoDocumentoProveedor,
+            IdTipoDocumentoProveedor = c.IdTipoDocumentoProveedor,
             Detalles = c.Detalles?.Select(d => new DetalleCompraDto
             {
                 Id = d.Id,
@@ -83,7 +88,8 @@ namespace Compras.API.Endpoints
                 Descripcion = d.Descripcion,
                 Cantidad = d.Cantidad,
                 PrecioUnitarioCompra = d.PrecioUnitarioCompra,
-                Subtotal = d.Subtotal
+                Subtotal = d.Subtotal,
+                AfectacionIgv = d.AfectacionIgv
             }).ToList() ?? new()
         };
     }

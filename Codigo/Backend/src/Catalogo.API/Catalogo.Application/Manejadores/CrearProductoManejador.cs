@@ -40,6 +40,7 @@ namespace Catalogo.Application.Manejadores
                 // Configuración de inventario
                 TieneVariantes = request.TieneVariantes,
                 PermiteInventarioNegativo = request.PermiteInventarioNegativo,
+                MetodoValuacion = request.MetodoValuacion,
 
                 // Configuración fiscal
                 GravadoImpuesto = request.GravadoImpuesto,

@@ -26,7 +26,7 @@ export const servicioInventario = {
     const response: any = await apiInventario.get(
       `${API_URL}/stock/producto/${idProducto}`,
     );
-    return response.datos || response.data;
+    return response.datos || response;
   },
 
   /**
@@ -51,7 +51,7 @@ export const servicioInventario = {
       `${API_URL}/movimientos`,
       movimiento,
     );
-    return response.datos || response.data;
+    return response.datos || response;
   },
 
   /**
@@ -62,7 +62,7 @@ export const servicioInventario = {
       `${API_URL}/stock/ajuste`,
       ajuste,
     );
-    return response.datos || response.data;
+    return response.datos || response;
   },
 
   /**
@@ -80,7 +80,7 @@ export const servicioInventario = {
         params: { idAlmacen, fechaInicio, fechaFin },
       },
     );
-    return response.datos || response.data;
+    return response.datos || response;
   },
 
   /**
@@ -88,18 +88,26 @@ export const servicioInventario = {
    */
   obtenerTiposMovimiento: async () => {
     const response: any = await apiInventario.get(
-      `${API_URL}/catalogos/tipos-movimiento`,
+      `${API_URL}/tipos-movimiento`,
     );
-    return response.datos || response.data;
+    return response.datos || response;
   },
 
   /**
    * Obtiene la lista de almacenes disponibles
    */
   obtenerAlmacenes: async () => {
-    const response: any = await apiInventario.get(
-      `${API_URL}/catalogos/almacenes`,
+    const response: any = await apiInventario.get(`${API_URL}/almacenes`);
+    return response.datos || response;
+  },
+
+  /**
+   * Ejecuta la sincronización masiva de compras y ventas históricas
+   */
+  sincronizarHistorico: async (reiniciar: boolean = true) => {
+    const response: any = await apiInventario.post(
+      `${API_URL}/movimientos/sincronizar-compras?reiniciar=${reiniciar}`,
     );
-    return response.datos || response.data;
+    return response.mensaje || response;
   },
 };

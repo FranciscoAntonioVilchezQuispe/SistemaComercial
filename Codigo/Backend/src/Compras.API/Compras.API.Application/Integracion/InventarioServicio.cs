@@ -15,7 +15,7 @@ namespace Compras.API.Application.Integracion
             _logger = logger;
         }
 
-        public async Task<bool> RegistrarEntradaCompraAsync(long idProducto, long idAlmacen, decimal cantidad, decimal costoUnitario, long idCompra)
+        public async Task<bool> RegistrarEntradaCompraAsync(long idProducto, long idAlmacen, decimal cantidad, decimal costoUnitario, long idCompra, long idTipoComprobante, string serie, string numero)
 
         {
             try
@@ -30,7 +30,10 @@ namespace Compras.API.Application.Integracion
                     ReferenciaModulo = "COMPRAS",
 
                     IdReferencia = idCompra,
-                    Observaciones = $"Ingreso automático por Compra #" + idCompra
+                    Observaciones = $"Ingreso automático por Compra #" + idCompra,
+                    IdTipoDocumento = idTipoComprobante,
+                    SerieDocumento = serie,
+                    NumeroDocumento = numero
                 };
 
                 var response = await _httpClient.PostAsJsonAsync("inventario/movimientos", comando);

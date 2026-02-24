@@ -1,0 +1,47 @@
+  Determinando los proyectos que se van a restaurar...
+  Todos los proyectos están actualizados para la restauración.
+  SqlRunner -> E:\ProyectosNuevos\SistemaComercial\Codigo\Backend\scripts\SqlRunner\bin\Debug\net8.0\SqlRunner.dll
+  DbSeeder -> E:\ProyectosNuevos\SistemaComercial\Codigo\Backend\src\Tools\DbSeeder\bin\Debug\net9.0\DbSeeder.dll
+  TestClient -> E:\ProyectosNuevos\SistemaComercial\Codigo\Backend\src\Tools\TestClient\bin\Debug\net9.0\TestClient.dll
+  Nucleo -> E:\ProyectosNuevos\SistemaComercial\Codigo\Backend\src\Nucleo\bin\Debug\net8.0\Nucleo.dll
+  Contabilidad.API.Domain -> E:\ProyectosNuevos\SistemaComercial\Codigo\Backend\src\Contabilidad.API\Contabilidad.API.Domain\bin\Debug\net8.0\Contabilidad.API.Domain.dll
+  Inventario.API.Domain -> E:\ProyectosNuevos\SistemaComercial\Codigo\Backend\src\Inventario.API\Inventario.API.Domain\bin\Debug\net8.0\Inventario.API.Domain.dll
+  Clientes.API.Domain -> E:\ProyectosNuevos\SistemaComercial\Codigo\Backend\src\Clientes.API\Clientes.API.Domain\bin\Debug\net8.0\Clientes.API.Domain.dll
+  Identidad.API.Domain -> E:\ProyectosNuevos\SistemaComercial\Codigo\Backend\src\Identidad.API\Identidad.API.Domain\bin\Debug\net8.0\Identidad.API.Domain.dll
+  Ventas.API.Domain -> E:\ProyectosNuevos\SistemaComercial\Codigo\Backend\src\Ventas.API\Ventas.API.Domain\bin\Debug\net8.0\Ventas.API.Domain.dll
+  Configuracion.API.Domain -> E:\ProyectosNuevos\SistemaComercial\Codigo\Backend\src\Configuracion.API\Configuracion.API.Domain\bin\Debug\net8.0\Configuracion.API.Domain.dll
+  Compras.API.Domain -> E:\ProyectosNuevos\SistemaComercial\Codigo\Backend\src\Compras.API\Compras.API.Domain\bin\Debug\net8.0\Compras.API.Domain.dll
+  Catalogo.Domain -> E:\ProyectosNuevos\SistemaComercial\Codigo\Backend\src\Catalogo.API\Catalogo.Domain\bin\Debug\net8.0\Catalogo.Domain.dll
+  Contabilidad.API.Infrastructure -> E:\ProyectosNuevos\SistemaComercial\Codigo\Backend\src\Contabilidad.API\Contabilidad.API.Infrastructure\bin\Debug\net8.0\Contabilidad.API.Infrastructure.dll
+  Contabilidad.API.Application -> E:\ProyectosNuevos\SistemaComercial\Codigo\Backend\src\Contabilidad.API\Contabilidad.API.Application\bin\Debug\net8.0\Contabilidad.API.Application.dll
+  Gateway.API -> E:\ProyectosNuevos\SistemaComercial\Codigo\Backend\src\Gateway.API\bin\Debug\net8.0\Gateway.API.dll
+  Inventario.API.Application -> E:\ProyectosNuevos\SistemaComercial\Codigo\Backend\src\Inventario.API\Inventario.API.Application\bin\Debug\net8.0\Inventario.API.Application.dll
+  Clientes.API.Infrastructure -> E:\ProyectosNuevos\SistemaComercial\Codigo\Backend\src\Clientes.API\Clientes.API.Infrastructure\bin\Debug\net8.0\Clientes.API.Infrastructure.dll
+  Clientes.API.Application -> E:\ProyectosNuevos\SistemaComercial\Codigo\Backend\src\Clientes.API\Clientes.API.Application\bin\Debug\net8.0\Clientes.API.Application.dll
+  Contabilidad.API.API -> E:\ProyectosNuevos\SistemaComercial\Codigo\Backend\src\Contabilidad.API\Contabilidad.API.API\bin\Debug\net8.0\Contabilidad.API.API.dll
+  Inventario.API.Infrastructure -> E:\ProyectosNuevos\SistemaComercial\Codigo\Backend\src\Inventario.API\Inventario.API.Infrastructure\bin\Debug\net8.0\Inventario.API.Infrastructure.dll
+E:\ProyectosNuevos\SistemaComercial\Codigo\Backend\src\Ventas.API\Ventas.API.Application\Manejadores\CrearVentaManejador.cs(78,17): error CS0019: El operador '??' no se puede aplicar a operandos del tipo 'long' y 'string' [E:\ProyectosNuevos\SistemaComercial\Codigo\Backend\src\Ventas.API\Ventas.API.Application\Ventas.API.Application.csproj]
+  Compras.API.Application -> E:\ProyectosNuevos\SistemaComercial\Codigo\Backend\src\Compras.API\Compras.API.Application\bin\Debug\net8.0\Compras.API.Application.dll
+  Clientes.API.API -> E:\ProyectosNuevos\SistemaComercial\Codigo\Backend\src\Clientes.API\Clientes.API.API\bin\Debug\net8.0\Clientes.API.API.dll
+  Identidad.API.Application -> E:\ProyectosNuevos\SistemaComercial\Codigo\Backend\src\Identidad.API\Identidad.API.Application\bin\Debug\net8.0\Identidad.API.Application.dll
+  Catalogo.Application -> E:\ProyectosNuevos\SistemaComercial\Codigo\Backend\src\Catalogo.API\Catalogo.Application\bin\Debug\net8.0\Catalogo.Application.dll
+  Inventario.API.API -> E:\ProyectosNuevos\SistemaComercial\Codigo\Backend\src\Inventario.API\Inventario.API.API\bin\Debug\net8.0\Inventario.API.API.dll
+  Configuracion.API.Application -> E:\ProyectosNuevos\SistemaComercial\Codigo\Backend\src\Configuracion.API\Configuracion.API.Application\bin\Debug\net8.0\Configuracion.API.Application.dll
+  Identidad.API.Infrastructure -> E:\ProyectosNuevos\SistemaComercial\Codigo\Backend\src\Identidad.API\Identidad.API.Infrastructure\bin\Debug\net8.0\Identidad.API.Infrastructure.dll
+  Catalogo.Infrastructure -> E:\ProyectosNuevos\SistemaComercial\Codigo\Backend\src\Catalogo.API\Catalogo.Infrastructure\bin\Debug\net8.0\Catalogo.Infrastructure.dll
+  Configuracion.API.Infrastructure -> E:\ProyectosNuevos\SistemaComercial\Codigo\Backend\src\Configuracion.API\Configuracion.API.Infrastructure\bin\Debug\net8.0\Configuracion.API.Infrastructure.dll
+  Identidad.API.API -> E:\ProyectosNuevos\SistemaComercial\Codigo\Backend\src\Identidad.API\Identidad.API.API\bin\Debug\net8.0\Identidad.API.API.dll
+  Compras.API.Infrastructure -> E:\ProyectosNuevos\SistemaComercial\Codigo\Backend\src\Compras.API\Compras.API.Infrastructure\bin\Debug\net8.0\Compras.API.Infrastructure.dll
+  Configuracion.API.API -> E:\ProyectosNuevos\SistemaComercial\Codigo\Backend\src\Configuracion.API\Configuracion.API.API\bin\Debug\net8.0\Configuracion.API.API.dll
+  Catalogo.API -> E:\ProyectosNuevos\SistemaComercial\Codigo\Backend\src\Catalogo.API\Catalogo.API\bin\Debug\net8.0\Catalogo.API.dll
+  Compras.API.API -> E:\ProyectosNuevos\SistemaComercial\Codigo\Backend\src\Compras.API\Compras.API.API\bin\Debug\net8.0\Compras.API.API.dll
+
+ERROR al compilar.
+
+E:\ProyectosNuevos\SistemaComercial\Codigo\Backend\src\Ventas.API\Ventas.API.Application\Manejadores\CrearVentaManejador.cs(78,17): error CS0019: El operador '??' no se puede aplicar a operandos del tipo 'long' y 'string' [E:\ProyectosNuevos\SistemaComercial\Codigo\Backend\src\Ventas.API\Ventas.API.Application\Ventas.API.Application.csproj]
+    0 Advertencia(s)
+    1 Errores
+
+Tiempo transcurrido 00:00:02.85
+
+Hay actualizaciones de carga de trabajo disponibles. Ejecute "dotnet workload list" para obtener más información.

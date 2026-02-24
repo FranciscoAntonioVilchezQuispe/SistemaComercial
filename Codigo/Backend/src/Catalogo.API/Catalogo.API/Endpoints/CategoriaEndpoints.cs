@@ -16,7 +16,7 @@ namespace Catalogo.API.Endpoints
 
             grupo.MapGet("/", async (ICategoriaRepositorio repo, [AsParameters] Nucleo.Comun.Application.Paginacion.PagedRequest request) =>
             {
-                var (datos, total) = await repo.ObtenerPaginadoAsync(request.Search, request.Activo, request.PageNumber, request.PageSize);
+                var (datos, total) = await repo.ObtenerPaginadoAsync(request.Search, request.Activo, request.PageNumber ?? 1, request.PageSize ?? 10);
 
                 var dtos = datos.Select(c => new CategoriaDto
                 {
@@ -28,7 +28,7 @@ namespace Catalogo.API.Endpoints
                     Activo = c.Activado
                 });
 
-                var response = new Nucleo.Comun.Application.Paginacion.PagedResponse<CategoriaDto>(dtos, request.PageNumber, request.PageSize, total);
+                var response = new Nucleo.Comun.Application.Paginacion.PagedResponse<CategoriaDto>(dtos, request.PageNumber ?? 1, request.PageSize ?? 10, total);
                 return Results.Ok(response);
             });
 

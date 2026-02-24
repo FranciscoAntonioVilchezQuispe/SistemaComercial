@@ -13,6 +13,7 @@ namespace Compras.API.Application.DTOs
         public decimal Cantidad { get; set; }
         public decimal PrecioUnitarioCompra { get; set; }
         public decimal Subtotal { get; set; }
+        public string AfectacionIgv { get; set; } = "G";
     }
 
     public class CompraDto
@@ -29,10 +30,14 @@ namespace Compras.API.Application.DTOs
         public string NumeroComprobante { get; set; } = null!;
         public DateTime FechaEmision { get; set; }
         public DateTime FechaContable { get; set; }
+        public DateTime? FechaVencimiento { get; set; }
         public long IdMoneda { get; set; }
         public string Moneda { get; set; } = "PEN";
         public decimal TipoCambio { get; set; }
         public decimal Subtotal { get; set; }
+        public decimal BaseGravada { get; set; }
+        public decimal BaseExonerada { get; set; }
+        public decimal BaseInafecta { get; set; }
         public decimal Impuesto { get; set; }
         public decimal Total { get; set; }
         public decimal? SaldoPendiente { get; set; }
@@ -41,6 +46,7 @@ namespace Compras.API.Application.DTOs
         public string? Observaciones { get; set; }
         public string? NumeroDocumentoProveedor { get; set; }
         public string? NombreTipoDocumentoProveedor { get; set; }
+        public long? IdTipoDocumentoProveedor { get; set; }
 
         public List<DetalleCompraDto> Detalles { get; set; } = new();
     }

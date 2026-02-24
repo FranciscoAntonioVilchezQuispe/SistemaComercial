@@ -39,6 +39,7 @@ namespace Compras.API.Endpoints
                     Telefono = dto.Telefono,
                     Email = dto.Email,
                     PaginaWeb = dto.PaginaWeb,
+                    Activado = dto.Activado ?? true,
                     UsuarioCreacion = "SISTEMA"
                 };
                 var creado = await repo.AgregarAsync(proveedor);
@@ -58,6 +59,7 @@ namespace Compras.API.Endpoints
                 existente.Telefono = dto.Telefono;
                 existente.Email = dto.Email;
                 existente.PaginaWeb = dto.PaginaWeb;
+                if (dto.Activado.HasValue) existente.Activado = dto.Activado.Value;
                 existente.UsuarioActualizacion = "SISTEMA";
                 existente.FechaActualizacion = DateTime.UtcNow;
 

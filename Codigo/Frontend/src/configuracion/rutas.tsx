@@ -54,8 +54,22 @@ const PaginaComprobantes = lazy(() =>
   })),
 );
 const PaginaReglasDocumento = lazy(() =>
-  import("@/features/configuracion/paginas/ReglasDocumentoPage").then((m) => ({
-    default: m.ReglasDocumentoPage,
+  import("@/features/configuracion/paginas/PaginaReglasDocumento").then(
+    (m) => ({
+      default: m.PaginaReglasDocumento,
+    }),
+  ),
+);
+const PaginaOperacionesSunat = lazy(() =>
+  import("@/features/configuracion/paginas/PaginaOperacionesSunat").then(
+    (m) => ({
+      default: m.PaginaOperacionesSunat,
+    }),
+  ),
+);
+const PaginaMatrizReglas = lazy(() =>
+  import("@/features/configuracion/paginas/PaginaMatrizReglas").then((m) => ({
+    default: m.PaginaMatrizReglas,
   })),
 );
 
@@ -78,7 +92,7 @@ const PaginaCompras = lazy(() =>
   })),
 );
 const PaginaOrdenesCompra = lazy(() =>
-  import("@/features/compras/ordenes-compra/paginas/OrdenCompraPage").then(
+  import("@/features/compras/ordenes-compra/paginas/PaginaOrdenCompra").then(
     (m) => ({
       default: m.default,
     }),
@@ -105,6 +119,21 @@ const PaginaAlmacenes = lazy(() =>
       default: m.default,
     }),
   ),
+);
+const PaginaKardexPeriodos = lazy(() =>
+  import("@/features/inventario/paginas/PaginaKardexPeriodos").then((m) => ({
+    default: m.default,
+  })),
+);
+const PaginaKardexReporte = lazy(() =>
+  import("@/features/inventario/paginas/PaginaKardexReporte").then((m) => ({
+    default: m.default,
+  })),
+);
+const PaginaTraslados = lazy(() =>
+  import("@/features/inventario/paginas/PaginaTraslados").then((m) => ({
+    default: m.PaginaTraslados,
+  })),
 );
 
 // Estado de carga base
@@ -233,6 +262,22 @@ export const ruteador = createBrowserRouter(
             </Suspense>
           ),
         },
+        {
+          path: "configuracion/operaciones-sunat",
+          element: (
+            <Suspense fallback={<CargandoPagina />}>
+              <PaginaOperacionesSunat />
+            </Suspense>
+          ),
+        },
+        {
+          path: "configuracion/matriz-sunat",
+          element: (
+            <Suspense fallback={<CargandoPagina />}>
+              <PaginaMatrizReglas />
+            </Suspense>
+          ),
+        },
 
         {
           path: "clientes",
@@ -271,6 +316,30 @@ export const ruteador = createBrowserRouter(
           element: (
             <Suspense fallback={<CargandoPagina />}>
               <PaginaAlmacenes />
+            </Suspense>
+          ),
+        },
+        {
+          path: "inventario/kardex/periodos",
+          element: (
+            <Suspense fallback={<CargandoPagina />}>
+              <PaginaKardexPeriodos />
+            </Suspense>
+          ),
+        },
+        {
+          path: "inventario/kardex/reporte",
+          element: (
+            <Suspense fallback={<CargandoPagina />}>
+              <PaginaKardexReporte />
+            </Suspense>
+          ),
+        },
+        {
+          path: "inventario/traslados",
+          element: (
+            <Suspense fallback={<CargandoPagina />}>
+              <PaginaTraslados />
             </Suspense>
           ),
         },

@@ -14,7 +14,8 @@ builder.AddCentralizedLogging();
 
 // Configuración de DbContext
 builder.Services.AddDbContext<ConfiguracionDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"),
+        o => o.MigrationsHistoryTable("__EFMigrationsHistory", "public"))
            .UseSnakeCaseNamingConvention());
 
 // Configuración de Controllers
@@ -65,6 +66,8 @@ builder.Services.AddScoped<IImpuestoRepositorio, ImpuestoRepositorio>();
 builder.Services.AddScoped<IMetodoPagoRepositorio, MetodoPagoRepositorio>();
 builder.Services.AddScoped<ISerieComprobanteRepositorio, SerieComprobanteRepositorio>();
 builder.Services.AddScoped<ITipoComprobanteRepositorio, TipoComprobanteRepositorio>();
+builder.Services.AddScoped<ITipoOperacionSunatRepositorio, TipoOperacionSunatRepositorio>();
+builder.Services.AddScoped<IMatrizReglaSunatRepositorio, MatrizReglaSunatRepositorio>();
 
 builder.Services.AddScoped<IReglasDocumentoServicio, ReglasDocumentoServicio>();
 
@@ -99,6 +102,8 @@ app.MapSerieComprobanteEndpoints();
 app.MapTipoComprobanteEndpoints();
 app.MapTipoDocumentoEndpoints();
 app.MapReglasDocumentoEndpoints();
+app.MapMatrizSunatEndpoints();
+app.MapTipoOperacionSunatEndpoints();
 
 app.MapTablaGeneralEndpoints();
 

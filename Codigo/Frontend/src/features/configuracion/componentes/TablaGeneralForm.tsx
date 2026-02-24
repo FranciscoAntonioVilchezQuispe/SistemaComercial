@@ -10,7 +10,9 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
+  FormDescription,
 } from "@/components/ui/form";
+import { Switch } from "@/components/ui/switch";
 import {
   TablaGeneral,
   TablaGeneralFormData,
@@ -109,6 +111,28 @@ export function TablaGeneralForm({
                 <Input placeholder="Descripción opcional" {...field} />
               </FormControl>
               <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="esSistema"
+          render={({ field }) => (
+            <FormItem className="flex items-center justify-between rounded-lg border p-3">
+              <div>
+                <FormLabel>Es tabla de sistema</FormLabel>
+                <FormDescription>
+                  Las tablas de sistema no pueden eliminarse.
+                </FormDescription>
+              </div>
+              <FormControl>
+                <Switch
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                  disabled={!!datosIniciales?.esSistema} // No permitir quitar este flag si ya estaba
+                />
+              </FormControl>
             </FormItem>
           )}
         />

@@ -16,7 +16,7 @@ namespace Catalogo.API.Endpoints
 
             grupo.MapGet("/", async (IMarcaRepositorio repo, [AsParameters] Nucleo.Comun.Application.Paginacion.PagedRequest request) =>
             {
-                var (datos, total) = await repo.ObtenerPaginadoAsync(request.Search, request.Activo, request.PageNumber, request.PageSize);
+                var (datos, total) = await repo.ObtenerPaginadoAsync(request.Search, request.Activo, request.PageNumber ?? 1, request.PageSize ?? 10);
 
                 var dtos = datos.Select(m => new MarcaDto
                 {
@@ -26,7 +26,7 @@ namespace Catalogo.API.Endpoints
                     PaisOrigen = m.PaisOrigen
                 });
 
-                var response = new Nucleo.Comun.Application.Paginacion.PagedResponse<MarcaDto>(dtos, request.PageNumber, request.PageSize, total);
+                var response = new Nucleo.Comun.Application.Paginacion.PagedResponse<MarcaDto>(dtos, request.PageNumber ?? 1, request.PageSize ?? 10, total);
                 return Results.Ok(response);
             });
 

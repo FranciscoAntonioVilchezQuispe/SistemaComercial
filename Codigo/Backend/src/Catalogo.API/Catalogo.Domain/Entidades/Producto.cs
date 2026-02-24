@@ -67,6 +67,12 @@ namespace Catalogo.Domain.Entidades
         [Column("permite_inventario_negativo")]
         public bool PermiteInventarioNegativo { get; set; }
 
+        // Kardex
+        [Required]
+        [MaxLength(2)]
+        [Column("metodo_valuacion")]
+        public string MetodoValuacion { get; set; } = "PP"; // PP=Promedio Ponderado, PE=PEPS, UE=UEPS
+
         // Fiscal
         [Column("id_tipo_producto")]
         public long? IdTipoProducto { get; set; }

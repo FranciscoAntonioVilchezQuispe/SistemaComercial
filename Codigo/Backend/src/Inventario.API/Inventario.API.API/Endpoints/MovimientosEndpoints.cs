@@ -37,6 +37,13 @@ namespace Inventario.API.Endpoints
                 var exito = await mediator.Send(new EliminarMovimientosPorReferenciaComando(modulo, idReferencia));
                 return exito ? Results.Ok(true) : Results.NotFound(false);
             });
+
+            // Endpoint Especial de Sincronización Histórica
+            grupo.MapPost("/sincronizar-compras", async ([FromQuery] bool reiniciar, IMediator mediator) =>
+            {
+                var result = await mediator.Send(new SincronizarComprasHistComando(reiniciar));
+                return Results.Ok(new { Mensaje = result });
+            });
         }
     }
 }

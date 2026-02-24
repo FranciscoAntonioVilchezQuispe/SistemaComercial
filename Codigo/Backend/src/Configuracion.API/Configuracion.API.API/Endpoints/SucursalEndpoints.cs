@@ -37,7 +37,7 @@ namespace Configuracion.API.Endpoints
                     Telefono = dto.Telefono,
                     EsPrincipal = dto.EsPrincipal,
                     UsuarioCreacion = "SISTEMA",
-                    Activado = true
+                    Activado = dto.Activado
                 };
                 var creado = await repo.AgregarAsync(sucursal);
                 return Results.Created($"/api/sucursales/{creado.Id}", new ToReturn<Sucursal>(creado));
@@ -53,6 +53,7 @@ namespace Configuracion.API.Endpoints
                 sucursal.Direccion = dto.Direccion;
                 sucursal.Telefono = dto.Telefono;
                 sucursal.EsPrincipal = dto.EsPrincipal;
+                sucursal.Activado = dto.Activado;
                 sucursal.UsuarioActualizacion = "SISTEMA";
                 sucursal.FechaActualizacion = DateTime.UtcNow;
 
@@ -64,7 +65,7 @@ namespace Configuracion.API.Endpoints
             {
                 var sucursal = await repo.ObtenerPorIdAsync(id);
                 if (sucursal == null) return Results.NotFound(new ToReturnError<object>("Sucursal no encontrada", 404));
-                
+
                 await repo.EliminarAsync(id);
                 return Results.NoContent();
             });

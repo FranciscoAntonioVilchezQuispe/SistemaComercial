@@ -22,6 +22,8 @@ namespace Configuracion.API.Infrastructure.Datos
         public DbSet<TipoComprobante> TiposComprobante { get; set; }
         public DbSet<DocumentoIdentidadRegla> DocumentoIdentidadReglas { get; set; }
         public DbSet<DocumentoComprobanteRelacion> DocumentoComprobanteRelaciones { get; set; }
+        public DbSet<TipoOperacionSunat> TiposOperacionSunat { get; set; } = null!;
+        public DbSet<MatrizReglaSunat> MatrizReglasSunat { get; set; } = null!;
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -44,6 +46,8 @@ namespace Configuracion.API.Infrastructure.Datos
             modelBuilder.Entity<MetodoPago>().ToTable("metodo_pago", "configuracion");
             modelBuilder.Entity<DocumentoIdentidadRegla>().ToTable("tipo_documento", "configuracion");
             modelBuilder.Entity<DocumentoComprobanteRelacion>().ToTable("regla_documento_comprobante", "configuracion");
+            modelBuilder.Entity<TipoOperacionSunat>().ToTable("tipo_operacion_sunat", "configuracion");
+            modelBuilder.Entity<MatrizReglaSunat>().ToTable("matriz_regla_sunat", "configuracion");
         }
 
     }

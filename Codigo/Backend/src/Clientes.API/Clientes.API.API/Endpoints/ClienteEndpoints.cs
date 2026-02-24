@@ -42,6 +42,7 @@ namespace Clientes.API.Endpoints
                     LimiteCredito = dto.LimiteCredito,
                     DiasCredito = dto.DiasCredito,
                     IdListaPrecioAsignada = dto.IdListaPrecioAsignada,
+                    Activado = dto.Activado ?? true,
                     UsuarioCreacion = "SISTEMA"
                 };
                 var creado = await repo.AgregarAsync(cliente);
@@ -64,6 +65,7 @@ namespace Clientes.API.Endpoints
                 existente.LimiteCredito = dto.LimiteCredito;
                 existente.DiasCredito = dto.DiasCredito;
                 existente.IdListaPrecioAsignada = dto.IdListaPrecioAsignada;
+                if (dto.Activado.HasValue) existente.Activado = dto.Activado.Value;
                 existente.UsuarioActualizacion = "SISTEMA";
                 existente.FechaActualizacion = DateTime.UtcNow;
 

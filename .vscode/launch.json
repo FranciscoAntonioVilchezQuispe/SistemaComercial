@@ -22,7 +22,7 @@
         "pattern": "\\\\bNow listening on:\\\\s+(https?://\\\\S+)",
         "uriFormat": "%s/swagger",
         "webRoot": "${workspaceFolder}/Codigo/Backend/src/Gateway.API",
-        "runtimeExecutable": "C:\\Program Files\\BraveSoftware\\Brave-Browser\\Application\\brave.exe"
+        "runtimeExecutable": "C:\\\\Program Files\\\\Mozilla Firefox\\\\firefox.exe"
       }
     },
     {
@@ -43,7 +43,7 @@
         "pattern": "\\\\bNow listening on:\\\\s+(https?://\\\\S+)",
         "uriFormat": "%s/swagger",
         "webRoot": "${workspaceFolder}/Codigo/Backend/src/Catalogo.API/Catalogo.API",
-        "runtimeExecutable": "C:\\Program Files\\BraveSoftware\\Brave-Browser\\Application\\brave.exe"
+        "runtimeExecutable": "C:\\\\Program Files\\\\Mozilla Firefox\\\\firefox.exe"
       }
     },
     {
@@ -64,7 +64,7 @@
         "pattern": "\\\\bNow listening on:\\\\s+(https?://\\\\S+)",
         "uriFormat": "%s/swagger",
         "webRoot": "${workspaceFolder}/Codigo/Backend/src/Clientes.API/Clientes.API.API",
-        "runtimeExecutable": "C:\\Program Files\\BraveSoftware\\Brave-Browser\\Application\\brave.exe"
+        "runtimeExecutable": "C:\\\\Program Files\\\\Mozilla Firefox\\\\firefox.exe"
       }
     },
     {
@@ -85,7 +85,7 @@
         "pattern": "\\\\bNow listening on:\\\\s+(https?://\\\\S+)",
         "uriFormat": "%s/swagger",
         "webRoot": "${workspaceFolder}/Codigo/Backend/src/Compras.API/Compras.API.API",
-        "runtimeExecutable": "C:\\Program Files\\BraveSoftware\\Brave-Browser\\Application\\brave.exe"
+        "runtimeExecutable": "C:\\\\Program Files\\\\Mozilla Firefox\\\\firefox.exe"
       }
     },
     {
@@ -106,7 +106,7 @@
         "pattern": "\\\\bNow listening on:\\\\s+(https?://\\\\S+)",
         "uriFormat": "%s/swagger",
         "webRoot": "${workspaceFolder}/Codigo/Backend/src/Configuracion.API/Configuracion.API.API",
-        "runtimeExecutable": "C:\\Program Files\\BraveSoftware\\Brave-Browser\\Application\\brave.exe"
+        "runtimeExecutable": "C:\\\\Program Files\\\\Mozilla Firefox\\\\firefox.exe"
       }
     },
     {
@@ -127,7 +127,7 @@
         "pattern": "\\\\bNow listening on:\\\\s+(https?://\\\\S+)",
         "uriFormat": "%s/swagger",
         "webRoot": "${workspaceFolder}/Codigo/Backend/src/Contabilidad.API/Contabilidad.API.API",
-        "runtimeExecutable": "C:\\Program Files\\BraveSoftware\\Brave-Browser\\Application\\brave.exe"
+        "runtimeExecutable": "C:\\\\Program Files\\\\Mozilla Firefox\\\\firefox.exe"
       }
     },
     {
@@ -148,7 +148,7 @@
         "pattern": "\\\\bNow listening on:\\\\s+(https?://\\\\S+)",
         "uriFormat": "%s/swagger",
         "webRoot": "${workspaceFolder}/Codigo/Backend/src/Identidad.API/Identidad.API.API",
-        "runtimeExecutable": "C:\\Program Files\\BraveSoftware\\Brave-Browser\\Application\\brave.exe"
+        "runtimeExecutable": "C:\\\\Program Files\\\\Mozilla Firefox\\\\firefox.exe"
       }
     },
     {
@@ -169,7 +169,7 @@
         "pattern": "\\\\bNow listening on:\\\\s+(https?://\\\\S+)",
         "uriFormat": "%s/swagger",
         "webRoot": "${workspaceFolder}/Codigo/Backend/src/Inventario.API/Inventario.API.API",
-        "runtimeExecutable": "C:\\Program Files\\BraveSoftware\\Brave-Browser\\Application\\brave.exe"
+        "runtimeExecutable": "C:\\\\Program Files\\\\Mozilla Firefox\\\\firefox.exe"
       }
     },
     {
@@ -190,7 +190,7 @@
         "pattern": "\\\\bNow listening on:\\\\s+(https?://\\\\S+)",
         "uriFormat": "%s/swagger",
         "webRoot": "${workspaceFolder}/Codigo/Backend/src/Ventas.API/Ventas.API.API",
-        "runtimeExecutable": "C:\\Program Files\\BraveSoftware\\Brave-Browser\\Application\\brave.exe"
+        "runtimeExecutable": "C:\\\\Program Files\\\\Mozilla Firefox\\\\firefox.exe"
       }
     },
     // ============================================
@@ -198,21 +198,21 @@
     // ============================================
     {
       "name": "Frontend: Dev Server",
-      "type": "chrome",
+      "type": "firefox",
       "request": "launch",
       "url": "http://localhost:5180",
       "webRoot": "${workspaceFolder}/Codigo/Frontend/src",
-      "runtimeExecutable": "C:\\Program Files\\BraveSoftware\\Brave-Browser\\Application\\brave.exe",
+      "runtimeExecutable": "C:\\\\Program Files\\\\Mozilla Firefox\\\\firefox.exe",
       "preLaunchTask": "npm: dev - Frontend"
     },
     {
-      "name": "Frontend: Debug Brave",
-      "type": "chrome",
+      "name": "Frontend: Debug Firefox",
+      "type": "firefox",
       "request": "attach",
       "port": 9222,
       "url": "http://localhost:5180",
       "webRoot": "${workspaceFolder}/Codigo/Frontend/src",
-      "runtimeExecutable": "C:\\Program Files\\BraveSoftware\\Brave-Browser\\Application\\brave.exe"
+      "runtimeExecutable": "C:\\\\Program Files\\\\Mozilla Firefox\\\\firefox.exe"
     }
   ],
   "compounds": [

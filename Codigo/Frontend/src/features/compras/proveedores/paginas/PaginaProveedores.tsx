@@ -19,6 +19,16 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import { toast } from "sonner";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 import { useProveedores, useEliminarProveedor } from "../hooks/useProveedores";
 import { Proveedor } from "../types/proveedor.types";
@@ -33,18 +43,11 @@ export default function PaginaProveedores() {
 
   const { data: proveedores, isLoading, error } = useProveedores();
   const eliminarProveedor = useEliminarProveedor();
+  const [eliminarId, setEliminarId] = useState<number | null>(null);
 
   const { data: tiposDocumento } = useCatalogo("TIPO_DOCUMENTO");
-  console.log("Tipos de documento cargados:", tiposDocumento);
 
-  const handleEliminar = (proveedor: Proveedor) => {
-    if (confirm(`¿Estás seguro de eliminar a ${proveedor.razonSocial}?`)) {
-      eliminarProveedor.mutate(proveedor.id, {
-        onSuccess: () => toast.success("Proveedor eliminado correctamente"),
-        onError: () => toast.error("Error al eliminar el proveedor"),
-      });
-    }
-  };
+  // Eliminación ahora mediante AlertDialog: abrir con setEliminarId
 
   const proveedoresFiltrados =
     proveedores?.filter(
@@ -122,7 +125,7 @@ export default function PaginaProveedores() {
             variant="ghost"
             size="icon"
             className="text-destructive"
-            onClick={() => handleEliminar(row)}
+            onClick={() => setEliminarId(row.id)}
           >
             <Trash2 className="h-4 w-4" />
           </Button>
@@ -193,6 +196,39 @@ export default function PaginaProveedores() {
           />
         </DialogContent>
       </Dialog>
+      <AlertDialog
+        open={eliminarId !== null}
+        onOpenChange={(open) => !open && setEliminarId(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Está absolutamente seguro?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta acción no se puede deshacer. Se eliminará al proveedor
+              seleccionado.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={() => {
+                if (eliminarId) {
+                  eliminarProveedor.mutate(eliminarId, {
+                    onSuccess: () => {
+                      toast.success("Proveedor eliminado correctamente");
+                      setEliminarId(null);
+                    },
+                    onError: () => toast.error("Error al eliminar el proveedor"),
+                  });
+                }
+              }}
+            >
+              {eliminarProveedor.isPending ? "Eliminando..." : "Sí, eliminar"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

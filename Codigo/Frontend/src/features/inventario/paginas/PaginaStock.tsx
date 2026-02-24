@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Search, Package, AlertTriangle, Plus, History } from "lucide-react";
 import { useStock, useAlmacenes } from "../hooks/useInventario";
+import { toast } from "sonner";
 import { TablaStock } from "../componentes/stock/TablaStock";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,13 +22,13 @@ export function PaginaStock() {
   const { data, isLoading } = useStock(filtros);
   const { data: almacenes } = useAlmacenes();
 
-  const handleVerKardex = (item: StockProducto) => {
-    console.log("Ver Kardex de:", item.idProducto);
+  const handleVerKardex = (_item: StockProducto) => {
+    toast.info("Próximamente: ver Kardex");
     // Redirigir a página de Kardex con params
   };
 
-  const handleAjustar = (item: StockProducto) => {
-    console.log("Ajustar stock de:", item.idProducto);
+  const handleAjustar = (_item: StockProducto) => {
+    toast.info("Próximamente: ajuste de stock");
     // Abrir modal de ajuste
   };
 

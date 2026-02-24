@@ -38,4 +38,5 @@ export interface ClienteFormData {
   limiteCredito?: number;
   diasCredito?: number;
   idListaPrecioAsignada?: number;
+  activado: boolean;
 }

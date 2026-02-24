@@ -37,11 +37,22 @@ namespace Catalogo.API.Endpoints
             // GET List Endpoint
             grupo.MapGet("/", async (Catalogo.Domain.Interfaces.IProductoRepositorio repo, [AsParameters] Nucleo.Comun.Application.Paginacion.PagedRequest request) =>
             {
-                var (datos, total) = await repo.ObtenerPaginadoAsync(request.Search, request.Activo, request.PageNumber, request.PageSize);
+                var (datos, total) = await repo.ObtenerPaginadoAsync(request.Search, request.Activo, request.PageNumber ?? 1, request.PageSize ?? 10);
 
                 var dtos = datos.Select(p => MapToDto(p));
 
-                var response = new Nucleo.Comun.Application.Paginacion.PagedResponse<ProductoDto>(dtos, request.PageNumber, request.PageSize, total);
+                var response = new Nucleo.Comun.Application.Paginacion.PagedResponse<ProductoDto>(dtos, request.PageNumber ?? 1, request.PageSize ?? 10, total);
+                return Results.Ok(response);
+            });
+
+            // GET By Id Endpoint
+            grupo.MapGet("/{id:long}", async (long id, Catalogo.Domain.Interfaces.IProductoRepositorio repo) =>
+            {
+                var producto = await repo.ObtenerPorIdAsync(id);
+                if (producto == null)
+                    return Results.NotFound(new ToReturnError<string>($"Producto con ID {id} no encontrado", 404));
+
+                var response = new ToReturn<ProductoDto>(MapToDto(producto));
                 return Results.Ok(response);
             });
         }
@@ -91,6 +102,7 @@ namespace Catalogo.API.Endpoints
             // Configuración de inventario
             TieneVariantes = p.TieneVariantes,
             PermiteInventarioNegativo = p.PermiteInventarioNegativo,
+            MetodoValuacion = p.MetodoValuacion,
 
             // Configuración fiscal
             GravadoImpuesto = p.GravadoImpuesto,

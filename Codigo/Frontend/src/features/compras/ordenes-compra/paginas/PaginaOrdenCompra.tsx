@@ -2,7 +2,6 @@ import { useState } from "react";
 import {
   Plus,
   Eye,
-  Trash2,
   XCircle,
   ShoppingBag,
   CheckCircle,
@@ -17,6 +16,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { DataTable } from "@/components/ui/DataTable";
 import { Loading } from "@compartido/componentes/feedback/Loading";
 import { MensajeError } from "@compartido/componentes/feedback/MensajeError";
@@ -41,13 +50,14 @@ import {
   EstadoOrdenCompraEtiquetas,
 } from "../../constantes";
 
-export default function OrdenCompraPage() {
+export default function PaginaOrdenCompra() {
   const navigate = useNavigate();
   const [dialogoOpen, setDialogoOpen] = useState(false);
   const [ordenSeleccionada, setOrdenSeleccionada] =
     useState<OrdenCompra | null>(null);
   const [modoCreacion, setModoCreacion] = useState(false);
   const [filtro, setFiltro] = useState("");
+  const [eliminarId, setEliminarId] = useState<number | null>(null);
 
   const { data: ordenes, isLoading, error } = useOrdenesCompra();
   const cambiarEstado = useCambiarEstadoOrdenCompra();
@@ -194,15 +204,9 @@ export default function OrdenCompraPage() {
             size="icon"
             className="text-destructive"
             title="Eliminar (Rechazar)"
-            onClick={() =>
-              handleCambiarEstado(
-                row.id,
-                EstadoOrdenCompra.Rechazada,
-                "Orden eliminada (rechazada)",
-              )
-            }
+            onClick={() => setEliminarId(row.id)}
           >
-            <Trash2 className="h-4 w-4" />
+            <XCircle className="h-4 w-4" />
           </Button>
         </div>
       ),
@@ -446,8 +450,7 @@ export default function OrdenCompraPage() {
                       })
                     }
                   >
-                    <ShoppingBag className="mr-2 h-4 w-4" /> Generar Registro de
-                    Compra
+                    <ShoppingBag className="mr-2 h-4 w-4" /> Comprar
                   </Button>
                 </div>
               )}
@@ -455,6 +458,38 @@ export default function OrdenCompraPage() {
           )}
         </DialogContent>
       </Dialog>
+      <AlertDialog
+        open={eliminarId !== null}
+        onOpenChange={(open) => !open && setEliminarId(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Está absolutamente seguro?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta acción no se puede deshacer. La orden será marcada como
+              rechazada.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={() => {
+                if (eliminarId) {
+                  handleCambiarEstado(
+                    eliminarId,
+                    EstadoOrdenCompra.Rechazada,
+                    "Orden eliminada (rechazada)",
+                  );
+                }
+                setEliminarId(null);
+              }}
+            >
+              Sí, rechazar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

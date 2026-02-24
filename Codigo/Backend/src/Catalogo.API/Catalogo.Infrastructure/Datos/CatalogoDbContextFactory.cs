@@ -20,7 +20,9 @@ namespace Catalogo.Infrastructure.Datos
             var builder = new DbContextOptionsBuilder<CatalogoDbContext>();
             var connectionString = configuration.GetConnectionString("DefaultConnection");
 
-            builder.UseNpgsql(connectionString);
+            builder.UseNpgsql(connectionString,
+                o => o.MigrationsHistoryTable("__ef_migrations", "catalogo"))
+                   .UseSnakeCaseNamingConvention();
 
             return new CatalogoDbContext(builder.Options);
         }

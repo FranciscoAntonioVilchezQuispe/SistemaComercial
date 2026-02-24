@@ -44,10 +44,20 @@ import {
   useProveedor,
 } from "@/features/compras/proveedores/hooks/useProveedores";
 import { useAlmacenes } from "@/features/inventario/almacenes/hooks/useAlmacenes";
-import { useProductos } from "@/features/catalogo/hooks/useProductos";
+import {
+  useProductos,
+  useProducto,
+} from "@/features/catalogo/hooks/useProductos";
 import { useReglasDocumentos } from "@/configuracion/hooks/useReglasDocumentos";
+import { useSeriesPorTipo } from "@/features/configuracion/hooks/useSeriesComprobante";
 
-import { limpiarSoloNumeros, padIzquierda } from "@compartido/utilidades";
+import {
+  limpiarSoloNumeros,
+  padIzquierda,
+  limpiarDecimal,
+  formatMoneda,
+  calcularIGV,
+} from "@compartido/utilidades";
 import { obtenerOrdenesCompra } from "@/features/compras/ordenes-compra/servicios/ordenCompraService";
 import {
   EstadoOrdenCompra,
@@ -65,6 +75,7 @@ const compraSchema = z.object({
   serieComprobante: z.string().min(1, "Serie requerida"),
   numeroComprobante: z.string().min(1, "Número requerido"),
   fechaEmision: z.date(),
+  fechaVencimiento: z.date().optional().nullable(),
   tipoCambio: z.coerce.number().min(0.001, "TC inválido"),
   observaciones: z.string().optional(),
   detalles: z
@@ -73,6 +84,8 @@ const compraSchema = z.object({
         idProducto: z.coerce.number().min(1, "Producto requerido"),
         cantidad: z.coerce.number().min(0.01, "Cantidad inválida"),
         precioUnitario: z.coerce.number().min(0, "Precio inválido"),
+        afectacionIgv: z.enum(["G", "E", "I"]).default("G"),
+        unidadMedida: z.string().optional(),
       }),
     )
     .min(1, "Debe agregar al menos un producto"),
@@ -91,34 +104,51 @@ interface CompraFormProps {
 const ProductInput = ({
   value,
   onChange,
-  productos,
-  placeholder = "Buscar producto...",
+  onProductSelect,
+  placeholder = "Buscar (Enter)...",
   disabled = false,
 }: {
   value: number;
   onChange: (id: number) => void;
-  productos: any[]; // Usar tipo correcto si está disponible
+  onProductSelect?: (producto: any) => void;
   placeholder?: string;
   disabled?: boolean;
 }) => {
   const [open, setOpen] = React.useState(false);
   const [inputValue, setInputValue] = React.useState("");
+  const [searchTerm, setSearchTerm] = React.useState("");
 
-  // Sincronizar input con valor seleccionado
+  // Buscar usando la query de forma condicional al término ingresado
+  const { data: qData, isFetching } = useProductos(
+    { search: searchTerm, pageSize: 50, pageNumber: 1 },
+    { enabled: !!searchTerm },
+  );
+  const productosEncontrados = qData?.datos || [];
+
+  // Cuando se selecciona un ID preexistente (e.j. al editar / OC),
+  // buscamos ese producto individual directamente
+  const { data: productoSeleccionado } = useProducto(value);
+
   React.useEffect(() => {
-    if (value) {
-      const selected = productos.find((p) => p.id === value);
-      if (selected) {
-        setInputValue(selected.nombre);
-      }
-    } else {
+    if (value && !inputValue && productoSeleccionado) {
+      setInputValue(productoSeleccionado.nombre);
+    } else if (!value) {
       setInputValue("");
     }
-  }, [value, productos]);
+  }, [value, productoSeleccionado]);
 
-  const filtered = productos.filter((p) =>
-    p.nombre.toLowerCase().includes(inputValue.toLowerCase()),
-  );
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      e.stopPropagation(); // Evitar submit del formulario
+      if (inputValue.trim().length >= 2) {
+        setSearchTerm(inputValue.trim());
+        setOpen(true);
+      } else {
+        toast.info("Ingrese al menos 2 caracteres para buscar");
+      }
+    }
+  };
 
   return (
     <Popover open={open && !disabled} onOpenChange={setOpen}>
@@ -131,33 +161,39 @@ const ProductInput = ({
               onChange={(e) => {
                 if (disabled) return;
                 setInputValue(e.target.value);
-                setOpen(true);
                 // Si borra todo, reseteamos el valor
                 if (e.target.value === "") {
                   onChange(0);
+                  if (onProductSelect) onProductSelect(null);
                 }
               }}
-              onFocus={() => !disabled && setOpen(true)}
-              className="pr-8" // Espacio para icono si se desea
+              onKeyDown={handleKeyDown}
+              className="pr-8"
               disabled={disabled}
             />
-            {/* Optional: Icono de búsqueda o chevron */}
+            {isFetching ? (
+              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground animate-pulse">
+                ...
+              </span>
+            ) : (
+              <Search className="absolute right-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+            )}
           </div>
         </FormControl>
       </PopoverTrigger>
       <PopoverContent className="w-[300px] p-0" align="start">
         <Command>
-          {/* No CommandInput here, we use the external Input */}
           <CommandList>
             <CommandEmpty>No se encontraron productos.</CommandEmpty>
             <CommandGroup>
-              {filtered.map((producto) => (
+              {productosEncontrados.map((producto: any) => (
                 <CommandItem
                   key={producto.id}
                   value={producto.nombre}
                   onSelect={() => {
                     onChange(producto.id);
                     setInputValue(producto.nombre);
+                    if (onProductSelect) onProductSelect(producto);
                     setOpen(false);
                   }}
                 >
@@ -167,7 +203,12 @@ const ProductInput = ({
                       value === producto.id ? "opacity-100" : "opacity-0",
                     )}
                   />
-                  {producto.nombre}
+                  <div className="flex flex-col">
+                    <span>{producto.nombre}</span>
+                    <span className="text-xs text-muted-foreground">
+                      {producto.codigo || ""}
+                    </span>
+                  </div>
                 </CommandItem>
               ))}
             </CommandGroup>
@@ -208,11 +249,7 @@ export function CompraForm({
   };
 
   const { data: almacenes } = useAlmacenes();
-  const { data: productosData } = useProductos({
-    pageNumber: 1,
-    pageSize: 1000,
-  });
-  const productos = productosData?.datos || [];
+  // Se quitó la carga masiva inicial de productos
 
   const form = useForm<CompraFormValues>({
     resolver: zodResolver(compraSchema),
@@ -225,12 +262,36 @@ export function CompraForm({
       serieComprobante: "",
       numeroComprobante: "",
       fechaEmision: new Date(),
+      fechaVencimiento: null,
       tipoCambio: 1.0,
       observaciones: "",
-      detalles: [{ idProducto: 0, cantidad: 1, precioUnitario: 0 }],
+      detalles: [
+        {
+          idProducto: 0,
+          cantidad: 1,
+          precioUnitario: 0,
+          afectacionIgv: "G",
+          unidadMedida: "",
+        },
+      ],
       ...datosIniciales,
     },
   });
+
+  const tipoComprobanteWatch = form.watch("tipoComprobante");
+  const { data: series = [] } = useSeriesPorTipo(
+    tipoComprobanteWatch ? Number(tipoComprobanteWatch) : null,
+  );
+
+  // Auto-asignar serie al cambiar el tipo de comprobante
+  React.useEffect(() => {
+    if (!datosIniciales?.serieComprobante && series.length > 0) {
+      form.setValue("serieComprobante", series[0].serie);
+      if (!datosIniciales?.numeroComprobante) {
+        form.setValue("numeroComprobante", "000000"); // Valor temporal para validar
+      }
+    }
+  }, [series, form, datosIniciales]);
 
   // Fetch selected provider data explicitly if ID exists (for pre-fill)
   const idProveedorWatch = form.watch("idProveedor");
@@ -240,16 +301,33 @@ export function CompraForm({
 
   // Merge search results with selected provider to ensure it appears in the list
   const listaProveedores = React.useMemo(() => {
-    const lista = [...proveedores];
-    // If we have a selected provider and it's not in the current list, add it
+    let lista = [...proveedores];
+
+    // Si tenemos un proveedor seleccionado de la base de datos (por fetch)
     if (
       proveedorSeleccionadoData &&
       !lista.some((p) => p.id === proveedorSeleccionadoData.id)
     ) {
       lista.push(proveedorSeleccionadoData);
     }
+
+    // Si tenemos info del proveedor en datosIniciales (para visualización instantánea)
+    if (
+      datosIniciales?.idProveedor &&
+      !lista.some((p) => p.id === datosIniciales.idProveedor)
+    ) {
+      lista.push({
+        id: datosIniciales.idProveedor,
+        razonSocial: (datosIniciales as any).razonSocialProveedor,
+        numeroDocumento: (datosIniciales as any).numeroDocumentoProveedor,
+        idTipoDocumento: (datosIniciales as any).idTipoDocumentoProveedor,
+        activado: true,
+        fechaCreacion: new Date().toISOString(),
+      } as any);
+    }
+
     return lista;
-  }, [proveedores, proveedorSeleccionadoData]);
+  }, [proveedores, proveedorSeleccionadoData, datosIniciales]);
 
   const { fields, append, remove, replace } = useFieldArray({
     control: form.control,
@@ -308,6 +386,7 @@ export function CompraForm({
           idProducto: d.idProducto,
           cantidad: d.cantidadSolicitada,
           precioUnitario: d.precioUnitarioPactado,
+          afectacionIgv: "G" as const,
         }));
 
         replace(nuevosDetalles);
@@ -325,14 +404,20 @@ export function CompraForm({
 
   const onSubmit = (values: CompraFormValues) => {
     // Calcular totales
-    const subtotal = values.detalles.reduce((acc, curr) => {
-      return (
-        acc + (Number(curr.cantidad) || 0) * (Number(curr.precioUnitario) || 0)
-      );
-    }, 0);
+    let baseGravada = 0;
+    let baseExonerada = 0;
+    let baseInafecta = 0;
 
-    const impuesto = subtotal * 0.18; // Asumiendo 18%
-    const total = subtotal + impuesto;
+    values.detalles.forEach((curr) => {
+      const sub =
+        (Number(curr.cantidad) || 0) * (Number(curr.precioUnitario) || 0);
+      if (curr.afectacionIgv === "G") baseGravada += sub;
+      else if (curr.afectacionIgv === "E") baseExonerada += sub;
+      else if (curr.afectacionIgv === "I") baseInafecta += sub;
+    });
+
+    const impuesto = baseGravada * 0.18; // Asumiendo 18% para gravados
+    const total = baseGravada + baseExonerada + baseInafecta + impuesto;
 
     // Construir payload que coincida con CompraDto del backend
     const payload: CrearCompraPayload = {
@@ -344,9 +429,12 @@ export function CompraForm({
       numeroComprobante: values.numeroComprobante,
       fechaEmision: values.fechaEmision,
       fechaContable: values.fechaEmision, // Usar misma fecha por defecto
-      moneda: values.idMoneda === 2 ? "USD" : "PEN", // Mapeo dinámico
+      fechaVencimiento: values.fechaVencimiento ?? null,
+      moneda: values.idMoneda === 52 ? "USD" : "PEN", // Mapeo dinámico (52=USD)
       tipoCambio: values.tipoCambio,
-      subtotal: subtotal,
+      baseGravada: baseGravada,
+      baseExonerada: baseExonerada,
+      baseInafecta: baseInafecta,
       impuesto: impuesto,
       total: total,
       saldoPendiente: total, // Inicialmente el saldo es el total
@@ -358,6 +446,7 @@ export function CompraForm({
         descripcion: "", // Backend lo puede llenar o dejar vacío
         cantidad: d.cantidad,
         precioUnitarioCompra: d.precioUnitario, // Mapeo clave para que el backend lo reciba bien
+        afectacionIgv: d.afectacionIgv as "G" | "E" | "I",
         subtotal: d.cantidad * d.precioUnitario,
       })),
     };
@@ -417,11 +506,30 @@ export function CompraForm({
 
   // Calcular totales en tiempo real
   const valoresDetalles = form.watch("detalles");
-  const totalCalculado = valoresDetalles.reduce((acc, curr) => {
-    return (
-      acc + (Number(curr.cantidad) || 0) * (Number(curr.precioUnitario) || 0)
+  const baseGravadaCalc = valoresDetalles
+    .filter((d) => d.afectacionIgv === "G")
+    .reduce(
+      (acc, curr) =>
+        acc + (Number(curr.cantidad) || 0) * (Number(curr.precioUnitario) || 0),
+      0,
     );
-  }, 0);
+  const baseExoneradaCalc = valoresDetalles
+    .filter((d) => d.afectacionIgv === "E")
+    .reduce(
+      (acc, curr) =>
+        acc + (Number(curr.cantidad) || 0) * (Number(curr.precioUnitario) || 0),
+      0,
+    );
+  const baseInafectaCalc = valoresDetalles
+    .filter((d) => d.afectacionIgv === "I")
+    .reduce(
+      (acc, curr) =>
+        acc + (Number(curr.cantidad) || 0) * (Number(curr.precioUnitario) || 0),
+      0,
+    );
+  const subtotalCalc = baseGravadaCalc + baseExoneradaCalc + baseInafectaCalc;
+  const impuestoCalc = calcularIGV(baseGravadaCalc); // Usando utilidad calcularIGV
+  const totalCalculado = subtotalCalc + impuestoCalc;
 
   return (
     <Form {...form}>
@@ -549,6 +657,47 @@ export function CompraForm({
               </FormItem>
             )}
           />
+
+          <FormField
+            control={form.control}
+            name="fechaVencimiento"
+            render={({ field }) => (
+              <FormItem className="flex flex-col mt-2">
+                <FormLabel>Vencimiento (Opcional)</FormLabel>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <FormControl>
+                      <Button
+                        variant={"outline"}
+                        className={cn(
+                          "w-full pl-3 text-left font-normal",
+                          !field.value && "text-muted-foreground",
+                        )}
+                      >
+                        {field.value ? (
+                          format(field.value, "PPP", { locale: es })
+                        ) : (
+                          <span>Seleccione fecha</span>
+                        )}
+                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                      </Button>
+                    </FormControl>
+                  </PopoverTrigger>
+                  {!readOnly && (
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={field.value ?? undefined}
+                        onSelect={field.onChange}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  )}
+                </Popover>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -595,7 +744,7 @@ export function CompraForm({
             control={form.control}
             name="numeroComprobante"
             render={({ field }) => (
-              <FormItem>
+              <FormItem className={!readOnly ? "hidden" : ""}>
                 <FormLabel>Número</FormLabel>
                 <FormControl>
                   <Input
@@ -640,7 +789,7 @@ export function CompraForm({
                 key={field.id}
                 className="grid grid-cols-12 gap-2 mb-2 items-end"
               >
-                <div className="col-span-5">
+                <div className="col-span-3">
                   <FormField
                     control={form.control}
                     name={`detalles.${index}.idProducto`}
@@ -653,9 +802,15 @@ export function CompraForm({
                           value={field.value}
                           onChange={(id) => {
                             field.onChange(id);
-                            // Lógica adicional si es necesario
                           }}
-                          productos={productos}
+                          onProductSelect={(prod) => {
+                            if (prod?.unidadMedida?.codigo) {
+                              form.setValue(
+                                `detalles.${index}.unidadMedida`,
+                                prod.unidadMedida.codigo,
+                              );
+                            }
+                          }}
                           disabled={readOnly}
                         />
                         <FormMessage />
@@ -667,6 +822,57 @@ export function CompraForm({
                 <div className="col-span-2">
                   <FormField
                     control={form.control}
+                    name={`detalles.${index}.afectacionIgv`}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className={index !== 0 ? "sr-only" : ""}>
+                          Afect. IGV
+                        </FormLabel>
+                        <FormControl>
+                          <select
+                            className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                            {...field}
+                            disabled={readOnly}
+                          >
+                            <option value="G">Gravado</option>
+                            <option value="E">Exonerado</option>
+                            <option value="I">Inafecto</option>
+                          </select>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <div className="col-span-1">
+                  <FormField
+                    control={form.control}
+                    name={`detalles.${index}.unidadMedida`}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className={index !== 0 ? "sr-only" : ""}>
+                          U.M.
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            type="text"
+                            {...field}
+                            value={field.value || ""}
+                            disabled
+                            className="bg-muted/50 font-mono text-center text-xs"
+                            placeholder="UND"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <div className="col-span-1">
+                  <FormField
+                    control={form.control}
                     name={`detalles.${index}.cantidad`}
                     render={({ field }) => (
                       <FormItem>
@@ -675,10 +881,13 @@ export function CompraForm({
                         </FormLabel>
                         <FormControl>
                           <Input
-                            type="number"
-                            step="1"
+                            type="text"
                             {...field}
+                            onChange={(e) => {
+                              field.onChange(limpiarDecimal(e.target.value));
+                            }}
                             disabled={readOnly}
+                            className="text-right"
                           />
                         </FormControl>
                         <FormMessage />
@@ -694,15 +903,18 @@ export function CompraForm({
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel className={index !== 0 ? "sr-only" : ""}>
-                          Precio Unit. (Sin IGV)
+                          P.U. (Sin IGV)
                         </FormLabel>
 
                         <FormControl>
                           <Input
-                            type="number"
-                            step="0.01"
+                            type="text"
                             {...field}
+                            onChange={(e) => {
+                              field.onChange(limpiarDecimal(e.target.value));
+                            }}
                             disabled={readOnly}
+                            className="text-right font-mono"
                           />
                         </FormControl>
                         <FormMessage />
@@ -721,11 +933,14 @@ export function CompraForm({
                     >
                       Subtotal
                     </label>
-                    <div className="h-9 flex items-center px-3 text-sm font-medium">
-                      {(
-                        form.watch(`detalles.${index}.cantidad`) *
-                        form.watch(`detalles.${index}.precioUnitario`)
-                      ).toFixed(2)}
+                    <div className="h-9 flex justify-end items-center px-3 text-sm font-medium font-mono text-right">
+                      {formatMoneda(
+                        (Number(form.watch(`detalles.${index}.cantidad`)) ||
+                          0) *
+                          (Number(
+                            form.watch(`detalles.${index}.precioUnitario`),
+                          ) || 0),
+                      )}
                     </div>
                   </div>
                 </div>
@@ -751,7 +966,12 @@ export function CompraForm({
                 variant="outline"
                 size="sm"
                 onClick={() =>
-                  append({ idProducto: 0, cantidad: 1, precioUnitario: 0 })
+                  append({
+                    idProducto: 0,
+                    cantidad: 1,
+                    precioUnitario: 0,
+                    afectacionIgv: "G",
+                  })
                 }
                 className="mt-2"
               >
@@ -760,9 +980,19 @@ export function CompraForm({
             )}
           </div>
 
-          <div className="flex justify-end gap-4 text-xl font-bold">
-            <span>Total:</span>
-            <span>{totalCalculado.toFixed(2)}</span>
+          <div className="flex flex-col items-end gap-2 text-base">
+            <div className="flex justify-end gap-4 text-muted-foreground w-48">
+              <span>Subtotal:</span>
+              <span>{formatMoneda(subtotalCalc)}</span>
+            </div>
+            <div className="flex justify-end gap-4 text-muted-foreground w-48 border-b pb-2">
+              <span>IGV (18%):</span>
+              <span>{formatMoneda(impuestoCalc)}</span>
+            </div>
+            <div className="flex justify-end gap-4 text-xl font-bold w-48 pt-1">
+              <span>Total:</span>
+              <span>{formatMoneda(totalCalculado)}</span>
+            </div>
           </div>
         </div>
 
@@ -775,7 +1005,11 @@ export function CompraForm({
             <FormItem>
               <FormLabel>Observaciones</FormLabel>
               <FormControl>
-                <Textarea {...field} disabled={readOnly} />
+                <Textarea
+                  {...field}
+                  value={field.value ?? ""}
+                  disabled={readOnly}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>

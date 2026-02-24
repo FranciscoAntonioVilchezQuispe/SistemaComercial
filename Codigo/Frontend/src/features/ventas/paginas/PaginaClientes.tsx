@@ -1,48 +1,34 @@
 import { useState } from "react";
-import { Search, UserPlus, Filter } from "lucide-react";
-import { useClientes } from "../hooks/useClientes";
-import { TablaClientes } from "../componentes/clientes/TablaClientes";
+import { UserPlus, Edit, Trash2 } from "lucide-react";
+import { useClientes, useEliminarCliente } from "../hooks/useClientes";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ClienteFiltros, Cliente } from "../tipos/ventas.types";
-import { ModalConfirmacion } from "@/compartido/componentes/feedback/ModalConfirmacion";
+import { DataTable } from "@/components/ui/DataTable";
 import { toast } from "sonner";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 export function PaginaClientes() {
   const [filtros, setFiltros] = useState<ClienteFiltros>({});
-  const [clienteAEliminar, setClienteAEliminar] = useState<Cliente | null>(
-    null,
-  );
-  const [modalEliminarAbierto, setModalEliminarAbierto] = useState(false);
-
   const { data, isLoading } = useClientes(filtros, 1, 100);
+  const eliminarCliente = useEliminarCliente();
+  const [eliminarId, setEliminarId] = useState<number | null>(null);
 
   const handleNuevoCliente = () => {
-    console.log("Nuevo cliente");
+    toast.info("Próximamente");
   };
 
-  const handleEditar = (cliente: Cliente) => {
-    console.log("Editar cliente:", cliente);
-  };
-
-  const handleConfirmarEliminar = (cliente: Cliente) => {
-    setClienteAEliminar(cliente);
-    setModalEliminarAbierto(true);
-  };
-
-  const handleEliminar = async () => {
-    if (!clienteAEliminar) return;
-
-    try {
-      console.log("Eliminando cliente:", clienteAEliminar.id);
-      toast.success("Cliente eliminado correctamente");
-    } catch (error) {
-      toast.error("Error al eliminar el cliente");
-    } finally {
-      setModalEliminarAbierto(false);
-      setClienteAEliminar(null);
-    }
+  const handleEditar = (_cliente: Cliente) => {
+    toast.info("Próximamente");
   };
 
   return (
@@ -62,48 +48,88 @@ export function PaginaClientes() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Búsqueda y Filtros</CardTitle>
+          <CardTitle>Clientes</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex gap-4">
-            <div className="relative flex-1">
-              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Buscar por nombre, documento o RUC..."
-                className="pl-8"
-                value={filtros.busqueda || ""}
-                onChange={(e) =>
-                  setFiltros({ ...filtros, busqueda: e.target.value })
-                }
-              />
-            </div>
-            <Button variant="outline">
-              <Filter className="mr-2 h-4 w-4" />
-              Filtros
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardContent className="pt-6">
-          <TablaClientes
-            clientes={data?.datos || []}
+          <DataTable
+            data={data?.datos || []}
+            columns={[
+              {
+                header: "Cliente",
+                cell: (cliente: Cliente) => (
+                  <div className="flex items-center gap-3">
+                    <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
+                      <UserPlus className="h-4 w-4 text-primary" />
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="font-medium">{cliente.razonSocial || cliente.nombreComercial || "Sin Nombre"}</span>
+                      <span className="text-xs text-muted-foreground">Documento: {cliente.numeroDocumento}</span>
+                    </div>
+                  </div>
+                ),
+              },
+              {
+                header: "Contacto",
+                cell: (cliente: Cliente) => (
+                  <div className="flex flex-col gap-1">
+                    {cliente.telefono && <div className="flex items-center text-xs">{cliente.telefono}</div>}
+                    {cliente.email && <div className="flex items-center text-xs">{cliente.email}</div>}
+                  </div>
+                ),
+              },
+              {
+                header: "Tipo",
+                cell: (cliente: Cliente) => (
+                  <div className="inline-block px-2 py-1 text-xs rounded-md border">{cliente.idTipoCliente === 1 ? "Persona" : "Empresa"}</div>
+                ),
+              },
+              {
+                header: "Estado",
+                cell: (cliente: Cliente) => (
+                  <div className="text-xs">{cliente.activado ? "Activo" : "Inactivo"}</div>
+                ),
+              },
+              {
+                header: "Acciones",
+                cell: (cliente: Cliente) => (
+                  <div className="flex items-center gap-2 justify-end">
+                    <Button variant="ghost" size="icon" onClick={() => handleEditar(cliente)} title="Editar cliente">
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                    <Button variant="ghost" size="icon" className="text-destructive" onClick={() => setEliminarId(cliente.id)} title="Eliminar cliente">
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ),
+              },
+            ]}
+            onSearchChange={(s) => setFiltros({ ...filtros, busqueda: s })}
+            searchPlaceholder="Buscar por nombre o documento..."
             isLoading={isLoading}
-            onEditar={handleEditar}
-            onEliminar={handleConfirmarEliminar}
+            actionElement={<Button onClick={handleNuevoCliente}><UserPlus className="mr-2 h-4 w-4" /> Nuevo Cliente</Button>}
           />
         </CardContent>
       </Card>
 
-      <ModalConfirmacion
-        abierto={modalEliminarAbierto}
-        alCambiarAbierto={setModalEliminarAbierto}
-        titulo="Eliminar Cliente"
-        descripcion={`¿Estás seguro que deseas eliminar al cliente "${clienteAEliminar?.nombres || ""}"? esta acción no se puede deshacer.`}
-        alConfirmar={handleEliminar}
-        variante="destructive"
-      />
+      <AlertDialog open={eliminarId !== null} onOpenChange={(open) => !open && setEliminarId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Está absolutamente seguro?</AlertDialogTitle>
+            <AlertDialogDescription>Esta acción no se puede deshacer. El cliente será eliminado.</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction className="bg-destructive text-destructive-foreground hover:bg-destructive/90" onClick={() => {
+              if (eliminarId) {
+                eliminarCliente.mutate(eliminarId, {
+                  onSuccess: () => { setEliminarId(null); toast.success("Cliente eliminado correctamente"); },
+                  onError: () => toast.error("Error al eliminar el cliente"),
+                });
+              }
+            }}>{eliminarCliente.isPending ? "Eliminando..." : "Sí, eliminar"}</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

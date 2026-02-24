@@ -1,7 +1,29 @@
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
 import { Impuesto, ImpuestoFormData } from "../tipos/impuesto.types";
+
+const schema = z.object({
+  codigo: z.string().min(1, "El código es requerido"),
+  nombre: z.string().min(1, "El nombre es requerido"),
+  porcentaje: z.coerce
+    .number()
+    .min(0, "Debe ser mayor o igual a 0")
+    .max(100, "Max 100%"),
+  esIgv: z.boolean().default(false),
+});
 
 interface ImpuestoFormProps {
   datosIniciales?: Impuesto;
@@ -16,94 +38,107 @@ export function ImpuestoForm({
   alCancelar,
   cargando,
 }: ImpuestoFormProps) {
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors },
-  } = useForm<ImpuestoFormData>({
+  const form = useForm<z.infer<typeof schema>>({
+    resolver: zodResolver(schema),
     defaultValues: {
+      codigo: "",
+      nombre: "",
+      porcentaje: 0,
       esIgv: false,
     },
   });
 
   useEffect(() => {
     if (datosIniciales) {
-      reset(datosIniciales);
+      form.reset({
+        codigo: datosIniciales.codigo,
+        nombre: datosIniciales.nombre,
+        porcentaje: datosIniciales.porcentaje,
+        esIgv: datosIniciales.esIgv,
+      });
     }
-  }, [datosIniciales, reset]);
+  }, [datosIniciales, form]);
 
-  const inputClass =
-    "flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50";
-  const labelClass =
-    "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70";
-  const checkboxClass =
-    "h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary";
+  const onSubmit = (values: z.infer<typeof schema>) => {
+    alEnviar(values);
+  };
 
   return (
-    <form onSubmit={handleSubmit(alEnviar)} className="space-y-4">
-      <div className="space-y-2">
-        <label className={labelClass}>Código</label>
-        <input
-          className={inputClass}
-          {...register("codigo", { required: "El código es requerido" })}
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <FormField
+          control={form.control}
+          name="codigo"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Código</FormLabel>
+              <FormControl>
+                <Input placeholder="Ej: IGV, ISC" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-        {errors.codigo && (
-          <p className="text-sm text-destructive">{errors.codigo.message}</p>
-        )}
-      </div>
 
-      <div className="space-y-2">
-        <label className={labelClass}>Nombre</label>
-        <input
-          className={inputClass}
-          {...register("nombre", { required: "El nombre es requerido" })}
+        <FormField
+          control={form.control}
+          name="nombre"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Nombre</FormLabel>
+              <FormControl>
+                <Input placeholder="Impuesto General" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-        {errors.nombre && (
-          <p className="text-sm text-destructive">{errors.nombre.message}</p>
-        )}
-      </div>
 
-      <div className="space-y-2">
-        <label className={labelClass}>Porcentaje (%)</label>
-        <input
-          type="number"
-          step="0.01"
-          className={inputClass}
-          {...register("porcentaje", {
-            required: "El porcentaje es requerido",
-            valueAsNumber: true,
-            min: { value: 0, message: "Debe ser mayor o igual a 0" },
-            max: { value: 100, message: "No puede ser mayor a 100" },
-          })}
+        <FormField
+          control={form.control}
+          name="porcentaje"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Porcentaje (%)</FormLabel>
+              <FormControl>
+                <Input type="number" step="0.01" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-        {errors.porcentaje && (
-          <p className="text-sm text-destructive">
-            {errors.porcentaje.message}
-          </p>
-        )}
-      </div>
 
-      <div className="flex items-center space-x-2 pt-2">
-        <input
-          type="checkbox"
-          id="esIgv"
-          className={checkboxClass}
-          {...register("esIgv")}
+        <FormField
+          control={form.control}
+          name="esIgv"
+          render={({ field }) => (
+            <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3">
+              <div className="space-y-0.5">
+                <FormLabel>Es IGV (Impuesto General a las Ventas)</FormLabel>
+              </div>
+              <FormControl>
+                <Switch
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                />
+              </FormControl>
+            </FormItem>
+          )}
         />
-        <label htmlFor="esIgv" className={labelClass}>
-          Es IGV (Impuesto General a las Ventas)
-        </label>
-      </div>
 
-      <div className="flex justify-end gap-2 pt-4">
-        <Button type="button" variant="outline" onClick={alCancelar}>
-          Cancelar
-        </Button>
-        <Button type="submit" disabled={cargando}>
-          {cargando ? "Guardando..." : datosIniciales ? "Actualizar" : "Crear"}
-        </Button>
-      </div>
-    </form>
+        <div className="flex justify-end gap-2 pt-4">
+          <Button type="button" variant="outline" onClick={alCancelar}>
+            Cancelar
+          </Button>
+          <Button type="submit" disabled={cargando}>
+            {cargando
+              ? "Guardando..."
+              : datosIniciales
+                ? "Actualizar"
+                : "Crear"}
+          </Button>
+        </div>
+      </form>
+    </Form>
   );
 }

@@ -71,6 +71,17 @@ const menuItems: ItemMenu[] = [
     subItems: [
       { titulo: "Stock", icono: null, ruta: "/inventario/stock" },
       { titulo: "Movimientos", icono: null, ruta: "/inventario/movimientos" },
+      { titulo: "Traslados", icono: null, ruta: "/inventario/traslados" },
+      {
+        titulo: "Kardex Reporte",
+        icono: null,
+        ruta: "/inventario/kardex/reporte",
+      },
+      {
+        titulo: "Control Kardex",
+        icono: null,
+        ruta: "/inventario/kardex/periodos",
+      },
       { titulo: "Almacenes", icono: null, ruta: "/inventario/almacenes" },
     ],
   },
@@ -112,9 +123,19 @@ const menuItems: ItemMenu[] = [
         ruta: "/configuracion/comprobantes",
       },
       {
-        titulo: "Tipos de Documento",
+        titulo: "Reglas SUNAT",
         icono: null,
         ruta: "/configuracion/reglas-sunat",
+      },
+      {
+        titulo: "Operaciones SUNAT",
+        icono: null,
+        ruta: "/configuracion/operaciones-sunat",
+      },
+      {
+        titulo: "Matriz SUNAT",
+        icono: null,
+        ruta: "/configuracion/matriz-sunat",
       },
       {
         titulo: "Tablas Generales",

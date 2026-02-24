@@ -30,7 +30,7 @@ builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Venta
 // Integración con Inventario (Servicios Externos)
 builder.Services.AddHttpClient<Ventas.API.Application.Interfaces.IInventarioServicio, Ventas.API.Application.Integracion.InventarioServicio>(client =>
 {
-    client.BaseAddress = new Uri(builder.Configuration["ExternalServices:InventarioUrl"] ?? "http://localhost:5004/api/");
+    client.BaseAddress = new Uri(builder.Configuration["ExternalServices:InventarioUrl"] ?? "http://localhost:5000/api/");
 });
 
 // CORS

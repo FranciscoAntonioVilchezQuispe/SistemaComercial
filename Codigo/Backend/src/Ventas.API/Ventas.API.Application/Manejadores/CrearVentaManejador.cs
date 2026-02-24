@@ -73,6 +73,9 @@ namespace Ventas.API.Application.Manejadores
             var evento = new VentaCreadaEvento(
                 venta.Id,
                 venta.IdAlmacen,
+                venta.IdTipoComprobante,
+                venta.Serie ?? string.Empty,
+                venta.Numero.ToString(),
                 venta.Detalles.Select(d => new VentaItemDetalle(d.IdProducto, d.Cantidad)).ToList()
             );
 

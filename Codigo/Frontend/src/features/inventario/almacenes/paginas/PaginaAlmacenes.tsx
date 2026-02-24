@@ -19,6 +19,16 @@ import {
 } from "@/components/ui/card";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 import { useAlmacenes, useEliminarAlmacen } from "../hooks/useAlmacenes";
 import { useSucursales } from "@/features/configuracion/hooks/useSucursales";
@@ -30,21 +40,13 @@ export default function PaginaAlmacenes() {
   const [almacenSeleccionado, setAlmacenSeleccionado] =
     useState<Almacen | null>(null);
   const [filtro, setFiltro] = useState("");
+  const [eliminarId, setEliminarId] = useState<number | null>(null);
 
   const { data: almacenes, isLoading, error } = useAlmacenes();
   const { data: sucursales } = useSucursales();
   const eliminarAlmacen = useEliminarAlmacen();
 
-  const handleEliminar = (almacen: Almacen) => {
-    if (
-      confirm(`¿Estás seguro de eliminar el almacén ${almacen.nombreAlmacen}?`)
-    ) {
-      eliminarAlmacen.mutate(almacen.id, {
-        onSuccess: () => toast.success("Almacén eliminado correctamente"),
-        onError: () => toast.error("Error al eliminar el almacén"),
-      });
-    }
-  };
+  // Eliminación ahora mediante AlertDialog: abrir con setEliminarId
 
   const almacenesFiltrados =
     almacenes?.filter((a) =>
@@ -84,7 +86,7 @@ export default function PaginaAlmacenes() {
     },
     {
       header: "Estado",
-      accessorKey: "activo" as keyof Almacen,
+      accessorKey: "activado" as keyof Almacen,
       cell: (row: Almacen) =>
         row.activado === true ? (
           <Badge
@@ -121,7 +123,7 @@ export default function PaginaAlmacenes() {
             variant="ghost"
             size="icon"
             className="text-destructive"
-            onClick={() => handleEliminar(row)}
+            onClick={() => setEliminarId(row.id)}
           >
             <Trash2 className="h-4 w-4" />
           </Button>
@@ -184,6 +186,40 @@ export default function PaginaAlmacenes() {
           />
         </DialogContent>
       </Dialog>
+
+      <AlertDialog
+        open={eliminarId !== null}
+        onOpenChange={(open) => !open && setEliminarId(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Está absolutamente seguro?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta acción no se puede deshacer. El almacén y sus valores
+              asociados serán eliminados.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={() => {
+                if (eliminarId) {
+                  eliminarAlmacen.mutate(eliminarId, {
+                    onSuccess: () => {
+                      toast.success("Almacén eliminado correctamente");
+                      setEliminarId(null);
+                    },
+                    onError: () => toast.error("Error al eliminar el almacén"),
+                  });
+                }
+              }}
+            >
+              {eliminarAlmacen.isPending ? "Eliminando..." : "Sí, eliminar"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

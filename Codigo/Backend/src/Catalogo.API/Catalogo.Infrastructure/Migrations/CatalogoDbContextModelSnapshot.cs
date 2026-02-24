@@ -65,12 +65,14 @@ namespace Catalogo.Infrastructure.Migrations
                         .HasColumnName("nombre_categoria");
 
                     b.Property<string>("UsuarioActualizacion")
-                        .HasColumnType("text")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
                         .HasColumnName("usuario_modificacion");
 
                     b.Property<string>("UsuarioCreacion")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
                         .HasColumnName("usuario_creacion");
 
                     b.HasKey("Id");
@@ -90,17 +92,20 @@ namespace Catalogo.Infrastructure.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
                     b.Property<bool>("Activado")
-                        .HasColumnType("boolean");
+                        .HasColumnType("boolean")
+                        .HasColumnName("activado");
 
                     b.Property<bool>("EsPrincipal")
                         .HasColumnType("boolean")
                         .HasColumnName("es_principal");
 
                     b.Property<DateTime?>("FechaActualizacion")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("fecha_modificacion");
 
                     b.Property<DateTime>("FechaCreacion")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("fecha_creacion");
 
                     b.Property<long>("IdProducto")
                         .HasColumnType("bigint")
@@ -117,17 +122,72 @@ namespace Catalogo.Infrastructure.Migrations
                         .HasColumnName("url_imagen");
 
                     b.Property<string>("UsuarioActualizacion")
-                        .HasColumnType("text");
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("usuario_modificacion");
 
                     b.Property<string>("UsuarioCreacion")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("usuario_creacion");
 
                     b.HasKey("Id");
 
                     b.HasIndex("IdProducto");
 
                     b.ToTable("imagenes_producto", "catalogo");
+                });
+
+            modelBuilder.Entity("Catalogo.Domain.Entidades.ListaPrecio", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_lista_precio");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<bool>("Activado")
+                        .HasColumnType("boolean")
+                        .HasColumnName("activado");
+
+                    b.Property<bool>("EsBase")
+                        .HasColumnType("boolean")
+                        .HasColumnName("es_base");
+
+                    b.Property<DateTime?>("FechaActualizacion")
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("fecha_modificacion");
+
+                    b.Property<DateTime>("FechaCreacion")
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("fecha_creacion");
+
+                    b.Property<string>("NombreLista")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("nombre_lista");
+
+                    b.Property<decimal?>("PorcentajeGananciaSugerido")
+                        .HasColumnType("decimal(5,2)")
+                        .HasColumnName("porcentaje_ganancia_sugerido");
+
+                    b.Property<string>("UsuarioActualizacion")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("usuario_modificacion");
+
+                    b.Property<string>("UsuarioCreacion")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("usuario_creacion");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("listas_precios", "catalogo");
                 });
 
             modelBuilder.Entity("Catalogo.Domain.Entidades.Marca", b =>
@@ -163,12 +223,14 @@ namespace Catalogo.Infrastructure.Migrations
                         .HasColumnName("pais_origen");
 
                     b.Property<string>("UsuarioActualizacion")
-                        .HasColumnType("text")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
                         .HasColumnName("usuario_modificacion");
 
                     b.Property<string>("UsuarioCreacion")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
                         .HasColumnName("usuario_creacion");
 
                     b.HasKey("Id");
@@ -224,7 +286,7 @@ namespace Catalogo.Infrastructure.Migrations
                         .HasColumnType("bigint")
                         .HasColumnName("id_marca");
 
-                    b.Property<long>("IdTipoProducto")
+                    b.Property<long?>("IdTipoProducto")
                         .HasColumnType("bigint")
                         .HasColumnName("id_tipo_producto");
 
@@ -236,6 +298,12 @@ namespace Catalogo.Infrastructure.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)")
                         .HasColumnName("imagen_principal_url");
+
+                    b.Property<string>("MetodoValuacion")
+                        .IsRequired()
+                        .HasMaxLength(2)
+                        .HasColumnType("character varying(2)")
+                        .HasColumnName("metodo_valuacion");
 
                     b.Property<string>("NombreProducto")
                         .IsRequired()
@@ -292,12 +360,14 @@ namespace Catalogo.Infrastructure.Migrations
                         .HasColumnName("tiene_variantes");
 
                     b.Property<string>("UsuarioActualizacion")
-                        .HasColumnType("text")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
                         .HasColumnName("usuario_modificacion");
 
                     b.Property<string>("UsuarioCreacion")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
                         .HasColumnName("usuario_creacion");
 
                     b.HasKey("Id");
@@ -353,12 +423,14 @@ namespace Catalogo.Infrastructure.Migrations
                         .HasColumnName("simbolo");
 
                     b.Property<string>("UsuarioActualizacion")
-                        .HasColumnType("text")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
                         .HasColumnName("usuario_modificacion");
 
                     b.Property<string>("UsuarioCreacion")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
                         .HasColumnName("usuario_creacion");
 
                     b.HasKey("Id");
@@ -376,7 +448,8 @@ namespace Catalogo.Infrastructure.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
                     b.Property<bool>("Activado")
-                        .HasColumnType("boolean");
+                        .HasColumnType("boolean")
+                        .HasColumnName("activado");
 
                     b.Property<string>("AtributosJson")
                         .HasColumnType("jsonb")
@@ -388,10 +461,12 @@ namespace Catalogo.Infrastructure.Migrations
                         .HasColumnName("codigo_barras_variante");
 
                     b.Property<DateTime?>("FechaActualizacion")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("fecha_modificacion");
 
                     b.Property<DateTime>("FechaCreacion")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("fecha_creacion");
 
                     b.Property<long>("IdProducto")
                         .HasColumnType("bigint")
@@ -414,11 +489,15 @@ namespace Catalogo.Infrastructure.Migrations
                         .HasColumnName("sku_variante");
 
                     b.Property<string>("UsuarioActualizacion")
-                        .HasColumnType("text");
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("usuario_modificacion");
 
                     b.Property<string>("UsuarioCreacion")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("usuario_creacion");
 
                     b.HasKey("Id");
 

@@ -1,8 +1,29 @@
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
 import { Sucursal, SucursalFormData } from "../tipos/sucursal.types";
 import { useEmpresa } from "../hooks/useEmpresa";
+
+const schema = z.object({
+  idEmpresa: z.coerce.number(),
+  nombreSucursal: z.string().min(1, "El nombre es requerido"),
+  direccion: z.string().optional().nullable(),
+  telefono: z.string().optional().nullable(),
+  esPrincipal: z.boolean().default(false),
+  activado: z.boolean().default(true),
+});
 
 interface SucursalFormProps {
   datosIniciales?: Sucursal;
@@ -19,82 +40,151 @@ export function SucursalForm({
 }: SucursalFormProps) {
   const { data: empresa } = useEmpresa();
 
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors },
-  } = useForm<SucursalFormData>({
+  const form = useForm<z.infer<typeof schema>>({
+    resolver: zodResolver(schema),
     defaultValues: {
+      idEmpresa: empresa?.id || 0,
+      nombreSucursal: "",
+      direccion: "",
+      telefono: "",
       esPrincipal: false,
+      activado: true,
     },
   });
 
   useEffect(() => {
     if (datosIniciales) {
-      reset(datosIniciales);
+      form.reset({
+        idEmpresa: datosIniciales.idEmpresa,
+        nombreSucursal: datosIniciales.nombreSucursal,
+        direccion: datosIniciales.direccion || "",
+        telefono: datosIniciales.telefono || "",
+        esPrincipal: datosIniciales.esPrincipal,
+        activado: datosIniciales.activado,
+      });
     } else if (empresa) {
-      reset({ idEmpresa: empresa.id }); // Pre-set current company ID
+      form.setValue("idEmpresa", empresa.id);
     }
-  }, [datosIniciales, empresa, reset]);
+  }, [datosIniciales, empresa, form]);
 
-  const inputClass =
-    "flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50";
-  const labelClass =
-    "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70";
-  const checkboxClass =
-    "h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary";
+  const onSubmit = (values: z.infer<typeof schema>) => {
+    alEnviar({
+      idEmpresa: values.idEmpresa,
+      nombreSucursal: values.nombreSucursal,
+      direccion: values.direccion || null,
+      telefono: values.telefono || null,
+      esPrincipal: values.esPrincipal,
+      activado: values.activado,
+    });
+  };
 
   return (
-    <form onSubmit={handleSubmit(alEnviar)} className="space-y-4">
-      {/* Hidden Empresa ID */}
-      <input type="hidden" {...register("idEmpresa")} />
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        {/* Hidden Empresa ID */}
+        <input type="hidden" {...form.register("idEmpresa")} />
 
-      <div className="space-y-2">
-        <label className={labelClass}>Nombre de Sucursal</label>
-        <input
-          className={inputClass}
-          {...register("nombreSucursal", {
-            required: "El nombre es requerido",
-          })}
+        <FormField
+          control={form.control}
+          name="nombreSucursal"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Nombre de Sucursal</FormLabel>
+              <FormControl>
+                <Input placeholder="Sede Principal" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-        {errors.nombreSucursal && (
-          <p className="text-sm text-destructive">
-            {errors.nombreSucursal.message}
-          </p>
-        )}
-      </div>
 
-      <div className="space-y-2">
-        <label className={labelClass}>Dirección</label>
-        <input className={inputClass} {...register("direccion")} />
-      </div>
-
-      <div className="space-y-2">
-        <label className={labelClass}>Teléfono</label>
-        <input className={inputClass} {...register("telefono")} />
-      </div>
-
-      <div className="flex items-center space-x-2 pt-2">
-        <input
-          type="checkbox"
-          id="esPrincipal"
-          className={checkboxClass}
-          {...register("esPrincipal")}
+        <FormField
+          control={form.control}
+          name="direccion"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Dirección</FormLabel>
+              <FormControl>
+                <Input
+                  placeholder="Av. Ejemplo 123"
+                  {...field}
+                  value={field.value || ""}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-        <label htmlFor="esPrincipal" className={labelClass}>
-          Es Sucursal Principal
-        </label>
-      </div>
 
-      <div className="flex justify-end gap-2 pt-4">
-        <Button type="button" variant="outline" onClick={alCancelar}>
-          Cancelar
-        </Button>
-        <Button type="submit" disabled={cargando}>
-          {cargando ? "Guardando..." : datosIniciales ? "Actualizar" : "Crear"}
-        </Button>
-      </div>
-    </form>
+        <FormField
+          control={form.control}
+          name="telefono"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Teléfono</FormLabel>
+              <FormControl>
+                <Input
+                  placeholder="01 2345678"
+                  {...field}
+                  value={field.value || ""}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 pt-2">
+          <FormField
+            control={form.control}
+            name="esPrincipal"
+            render={({ field }) => (
+              <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3">
+                <div className="space-y-0.5">
+                  <FormLabel>Es Sucursal Principal</FormLabel>
+                </div>
+                <FormControl>
+                  <Switch
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                  />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="activado"
+            render={({ field }) => (
+              <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3">
+                <div className="space-y-0.5">
+                  <FormLabel>Estado Activo</FormLabel>
+                </div>
+                <FormControl>
+                  <Switch
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                  />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+        </div>
+
+        <div className="flex justify-end gap-2 pt-4">
+          <Button type="button" variant="outline" onClick={alCancelar}>
+            Cancelar
+          </Button>
+          <Button type="submit" disabled={cargando}>
+            {cargando
+              ? "Guardando..."
+              : datosIniciales
+                ? "Actualizar"
+                : "Crear"}
+          </Button>
+        </div>
+      </form>
+    </Form>
   );
 }

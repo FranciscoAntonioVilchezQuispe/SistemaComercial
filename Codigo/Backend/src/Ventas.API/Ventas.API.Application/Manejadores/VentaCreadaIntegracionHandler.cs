@@ -26,7 +26,10 @@ namespace Ventas.API.Application.Manejadores
                     item.IdProducto, 
                     notification.IdAlmacen, 
                     item.Cantidad, 
-                    notification.VentaId);
+                    notification.VentaId,
+                    notification.IdTipoComprobante,
+                    notification.Serie,
+                    notification.Numero);
 
                 if (!success)
                 {

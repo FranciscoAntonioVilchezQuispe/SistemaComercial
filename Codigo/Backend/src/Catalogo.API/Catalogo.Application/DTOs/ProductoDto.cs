@@ -34,6 +34,7 @@ namespace Catalogo.Application.DTOs
         // Configuración de inventario
         public bool TieneVariantes { get; set; }
         public bool PermiteInventarioNegativo { get; set; }
+        public string MetodoValuacion { get; set; } = "PP";
 
         // Configuración fiscal
         public bool GravadoImpuesto { get; set; }

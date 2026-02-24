@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
+import { Loading } from "@compartido/componentes/feedback/Loading";
 import { usuarioPermisoService } from "../servicios/servicioUsuarioPermiso";
 import type { UsuarioRol, Menu } from "@/types/permisos.types";
 import { UsuariosList } from "../components/usuarios/UsuariosList";
@@ -13,13 +14,14 @@ interface Usuario {
   email?: string;
 }
 
-export function UsuariosRolesPage() {
+export function PaginaUsuariosRoles() {
   const [usuarios, setUsuarios] = useState<Usuario[]>([]);
   const [usuarioSeleccionado, setUsuarioSeleccionado] =
     useState<Usuario | null>(null);
   const [rolesAsignados, setRolesAsignados] = useState<UsuarioRol[]>([]);
   const [menusDisponibles, setMenusDisponibles] = useState<Menu[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isMock] = useState(true);
 
   useEffect(() => {
     cargarUsuarios();
@@ -80,13 +82,7 @@ export function UsuariosRolesPage() {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-      </div>
-    );
-  }
+  if (loading) return <Loading mensaje="Cargando usuarios..." />;
 
   return (
     <div className="container mx-auto py-6">
@@ -96,6 +92,13 @@ export function UsuariosRolesPage() {
           Gestiona los roles asignados a cada usuario del sistema
         </p>
       </div>
+
+      {isMock && (
+        <div className="p-3 mb-4 rounded border border-yellow-100 bg-yellow-50 text-yellow-800">
+          <strong>Modo DEV:</strong> esta página usa datos de ejemplo. Conectar
+          con el servicio real de usuarios para producción.
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Lista de Usuarios */}

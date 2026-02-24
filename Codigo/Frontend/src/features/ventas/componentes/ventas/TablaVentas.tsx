@@ -49,7 +49,8 @@ export function TablaVentas({
     {
       clave: "cliente",
       titulo: "Cliente",
-      renderizar: (venta: Venta) => venta.cliente?.nombres || "Cliente General",
+      renderizar: (venta: Venta) =>
+        venta.cliente?.razonSocial || "Cliente General",
     },
     {
       clave: "total",

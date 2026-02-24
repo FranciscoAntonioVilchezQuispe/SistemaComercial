@@ -18,10 +18,12 @@ const QUERY_KEY = "productos";
  */
 export function useProductos(
   req?: PagedRequest,
+  options?: { enabled?: boolean },
 ): UseQueryResult<PagedResponse<Producto>, Error> {
   return useQuery({
     queryKey: [QUERY_KEY, req],
     queryFn: () => servicioProductos.obtenerProductos(req),
+    enabled: options?.enabled ?? true,
   });
 }
 

@@ -10,7 +10,11 @@ namespace Inventario.API.Application.Comandos
         decimal? CostoUnitario,
         string? ReferenciaModulo,
         long? IdReferencia,
-        string? Observaciones
+        string? Observaciones,
+        long? IdTipoDocumento,
+        string? SerieDocumento,
+        string? NumeroDocumento,
+        DateTime? FechaMovimiento = null
     ) : IRequest<long>;
 
 }

@@ -13,6 +13,7 @@ namespace Clientes.API.Application.DTOs
         public decimal? LimiteCredito { get; set; }
         public int? DiasCredito { get; set; }
         public long? IdListaPrecioAsignada { get; set; }
+        public bool? Activado { get; set; }
     }
 
     public class ClienteDto : CrearClienteDto

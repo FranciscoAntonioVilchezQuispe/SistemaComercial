@@ -1,6 +1,7 @@
 // Exportar páginas
 export { PaginaStock } from "./paginas/PaginaStock";
 export { PaginaMovimientos } from "./paginas/PaginaMovimientos";
+export { PaginaTraslados } from "./paginas/PaginaTraslados";
 
 // Exportar componentes
 export { TablaStock } from "./componentes/stock/TablaStock";
@@ -17,6 +18,11 @@ export {
   useTiposMovimiento,
   useAlmacenes,
 } from "./hooks/useInventario";
+export {
+  useTraslados,
+  useCrearTraslado,
+  useRecibirTraslado,
+} from "./hooks/useTraslados";
 
 // Exportar tipos
 export type {

@@ -14,6 +14,8 @@ AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 var builder = WebApplication.CreateBuilder(args);
 builder.AddCentralizedLogging();
 
+
+
 // Add services to the container.
 // builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -25,7 +27,8 @@ builder.Services.AddSwaggerGen(c =>
 // DbContext e Interfaz
 builder.Services.AddDbContext<InventarioDbContext>(options =>
 {
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"),
+        o => o.MigrationsHistoryTable("__ef_migrations", "inventario"));
     options.UseSnakeCaseNamingConvention();
 });
 
@@ -35,6 +38,14 @@ builder.Services.AddScoped<IInventarioDbContext>(provider => provider.GetRequire
 // Repositorios
 builder.Services.AddScoped<IAlmacenRepositorio, AlmacenRepositorio>();
 builder.Services.AddScoped<IStockRepositorio, StockRepositorio>();
+
+// Kardex (Repositorios y Servicios)
+builder.Services.AddScoped<Inventario.API.Domain.Interfaces.IKardexMovimientoRepositorio, KardexMovimientoRepositorio>();
+builder.Services.AddScoped<Inventario.API.Domain.Interfaces.IKardexPeriodoControlRepositorio, KardexPeriodoControlRepositorio>();
+builder.Services.AddScoped<Inventario.API.Domain.Interfaces.IKardexRecalculoLogRepositorio, KardexRecalculoLogRepositorio>();
+builder.Services.AddScoped<Inventario.API.Application.Interfaces.IKardexService, Inventario.API.Application.Servicios.KardexService>();
+builder.Services.AddScoped<Inventario.API.Application.Servicios.IKardexRecalculoService, Inventario.API.Application.Servicios.KardexRecalculoService>();
+builder.Services.AddScoped<Inventario.API.Application.Interfaces.IValidacionReglaSunatService, Inventario.API.Application.Servicios.ValidacionReglaSunatService>();
 
 // MediatR (Scan Application Assembly de forma segura)
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Inventario.API.Application.Comandos.CrearMovimientoInventarioComando).Assembly));
@@ -78,5 +89,7 @@ app.UseAuthorization();
 app.MapAlmacenEndpoints();
 app.MapStockEndpoints();
 app.MapMovimientosEndpoints();
+app.MapKardexEndpoints();
+app.MapTrasladoEndpoints();
 
 app.Run();

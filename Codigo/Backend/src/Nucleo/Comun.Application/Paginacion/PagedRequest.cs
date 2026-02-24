@@ -5,10 +5,10 @@ namespace Nucleo.Comun.Application.Paginacion
     public class PagedRequest
     {
         [JsonIgnore]
-        public int PageNumber { get; set; } = 1;
+        public int? PageNumber { get; set; } = 1;
 
         [JsonIgnore]
-        public int PageSize { get; set; } = 10;
+        public int? PageSize { get; set; } = 10;
 
         // Propiedades auxiliares para binding desde query string si es necesario
         // Pero en Minimal APIs se bindean directo.

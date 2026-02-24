@@ -19,6 +19,8 @@ import {
 import { usePagination } from "@/hooks/usePagination";
 import { Producto } from "../tipos/catalogo.types";
 import { toast } from "sonner";
+import { Loading } from "@compartido/componentes/feedback/Loading";
+import { MensajeError } from "@compartido/componentes/feedback/MensajeError";
 
 export function PaginaProductos() {
   const [dialogoAbierto, setDialogoAbierto] = useState(false);
@@ -41,8 +43,8 @@ export function PaginaProductos() {
 
   const productos = data?.datos || [];
 
-  if (isLoading) return <div>Cargando...</div>; // O componente Loading si lo importo
-  if (error) return <div>Error: {error.message}</div>;
+  if (isLoading) return <Loading mensaje="Cargando productos..." />;
+  if (error) return <MensajeError mensaje={error.message} />;
 
   const manejarAbrirCrear = () => {
     setProductoAModificar(null);
@@ -197,12 +199,8 @@ export function PaginaProductos() {
         searchPlaceholder="Buscar por nombre o código..."
         isLoading={isLoading}
         actionElement={
-          <Button
-            onClick={manejarAbrirCrear}
-            className="bg-blue-600 hover:bg-blue-700 text-white rounded-full px-6"
-          >
-            <Plus className="mr-2 h-4 w-4" />
-            Nuevo
+          <Button onClick={manejarAbrirCrear}>
+            <Plus className="mr-2 h-4 w-4" /> Nuevo
           </Button>
         }
       />

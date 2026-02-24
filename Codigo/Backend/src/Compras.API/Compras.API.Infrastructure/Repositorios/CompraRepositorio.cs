@@ -38,6 +38,7 @@ namespace Compras.API.Infrastructure.Repositorios
             compra.NombreAlmacen = resultado.a.NombreAlmacen;
             compra.NombreTipoComprobante = resultado.tc.Nombre;
             compra.NombreTipoDocumentoProveedor = resultado.td.Nombre;
+            compra.IdTipoDocumentoProveedor = resultado.p.IdTipoDocumento;
 
             var detallesQuery = from dc in _context.DetallesCompra
                                 join prod in _context.ProductosRef on dc.IdProducto equals prod.Id
@@ -79,6 +80,7 @@ namespace Compras.API.Infrastructure.Repositorios
                 c.NombreAlmacen = r.a.NombreAlmacen;
                 c.NombreTipoComprobante = r.tc.Nombre;
                 c.NombreTipoDocumentoProveedor = r.td.Nombre;
+                c.IdTipoDocumentoProveedor = r.p.IdTipoDocumento;
                 return c;
             }).ToList();
         }

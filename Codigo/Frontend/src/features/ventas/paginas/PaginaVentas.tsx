@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Plus, Search, Filter } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 import { useVentas } from "../hooks/useVentas";
 import { TablaVentas } from "../componentes/ventas/TablaVentas";
 import { Button } from "@/components/ui/button";
@@ -16,8 +17,8 @@ export function PaginaVentas() {
 
   const { data, isLoading } = useVentas(filtros, 1, 100); // Simplificado para este ejemplo
 
-  const handleVerDetalle = (venta: Venta) => {
-    console.log("Ver detalle:", venta);
+  const handleVerDetalle = (_venta: Venta) => {
+    toast.info("Próximamente: ver detalle de venta");
   };
 
   const handleNuevoPOS = () => {
@@ -103,8 +104,8 @@ export function PaginaVentas() {
             ventas={data?.datos || []}
             isLoading={isLoading}
             onVerDetalle={handleVerDetalle}
-            onGenerarTicket={(v) => console.log("Ticket", v)}
-            onGenerarFactura={(v) => console.log("Factura", v)}
+            onGenerarTicket={() => toast.info("Próximamente: generar ticket")}
+            onGenerarFactura={() => toast.info("Próximamente: generar factura")}
           />
         </CardContent>
       </Card>

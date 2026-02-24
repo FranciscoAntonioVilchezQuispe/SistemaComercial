@@ -27,7 +27,10 @@ namespace Compras.API.Application.Manejadores
                     notification.IdAlmacen,
                     item.Cantidad,
                     item.CostoUnitario,
-                    notification.CompraId);
+                    notification.CompraId,
+                    notification.IdTipoComprobante,
+                    notification.SerieComprobante,
+                    notification.NumeroComprobante);
 
 
 

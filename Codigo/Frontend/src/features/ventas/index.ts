@@ -9,7 +9,8 @@ export { GridProductosPOS } from "./componentes/pos/GridProductosPOS";
 export { TablaVentas } from "./componentes/ventas/TablaVentas";
 export { DetalleVentaModal } from "./componentes/ventas/DetalleVentaModal";
 export { TablaClientes } from "./componentes/clientes/TablaClientes";
-export { FormularioCliente } from "./componentes/clientes/FormularioCliente";
+// export { FormularioCliente } from "./componentes/clientes/FormularioCliente"; // Eliminado a favor de ClienteForm
+// ClienteForm se debe usar importándolo directamente de @features/clientes
 
 // Exportar hooks
 export {

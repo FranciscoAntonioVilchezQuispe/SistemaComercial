@@ -7,6 +7,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { DataTable } from "@/components/ui/DataTable";
 import { toast } from "sonner";
 import { UnidadMedida } from "../tipos/catalogo.types";
@@ -21,6 +31,7 @@ export function PaginaUnidadesMedida() {
   const [dialogoOpen, setDialogoOpen] = useState(false);
   const [unidadSeleccionada, setUnidadSeleccionada] =
     useState<UnidadMedida | null>(null);
+  const [eliminarId, setEliminarId] = useState<number | null>(null);
 
   const { data: unidades, isLoading } = useUnidadesMedida();
   const eliminarMutation = useEliminarUnidadMedida();
@@ -36,9 +47,7 @@ export function PaginaUnidadesMedida() {
   };
 
   const handleEliminar = async (unidad: UnidadMedida) => {
-    if (confirm(`¿Está seguro de eliminar la unidad "${unidad.nombre}"?`)) {
-      eliminarMutation.mutate(unidad.id);
-    }
+    setEliminarId(unidad.id);
   };
 
   const columnas = [
@@ -92,12 +101,8 @@ export function PaginaUnidadesMedida() {
         isLoading={isLoading}
         searchPlaceholder="Buscar unidad..."
         actionElement={
-          <Button
-            onClick={handleNuevo}
-            className="bg-blue-600 hover:bg-blue-700 text-white rounded-full px-6"
-          >
-            <Plus className="mr-2 h-4 w-4" />
-            Nuevo
+          <Button onClick={handleNuevo}>
+            <Plus className="mr-2 h-4 w-4" /> Nuevo
           </Button>
         }
       />
@@ -121,6 +126,38 @@ export function PaginaUnidadesMedida() {
           />
         </DialogContent>
       </Dialog>
+      <AlertDialog open={eliminarId !== null} onOpenChange={(open) => !open && setEliminarId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Está absolutamente seguro?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta acción eliminará la unidad seleccionada. No se puede deshacer.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={() => {
+                if (eliminarId) {
+                  eliminarMutation.mutate(eliminarId, {
+                    onSuccess: () => {
+                      toast.success("Unidad eliminada");
+                      setEliminarId(null);
+                    },
+                    onError: (e: any) => {
+                      toast.error("Error: " + e.message);
+                      setEliminarId(null);
+                    },
+                  });
+                }
+              }}
+            >
+              Sí, eliminar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

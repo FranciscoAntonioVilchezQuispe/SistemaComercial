@@ -19,11 +19,22 @@ import {
 import { MetodoPago, MetodoPagoFormData } from "../tipos/metodoPago.types";
 import { MetodoPagoForm } from "../componentes/MetodoPagoForm";
 import { toast } from "sonner";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 export function PaginaMetodosPago() {
   const [dialogoOpen, setDialogoOpen] = useState(false);
   const [registroSeleccionado, setRegistroSeleccionado] =
     useState<MetodoPago | null>(null);
+  const [eliminarId, setEliminarId] = useState<number | null>(null);
 
   const { data: metodos, isLoading, error } = useMetodosPago();
 
@@ -41,14 +52,7 @@ export function PaginaMetodosPago() {
     setDialogoOpen(true);
   };
 
-  const handleEliminar = (metodo: MetodoPago) => {
-    if (confirm(`¿Está seguro de eliminar el método ${metodo.nombre}?`)) {
-      eliminarMutation.mutate(metodo.id, {
-        onSuccess: () => toast.success("Método eliminado"),
-        onError: () => toast.error("Error al eliminar método"),
-      });
-    }
-  };
+  // Eliminación ahora via AlertDialog: setEliminarId para abrir diálogo
 
   const handleGuardar = (datos: MetodoPagoFormData) => {
     if (registroSeleccionado) {
@@ -121,7 +125,7 @@ export function PaginaMetodosPago() {
             variant="ghost"
             size="icon"
             className="text-destructive"
-            onClick={() => handleEliminar(row)}
+            onClick={() => setEliminarId(row.id)}
             title="Eliminar"
           >
             <Trash2 className="h-4 w-4" />
@@ -166,6 +170,40 @@ export function PaginaMetodosPago() {
           />
         </DialogContent>
       </Dialog>
+
+      <AlertDialog
+        open={eliminarId !== null}
+        onOpenChange={(open) => !open && setEliminarId(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Está absolutamente seguro?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta acción no se puede deshacer. Se eliminará el método de pago
+              seleccionado.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={() => {
+                if (eliminarId) {
+                  eliminarMutation.mutate(eliminarId, {
+                    onSuccess: () => {
+                      toast.success("Método eliminado");
+                      setEliminarId(null);
+                    },
+                    onError: () => toast.error("Error al eliminar método"),
+                  });
+                }
+              }}
+            >
+              {eliminarMutation.isPending ? "Eliminando..." : "Sí, eliminar"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

@@ -53,12 +53,20 @@ export function PaginaMovimientos() {
               <Input
                 placeholder="Buscar por producto o ref..."
                 className="pl-8"
-                onChange={(e) =>
-                  setFiltros({
-                    ...filtros,
-                    idProducto: Number(e.target.value) || undefined,
-                  })
-                }
+                onChange={(e) => {
+                  const val = e.target.value;
+                  const parsed = Number(val);
+                  const isNumber = !Number.isNaN(parsed) && val.trim() !== "";
+                  const nuevos: any = { ...filtros };
+                  if (isNumber) {
+                    nuevos.idProducto = parsed;
+                    delete nuevos.busqueda;
+                  } else {
+                    nuevos.idProducto = undefined;
+                    nuevos.busqueda = val || undefined;
+                  }
+                  setFiltros(nuevos);
+                }}
               />
             </div>
             <Select

@@ -22,6 +22,7 @@ namespace Configuracion.API.Application.DTOs
         public string? Direccion { get; set; }
         public string? Telefono { get; set; }
         public bool EsPrincipal { get; set; }
+        public bool Activado { get; set; }
     }
 
     public class ImpuestoDto

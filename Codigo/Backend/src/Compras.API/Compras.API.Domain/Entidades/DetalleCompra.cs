@@ -32,6 +32,11 @@ namespace Compras.API.Domain.Entidades
         [Column("subtotal", TypeName = "decimal(12,2)")]
         public decimal Subtotal { get; set; }
 
+        [Required]
+        [MaxLength(1)]
+        [Column("afectacion_igv")]
+        public string AfectacionIgv { get; set; } = "G";
+
         [ForeignKey("IdCompra")]
         public virtual Compra Compra { get; set; } = null!;
     }

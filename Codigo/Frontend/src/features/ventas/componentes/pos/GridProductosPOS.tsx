@@ -3,11 +3,25 @@ import { Search, Package } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { useQuery } from "@tanstack/react-query";
 import { useProductos } from "@features/catalogo";
 import { useCarrito } from "../../hooks/useCarrito";
 import { useDebounce } from "@compartido/hooks/useDebounce";
 import { formatearMoneda } from "@compartido/utilidades/moneda";
 import { Loading } from "@compartido/componentes/feedback/Loading";
+import { apiInventario } from "@/lib/axios";
+
+// TODO: Obtener del contexto de usuario/sucursal. Por ahora almacén 1.
+const ID_ALMACEN_POS = 1;
+
+interface StockDto {
+  idProducto: number;
+  cantidadActual: number;
+}
+
+interface RespuestaStock {
+  data: StockDto[];
+}
 
 export function GridProductosPOS() {
   const [busqueda, setBusqueda] = useState("");
@@ -19,6 +33,19 @@ export function GridProductosPOS() {
     pageNumber: 1,
     pageSize: 20,
   });
+
+  // Cargar stock real desde Inventario.API
+  const { data: stockData } = useQuery<RespuestaStock>({
+    queryKey: ["stock-almacen", ID_ALMACEN_POS],
+    queryFn: () =>
+      apiInventario.get(`/inventario/stock/almacen/${ID_ALMACEN_POS}`),
+    staleTime: 1000 * 30, // 30 segundos
+  });
+
+  // Mapa idProducto → cantidadActual para búsqueda O(1)
+  const stockMap = new Map<number, number>(
+    (stockData?.data ?? []).map((s) => [s.idProducto, s.cantidadActual]),
+  );
 
   const { agregarProducto } = useCarrito();
 
@@ -44,8 +71,10 @@ export function GridProductosPOS() {
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {productos.map((producto) => {
-              const stockBajo = producto.stock <= producto.stockMinimo;
-              const sinStock = producto.stock === 0;
+              // Usar stock real de Inventario.API; si no hay registro = 0
+              const stockReal = stockMap.get(producto.id) ?? 0;
+              const stockBajo = stockReal <= producto.stockMinimo;
+              const sinStock = stockReal === 0;
 
               return (
                 <Card
@@ -103,7 +132,7 @@ export function GridProductosPOS() {
                         {formatearMoneda(producto.precioVentaPublico)}
                       </p>
                       <p className="text-xs text-muted-foreground">
-                        Stock: {producto.stock}
+                        Stock: {stockReal}
                       </p>
                     </div>
                   </div>

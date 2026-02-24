@@ -13,5 +13,6 @@ namespace Compras.API.Application.DTOs
         public string? Telefono { get; set; }
         public string? Email { get; set; }
         public string? PaginaWeb { get; set; }
+        public bool? Activado { get; set; }
     }
 }

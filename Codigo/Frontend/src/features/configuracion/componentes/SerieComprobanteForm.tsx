@@ -1,6 +1,24 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   SerieComprobante,
   SerieComprobanteFormData,
@@ -8,6 +26,13 @@ import {
 import { useTiposComprobante } from "../hooks/useTiposComprobante";
 import { useAlmacenes } from "../../inventario/almacenes/hooks/useAlmacenes";
 import { padIzquierda, limpiarSoloNumeros } from "@compartido/utilidades";
+
+const schema = z.object({
+  idTipoComprobante: z.coerce.number().min(1, "El tipo es requerido"),
+  serie: z.string().min(1, "La serie es requerida"),
+  correlativoActual: z.coerce.number().min(0, "Debe ser al menos 0"),
+  idAlmacen: z.coerce.number().optional().nullable(),
+});
 
 interface SerieComprobanteFormProps {
   datosIniciales?: SerieComprobante;
@@ -27,116 +52,162 @@ export function SerieComprobanteForm({
   const { data: tipos } = useTiposComprobante();
   const { data: almacenes } = useAlmacenes();
 
-  const {
-    register,
-    handleSubmit,
-    reset,
-    setValue,
-    formState: { errors },
-  } = useForm<SerieComprobanteFormData>({
+  const [inputCorrelativo, setInputCorrelativo] = useState("00000000");
+
+  const form = useForm<z.infer<typeof schema>>({
+    resolver: zodResolver(schema),
     defaultValues: {
+      idTipoComprobante: idTipoPreseleccionado || 0,
+      serie: "",
       correlativoActual: 0,
+      idAlmacen: null,
     },
   });
 
   useEffect(() => {
     if (datosIniciales) {
-      reset(datosIniciales);
+      form.reset({
+        idTipoComprobante: datosIniciales.idTipoComprobante,
+        serie: datosIniciales.serie,
+        correlativoActual: datosIniciales.correlativoActual,
+        idAlmacen: datosIniciales.idAlmacen,
+      });
+      setInputCorrelativo(
+        padIzquierda(String(datosIniciales.correlativoActual)),
+      );
     } else if (idTipoPreseleccionado) {
-      reset({ idTipoComprobante: idTipoPreseleccionado });
+      form.setValue("idTipoComprobante", idTipoPreseleccionado);
     }
-  }, [datosIniciales, idTipoPreseleccionado, reset]);
+  }, [datosIniciales, idTipoPreseleccionado, form]);
 
-  const inputClass =
-    "flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50";
-  const labelClass =
-    "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70";
+  const onSubmit = (values: z.infer<typeof schema>) => {
+    alEnviar({
+      idTipoComprobante: values.idTipoComprobante,
+      serie: values.serie,
+      correlativoActual: Number(inputCorrelativo) || 0,
+      idAlmacen: values.idAlmacen || undefined,
+    });
+  };
 
   return (
-    <form onSubmit={handleSubmit(alEnviar)} className="space-y-4">
-      {!idTipoPreseleccionado && (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        {!idTipoPreseleccionado && (
+          <FormField
+            control={form.control}
+            name="idTipoComprobante"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Tipo de Comprobante</FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  value={field.value ? String(field.value) : ""}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Seleccione un tipo..." />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {tipos?.map((t) => (
+                      <SelectItem key={t.id} value={String(t.id)}>
+                        {t.nombre}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        )}
+
+        {/* If preselected, hidden field */}
+        {idTipoPreseleccionado && (
+          <input
+            type="hidden"
+            {...form.register("idTipoComprobante")}
+            value={idTipoPreseleccionado}
+          />
+        )}
+
+        <FormField
+          control={form.control}
+          name="serie"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Serie</FormLabel>
+              <FormControl>
+                <Input placeholder="Ej: F001, B001" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        {/* Mantenemos un input local para el padding, pero controlamos en submit y en Zod */}
         <div className="space-y-2">
-          <label className={labelClass}>Tipo de Comprobante</label>
-          <select
-            className={inputClass}
-            {...register("idTipoComprobante", {
-              required: "El tipo es requerido",
-              valueAsNumber: true,
-            })}
-          >
-            <option value="">Seleccione un tipo...</option>
-            {tipos?.map((t) => (
-              <option key={t.id} value={t.id}>
-                {t.nombre}
-              </option>
-            ))}
-          </select>
-          {errors.idTipoComprobante && (
-            <p className="text-sm text-destructive">
-              {errors.idTipoComprobante.message}
+          <FormLabel>Correlativo Actual</FormLabel>
+          <Input
+            value={inputCorrelativo}
+            onChange={(e) => {
+              const val = limpiarSoloNumeros(e.target.value);
+              setInputCorrelativo(val);
+            }}
+            onBlur={() => {
+              setInputCorrelativo(padIzquierda(inputCorrelativo));
+              form.setValue("correlativoActual", Number(inputCorrelativo) || 0);
+            }}
+            placeholder="00000000"
+          />
+          {form.formState.errors.correlativoActual && (
+            <p className="text-sm font-medium text-destructive">
+              {form.formState.errors.correlativoActual.message}
             </p>
           )}
         </div>
-      )}
-      {/* If preselected, hidden field */}
-      {idTipoPreseleccionado && (
-        <input
-          type="hidden"
-          {...register("idTipoComprobante", { valueAsNumber: true })}
+
+        <FormField
+          control={form.control}
+          name="idAlmacen"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Almacén pertecene (Opcional)</FormLabel>
+              <Select
+                onValueChange={field.onChange}
+                value={field.value ? String(field.value) : ""}
+              >
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Seleccione un almacén..." />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {almacenes?.map((almacen: any) => (
+                    <SelectItem key={almacen.id} value={String(almacen.id)}>
+                      {almacen.nombreAlmacen}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-      )}
 
-      <div className="space-y-2">
-        <label className={labelClass}>Serie</label>
-        <input
-          className={inputClass}
-          {...register("serie", { required: "La serie es requerida" })}
-          placeholder="Ej: F001, B001"
-        />
-        {errors.serie && (
-          <p className="text-sm text-destructive">{errors.serie.message}</p>
-        )}
-      </div>
-
-      <div className="space-y-2">
-        <label className={labelClass}>Correlativo Actual</label>
-        <input
-          type="text"
-          className={inputClass}
-          {...register("correlativoActual", {
-            required: true,
-            onBlur: (e) => {
-              const val = limpiarSoloNumeros(e.target.value);
-              setValue("correlativoActual", padIzquierda(val) as any);
-            },
-          })}
-          defaultValue={0}
-        />
-      </div>
-
-      <div className="space-y-2">
-        <label className={labelClass}>Almacén pertecene (Opcional)</label>
-        <select
-          className={inputClass}
-          {...register("idAlmacen", { valueAsNumber: true })}
-        >
-          <option value="">Seleccione un almacén...</option>
-          {almacenes?.map((almacen: any) => (
-            <option key={almacen.id} value={almacen.id}>
-              {almacen.nombreAlmacen}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      <div className="flex justify-end gap-2 pt-4">
-        <Button type="button" variant="outline" onClick={alCancelar}>
-          Cancelar
-        </Button>
-        <Button type="submit" disabled={cargando}>
-          {cargando ? "Guardando..." : datosIniciales ? "Actualizar" : "Crear"}
-        </Button>
-      </div>
-    </form>
+        <div className="flex justify-end gap-2 pt-4">
+          <Button type="button" variant="outline" onClick={alCancelar}>
+            Cancelar
+          </Button>
+          <Button type="submit" disabled={cargando}>
+            {cargando
+              ? "Guardando..."
+              : datosIniciales
+                ? "Actualizar"
+                : "Crear"}
+          </Button>
+        </div>
+      </form>
+    </Form>
   );
 }

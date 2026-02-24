@@ -41,6 +41,9 @@ namespace Compras.API.Domain.Entidades
         [Column("fecha_contable")]
         public DateTime FechaContable { get; set; }
 
+        [Column("fecha_vencimiento")]
+        public DateTime? FechaVencimiento { get; set; }
+
         [MaxLength(3)]
         [Column("moneda")]
         public string Moneda { get; set; } = "PEN";
@@ -50,6 +53,15 @@ namespace Compras.API.Domain.Entidades
 
         [Column("subtotal", TypeName = "decimal(12,2)")]
         public decimal Subtotal { get; set; }
+
+        [Column("base_gravada", TypeName = "decimal(12,2)")]
+        public decimal BaseGravada { get; set; }
+
+        [Column("base_exonerada", TypeName = "decimal(12,2)")]
+        public decimal BaseExonerada { get; set; }
+
+        [Column("base_inafecta", TypeName = "decimal(12,2)")]
+        public decimal BaseInafecta { get; set; }
 
         [Column("impuesto", TypeName = "decimal(12,2)")]
         public decimal Impuesto { get; set; }
@@ -76,6 +88,8 @@ namespace Compras.API.Domain.Entidades
         public string? NombreTipoComprobante { get; set; }
         [NotMapped]
         public string? NombreTipoDocumentoProveedor { get; set; }
+        [NotMapped]
+        public long IdTipoDocumentoProveedor { get; set; }
 
         public virtual ICollection<DetalleCompra> Detalles { get; set; } = new List<DetalleCompra>();
     }

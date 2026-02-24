@@ -8,4 +8,4 @@ export interface Sucursal {
   activado: boolean;
 }
 
-export type SucursalFormData = Omit<Sucursal, "id" | "activado">;
+export type SucursalFormData = Omit<Sucursal, "id">;

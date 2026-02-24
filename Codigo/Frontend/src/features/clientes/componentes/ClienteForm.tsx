@@ -11,8 +11,10 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
+  FormDescription,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Switch } from "@/components/ui/switch";
 import { useEffect } from "react";
 import { SelectorCatalogo } from "@/compartido/componentes/formularios/SelectorCatalogo";
 
@@ -30,6 +32,7 @@ const formSchema = z.object({
   limiteCredito: z.coerce.number().optional(),
   diasCredito: z.coerce.number().int().optional(),
   idListaPrecioAsignada: z.coerce.number().optional(),
+  activado: z.boolean().default(true),
 });
 
 interface ClienteFormProps {
@@ -60,6 +63,7 @@ export function ClienteForm({
       limiteCredito: 0,
       diasCredito: 0,
       idListaPrecioAsignada: 0,
+      activado: true,
     },
   });
 
@@ -77,6 +81,7 @@ export function ClienteForm({
         limiteCredito: cliente.limiteCredito || 0,
         diasCredito: cliente.diasCredito || 0,
         idListaPrecioAsignada: cliente.idListaPrecioAsignada || 0,
+        activado: cliente.activado ?? true,
       });
     }
   }, [cliente, form]);
@@ -92,6 +97,7 @@ export function ClienteForm({
       direccion: values.direccion || undefined,
       telefono: values.telefono || undefined,
       email: values.email || undefined,
+      activado: values.activado,
     };
 
     if (cliente) {
@@ -258,6 +264,28 @@ export function ClienteForm({
                   <Input {...field} type="number" />
                 </FormControl>
                 <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="activado"
+            render={({ field }) => (
+              <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 mt-2 md:col-span-2">
+                <div className="space-y-0.5">
+                  <FormLabel>Estado Activo</FormLabel>
+                  <FormDescription>
+                    Determina si este cliente puede ser utilizado en
+                    operaciones.
+                  </FormDescription>
+                </div>
+                <FormControl>
+                  <Switch
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                  />
+                </FormControl>
               </FormItem>
             )}
           />

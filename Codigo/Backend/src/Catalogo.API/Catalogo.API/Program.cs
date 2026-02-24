@@ -12,7 +12,8 @@ AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
 // Configurar DB
 builder.Services.AddDbContext<CatalogoDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"),
+        o => o.MigrationsHistoryTable("__ef_migrations", "catalogo"))
            .UseSnakeCaseNamingConvention());
 
 // Configurar MediatR (Scan Application assm)

@@ -11,8 +11,8 @@ import {
 import { cn } from '@/lib/utils'
 import { ContenedorPagina } from '@/compartido/componentes/ContenedorPagina'
 import { TarjetaEstadistica } from '@/compartido/componentes/TarjetaEstadistica'
-import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/componentes/ui/card'
-import { Badge } from '@/componentes/ui/badge'
+import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
 import { 
   Table, 
   TableBody, 
@@ -20,9 +20,9 @@ import {
   TableHead, 
   TableHeader, 
   TableRow 
-} from '@/componentes/ui/table'
-import { Avatar, AvatarFallback } from '@/componentes/ui/avatar'
-import { Button } from '@/componentes/ui/button'
+} from '@/components/ui/table'
+import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { Button } from '@/components/ui/button'
 
 export default function PaginaDashboard() {
   return (

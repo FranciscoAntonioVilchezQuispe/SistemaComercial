@@ -170,11 +170,14 @@ export function OrdenCompraForm({ onSuccess, onCancel }: OrdenCompraFormProps) {
   );
 
   const { data: almacenes } = useAlmacenes();
-  const { data: productosData } = useProductos({
-    pageNumber: 1,
-    pageSize: 50,
-    search: terminoBusqueda,
-  });
+  const { data: productosData } = useProductos(
+    {
+      pageNumber: 1,
+      pageSize: 50,
+      search: terminoBusqueda,
+    },
+    { enabled: !!terminoBusqueda },
+  );
   const productos = productosData?.datos || [];
 
   const handleSearchProveedor = (term: string) => {

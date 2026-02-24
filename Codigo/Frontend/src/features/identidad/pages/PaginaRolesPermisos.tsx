@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
+import { Loading } from "@compartido/componentes/feedback/Loading";
 import { rolMenuService } from "../servicios/servicioRolMenu";
 import { tipoPermisoService } from "../servicios/servicioTipoPermiso";
 import type { RolMenu, TipoPermiso } from "@/types/permisos.types";
@@ -14,12 +15,13 @@ interface Rol {
   descripcion?: string;
 }
 
-export function RolesPermisosPage() {
+export function PaginaRolesPermisos() {
   const [roles, setRoles] = useState<Rol[]>([]);
   const [rolSeleccionado, setRolSeleccionado] = useState<Rol | null>(null);
   const [rolesMenus, setRolesMenus] = useState<RolMenu[]>([]);
   const [tiposPermiso, setTiposPermiso] = useState<TipoPermiso[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isMock] = useState(true);
 
   useEffect(() => {
     cargarDatosIniciales();
@@ -83,13 +85,7 @@ export function RolesPermisosPage() {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-      </div>
-    );
-  }
+  if (loading) return <Loading mensaje="Cargando roles y permisos..." />;
 
   return (
     <div className="container mx-auto py-6">
@@ -99,6 +95,13 @@ export function RolesPermisosPage() {
           Asigna menús y permisos específicos a cada rol del sistema
         </p>
       </div>
+
+      {isMock && (
+        <div className="p-3 mb-4 rounded border border-yellow-100 bg-yellow-50 text-yellow-800">
+          <strong>Modo DEV:</strong> esta página usa datos de ejemplo. Conectar
+          con el servicio real de roles/usuarios para producción.
+        </div>
+      )}
 
       <div className="grid grid-cols-12 gap-6">
         {/* Lista de Roles */}

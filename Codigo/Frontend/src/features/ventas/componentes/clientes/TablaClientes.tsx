@@ -3,7 +3,6 @@ import { Cliente } from "../../tipos/ventas.types";
 import { TablaPaginada } from "@/compartido/componentes/tablas/TablaPaginada";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { formatearMoneda } from "@compartido/utilidades";
 
 interface Props {
   clientes: Cliente[];
@@ -20,7 +19,7 @@ export function TablaClientes({
 }: Props) {
   const columnas = [
     {
-      clave: "nombres",
+      clave: "razonSocial",
       titulo: "Cliente",
       renderizar: (cliente: Cliente) => (
         <div className="flex items-center gap-3">
@@ -29,11 +28,10 @@ export function TablaClientes({
           </div>
           <div className="flex flex-col">
             <span className="font-medium">
-              {cliente.razonSocial ||
-                `${cliente.nombres} ${cliente.apellidos || ""}`}
+              {cliente.razonSocial || cliente.nombreComercial || "Sin Nombre"}
             </span>
             <span className="text-xs text-muted-foreground">
-              {cliente.tipoDocumento}: {cliente.numeroDocumento}
+              Documento: {cliente.numeroDocumento}
             </span>
           </div>
         </div>
@@ -58,29 +56,21 @@ export function TablaClientes({
       ),
     },
     {
-      clave: "tipoCliente",
+      clave: "idTipoCliente",
       titulo: "Tipo",
       renderizar: (cliente: Cliente) => (
-        <Badge variant="outline">{cliente.tipoCliente || "Regular"}</Badge>
+        <Badge variant="outline">
+          {cliente.idTipoCliente === 1 ? "Persona" : "Empresa"}
+        </Badge>
       ),
     },
+
     {
-      clave: "creditoDisponible",
-      titulo: "Crédito Disp.",
-      renderizar: (cliente: Cliente) => (
-        <span
-          className={cliente.creditoDisponible < 0 ? "text-destructive" : ""}
-        >
-          {formatearMoneda(cliente.creditoDisponible)}
-        </span>
-      ),
-    },
-    {
-      clave: "activo",
+      clave: "activado",
       titulo: "Estado",
       renderizar: (cliente: Cliente) => (
-        <Badge variant={cliente.activo ? "default" : "secondary"}>
-          {cliente.activo ? "Activo" : "Inactivo"}
+        <Badge variant={cliente.activado ? "default" : "secondary"}>
+          {cliente.activado ? "Activo" : "Inactivo"}
         </Badge>
       ),
     },

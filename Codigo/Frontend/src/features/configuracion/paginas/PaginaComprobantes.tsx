@@ -7,6 +7,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { DataTable } from "@/components/ui/DataTable";
 import { Loading } from "@compartido/componentes/feedback/Loading";
 import { MensajeError } from "@compartido/componentes/feedback/MensajeError";
@@ -53,6 +63,8 @@ export function PaginaComprobantes() {
   const [dialogoSerieOpen, setDialogoSerieOpen] = useState(false);
   const [serieSeleccionada, setSerieSeleccionada] =
     useState<SerieComprobante | null>(null);
+  const [eliminarTipoId, setEliminarTipoId] = useState<number | null>(null);
+  const [eliminarSerieId, setEliminarSerieId] = useState<number | null>(null);
 
   // Hooks Tipos
   const {
@@ -98,11 +110,7 @@ export function PaginaComprobantes() {
     }
   };
 
-  const handleEliminarTipo = (tipo: TipoComprobante) => {
-    if (confirm(`¿Eliminar tipo ${tipo.nombre}?`)) {
-      eliminarTipo.mutate(tipo.id);
-    }
-  };
+  
 
   // Handlers Series
   const handleGuardarSerie = (datos: SerieComprobanteFormData) => {
@@ -128,11 +136,7 @@ export function PaginaComprobantes() {
     }
   };
 
-  const handleEliminarSerie = (serie: SerieComprobante) => {
-    if (confirm(`¿Eliminar serie ${serie.serie}?`)) {
-      eliminarSerie.mutate(serie.id);
-    }
-  };
+  
 
   // Columnas Tipos
   const columnasTipos = [
@@ -177,7 +181,7 @@ export function PaginaComprobantes() {
             variant="ghost"
             size="icon"
             className="text-destructive"
-            onClick={() => handleEliminarTipo(row)}
+            onClick={() => setEliminarTipoId(row.id)}
           >
             <Trash2 className="h-4 w-4" />
           </Button>
@@ -225,7 +229,7 @@ export function PaginaComprobantes() {
             variant="ghost"
             size="icon"
             className="text-destructive"
-            onClick={() => handleEliminarSerie(row)}
+            onClick={() => setEliminarSerieId(row.id)}
           >
             <Trash2 className="h-4 w-4" />
           </Button>
@@ -347,6 +351,81 @@ export function PaginaComprobantes() {
           />
         </DialogContent>
       </Dialog>
+      {/* AlertDialog eliminar tipo */}
+      <AlertDialog
+        open={eliminarTipoId !== null}
+        onOpenChange={(open) => !open && setEliminarTipoId(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Está absolutamente seguro?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta acción eliminará el tipo de comprobante. No se puede
+              deshacer.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={() => {
+                if (eliminarTipoId) {
+                  eliminarTipo.mutate(eliminarTipoId, {
+                    onSuccess: () => {
+                      toast.success("Tipo eliminado");
+                      setEliminarTipoId(null);
+                    },
+                    onError: (e: any) => {
+                      toast.error("Error: " + e.message);
+                      setEliminarTipoId(null);
+                    },
+                  });
+                }
+              }}
+            >
+              Sí, eliminar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* AlertDialog eliminar serie */}
+      <AlertDialog
+        open={eliminarSerieId !== null}
+        onOpenChange={(open) => !open && setEliminarSerieId(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Está absolutamente seguro?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta acción eliminará la serie seleccionada. No se puede
+              deshacer.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={() => {
+                if (eliminarSerieId) {
+                  eliminarSerie.mutate(eliminarSerieId, {
+                    onSuccess: () => {
+                      toast.success("Serie eliminada");
+                      setEliminarSerieId(null);
+                    },
+                    onError: (e: any) => {
+                      toast.error("Error: " + e.message);
+                      setEliminarSerieId(null);
+                    },
+                  });
+                }
+              }}
+            >
+              Sí, eliminar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

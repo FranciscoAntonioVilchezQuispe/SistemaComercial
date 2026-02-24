@@ -131,6 +131,8 @@ export function ProveedorForm({
                 direccion: values.direccion || undefined,
                 telefono: values.telefono || undefined,
                 email: values.email || undefined,
+                idTipoCliente: values.idTipoDocumento === 1 ? 1 : 2, // 1: DNI (Persona), 2: RUC/Otros (Empresa)
+                activado: true,
               };
 
               try {

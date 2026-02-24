@@ -84,6 +84,7 @@ export default function PaginaCompras() {
           idProducto: d.idProducto,
           cantidad: d.cantidadSolicitada,
           precioUnitario: d.precioUnitarioPactado,
+          afectacionIgv: "G",
         })),
       };
       setDatosIniciales(iniciales);
@@ -221,7 +222,9 @@ export default function PaginaCompras() {
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
-              {modoCreacion ? "Nueva Compra (Ingreso)" : "Detalle de Compra"}
+              {modoCreacion
+                ? "Nueva Compra (Ingreso)"
+                : `Detalle de Compra - ${compraSeleccionada?.nombreTipoComprobante || compraSeleccionada?.tipoComprobante} : ${compraSeleccionada?.serieComprobante}-${compraSeleccionada?.numeroComprobante}`}
             </DialogTitle>
           </DialogHeader>
 
@@ -243,8 +246,16 @@ export default function PaginaCompras() {
                 datosIniciales={
                   {
                     idProveedor: compraSeleccionada.idProveedor,
+                    razonSocialProveedor:
+                      compraSeleccionada.razonSocialProveedor,
+                    numeroDocumentoProveedor:
+                      compraSeleccionada.numeroDocumentoProveedor,
+                    idTipoDocumentoProveedor:
+                      compraSeleccionada.idTipoDocumentoProveedor,
                     idAlmacen: compraSeleccionada.idAlmacen,
-                    idMoneda: compraSeleccionada.idMoneda,
+                    idMoneda:
+                      compraSeleccionada.idMoneda ||
+                      (compraSeleccionada.moneda === "USD" ? 52 : 51),
                     tipoComprobante:
                       compraSeleccionada.idTipoComprobante.toString(),
                     serieComprobante: compraSeleccionada.serieComprobante,
@@ -255,6 +266,7 @@ export default function PaginaCompras() {
                       idProducto: d.idProducto,
                       cantidad: d.cantidad,
                       precioUnitario: d.precioUnitarioCompra,
+                      afectacionIgv: "G", // o d.afectacionIgv si viene de backend
                     })),
                   } as any
                 }

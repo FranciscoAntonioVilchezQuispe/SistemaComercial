@@ -15,7 +15,7 @@ namespace Ventas.API.Application.Integracion
             _logger = logger;
         }
 
-        public async Task<bool> RegistrarSalidaVentaAsync(long idProducto, long idAlmacen, decimal cantidad, long idVenta)
+        public async Task<bool> RegistrarSalidaVentaAsync(long idProducto, long idAlmacen, decimal cantidad, long idVenta, long idTipoComprobante, string serie, string numero)
         {
             try
             {
@@ -29,7 +29,10 @@ namespace Ventas.API.Application.Integracion
                     Cantidad = cantidad,
                     ReferenciaModulo = "VENTAS",
                     IdReferencia = idVenta,
-                    Observaciones = $"Salida automática por Venta #" + idVenta
+                    Observaciones = $"Salida automática por Venta #" + idVenta,
+                    IdTipoDocumento = idTipoComprobante,
+                    SerieDocumento = serie,
+                    NumeroDocumento = numero
                 };
 
                 var response = await _httpClient.PostAsJsonAsync("inventario/movimientos", comando);

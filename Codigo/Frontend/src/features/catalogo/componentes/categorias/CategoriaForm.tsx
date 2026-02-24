@@ -88,7 +88,11 @@ export function CategoriaForm({
             Cancelar
           </Button>
           <Button type="submit" disabled={cargando}>
-            {datosIniciales ? "Actualizar" : "Crear"}
+            {cargando
+              ? "Guardando..."
+              : datosIniciales
+                ? "Actualizar"
+                : "Crear"}
           </Button>
         </div>
       </form>

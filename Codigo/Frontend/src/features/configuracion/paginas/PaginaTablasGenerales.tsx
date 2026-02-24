@@ -1,12 +1,24 @@
 import { useState } from "react";
 import { Plus, Edit2, Trash2, List } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { toast } from "sonner";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { DataTable } from "@/components/ui/DataTable";
 import { usePagination } from "@/hooks/usePagination";
 import { TablaGeneralForm } from "../componentes/TablaGeneralForm";
@@ -30,6 +42,7 @@ export function PaginaTablasGenerales() {
 
   const [tablaSeleccionada, setTablaSeleccionada] =
     useState<TablaGeneral | null>(null); // For Edit Table or View Details
+  const [eliminarId, setEliminarId] = useState<number | null>(null);
 
   const { paginacion, cambiarPagina, cambiarPageSize, cambiarBusqueda } =
     usePagination();
@@ -55,23 +68,29 @@ export function PaginaTablasGenerales() {
   };
 
   const handleEliminar = (tabla: TablaGeneral) => {
-    if (
-      confirm(
-        `¿Eliminar tabla ${tabla.nombre}? Se eliminarán también sus detalles.`,
-      )
-    ) {
-      eliminarTabla.mutate(tabla.id);
-    }
+    setEliminarId(tabla.id);
   };
 
   const handleGuardarTabla = (datos: TablaGeneralFormData) => {
     if (tablaSeleccionada) {
       actualizarTabla.mutate(
         { id: tablaSeleccionada.id, datos },
-        { onSuccess: () => setTablaDialogoOpen(false) },
+        {
+          onSuccess: () => {
+            toast.success("Tabla actualizada");
+            setTablaDialogoOpen(false);
+          },
+          onError: (e: any) => toast.error("Error: " + e.message),
+        },
       );
     } else {
-      crearTabla.mutate(datos, { onSuccess: () => setTablaDialogoOpen(false) });
+      crearTabla.mutate(datos, {
+        onSuccess: () => {
+          toast.success("Tabla creada");
+          setTablaDialogoOpen(false);
+        },
+        onError: (e: any) => toast.error("Error: " + e.message),
+      });
     }
   };
 
@@ -96,7 +115,7 @@ export function PaginaTablasGenerales() {
       header: "Valores",
       accessorKey: "cantidadValores" as keyof TablaGeneral,
       cell: (row: TablaGeneral) => (
-        <span className="badge badge-ghost">{row.cantidadValores}</span>
+        <Badge variant="secondary">{row.cantidadValores}</Badge>
       ),
     },
     {
@@ -176,6 +195,40 @@ export function PaginaTablasGenerales() {
           />
         </DialogContent>
       </Dialog>
+
+      <AlertDialog open={eliminarId !== null} onOpenChange={(open) => !open && setEliminarId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Está absolutamente seguro?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta acción eliminará la tabla y sus valores asociados. No se
+              puede deshacer.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={() => {
+                if (eliminarId) {
+                  eliminarTabla.mutate(eliminarId, {
+                    onSuccess: () => {
+                      toast.success("Tabla eliminada");
+                      setEliminarId(null);
+                    },
+                    onError: (e: any) => {
+                      toast.error("Error: " + e.message);
+                      setEliminarId(null);
+                    },
+                  });
+                }
+              }}
+            >
+              Sí, eliminar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* Dialogo GESTIONAR DETALLES */}
       <Dialog open={detalleDialogoOpen} onOpenChange={setDetalleDialogoOpen}>

@@ -3,6 +3,10 @@
  */
 
 import { Producto } from "@features/catalogo";
+import {
+  Cliente as ClienteGlobal,
+  ClienteFormData as ClienteFormDataGlobal,
+} from "@/features/clientes/types/cliente.types";
 
 // ============================================
 // VENTA
@@ -14,7 +18,7 @@ export interface Venta {
   idTipoComprobante: number;
   tipoComprobante?: string;
   idCliente: number;
-  cliente?: Cliente;
+  cliente?: ClienteGlobal;
   idUsuario: number;
   usuario?: string;
   fecha: string;
@@ -74,38 +78,8 @@ export interface VentaFiltros {
 // CLIENTE
 // ============================================
 
-export interface Cliente {
-  id: number;
-  idTipoDocumento: number;
-  tipoDocumento?: string;
-  numeroDocumento: string;
-  nombres: string;
-  apellidos?: string;
-  razonSocial?: string;
-  direccion?: string;
-  telefono?: string;
-  email?: string;
-  idTipoCliente: number;
-  tipoCliente?: string;
-  limiteCredito: number;
-  creditoDisponible: number;
-  activo: boolean;
-  fechaCreacion: string;
-}
-
-export interface ClienteFormData {
-  idTipoDocumento: number;
-  numeroDocumento: string;
-  nombres: string;
-  apellidos?: string;
-  razonSocial?: string;
-  direccion?: string;
-  telefono?: string;
-  email?: string;
-  idTipoCliente: number;
-  limiteCredito: number;
-  activo: boolean;
-}
+export type Cliente = ClienteGlobal;
+export type ClienteFormData = ClienteFormDataGlobal;
 
 export interface ClienteFiltros {
   busqueda?: string;
