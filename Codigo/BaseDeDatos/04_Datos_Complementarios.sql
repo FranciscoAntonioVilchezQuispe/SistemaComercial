@@ -1,8 +1,8 @@
--- =====================================================
--- DATOS SEMILLA: Matriz de Reglas SUNAT (Cruce Dinámico)
+﻿-- =====================================================
+-- DATOS SEMILLA: Matriz de Reglas SUNAT (Cruce DinÃ¡mico)
 -- =====================================================
 
--- 1. Limpiar y poblar Tipos de Operación
+-- 1. Limpiar y poblar Tipos de OperaciÃ³n
 TRUNCATE TABLE configuracion.tipo_operacion_sunat CASCADE;
 INSERT INTO configuracion.tipo_operacion_sunat (codigo, nombre) VALUES 
 ('01', 'VENTA'),
@@ -19,7 +19,7 @@ INSERT INTO configuracion.tipo_operacion_sunat (codigo, nombre) VALUES
 -- 2. Limpiar Matriz
 TRUNCATE TABLE configuracion.matriz_regla_sunat RESTART IDENTITY;
 
--- Función auxiliar para insertar reglas por códigos
+-- FunciÃ³n auxiliar para insertar reglas por cÃ³digos
 DO $$
 DECLARE
     v_op_01 INT; v_op_02 INT; v_op_03 INT; v_op_04 INT; v_op_05 INT; v_op_06 INT;
@@ -62,7 +62,7 @@ BEGIN
     INSERT INTO configuracion.matriz_regla_sunat (id_tipo_operacion, id_tipo_comprobante, nivel_obligatoriedad)
     SELECT v_op_11, id_tipo_comprobante, 1 FROM configuracion.tipo_comprobante WHERE codigo = '09';
 
-    -- SALDO INICIAL (16) -> Cargo (AI - Ajuste Inventario se suele mapear a un código interno si no hay SUNAT)
+    -- SALDO INICIAL (16) -> Cargo (AI - Ajuste Inventario se suele mapear a un cÃ³digo interno si no hay SUNAT)
     INSERT INTO configuracion.matriz_regla_sunat (id_tipo_operacion, id_tipo_comprobante, nivel_obligatoriedad)
     SELECT v_op_16, id_tipo_comprobante, 1 FROM configuracion.tipo_comprobante WHERE codigo = 'AI';
 END $$;
