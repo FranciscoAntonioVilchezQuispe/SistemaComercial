@@ -5,7 +5,7 @@ using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
-using Nucleo.Comun.Application.Wrappers; // Import wrapper
+using Nucleo.Comun.Application.Wrappers;
 
 namespace Catalogo.API.Endpoints
 {
@@ -54,6 +54,61 @@ namespace Catalogo.API.Endpoints
 
                 var response = new ToReturn<ProductoDto>(MapToDto(producto));
                 return Results.Ok(response);
+            });
+
+            // PUT Update Endpoint
+            grupo.MapPut("/{id:long}", async (long id, ActualizarProductoRequest dto, ISender sender) =>
+            {
+                try
+                {
+                    var comando = new ActualizarProductoComando(
+                        id,
+                        dto.Codigo,
+                        dto.Nombre,
+                        dto.Descripcion,
+                        dto.IdCategoria,
+                        dto.IdMarca,
+                        dto.IdUnidadMedida,
+                        dto.IdTipoProducto,
+                        dto.CodigoBarras,
+                        dto.Sku,
+                        dto.PrecioCompra,
+                        dto.PrecioVentaPublico,
+                        dto.PrecioVentaMayorista,
+                        dto.PrecioVentaDistribuidor,
+                        dto.StockMinimo,
+                        dto.StockMaximo,
+                        dto.TieneVariantes,
+                        dto.PermiteInventarioNegativo,
+                        dto.GravadoImpuesto,
+                        dto.PorcentajeImpuesto,
+                        dto.ImagenPrincipalUrl,
+                        dto.Activo
+                    );
+
+                    var actualizado = await sender.Send(comando);
+                    if (!actualizado)
+                        return Results.NotFound(new ToReturnError<string>($"Producto con ID {id} no encontrado", 404));
+
+                    return Results.Ok(new ToReturn<string>("Producto actualizado correctamente"));
+                }
+                catch (Exception ex)
+                {
+                    var inner = ex.InnerException != null ? ex.InnerException.Message : "No Inner";
+                    var msg = $"ERR: {ex.Message} || INNER: {inner}";
+                    Console.WriteLine(msg);
+                    return Results.Json(new ToReturnError<string>(msg, 500), statusCode: 500);
+                }
+            });
+
+            // DELETE (lógico) Endpoint — pone Activado = false, no elimina físicamente
+            grupo.MapDelete("/{id:long}", async (long id, ISender sender) =>
+            {
+                var eliminado = await sender.Send(new EliminarProductoComando(id));
+                if (!eliminado)
+                    return Results.NotFound(new ToReturnError<string>($"Producto con ID {id} no encontrado", 404));
+
+                return Results.Ok(new ToReturn<string>("Producto desactivado correctamente"));
             });
         }
 

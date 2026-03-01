@@ -1,5 +1,4 @@
 import { apiConfiguracion } from "@/lib/axios";
-import { ToReturnList } from "@/types/api.types";
 
 export interface TipoDocumento {
   id: number;
@@ -12,8 +11,9 @@ export interface TipoDocumento {
 }
 
 export const tipoDocumentoService = {
-  getAll: async (): Promise<ToReturnList<TipoDocumento>> => {
-    // Usando el endpoint existente que ya devuelve los tipos de documento
-    return await apiConfiguracion.get("/reglasdocumentos/reglas");
+  /** Obtiene los tipos de documento desde la tabla configuracion.tipo_documento */
+  getAll: async (): Promise<TipoDocumento[]> => {
+    const response: any = await apiConfiguracion.get("/tipos-documento");
+    return response.datos || response.data || [];
   },
 };

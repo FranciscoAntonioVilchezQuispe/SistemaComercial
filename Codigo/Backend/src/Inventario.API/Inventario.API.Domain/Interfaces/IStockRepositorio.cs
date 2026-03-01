@@ -9,5 +9,6 @@ namespace Inventario.API.Domain.Interfaces
         Task<Stock?> ObtenerPorProductoAlmacenAsync(long idProducto, long idAlmacen);
         Task<IEnumerable<Stock>> ObtenerStockBajoAsync(decimal nivelMinimo);
         Task<IEnumerable<Stock>> ObtenerPorAlmacenAsync(long idAlmacen);
+        Task<IEnumerable<Stock>> ObtenerTodoAsync();
     }
 }

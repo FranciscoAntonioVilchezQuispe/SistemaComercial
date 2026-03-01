@@ -38,6 +38,7 @@ interface DialogoFinalizarVentaProps {
     serie: string,
     numero: number,
   ) => Promise<void>;
+  tipoComprobanteSeleccionado?: string;
 }
 
 export function DialogoFinalizarVenta({
@@ -52,12 +53,21 @@ export function DialogoFinalizarVenta({
   total,
   montoPagado,
   onConfirmar,
+  tipoComprobanteSeleccionado,
 }: DialogoFinalizarVentaProps) {
   const { data: tiposComprobante = [], isLoading: cargandoTipos } =
     useTipoComprobante("VENTA");
-  const [tipoComprobante, setTipoComprobante] = useState("");
+  const [tipoComprobante, setTipoComprobante] = useState(
+    tipoComprobanteSeleccionado || "",
+  );
   const [procesando, setProcesando] = useState(false);
   const [serieSeleccionada, setSerieSeleccionada] = useState<any>(null);
+
+  useEffect(() => {
+    if (tipoComprobanteSeleccionado) {
+      setTipoComprobante(tipoComprobanteSeleccionado);
+    }
+  }, [tipoComprobanteSeleccionado]);
 
   // Seleccionar el primero por defecto
   useEffect(() => {

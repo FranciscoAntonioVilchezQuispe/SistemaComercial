@@ -30,8 +30,8 @@ namespace Catalogo.Application.Manejadores
                 IdTipoProducto = request.IdTipoProducto,
 
                 // Códigos adicionales
-                CodigoBarras = request.CodigoBarras,
-                Sku = request.Sku,
+                CodigoBarras = string.IsNullOrWhiteSpace(request.CodigoBarras) ? null : request.CodigoBarras,
+                Sku = string.IsNullOrWhiteSpace(request.Sku) ? null : request.Sku,
 
                 // Stock
                 StockMinimo = request.StockMinimo,

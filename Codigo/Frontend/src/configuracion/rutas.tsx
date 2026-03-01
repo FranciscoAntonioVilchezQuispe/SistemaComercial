@@ -113,6 +113,16 @@ const PaginaListasPrecios = lazy(() =>
     default: m.default,
   })),
 );
+const PaginaStock = lazy(() =>
+  import("@/features/inventario/paginas/PaginaStock").then((m) => ({
+    default: m.PaginaStock,
+  })),
+);
+const PaginaMovimientos = lazy(() =>
+  import("@/features/inventario/paginas/PaginaMovimientos").then((m) => ({
+    default: m.PaginaMovimientos,
+  })),
+);
 const PaginaAlmacenes = lazy(() =>
   import("@/features/inventario/almacenes/paginas/PaginaAlmacenes").then(
     (m) => ({
@@ -340,6 +350,22 @@ export const ruteador = createBrowserRouter(
           element: (
             <Suspense fallback={<CargandoPagina />}>
               <PaginaTraslados />
+            </Suspense>
+          ),
+        },
+        {
+          path: "inventario/stock",
+          element: (
+            <Suspense fallback={<CargandoPagina />}>
+              <PaginaStock />
+            </Suspense>
+          ),
+        },
+        {
+          path: "inventario/movimientos",
+          element: (
+            <Suspense fallback={<CargandoPagina />}>
+              <PaginaMovimientos />
             </Suspense>
           ),
         },

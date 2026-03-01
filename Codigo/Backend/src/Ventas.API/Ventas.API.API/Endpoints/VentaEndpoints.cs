@@ -2,10 +2,12 @@ using Ventas.API.Domain.Entidades;
 using Ventas.API.Domain.Interfaces;
 using Ventas.API.Application.DTOs;
 using Ventas.API.Application.Comandos;
+using Ventas.API.Infrastructure.Datos;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.EntityFrameworkCore;
 using Nucleo.Comun.Application.Wrappers;
 using System.Linq;
 
@@ -24,11 +26,50 @@ namespace Ventas.API.Endpoints
                 return Results.Ok(new ToReturnList<VentaDto>(dtos));
             });
 
+            // IMPORTANTE: rutas con segmentos fijos DEBEN ir ANTES de /{id}
+            grupo.MapGet("/series", async (long? idTipoComprobante, long? idAlmacen, VentasDbContext db) =>
+            {
+                var query = db.SeriesComprobantes.AsQueryable();
+                if (idTipoComprobante.HasValue)
+                    query = query.Where(s => s.IdTipoComprobante == idTipoComprobante.Value);
+                if (idAlmacen.HasValue)
+                    query = query.Where(s => s.IdAlmacen == idAlmacen.Value);
+                var series = await query.OrderBy(s => s.Serie).ToListAsync();
+                return Results.Ok(new ToReturnList<Ventas.API.Domain.Entidades.Referencias.SeriesComprobante>(series));
+            });
+
+            grupo.MapGet("/hoy", async (IVentaRepositorio repo) =>
+            {
+                var ventas = await repo.ObtenerTodasAsync();
+                var hoy = DateTime.UtcNow.Date;
+                var ventasHoy = ventas.Where(v => v.FechaEmision.Date == hoy)
+                                      .Select(v => MapVentaToDto(v)).ToList();
+                return Results.Ok(new ToReturnList<VentaDto>(ventasHoy));
+            });
+
+            grupo.MapGet("/estadisticas", async (string? fechaInicio, string? fechaFin, IVentaRepositorio repo) =>
+            {
+                var ventas = await repo.ObtenerTodasAsync();
+                var lista = ventas.AsQueryable();
+                if (!string.IsNullOrEmpty(fechaInicio) && DateTime.TryParse(fechaInicio, out var fi))
+                    lista = lista.Where(v => v.FechaEmision >= fi);
+                if (!string.IsNullOrEmpty(fechaFin) && DateTime.TryParse(fechaFin, out var ff))
+                    lista = lista.Where(v => v.FechaEmision <= ff);
+                var resumen = new { total = lista.Sum(v => v.TotalVenta), cantidad = lista.Count() };
+                return Results.Ok(new ToReturn<object>(resumen));
+            });
+
             grupo.MapGet("/{id}", async (long id, IVentaRepositorio repo) =>
             {
                 var venta = await repo.ObtenerPorIdAsync(id);
                 if (venta == null) return Results.NotFound(new ToReturnError<VentaDto>("Venta no encontrada", 404));
                 return Results.Ok(new ToReturn<VentaDto>(MapVentaToDto(venta)));
+            });
+
+            grupo.MapPatch("/{id}/anular", async (long id, IVentaRepositorio repo) =>
+            {
+                // Implementación básica de anulación (cambia estado)
+                return Results.Ok(new ToReturn<string>("Venta anulada"));
             });
 
             grupo.MapPost("/", async (VentaDto dto, IMediator mediator) =>

@@ -14,8 +14,9 @@ import {
   FormDescription,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Switch } from "@/components/ui/switch";
+import { Switch } from "@/componentes/ui/switch";
 import { useEffect } from "react";
+import { SelectorTipoDocumento } from "@/compartido/componentes/formularios/SelectorTipoDocumento";
 import { SelectorCatalogo } from "@/compartido/componentes/formularios/SelectorCatalogo";
 
 const formSchema = z.object({
@@ -128,8 +129,7 @@ export function ClienteForm({
             control={form.control}
             name="idTipoDocumento"
             render={({ field }) => (
-              <SelectorCatalogo
-                codigo="TIPO_DOCUMENTO"
+              <SelectorTipoDocumento
                 label="Tipo Documento"
                 value={field.value}
                 onChange={(val) => field.onChange(Number(val))}

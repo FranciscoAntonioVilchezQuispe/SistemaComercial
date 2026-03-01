@@ -24,6 +24,7 @@ import { useClientes, useEliminarCliente } from "../hooks/useClientes";
 import { Cliente } from "../types/cliente.types";
 import { ClienteForm } from "../componentes/ClienteForm";
 import { useCatalogo } from "@/features/configuracion/hooks/useCatalogo";
+import { useTipoDocumento } from "@/features/configuracion/hooks/useTipoDocumento";
 
 export function PaginaClientes() {
   const [dialogoOpen, setDialogoOpen] = useState(false);
@@ -34,9 +35,9 @@ export function PaginaClientes() {
   const { data: clientes, isLoading, error } = useClientes();
   const eliminarCliente = useEliminarCliente();
 
-  // Cargamos catalogos para mostrar nombres en la tabla
-  // "TIPO_DOCUMENTO", "TIPO_CLIENTE"
-  const { data: tiposDocumento } = useCatalogo("TIPO_DOCUMENTO");
+  // Cargamos tipos de documento desde configuracion.tipo_documento y
+  // tipo cliente desde el catálogo de detalle
+  const { data: tiposDocumento } = useTipoDocumento();
   const { data: tiposCliente } = useCatalogo("TIPO_CLIENTE");
 
   const handleEliminar = (cliente: Cliente) => {
@@ -64,8 +65,8 @@ export function PaginaClientes() {
           (t: any) => t.id === row.idTipoDocumento,
         );
         return (
-          <span className="text-xs font-medium text-muted-foreground">
-            {tipo?.nombre || row.idTipoDocumento}
+          <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold uppercase bg-muted text-muted-foreground">
+            {tipo?.nombre || tipo?.codigo || row.idTipoDocumento}
           </span>
         );
       },

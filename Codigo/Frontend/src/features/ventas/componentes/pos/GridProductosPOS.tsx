@@ -20,7 +20,7 @@ interface StockDto {
 }
 
 interface RespuestaStock {
-  data: StockDto[];
+  datos: StockDto[];
 }
 
 export function GridProductosPOS() {
@@ -44,7 +44,7 @@ export function GridProductosPOS() {
 
   // Mapa idProducto → cantidadActual para búsqueda O(1)
   const stockMap = new Map<number, number>(
-    (stockData?.data ?? []).map((s) => [s.idProducto, s.cantidadActual]),
+    (stockData?.datos ?? []).map((s) => [s.idProducto, s.cantidadActual]),
   );
 
   const { agregarProducto } = useCarrito();
@@ -75,7 +75,6 @@ export function GridProductosPOS() {
               const stockReal = stockMap.get(producto.id) ?? 0;
               const stockBajo = stockReal <= producto.stockMinimo;
               const sinStock = stockReal === 0;
-
               return (
                 <Card
                   key={producto.id}

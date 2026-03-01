@@ -33,7 +33,7 @@ import {
 import { useProveedores, useEliminarProveedor } from "../hooks/useProveedores";
 import { Proveedor } from "../types/proveedor.types";
 import { ProveedorForm } from "../componentes/ProveedorForm";
-import { useCatalogo } from "@/features/configuracion/hooks/useCatalogo";
+import { useTipoDocumento } from "@/features/configuracion/hooks/useTipoDocumento";
 
 export default function PaginaProveedores() {
   const [dialogoOpen, setDialogoOpen] = useState(false);
@@ -45,7 +45,8 @@ export default function PaginaProveedores() {
   const eliminarProveedor = useEliminarProveedor();
   const [eliminarId, setEliminarId] = useState<number | null>(null);
 
-  const { data: tiposDocumento } = useCatalogo("TIPO_DOCUMENTO");
+  // Tipos de documento desde configuracion.tipo_documento
+  const { data: tiposDocumento } = useTipoDocumento();
 
   // Eliminación ahora mediante AlertDialog: abrir con setEliminarId
 
@@ -65,8 +66,8 @@ export default function PaginaProveedores() {
           (t: any) => t.id === row.idTipoDocumento,
         );
         return (
-          <span className="text-xs font-medium text-muted-foreground">
-            {tipo?.codigo || row.idTipoDocumento}
+          <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold uppercase bg-muted text-muted-foreground">
+            {tipo?.nombre || tipo?.codigo || row.idTipoDocumento}
           </span>
         );
       },
@@ -154,9 +155,9 @@ export default function PaginaProveedores() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <DataTable 
-            data={proveedoresFiltrados} 
-            columns={columnas} 
+          <DataTable
+            data={proveedoresFiltrados}
+            columns={columnas}
             onSearchChange={setFiltro}
             searchPlaceholder="Buscar por razón social o documento..."
             actionElement={
@@ -219,7 +220,8 @@ export default function PaginaProveedores() {
                       toast.success("Proveedor eliminado correctamente");
                       setEliminarId(null);
                     },
-                    onError: () => toast.error("Error al eliminar el proveedor"),
+                    onError: () =>
+                      toast.error("Error al eliminar el proveedor"),
                   });
                 }
               }}

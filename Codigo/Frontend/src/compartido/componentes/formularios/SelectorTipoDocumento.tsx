@@ -23,7 +23,7 @@ interface SelectorTipoDocumentoProps {
   onChange: (value: string) => void;
   disabled?: boolean;
   hideLabel?: boolean;
-  soloCodigo?: boolean; // Para mostrar solo el código en lugar del nombre completo
+  soloCodigo?: boolean;
 }
 
 export const SelectorTipoDocumento: React.FC<SelectorTipoDocumentoProps> = ({
@@ -37,12 +37,14 @@ export const SelectorTipoDocumento: React.FC<SelectorTipoDocumentoProps> = ({
 }) => {
   const { data: tipos, isLoading, isError } = useTipoDocumento();
 
+  const listaFiltrada = tipos ?? [];
+
   return (
     <FormItem>
       {!hideLabel && <FormLabel>{label}</FormLabel>}
       <Select
         onValueChange={onChange}
-        value={value?.toString()}
+        value={value != null ? value.toString() : undefined}
         disabled={disabled || isLoading}
       >
         <FormControl>
@@ -50,7 +52,7 @@ export const SelectorTipoDocumento: React.FC<SelectorTipoDocumentoProps> = ({
             {isLoading ? (
               <div className="flex items-center gap-2">
                 <Loader2 className="h-4 w-4 animate-spin" />
-                <span>...</span>
+                <span>Cargando...</span>
               </div>
             ) : (
               <SelectValue placeholder={placeholder} />
@@ -60,16 +62,19 @@ export const SelectorTipoDocumento: React.FC<SelectorTipoDocumentoProps> = ({
         <SelectContent>
           {isError && (
             <SelectItem value="error" disabled>
-              Error al cargar datos
+              Error al cargar tipos de documento
             </SelectItem>
           )}
-          {!isLoading && !isError && tipos?.length === 0 && (
+          {!isLoading && !isError && listaFiltrada.length === 0 && (
             <SelectItem value="none" disabled>
-              No hay opciones disponibles
+              No hay tipos disponibles
             </SelectItem>
           )}
-          {tipos?.map((tipo: TipoDocumento) => (
+          {listaFiltrada.map((tipo: TipoDocumento) => (
             <SelectItem key={tipo.id} value={tipo.id.toString()}>
+              <span className="font-mono text-xs text-muted-foreground mr-2">
+                {tipo.codigo}
+              </span>
               {soloCodigo ? tipo.codigo : tipo.nombre}
             </SelectItem>
           ))}

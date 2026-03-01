@@ -36,5 +36,10 @@ namespace Inventario.API.Infrastructure.Repositorios
                 .Where(s => s.IdAlmacen == idAlmacen)
                 .ToListAsync();
         }
+
+        public async Task<IEnumerable<Stock>> ObtenerTodoAsync()
+        {
+            return await _context.Stocks.ToListAsync();
+        }
     }
 }

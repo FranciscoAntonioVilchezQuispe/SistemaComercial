@@ -27,6 +27,8 @@ import { useCategorias } from "../../hooks/useCategorias";
 import { useMarcas } from "../../hooks/useMarcas";
 import { useUnidadesMedida } from "../../hooks/useUnidadesMedida";
 import { useEffect } from "react";
+import { limpiarDecimal } from "@compartido/utilidades";
+import { toast } from "sonner";
 
 const formSchema = z.object({
   // Información básica
@@ -35,9 +37,9 @@ const formSchema = z.object({
   descripcion: z.string().optional(),
 
   // Relaciones
-  idCategoria: z.coerce.number().min(1, "Seleccione una categoría"),
-  idMarca: z.coerce.number().min(1, "Seleccione una marca"),
-  idUnidadMedida: z.coerce.number().min(1, "Seleccione una unidad"),
+  idCategoria: z.coerce.number().min(0),
+  idMarca: z.coerce.number().min(0),
+  idUnidadMedida: z.coerce.number().min(0),
   idTipoProducto: z.coerce.number().optional(),
 
   // Códigos adicionales
@@ -118,7 +120,7 @@ export function ProductoForm({
       idCategoria: 0,
       idMarca: 0,
       idUnidadMedida: 0,
-      idTipoProducto: 1,
+      idTipoProducto: undefined,
       codigoBarras: "",
       sku: "",
       precioCompra: 0,
@@ -145,7 +147,7 @@ export function ProductoForm({
         idCategoria: datosIniciales.idCategoria,
         idMarca: datosIniciales.idMarca,
         idUnidadMedida: datosIniciales.idUnidadMedida,
-        idTipoProducto: datosIniciales.idTipoProducto,
+        idTipoProducto: datosIniciales.idTipoProducto ?? undefined,
         codigoBarras: datosIniciales.codigoBarras || "",
         sku: datosIniciales.sku || "",
         precioCompra: datosIniciales.precioCompra,
@@ -166,9 +168,29 @@ export function ProductoForm({
 
   const gravadoImpuesto = form.watch("gravadoImpuesto");
 
+  const onInvalid = (errors: any) => {
+    const nombres: Record<string, string> = {
+      codigo: "Código",
+      nombre: "Nombre",
+      idCategoria: "Categoría",
+      idMarca: "Marca",
+      idUnidadMedida: "Unidad de medida",
+      precioCompra: "Precio compra",
+      precioVentaPublico: "Precio público",
+      stockMinimo: "Stock mínimo",
+    };
+    const campos = Object.keys(errors)
+      .map((k) => nombres[k] || k)
+      .join(", ");
+    toast.error(`Campos con error: ${campos}`);
+  };
+
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(alEnviar)} className="space-y-4">
+      <form
+        onSubmit={form.handleSubmit(alEnviar, onInvalid)}
+        className="space-y-4"
+      >
         <Tabs defaultValue="general" className="w-full">
           <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 h-auto">
             <TabsTrigger value="general">General</TabsTrigger>
@@ -359,10 +381,13 @@ export function ProductoForm({
                     <FormLabel>Precio de Compra *</FormLabel>
                     <FormControl>
                       <Input
-                        type="number"
-                        step="0.01"
+                        type="text"
+                        inputMode="decimal"
                         placeholder="0.00"
                         {...field}
+                        onChange={(e) =>
+                          field.onChange(limpiarDecimal(e.target.value))
+                        }
                       />
                     </FormControl>
                     <FormDescription>Costo de adquisición</FormDescription>
@@ -378,10 +403,13 @@ export function ProductoForm({
                     <FormLabel>Precio Venta Público *</FormLabel>
                     <FormControl>
                       <Input
-                        type="number"
-                        step="0.01"
+                        type="text"
+                        inputMode="decimal"
                         placeholder="0.00"
                         {...field}
+                        onChange={(e) =>
+                          field.onChange(limpiarDecimal(e.target.value))
+                        }
                       />
                     </FormControl>
                     <FormDescription>
@@ -402,10 +430,13 @@ export function ProductoForm({
                     <FormLabel>Precio Venta Mayorista</FormLabel>
                     <FormControl>
                       <Input
-                        type="number"
-                        step="0.01"
+                        type="text"
+                        inputMode="decimal"
                         placeholder="0.00"
                         {...field}
+                        onChange={(e) =>
+                          field.onChange(limpiarDecimal(e.target.value))
+                        }
                       />
                     </FormControl>
                     <FormDescription>Precio para mayoristas</FormDescription>
@@ -421,10 +452,13 @@ export function ProductoForm({
                     <FormLabel>Precio Venta Distribuidor</FormLabel>
                     <FormControl>
                       <Input
-                        type="number"
-                        step="0.01"
+                        type="text"
+                        inputMode="decimal"
                         placeholder="0.00"
                         {...field}
+                        onChange={(e) =>
+                          field.onChange(limpiarDecimal(e.target.value))
+                        }
                       />
                     </FormControl>
                     <FormDescription>
@@ -448,10 +482,13 @@ export function ProductoForm({
                     <FormLabel>Stock Mínimo *</FormLabel>
                     <FormControl>
                       <Input
-                        type="number"
-                        step="0.001"
+                        type="text"
+                        inputMode="decimal"
                         placeholder="0"
                         {...field}
+                        onChange={(e) =>
+                          field.onChange(limpiarDecimal(e.target.value))
+                        }
                       />
                     </FormControl>
                     <FormDescription>
@@ -469,10 +506,13 @@ export function ProductoForm({
                     <FormLabel>Stock Máximo</FormLabel>
                     <FormControl>
                       <Input
-                        type="number"
-                        step="0.001"
+                        type="text"
+                        inputMode="decimal"
                         placeholder="0"
                         {...field}
+                        onChange={(e) =>
+                          field.onChange(limpiarDecimal(e.target.value))
+                        }
                       />
                     </FormControl>
                     <FormDescription>Límite de almacenamiento</FormDescription>
@@ -565,11 +605,14 @@ export function ProductoForm({
                     <FormLabel>Porcentaje de Impuesto (%)</FormLabel>
                     <FormControl>
                       <Input
-                        type="number"
-                        step="0.01"
+                        type="text"
+                        inputMode="decimal"
                         placeholder="18.00"
                         disabled={!gravadoImpuesto}
                         {...field}
+                        onChange={(e) =>
+                          field.onChange(limpiarDecimal(e.target.value))
+                        }
                       />
                     </FormControl>
                     <FormDescription>

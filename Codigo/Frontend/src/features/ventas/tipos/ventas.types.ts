@@ -50,10 +50,13 @@ export interface VentaFormData {
   idCliente: number;
   idTipoComprobante: number;
   idAlmacen: number;
-  idMoneda: number;
   serie: string;
   numero: number;
   tipoCambio: number;
+  moneda: string;
+  subtotalGravado: number;
+  totalImpuesto: number;
+  totalVenta: number;
   observaciones?: string;
   detalles: DetalleVentaFormData[];
 }

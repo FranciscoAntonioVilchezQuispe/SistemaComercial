@@ -13,6 +13,33 @@ namespace Inventario.API.Endpoints
         public static void MapStockEndpoints(this IEndpointRouteBuilder app)
         {
             var grupo = app.MapGroup("/api/inventario/stock").WithTags("Stock");
+            
+            grupo.MapGet("/", async (long? idAlmacen, IStockRepositorio repo) =>
+            {
+                IEnumerable<Stock> stockList;
+                if (idAlmacen.HasValue)
+                {
+                    stockList = await repo.ObtenerPorAlmacenAsync(idAlmacen.Value);
+                }
+                else
+                {
+                    stockList = await repo.ObtenerTodoAsync();
+                }
+
+                var dtos = stockList.Select(s => new StockDto
+                {
+                    Id = s.Id,
+                    IdProducto = s.IdProducto,
+                    IdVariante = s.IdVariante,
+                    IdAlmacen = s.IdAlmacen,
+                    CantidadActual = s.CantidadActual,
+                    CantidadReservada = s.CantidadReservada,
+                    UbicacionFisica = s.UbicacionFisica,
+                    FechaActualizacion = s.FechaActualizacion ?? s.FechaCreacion
+                }).ToList();
+
+                return Results.Ok(new ToReturnList<StockDto>(dtos));
+            });
 
             grupo.MapGet("/producto/{idProducto}/almacen/{idAlmacen}", async (long idProducto, long idAlmacen, IStockRepositorio repo) =>
             {

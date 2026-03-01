@@ -45,6 +45,7 @@ export function CarritoCompras() {
     });
   const [montoPagado, setMontoPagado] = useState<number>(total);
   const [dialogoOpen, setDialogoOpen] = useState(false);
+  const [tipoComprobante, setTipoComprobante] = useState<string>("2"); // Boleta por defecto
 
   const crearVentaMutation = useCrearVenta();
   const cantidadTotal = obtenerCantidadItems();
@@ -90,10 +91,13 @@ export function CarritoCompras() {
         idCliente: clienteSeleccionado?.id || 0, // 0 = Público General
         idTipoComprobante: Number(tipoComprobante),
         idAlmacen: 1, // TODO: Obtener del contexto de usuario/sucursal. Por ahora 1.
-        idMoneda: 1, // TODO: Selector de moneda. Por ahora 1 (Soles).
         serie: serie,
         numero: numero,
         tipoCambio: 1, // TODO: Obtener tipo de cambio actual.
+        moneda: "PEN", // Ahora enviamos el string que el backend espera
+        subtotalGravado: subtotal,
+        totalImpuesto: igv,
+        totalVenta: total,
         observaciones: `Método de pago: ${metodoPagoSeleccionado.nombre}`,
         detalles,
       };
@@ -135,6 +139,8 @@ export function CarritoCompras() {
           <SelectorCliente
             onSeleccionar={setClienteSeleccionado}
             clienteSeleccionado={clienteSeleccionado}
+            tipoComprobante={tipoComprobante}
+            onTipoComprobanteChange={setTipoComprobante}
           />
 
           <Separator />
@@ -307,6 +313,7 @@ export function CarritoCompras() {
         total={total}
         montoPagado={montoPagado}
         onConfirmar={handleConfirmarVenta}
+        tipoComprobanteSeleccionado={tipoComprobante}
       />
     </>
   );

@@ -6,7 +6,7 @@ import {
   useActualizarProveedor,
 } from "../hooks/useProveedores";
 import { Proveedor, ProveedorFormData } from "../types/proveedor.types";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/componentes/ui/button";
 import {
   Form,
   FormControl,
@@ -15,11 +15,11 @@ import {
   FormLabel,
   FormMessage,
   FormDescription,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Switch } from "@/components/ui/switch";
+} from "@/componentes/ui/form";
+import { Input } from "@/componentes/ui/input";
+import { Switch } from "@/componentes/ui/switch";
 import { useEffect } from "react";
-import { SelectorCatalogo } from "@/compartido/componentes/formularios/SelectorCatalogo";
+import { SelectorTipoDocumento } from "@/compartido/componentes/formularios/SelectorTipoDocumento";
 import {
   useClientes,
   useCrearCliente,
@@ -187,8 +187,7 @@ export function ProveedorForm({
             control={form.control}
             name="idTipoDocumento"
             render={({ field }) => (
-              <SelectorCatalogo
-                codigo="TIPO_DOCUMENTO"
+              <SelectorTipoDocumento
                 label="Tipo Documento *"
                 value={field.value}
                 onChange={(val) => field.onChange(Number(val))}

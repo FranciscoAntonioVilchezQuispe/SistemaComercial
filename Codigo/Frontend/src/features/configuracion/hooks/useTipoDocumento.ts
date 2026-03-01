@@ -6,13 +6,13 @@ import {
 
 /**
  * Hook para obtener los tipos de documento desde la tabla tipo_documento.
- * Utiliza React Query para el manejo de caché y estado.
+ * El servicio ya extrae los datos de la respuesta del API, por lo que
+ * este hook los recibe directamente como TipoDocumento[].
  */
 export const useTipoDocumento = (): UseQueryResult<TipoDocumento[], Error> => {
   return useQuery({
     queryKey: ["tipos-documento"],
     queryFn: () => tipoDocumentoService.getAll(),
-    select: (response: any) => response.datos || response.data || [],
     staleTime: 1000 * 60 * 10, // 10 minutos de caché
     refetchOnWindowFocus: false,
   });
