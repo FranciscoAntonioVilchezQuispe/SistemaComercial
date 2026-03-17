@@ -11,12 +11,14 @@ import {
 } from "@/componentes/ui/card";
 import { Button } from "@/componentes/ui/button";
 import { Input } from "@/componentes/ui/input";
-import { ContenedorPagina } from "@/compartido/componentes/ContenedorPagina";
 import { kardexService } from "../servicios/servicioKardex";
 
 type FormValues = {
   periodo: string;
 };
+
+import { ModuleTabBar } from "@/componentes/shared/ModuleTabBar";
+import { RUTAS_TITULOS } from "@/config/rutasTitulos";
 
 export default function PaginaKardexPeriodos() {
   const [procesandoAbrir, setProcesandoAbrir] = useState(false);
@@ -34,6 +36,15 @@ export default function PaginaKardexPeriodos() {
   });
 
   const periodoObservado = watch("periodo");
+
+  const tabsInventario = [
+     { label: RUTAS_TITULOS["/inventario/stock"], to: "/inventario/stock" },
+    { label: RUTAS_TITULOS["/inventario/movimientos"], to: "/inventario/movimientos" },
+    { label: RUTAS_TITULOS["/inventario/traslados"], to: "/inventario/traslados" },
+    { label: RUTAS_TITULOS["/inventario/kardex/reporte"], to: "/inventario/kardex/reporte" },
+    { label: RUTAS_TITULOS["/inventario/kardex/periodos"], to: "/inventario/kardex/periodos" },
+    { label: RUTAS_TITULOS["/inventario/almacenes"], to: "/inventario/almacenes" },
+  ];
 
   const onAbrir = async (data: FormValues) => {
     try {
@@ -69,12 +80,11 @@ export default function PaginaKardexPeriodos() {
   };
 
   return (
-    <ContenedorPagina
-      titulo="Control de Periodos del Kardex"
-      descripcion="Abre o cierra meses fiscales para permitir u bloquear movimientos en el Kardex"
-    >
-      <div className="max-w-xl mt-6">
-        <Card>
+    <div className="space-y-4">
+      <ModuleTabBar tabs={tabsInventario} />
+
+      <div className="max-w-xl">
+        <Card className="shadow-none border-muted/20">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <CalendarDays className="h-5 w-5" />
@@ -110,6 +120,7 @@ export default function PaginaKardexPeriodos() {
                   onClick={handleSubmit(onAbrir)}
                   disabled={procesandoAbrir || procesandoCerrar}
                   className="w-full bg-green-600 hover:bg-green-700 text-white"
+                  size="sm"
                 >
                   <Unlock className="w-4 h-4 mr-2" />
                   Abrir Periodo {periodoObservado}
@@ -119,6 +130,7 @@ export default function PaginaKardexPeriodos() {
                   disabled={procesandoAbrir || procesandoCerrar}
                   variant="destructive"
                   className="w-full"
+                  size="sm"
                 >
                   <Lock className="w-4 h-4 mr-2" />
                   Cerrar Periodo {periodoObservado}
@@ -128,6 +140,6 @@ export default function PaginaKardexPeriodos() {
           </CardContent>
         </Card>
       </div>
-    </ContenedorPagina>
+    </div>
   );
 }

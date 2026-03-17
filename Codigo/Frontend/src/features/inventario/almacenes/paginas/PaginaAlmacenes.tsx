@@ -10,13 +10,7 @@ import {
 import { DataTable } from "@/components/ui/DataTable";
 import { Loading } from "@compartido/componentes/feedback/Loading";
 import { MensajeError } from "@compartido/componentes/feedback/MensajeError";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -29,11 +23,12 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-
 import { useAlmacenes, useEliminarAlmacen } from "../hooks/useAlmacenes";
 import { useSucursales } from "@/features/configuracion/hooks/useSucursales";
 import { Almacen } from "../types/almacen.types";
 import { AlmacenForm } from "../componentes/AlmacenForm";
+import { ModuleTabBar } from "@/componentes/shared/ModuleTabBar";
+import { RUTAS_TITULOS } from "@/config/rutasTitulos";
 
 export default function PaginaAlmacenes() {
   const [dialogoOpen, setDialogoOpen] = useState(false);
@@ -46,13 +41,21 @@ export default function PaginaAlmacenes() {
   const { data: sucursales } = useSucursales();
   const eliminarAlmacen = useEliminarAlmacen();
 
-  // Eliminación ahora mediante AlertDialog: abrir con setEliminarId
+  const tabsInventario = [
+    { label: RUTAS_TITULOS["/inventario/stock"], to: "/inventario/stock" },
+    { label: RUTAS_TITULOS["/inventario/movimientos"], to: "/inventario/movimientos" },
+    { label: RUTAS_TITULOS["/inventario/traslados"], to: "/inventario/traslados" },
+    { label: RUTAS_TITULOS["/inventario/kardex/reporte"], to: "/inventario/kardex/reporte" },
+    { label: RUTAS_TITULOS["/inventario/kardex/periodos"], to: "/inventario/kardex/periodos" },
+    { label: RUTAS_TITULOS["/inventario/almacenes"], to: "/inventario/almacenes" },
+  ];
 
   const almacenesFiltrados =
     almacenes?.filter((a) =>
       a.nombreAlmacen.toLowerCase().includes(filtro.toLowerCase()),
     ) || [];
 
+// ... columnas ...
   const columnas = [
     {
       header: "Nombre",
@@ -136,28 +139,23 @@ export default function PaginaAlmacenes() {
   if (error) return <MensajeError mensaje="Error al cargar almacenes" />;
 
   return (
-    <div className="space-y-6">
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-          <div>
-            <CardTitle className="text-2xl font-bold">
-              Gestión de Almacenes
-            </CardTitle>
-            <CardDescription>
-              Administre las ubicaciones donde se gestiona el inventario.
-            </CardDescription>
-          </div>
-          <Button
-            onClick={() => {
-              setAlmacenSeleccionado(null);
-              setDialogoOpen(true);
-            }}
-            className="shadow-sm"
-          >
-            <Plus className="mr-2 h-4 w-4" /> Nuevo Almacén
-          </Button>
-        </CardHeader>
-        <CardContent>
+    <div className="space-y-4">
+      <ModuleTabBar tabs={tabsInventario} />
+
+      <div className="flex justify-end gap-2 mb-2">
+        <Button
+          onClick={() => {
+            setAlmacenSeleccionado(null);
+            setDialogoOpen(true);
+          }}
+          size="sm"
+        >
+          <Plus className="mr-2 h-4 w-4" /> Nuevo Almacén
+        </Button>
+      </div>
+
+      <Card className="shadow-none border-muted/20">
+        <CardContent className="pt-6">
           <DataTable
             data={almacenesFiltrados}
             columns={columnas}

@@ -8,7 +8,6 @@ import {
 } from "lucide-react";
 import { formatFecha } from "@compartido/utilidades";
 import { useNavigate } from "react-router-dom";
-
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -29,16 +28,9 @@ import {
 import { DataTable } from "@/components/ui/DataTable";
 import { Loading } from "@compartido/componentes/feedback/Loading";
 import { MensajeError } from "@compartido/componentes/feedback/MensajeError";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-
 import {
   useOrdenesCompra,
   useCambiarEstadoOrdenCompra,
@@ -49,6 +41,8 @@ import {
   EstadoOrdenCompra,
   EstadoOrdenCompraEtiquetas,
 } from "../../constantes";
+import { ModuleTabBar } from "@/componentes/shared/ModuleTabBar";
+import { RUTAS_TITULOS } from "@/config/rutasTitulos";
 
 export default function PaginaOrdenCompra() {
   const navigate = useNavigate();
@@ -62,11 +56,18 @@ export default function PaginaOrdenCompra() {
   const { data: ordenes, isLoading, error } = useOrdenesCompra();
   const cambiarEstado = useCambiarEstadoOrdenCompra();
 
+  const tabsCompras = [
+    { label: RUTAS_TITULOS["/proveedores/ordenes"], to: "/proveedores/ordenes" },
+    { label: RUTAS_TITULOS["/compras/lista"], to: "/compras/lista" },
+    { label: RUTAS_TITULOS["/proveedores"], to: "/proveedores" },
+  ];
+
   const handleCambiarEstado = (
     id: number,
     nuevoEstado: EstadoOrdenCompra,
     mensaje: string,
   ) => {
+// ... resto de la lógica ...
     cambiarEstado.mutate(
       { id, idEstado: nuevoEstado },
       {
@@ -91,6 +92,7 @@ export default function PaginaOrdenCompra() {
         o.id.toString().includes(filtro),
     ) || [];
 
+// ... columnas ...
   const columnas = [
     {
       header: "Código",
@@ -135,81 +137,75 @@ export default function PaginaOrdenCompra() {
     {
       header: "Acciones",
       className: "text-right",
-      cell: (row: OrdenCompra) => (
-        <div className="flex justify-end gap-1">
-          <Button
-            variant="ghost"
-            size="icon"
-            title="Ver Detalle"
-            onClick={() => {
-              setOrdenSeleccionada(row);
-              setModoCreacion(false);
-              setDialogoOpen(true);
-            }}
-          >
-            <Eye className="h-4 w-4" />
-          </Button>
-
-          {row.idEstado === EstadoOrdenCompra.Pendiente && (
-            <>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="text-green-600"
-                title="Aprobar"
-                onClick={() =>
-                  handleCambiarEstado(
-                    row.id,
-                    EstadoOrdenCompra.Aprobada,
-                    "Orden aprobada",
-                  )
-                }
-              >
-                <CheckCircle className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="text-orange-600"
-                title="Rechazar"
-                onClick={() =>
-                  handleCambiarEstado(
-                    row.id,
-                    EstadoOrdenCompra.Rechazada,
-                    "Orden rechazada",
-                  )
-                }
-              >
-                <XCircle className="h-4 w-4" />
-              </Button>
-            </>
-          )}
-
-          {row.idEstado === EstadoOrdenCompra.Aprobada && (
+      cell: (row: OrdenCompra) => {
+        return (
+          <div className="flex justify-end gap-1">
             <Button
-              variant="outline"
-              size="sm"
-              className="text-blue-600 border-blue-200 hover:bg-blue-50"
-              title="Generar Compra"
-              onClick={() =>
-                navigate("/compras/lista", { state: { orden: row } })
-              }
+              variant="ghost"
+              size="icon"
+              title="Ver Detalle"
+              onClick={() => {
+                setOrdenSeleccionada(row);
+                setModoCreacion(false);
+                setDialogoOpen(true);
+              }}
+              className="h-8 w-8"
             >
-              <ShoppingBag className="h-3 w-3 mr-1" />
+              <Eye className="h-4 w-4" />
             </Button>
-          )}
 
-          <Button
-            variant="ghost"
-            size="icon"
-            className="text-destructive"
-            title="Eliminar (Rechazar)"
-            onClick={() => setEliminarId(row.id)}
-          >
-            <XCircle className="h-4 w-4" />
-          </Button>
-        </div>
-      ),
+            {row.idEstado === EstadoOrdenCompra.Pendiente && (
+              <>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="text-green-600 h-8 w-8"
+                  title="Aprobar"
+                  onClick={() =>
+                    handleCambiarEstado(
+                      row.id,
+                      EstadoOrdenCompra.Aprobada,
+                      "Orden aprobada",
+                    )
+                  }
+                >
+                  <CheckCircle className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="text-orange-600 h-8 w-8"
+                  title="Rechazar"
+                  onClick={() =>
+                    handleCambiarEstado(
+                      row.id,
+                      EstadoOrdenCompra.Rechazada,
+                      "Orden rechazada",
+                    )
+                  }
+                >
+                  <XCircle className="h-4 w-4" />
+                </Button>
+              </>
+            )}
+
+            {row.idEstado === EstadoOrdenCompra.Aprobada && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="text-blue-600 border-blue-200 hover:bg-blue-50 h-8 px-2"
+                title="Generar Compra"
+                onClick={() =>
+                  navigate("/compras/lista", { state: { orden: row } })
+                }
+              >
+                <ShoppingBag className="h-3 w-3 mr-1" />
+                Comprar
+              </Button>
+            )}
+          </div>
+        );
+      },
     },
   ];
 
@@ -217,29 +213,24 @@ export default function PaginaOrdenCompra() {
   if (error) return <MensajeError mensaje="Error al cargar órdenes" />;
 
   return (
-    <div className="space-y-6">
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-          <div>
-            <CardTitle className="text-2xl font-bold">
-              Órdenes de Compra
-            </CardTitle>
-            <CardDescription>
-              Gestión de pedidos a proveedores y registro histórico.
-            </CardDescription>
-          </div>
-          <Button
-            onClick={() => {
-              setOrdenSeleccionada(null);
-              setModoCreacion(true);
-              setDialogoOpen(true);
-            }}
-            className="shadow-sm"
-          >
-            <Plus className="mr-2 h-4 w-4" /> Nueva Orden
-          </Button>
-        </CardHeader>
-        <CardContent>
+    <div className="space-y-4">
+      <ModuleTabBar tabs={tabsCompras} />
+
+      <div className="flex justify-end gap-2 mb-2">
+        <Button
+          onClick={() => {
+            setOrdenSeleccionada(null);
+            setModoCreacion(true);
+            setDialogoOpen(true);
+          }}
+          size="sm"
+        >
+          <Plus className="mr-2 h-4 w-4" /> Nueva Orden
+        </Button>
+      </div>
+
+      <Card className="shadow-none border-muted/20">
+        <CardContent className="pt-6">
           <DataTable
             data={ordenesFiltradas}
             columns={columnas}

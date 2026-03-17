@@ -9,7 +9,8 @@ const BASE_URL = "/tipos-comprobante";
 export const servicioTipoComprobante = {
   obtenerTodos: async (): Promise<TipoComprobante[]> => {
     const response: any = await apiConfiguracion.get(BASE_URL);
-    return response.datos || response.data || response;
+    const lista = response.datos || response.data || response;
+    return Array.isArray(lista) ? lista : [];
   },
 
   crear: async (datos: TipoComprobanteFormData): Promise<TipoComprobante> => {

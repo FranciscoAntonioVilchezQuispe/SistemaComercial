@@ -112,13 +112,13 @@ export function DataTable<T extends { id: number | string }>({
                   Cargando datos...
                 </TableCell>
               </TableRow>
-            ) : data.length === 0 ? (
+            ) : !Array.isArray(data) || data.length === 0 ? (
               <TableRow>
                 <TableCell
                   colSpan={columns.length}
                   className="h-24 text-center"
                 >
-                  No se encontraron resultados.
+                  No se encontraron resultados o los datos son inválidos.
                 </TableCell>
               </TableRow>
             ) : (

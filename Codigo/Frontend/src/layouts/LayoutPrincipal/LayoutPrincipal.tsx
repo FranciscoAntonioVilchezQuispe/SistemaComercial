@@ -1,13 +1,23 @@
 import { useState, useEffect, useRef } from "react";
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import { Header } from "./Header";
 import { Sidebar } from "./Sidebar";
 import { Footer } from "./Footer";
+import { RUTAS_TITULOS } from "@/config/rutasTitulos";
 
 export function LayoutPrincipal() {
   const [sidebarAbierto, setSidebarAbierto] = useState(true);
   const [isHovering, setIsHovering] = useState(false);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const { pathname } = useLocation();
+
+  // Sincronizar título de la pestaña del navegador
+  useEffect(() => {
+    const titulo = RUTAS_TITULOS[pathname] || "";
+    document.title = titulo
+      ? `${titulo} | Sistema Comercial`
+      : "Sistema Comercial";
+  }, [pathname]);
 
   const alternarSidebar = () => {
     setSidebarAbierto(!sidebarAbierto);

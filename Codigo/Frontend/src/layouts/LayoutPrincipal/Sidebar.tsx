@@ -30,9 +30,11 @@ interface ItemMenu {
   subItems?: ItemMenu[];
 }
 
+import { RUTAS_TITULOS } from "@/config/rutasTitulos";
+
 const menuItems: ItemMenu[] = [
   {
-    titulo: "Dashboard",
+    titulo: RUTAS_TITULOS["/dashboard"],
     icono: <LayoutDashboard className="h-5 w-5" />,
     ruta: "/dashboard",
   },
@@ -40,66 +42,46 @@ const menuItems: ItemMenu[] = [
     titulo: "Catálogo",
     icono: <Package className="h-5 w-5" />,
     subItems: [
-      { titulo: "Productos", icono: null, ruta: "/catalogo/productos" },
-      { titulo: "Categorías", icono: null, ruta: "/catalogo/categorias" },
-      { titulo: "Marcas", icono: null, ruta: "/catalogo/marcas" },
-      {
-        titulo: "Unidades de Medida",
-        icono: null,
-        ruta: "/catalogo/unidades-medida",
-      },
-      {
-        titulo: "Listas de Precios",
-        icono: null,
-        ruta: "/catalogo/listas-precios",
-      },
+      { titulo: RUTAS_TITULOS["/catalogo/productos"], icono: null, ruta: "/catalogo/productos" },
+      { titulo: RUTAS_TITULOS["/catalogo/categorias"], icono: null, ruta: "/catalogo/categorias" },
+      { titulo: RUTAS_TITULOS["/catalogo/marcas"], icono: null, ruta: "/catalogo/marcas" },
+      { titulo: RUTAS_TITULOS["/catalogo/unidades-medida"], icono: null, ruta: "/catalogo/unidades-medida" },
+      { titulo: RUTAS_TITULOS["/catalogo/listas-precios"], icono: null, ruta: "/catalogo/listas-precios" },
     ],
   },
   {
     titulo: "Ventas",
     icono: <ShoppingCart className="h-5 w-5" />,
     subItems: [
-      { titulo: "POS", icono: null, ruta: "/ventas/pos" },
-      { titulo: "Ventas", icono: null, ruta: "/ventas/lista" },
-      { titulo: "Cotizaciones", icono: null, ruta: "/ventas/cotizaciones" },
-      { titulo: "Clientes", icono: null, ruta: "/clientes" },
+      { titulo: RUTAS_TITULOS["/ventas/pos"], icono: null, ruta: "/ventas/pos" },
+      { titulo: RUTAS_TITULOS["/ventas/lista"], icono: null, ruta: "/ventas/lista" },
+      { titulo: RUTAS_TITULOS["/ventas/cotizaciones"], icono: null, ruta: "/ventas/cotizaciones" },
+      { titulo: RUTAS_TITULOS["/clientes"], icono: null, ruta: "/clientes" },
     ],
   },
   {
     titulo: "Inventario",
     icono: <Warehouse className="h-5 w-5" />,
     subItems: [
-      { titulo: "Stock", icono: null, ruta: "/inventario/stock" },
-      { titulo: "Movimientos", icono: null, ruta: "/inventario/movimientos" },
-      { titulo: "Traslados", icono: null, ruta: "/inventario/traslados" },
-      {
-        titulo: "Kardex Reporte",
-        icono: null,
-        ruta: "/inventario/kardex/reporte",
-      },
-      {
-        titulo: "Control Kardex",
-        icono: null,
-        ruta: "/inventario/kardex/periodos",
-      },
-      { titulo: "Almacenes", icono: null, ruta: "/inventario/almacenes" },
+      { titulo: RUTAS_TITULOS["/inventario/stock"], icono: null, ruta: "/inventario/stock" },
+      { titulo: RUTAS_TITULOS["/inventario/movimientos"], icono: null, ruta: "/inventario/movimientos" },
+      { titulo: RUTAS_TITULOS["/inventario/traslados"], icono: null, ruta: "/inventario/traslados" },
+      { titulo: RUTAS_TITULOS["/inventario/kardex/reporte"], icono: null, ruta: "/inventario/kardex/reporte" },
+      { titulo: RUTAS_TITULOS["/inventario/kardex/periodos"], icono: null, ruta: "/inventario/kardex/periodos" },
+      { titulo: RUTAS_TITULOS["/inventario/almacenes"], icono: null, ruta: "/inventario/almacenes" },
     ],
   },
   {
     titulo: "Compras",
     icono: <ShoppingBag className="h-5 w-5" />,
     subItems: [
-      {
-        titulo: "Órdenes de Compra",
-        icono: null,
-        ruta: "/compras/ordenes-compra",
-      },
-      { titulo: "Compras", icono: null, ruta: "/compras/lista" },
-      { titulo: "Proveedores", icono: null, ruta: "/compras/proveedores" },
+      { titulo: RUTAS_TITULOS["/proveedores/ordenes"], icono: null, ruta: "/proveedores/ordenes" },
+      { titulo: "Compras", icono: null, ruta: "/compras/lista" }, // TODO: Agregar a RUTAS_TITULOS si falta
+      { titulo: RUTAS_TITULOS["/proveedores"], icono: null, ruta: "/proveedores" },
     ],
   },
   {
-    titulo: "Reportes",
+    titulo: RUTAS_TITULOS["/reportes"] || "Reportes",
     icono: <FileText className="h-5 w-5" />,
     ruta: "/reportes",
   },
@@ -107,41 +89,17 @@ const menuItems: ItemMenu[] = [
     titulo: "Configuración",
     icono: <Settings className="h-5 w-5" />,
     subItems: [
-      { titulo: "Usuarios", icono: null, ruta: "/configuracion/usuarios" },
-      { titulo: "Roles", icono: null, ruta: "/configuracion/roles" },
-      { titulo: "Empresa", icono: null, ruta: "/configuracion/empresa" },
-      { titulo: "Sucursales", icono: null, ruta: "/configuracion/sucursales" },
-      { titulo: "Impuestos", icono: null, ruta: "/configuracion/impuestos" },
-      {
-        titulo: "Métodos de Pago",
-        icono: null,
-        ruta: "/configuracion/metodos-pago",
-      },
-      {
-        titulo: "Comprobantes",
-        icono: null,
-        ruta: "/configuracion/comprobantes",
-      },
-      {
-        titulo: "Reglas SUNAT",
-        icono: null,
-        ruta: "/configuracion/reglas-sunat",
-      },
-      {
-        titulo: "Operaciones SUNAT",
-        icono: null,
-        ruta: "/configuracion/operaciones-sunat",
-      },
-      {
-        titulo: "Matriz SUNAT",
-        icono: null,
-        ruta: "/configuracion/matriz-sunat",
-      },
-      {
-        titulo: "Tablas Generales",
-        icono: null,
-        ruta: "/configuracion/tablas-generales",
-      },
+      { titulo: RUTAS_TITULOS["/configuracion/usuarios"], icono: null, ruta: "/configuracion/usuarios" },
+      { titulo: RUTAS_TITULOS["/configuracion/roles"], icono: null, ruta: "/configuracion/roles" },
+      { titulo: RUTAS_TITULOS["/configuracion/empresa"], icono: null, ruta: "/configuracion/empresa" },
+      { titulo: RUTAS_TITULOS["/configuracion/sucursales"], icono: null, ruta: "/configuracion/sucursales" },
+      { titulo: RUTAS_TITULOS["/configuracion/impuestos"], icono: null, ruta: "/configuracion/impuestos" },
+      { titulo: RUTAS_TITULOS["/configuracion/metodos-pago"], icono: null, ruta: "/configuracion/metodos-pago" },
+      { titulo: RUTAS_TITULOS["/configuracion/comprobantes"], icono: null, ruta: "/configuracion/comprobantes" },
+      { titulo: RUTAS_TITULOS["/configuracion/reglas-sunat"], icono: null, ruta: "/configuracion/reglas-sunat" },
+      { titulo: RUTAS_TITULOS["/configuracion/operaciones-sunat"], icono: null, ruta: "/configuracion/operaciones-sunat" },
+      { titulo: RUTAS_TITULOS["/configuracion/matriz-sunat"], icono: null, ruta: "/configuracion/matriz-sunat" },
+      { titulo: RUTAS_TITULOS["/configuracion/tablas-generales"], icono: null, ruta: "/configuracion/tablas-generales" },
     ],
   },
 ];

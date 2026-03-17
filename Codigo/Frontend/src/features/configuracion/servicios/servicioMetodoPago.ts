@@ -6,7 +6,8 @@ const BASE_URL = "/metodos-pago";
 export const servicioMetodoPago = {
   obtenerTodos: async (): Promise<MetodoPago[]> => {
     const response: any = await apiConfiguracion.get(BASE_URL);
-    return response.datos || response.data || response;
+    const lista = response.datos || response.data || response;
+    return Array.isArray(lista) ? lista : [];
   },
 
   crear: async (datos: MetodoPagoFormData): Promise<MetodoPago> => {

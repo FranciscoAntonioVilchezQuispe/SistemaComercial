@@ -28,5 +28,17 @@ namespace Configuracion.API.Domain.Entidades
 
         [Column("estado")]
         public bool Estado { get; set; } = true;
+
+        [Column("es_persona_natural")]
+        public bool EsPersonaNatural { get; set; }
+
+        [Column("es_empresa")]
+        public bool EsEmpresa { get; set; }
+
+        [Column("aplica_sin_ruc")]
+        public bool AplicaSinRuc { get; set; }
+
+        [Column("longitud_maxima")]
+        public int? LongitudMaxima { get; set; }
     }
 }

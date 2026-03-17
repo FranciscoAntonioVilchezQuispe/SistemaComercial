@@ -6,8 +6,8 @@ const BASE_URL = "/empresa";
 export const servicioEmpresa = {
   obtenerEmpresa: async (): Promise<Empresa> => {
     const response: any = await apiConfiguracion.get(BASE_URL);
-    // response is the body (Wrapper). response.data is the entity.
-    return response.data;
+    // Extraer data de forma segura
+    return response.data || response;
   },
 
   actualizarEmpresa: async (datos: EmpresaFormData): Promise<Empresa> => {

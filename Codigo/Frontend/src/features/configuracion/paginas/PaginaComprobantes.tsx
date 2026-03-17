@@ -51,6 +51,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { ModuleTabBar } from "@/componentes/shared/ModuleTabBar";
+import { RUTAS_TITULOS } from "@/config/rutasTitulos";
 
 export function PaginaComprobantes() {
   const [tabActual, setTabActual] = useState("tipos");
@@ -86,6 +88,18 @@ export function PaginaComprobantes() {
   const actualizarSerie = useActualizarSerieComprobante();
   const eliminarSerie = useEliminarSerieComprobante();
 
+  const tabsConfig = [
+    { label: RUTAS_TITULOS["/configuracion/empresa"], to: "/configuracion/empresa" },
+    { label: RUTAS_TITULOS["/configuracion/sucursales"], to: "/configuracion/sucursales" },
+    { label: RUTAS_TITULOS["/configuracion/impuestos"], to: "/configuracion/impuestos" },
+    { label: RUTAS_TITULOS["/configuracion/metodos-pago"], to: "/configuracion/metodos-pago" },
+    { label: RUTAS_TITULOS["/configuracion/comprobantes"], to: "/configuracion/comprobantes" },
+    { label: RUTAS_TITULOS["/configuracion/reglas-sunat"], to: "/configuracion/reglas-sunat" },
+    { label: RUTAS_TITULOS["/configuracion/operaciones-sunat"], to: "/configuracion/operaciones-sunat" },
+    { label: RUTAS_TITULOS["/configuracion/matriz-sunat"], to: "/configuracion/matriz-sunat" },
+    { label: RUTAS_TITULOS["/configuracion/tablas-generales"], to: "/configuracion/tablas-generales" },
+  ];
+
   // Handlers Tipos
   const handleGuardarTipo = (datos: TipoComprobanteFormData) => {
     if (tipoSeleccionado) {
@@ -109,8 +123,6 @@ export function PaginaComprobantes() {
       });
     }
   };
-
-  
 
   // Handlers Series
   const handleGuardarSerie = (datos: SerieComprobanteFormData) => {
@@ -136,40 +148,39 @@ export function PaginaComprobantes() {
     }
   };
 
-  
-
   // Columnas Tipos
   const columnasTipos = [
     {
       header: "Código",
       accessorKey: "codigo" as keyof TipoComprobante,
-      className: "font-mono",
+      className: "font-mono text-[11px]",
     },
     {
       header: "Nombre",
       accessorKey: "nombre" as keyof TipoComprobante,
-      className: "font-semibold",
+      className: "font-semibold text-primary",
     },
     {
       header: "Stock",
       accessorKey: "mueveStock" as keyof TipoComprobante,
       cell: (row: TipoComprobante) =>
         row.mueveStock ? (
-          <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-blue-100 text-blue-800">
+          <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-600 border border-blue-200">
             {row.tipoMovimientoStock}
           </span>
         ) : (
-          <span className="text-xs text-muted-foreground">No Aplica</span>
+          <span className="text-[11px] text-muted-foreground italic">No Aplica</span>
         ),
     },
     {
       header: "Acciones",
       className: "text-right",
       cell: (row: TipoComprobante) => (
-        <div className="flex justify-end gap-2">
+        <div className="flex justify-end gap-1">
           <Button
             variant="ghost"
-            size="icon"
+            size="sm"
+            className="h-8 w-8 p-0"
             onClick={() => {
               setTipoSeleccionado(row);
               setDialogoTipoOpen(true);
@@ -179,8 +190,8 @@ export function PaginaComprobantes() {
           </Button>
           <Button
             variant="ghost"
-            size="icon"
-            className="text-destructive"
+            size="sm"
+            className="h-8 w-8 p-0 text-destructive hover:text-destructive hover:bg-destructive/10"
             onClick={() => setEliminarTipoId(row.id)}
           >
             <Trash2 className="h-4 w-4" />
@@ -197,27 +208,28 @@ export function PaginaComprobantes() {
       accessorKey: "idTipoComprobante" as keyof SerieComprobante,
       cell: (row: SerieComprobante) => {
         const tipo = tipos?.find((t) => t.id === row.idTipoComprobante);
-        return tipo ? tipo.nombre : row.idTipoComprobante;
+        return <span className="text-primary font-medium">{tipo ? tipo.nombre : row.idTipoComprobante}</span>;
       },
     },
     {
       header: "Serie",
       accessorKey: "serie" as keyof SerieComprobante,
-      className: "font-mono font-bold",
+      className: "font-mono font-bold text-primary",
     },
     {
       header: "Correlativo",
       accessorKey: "correlativoActual" as keyof SerieComprobante,
-      className: "font-mono",
+      className: "font-mono text-muted-foreground",
     },
     {
       header: "Acciones",
       className: "text-right",
       cell: (row: SerieComprobante) => (
-        <div className="flex justify-end gap-2">
+        <div className="flex justify-end gap-1">
           <Button
             variant="ghost"
-            size="icon"
+            size="sm"
+            className="h-8 w-8 p-0"
             onClick={() => {
               setSerieSeleccionada(row);
               setDialogoSerieOpen(true);
@@ -227,8 +239,8 @@ export function PaginaComprobantes() {
           </Button>
           <Button
             variant="ghost"
-            size="icon"
-            className="text-destructive"
+            size="sm"
+            className="h-8 w-8 p-0 text-destructive hover:text-destructive hover:bg-destructive/10"
             onClick={() => setEliminarSerieId(row.id)}
           >
             <Trash2 className="h-4 w-4" />
@@ -244,36 +256,31 @@ export function PaginaComprobantes() {
     return <MensajeError mensaje="Error al cargar datos" />;
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">Comprobantes de Pago</h1>
-        <p className="text-muted-foreground">
-          Gestión de tipos de documentos (Facturas, Boletas) y sus series de
-          numeración.
-        </p>
-      </div>
+    <div className="space-y-4">
+      <ModuleTabBar tabs={tabsConfig} />
 
       <Tabs value={tabActual} onValueChange={setTabActual} className="w-full">
-        <TabsList className="grid w-full grid-cols-2 max-w-[400px]">
-          <TabsTrigger value="tipos">Tipos de Comprobante</TabsTrigger>
-          <TabsTrigger value="series">Series y Numeración</TabsTrigger>
+        <TabsList className="inline-flex h-9 items-center justify-center rounded-lg bg-muted p-1 text-muted-foreground w-auto mb-2">
+          <TabsTrigger value="tipos" className="px-5 py-1.5 text-xs font-semibold">Tipos de Comprobante</TabsTrigger>
+          <TabsTrigger value="series" className="px-5 py-1.5 text-xs font-semibold">Series y Numeración</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="tipos" className="mt-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Tipos Disponibles</CardTitle>
+        <TabsContent value="tipos" className="mt-2 outline-none">
+          <Card className="rounded-xl border border-muted/20 bg-card shadow-sm overflow-hidden">
+            <CardHeader className="bg-muted/5 border-b pb-4">
+              <CardTitle className="text-lg">Tipos Disponibles</CardTitle>
               <CardDescription>
                 Define los documentos que emite o recibe la empresa y su impacto
                 en inventario.
               </CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-6">
               <DataTable
                 data={tipos || []}
                 columns={columnasTipos}
                 actionElement={
                   <Button
+                    size="sm"
                     onClick={() => {
                       setTipoSeleccionado(null);
                       setDialogoTipoOpen(true);
@@ -287,21 +294,22 @@ export function PaginaComprobantes() {
           </Card>
         </TabsContent>
 
-        <TabsContent value="series" className="mt-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Series Activas</CardTitle>
+        <TabsContent value="series" className="mt-2 outline-none">
+          <Card className="rounded-xl border border-muted/20 bg-card shadow-sm overflow-hidden">
+            <CardHeader className="bg-muted/5 border-b pb-4">
+              <CardTitle className="text-lg">Series Activas</CardTitle>
               <CardDescription>
                 Configura las series (ej. F001, B001) y sus correlativos
                 actuales.
               </CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-6">
               <DataTable
                 data={series || []}
                 columns={columnasSeries}
                 actionElement={
                   <Button
+                    size="sm"
                     onClick={() => {
                       setSerieSeleccionada(null);
                       setDialogoSerieOpen(true);
@@ -351,6 +359,7 @@ export function PaginaComprobantes() {
           />
         </DialogContent>
       </Dialog>
+
       {/* AlertDialog eliminar tipo */}
       <AlertDialog
         open={eliminarTipoId !== null}

@@ -7,7 +7,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { CatalogoHeader } from "../componentes/comunes/CatalogoHeader";
+import { ModuleTabBar } from "@/componentes/shared/ModuleTabBar";
+import { RUTAS_TITULOS } from "@/config/rutasTitulos";
 import { DataTable } from "@/components/ui/DataTable";
 import { ProductoForm } from "../componentes/productos/ProductoForm";
 import {
@@ -177,16 +178,23 @@ export function PaginaProductos() {
     },
   ];
 
-  return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">Productos</h1>
-        <p className="text-muted-foreground">
-          Gestiona el catálogo de productos, precios y stocks.
-        </p>
-      </div>
+  const tabsCatalogo = [
+    { label: RUTAS_TITULOS["/catalogo/productos"], to: "/catalogo/productos" },
+    { label: RUTAS_TITULOS["/catalogo/categorias"], to: "/catalogo/categorias" },
+    { label: RUTAS_TITULOS["/catalogo/marcas"], to: "/catalogo/marcas" },
+    { label: RUTAS_TITULOS["/catalogo/unidades-medida"], to: "/catalogo/unidades-medida" },
+    { label: RUTAS_TITULOS["/catalogo/listas-precios"], to: "/catalogo/listas-precios" },
+  ];
 
-      <CatalogoHeader />
+  return (
+    <div className="space-y-4">
+      <ModuleTabBar tabs={tabsCatalogo} />
+
+      <div className="flex justify-end mb-2">
+        <Button onClick={manejarAbrirCrear} size="sm">
+          <Plus className="mr-2 h-4 w-4" /> Nuevo Producto
+        </Button>
+      </div>
 
       <DataTable
         data={productos}
@@ -198,11 +206,6 @@ export function PaginaProductos() {
         onActiveFilterChange={cambiarFiltroActivo}
         searchPlaceholder="Buscar por nombre o código..."
         isLoading={isLoading}
-        actionElement={
-          <Button onClick={manejarAbrirCrear}>
-            <Plus className="mr-2 h-4 w-4" /> Nuevo
-          </Button>
-        }
       />
 
       <Dialog open={dialogoAbierto} onOpenChange={setDialogoAbierto}>

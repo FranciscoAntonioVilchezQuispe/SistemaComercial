@@ -16,6 +16,8 @@ import {
 } from "@/components/ui/dialog";
 import { FormularioTraslado } from "../componentes/traslados/FormularioTraslado";
 import { ModalRecepcionTraslado } from "../componentes/traslados/ModalRecepcionTraslado";
+import { ModuleTabBar } from "@/componentes/shared/ModuleTabBar";
+import { RUTAS_TITULOS } from "@/config/rutasTitulos";
 
 export function PaginaTraslados() {
   const { data: traslados, isLoading, error, refetch } = useTraslados();
@@ -23,6 +25,15 @@ export function PaginaTraslados() {
   const [modalNuevoOpen, setModalNuevoOpen] = useState(false);
   const [modalRecibirOpen, setModalRecibirOpen] = useState(false);
   const [trasladoSeleccionado, setTrasladoSeleccionado] = useState<any>(null);
+
+  const tabsInventario = [
+    { label: RUTAS_TITULOS["/inventario/stock"], to: "/inventario/stock" },
+    { label: RUTAS_TITULOS["/inventario/movimientos"], to: "/inventario/movimientos" },
+    { label: RUTAS_TITULOS["/inventario/traslados"], to: "/inventario/traslados" },
+    { label: RUTAS_TITULOS["/inventario/kardex/reporte"], to: "/inventario/kardex/reporte" },
+    { label: RUTAS_TITULOS["/inventario/kardex/periodos"], to: "/inventario/kardex/periodos" },
+    { label: RUTAS_TITULOS["/inventario/almacenes"], to: "/inventario/almacenes" },
+  ];
 
   const columnas: any[] = [
     {
@@ -100,23 +111,17 @@ export function PaginaTraslados() {
     return <MensajeError mensaje="Error al cargar la lista de traslados" />;
 
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">
-            Traslados entre Almacenes
-          </h1>
-          <p className="text-muted-foreground">
-            Gestión y seguimiento de movimientos de mercadería entre sucursales.
-          </p>
-        </div>
-        <Button onClick={() => setModalNuevoOpen(true)}>
+    <div className="space-y-4">
+      <ModuleTabBar tabs={tabsInventario} />
+
+      <div className="flex justify-end mb-2">
+        <Button onClick={() => setModalNuevoOpen(true)} size="sm">
           <Plus className="mr-2 h-4 w-4" /> Nuevo Traslado
         </Button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card className="border-l-4 border-l-blue-500">
+        <Card className="border-l-4 border-l-blue-500 shadow-none">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-blue-600">
               En Tránsito
@@ -133,7 +138,7 @@ export function PaginaTraslados() {
             <p className="text-xs text-muted-foreground">Vehículos en ruta</p>
           </CardContent>
         </Card>
-        <Card className="border-l-4 border-l-green-500">
+        <Card className="border-l-4 border-l-green-500 shadow-none">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-green-600">
               Recibidos
@@ -151,7 +156,7 @@ export function PaginaTraslados() {
             </p>
           </CardContent>
         </Card>
-        <Card className="border-l-4 border-l-yellow-500">
+        <Card className="border-l-4 border-l-yellow-500 shadow-none">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-yellow-600">
               En Preparación
@@ -170,7 +175,7 @@ export function PaginaTraslados() {
         </Card>
       </div>
 
-      <Card>
+      <Card className="shadow-none border-muted/20">
         <CardContent className="pt-6">
           <DataTable data={traslados || []} columns={columnas} />
         </CardContent>

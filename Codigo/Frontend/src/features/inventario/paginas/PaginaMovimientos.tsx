@@ -4,7 +4,7 @@ import { useMovimientos, useTiposMovimiento } from "../hooks/useInventario";
 import { TablaMovimientos } from "../componentes/movimientos/TablaMovimientos";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Select,
   SelectContent,
@@ -14,6 +14,8 @@ import {
 } from "@/components/ui/select";
 import { SelectorRangoFecha } from "@/compartido/componentes/formularios/SelectorRangoFecha";
 import { MovimientoFiltros } from "../tipos/inventario.types";
+import { ModuleTabBar } from "@/componentes/shared/ModuleTabBar";
+import { RUTAS_TITULOS } from "@/config/rutasTitulos";
 
 export function PaginaMovimientos() {
   const [pagina] = useState(1);
@@ -22,31 +24,28 @@ export function PaginaMovimientos() {
   const { data, isLoading } = useMovimientos(filtros, pagina, 10);
   const { data: tipos } = useTiposMovimiento();
 
+  const tabsInventario = [
+    { label: RUTAS_TITULOS["/inventario/stock"], to: "/inventario/stock" },
+    { label: RUTAS_TITULOS["/inventario/movimientos"], to: "/inventario/movimientos" },
+    { label: RUTAS_TITULOS["/inventario/traslados"], to: "/inventario/traslados" },
+    { label: RUTAS_TITULOS["/inventario/kardex/reporte"], to: "/inventario/kardex/reporte" },
+    { label: RUTAS_TITULOS["/inventario/kardex/periodos"], to: "/inventario/kardex/periodos" },
+    { label: RUTAS_TITULOS["/inventario/almacenes"], to: "/inventario/almacenes" },
+  ];
+
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex justify-between items-center flex-wrap gap-4">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">
-            Movimientos de Inventario
-          </h1>
-          <p className="text-muted-foreground">
-            Historial detallado de todas las entradas, salidas y ajustes
-            realizados.
-          </p>
-        </div>
-        <div className="flex gap-2">
-          <Button variant="outline">
-            <ArrowUpDown className="mr-2 h-4 w-4" />
-            Reporte Kardex
-          </Button>
-        </div>
+    <div className="space-y-4">
+      <ModuleTabBar tabs={tabsInventario} />
+
+      <div className="flex justify-end gap-2 mb-2">
+        <Button variant="outline" size="sm">
+          <ArrowUpDown className="mr-2 h-4 w-4" />
+          Reporte Kardex
+        </Button>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Búsqueda y Filtros Históricos</CardTitle>
-        </CardHeader>
-        <CardContent>
+      <Card className="shadow-none border-muted/20">
+        <CardContent className="pt-6">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className="relative">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -95,7 +94,7 @@ export function PaginaMovimientos() {
                   })
                 }
               />
-              <Button variant="ghost" onClick={() => setFiltros({})}>
+              <Button variant="ghost" onClick={() => setFiltros({})} size="sm">
                 Limpiar
               </Button>
             </div>
@@ -103,7 +102,7 @@ export function PaginaMovimientos() {
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className="shadow-none border-muted/20">
         <CardContent className="pt-6">
           <TablaMovimientos
             movimientos={data?.datos || []}

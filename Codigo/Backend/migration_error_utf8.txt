@@ -1,0 +1,31 @@
+﻿Build started...
+Build succeeded.
+[22:15:03 ERR] Failed executing DbCommand (5ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+ALTER TABLE configuracion.regla_documento_comprobante DROP CONSTRAINT fk_regla_documento_comprobante_tipo_comprobante_id_tipo_compro;
+Npgsql.PostgresException (0x80004005): 42704: no existe la restricci├│n ┬½fk_regla_documento_comprobante_tipo_comprobante_id_tipo_compro┬╗ en la relaci├│n ┬½regla_documento_comprobante┬╗
+   at Npgsql.Internal.NpgsqlConnector.ReadMessageLong(Boolean async, DataRowLoadingMode dataRowLoadingMode, Boolean readingNotifications, Boolean isReadingPrependedMessage)
+   at System.Runtime.CompilerServices.PoolingAsyncValueTaskMethodBuilder`1.StateMachineBox`1.System.Threading.Tasks.Sources.IValueTaskSource<TResult>.GetResult(Int16 token)
+   at Npgsql.NpgsqlDataReader.NextResult(Boolean async, Boolean isConsuming, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlDataReader.NextResult(Boolean async, Boolean isConsuming, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlDataReader.NextResult()
+   at Npgsql.NpgsqlCommand.ExecuteReader(Boolean async, CommandBehavior behavior, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteReader(Boolean async, CommandBehavior behavior, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteNonQuery(Boolean async, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteNonQuery()
+   at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteNonQuery(RelationalCommandParameterObject parameterObject)
+   at Microsoft.EntityFrameworkCore.Migrations.MigrationCommand.ExecuteNonQuery(IRelationalConnection connection, IReadOnlyDictionary`2 parameterValues)
+   at Microsoft.EntityFrameworkCore.Migrations.Internal.MigrationCommandExecutor.ExecuteNonQuery(IEnumerable`1 migrationCommands, IRelationalConnection connection)
+   at Microsoft.EntityFrameworkCore.Migrations.Internal.Migrator.Migrate(String targetMigration)
+   at Npgsql.EntityFrameworkCore.PostgreSQL.Migrations.Internal.NpgsqlMigrator.Migrate(String targetMigration)
+   at Microsoft.EntityFrameworkCore.Design.Internal.MigrationsOperations.UpdateDatabase(String targetMigration, String connectionString, String contextType)
+   at Microsoft.EntityFrameworkCore.Design.OperationExecutor.UpdateDatabaseImpl(String targetMigration, String connectionString, String contextType)
+   at Microsoft.EntityFrameworkCore.Design.OperationExecutor.UpdateDatabase.<>c__DisplayClass0_0.<.ctor>b__0()
+   at Microsoft.EntityFrameworkCore.Design.OperationExecutor.OperationBase.Execute(Action action)
+  Exception data:
+    Severity: ERROR
+    SqlState: 42704
+    MessageText: no existe la restricci├│n ┬½fk_regla_documento_comprobante_tipo_comprobante_id_tipo_compro┬╗ en la relaci├│n ┬½regla_documento_comprobante┬╗
+    File: tablecmds.c
+    Line: 11720
+    Routine: ATExecDropConstraint
+42704: no existe la restricci├│n ┬½fk_regla_documento_comprobante_tipo_comprobante_id_tipo_compro┬╗ en la relaci├│n ┬½regla_documento_comprobante┬╗

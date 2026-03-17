@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus, Edit2, Trash2, MapPin } from "lucide-react";
+import { Plus, Edit2, Trash2, MapPin, CheckCircle, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -20,11 +20,32 @@ import { Sucursal, SucursalFormData } from "../tipos/sucursal.types";
 import { SucursalForm } from "../componentes/SucursalForm";
 import { toast } from "sonner";
 import { useEmpresa } from "../hooks/useEmpresa";
+import { ModuleTabBar } from "@/componentes/shared/ModuleTabBar";
+import { RUTAS_TITULOS } from "@/config/rutasTitulos";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 
 export function PaginaSucursales() {
   const [dialogoOpen, setDialogoOpen] = useState(false);
   const [registroSeleccionado, setRegistroSeleccionado] =
     useState<Sucursal | null>(null);
+  const [eliminarId, setEliminarId] = useState<number | null>(null);
 
   const { data: sucursales, isLoading, error } = useSucursales();
   const { data: empresa } = useEmpresa(); // Needed to set default idEmpresa
@@ -32,6 +53,18 @@ export function PaginaSucursales() {
   const crearMutation = useCrearSucursal();
   const actualizarMutation = useActualizarSucursal();
   const eliminarMutation = useEliminarSucursal();
+
+  const tabsConfig = [
+    { label: RUTAS_TITULOS["/configuracion/empresa"], to: "/configuracion/empresa" },
+    { label: RUTAS_TITULOS["/configuracion/sucursales"], to: "/configuracion/sucursales" },
+    { label: RUTAS_TITULOS["/configuracion/impuestos"], to: "/configuracion/impuestos" },
+    { label: RUTAS_TITULOS["/configuracion/metodos-pago"], to: "/configuracion/metodos-pago" },
+    { label: RUTAS_TITULOS["/configuracion/comprobantes"], to: "/configuracion/comprobantes" },
+    { label: RUTAS_TITULOS["/configuracion/reglas-sunat"], to: "/configuracion/reglas-sunat" },
+    { label: RUTAS_TITULOS["/configuracion/operaciones-sunat"], to: "/configuracion/operaciones-sunat" },
+    { label: RUTAS_TITULOS["/configuracion/matriz-sunat"], to: "/configuracion/matriz-sunat" },
+    { label: RUTAS_TITULOS["/configuracion/tablas-generales"], to: "/configuracion/tablas-generales" },
+  ];
 
   const handleCrear = () => {
     setRegistroSeleccionado(null);
@@ -43,21 +76,7 @@ export function PaginaSucursales() {
     setDialogoOpen(true);
   };
 
-  const handleEliminar = (sucursal: Sucursal) => {
-    if (
-      confirm(
-        `¿Está seguro de eliminar la sucursal ${sucursal.nombreSucursal}?`,
-      )
-    ) {
-      eliminarMutation.mutate(sucursal.id, {
-        onSuccess: () => toast.success("Sucursal eliminada"),
-        onError: () => toast.error("Error al eliminar sucursal"),
-      });
-    }
-  };
-
   const handleGuardar = (datos: SucursalFormData) => {
-    // Ensure idEmpresa is set if missing (e.g. creating new)
     if (!datos.idEmpresa && empresa) {
       datos.idEmpresa = empresa.id;
     }
@@ -91,47 +110,56 @@ export function PaginaSucursales() {
     {
       header: "Nombre",
       accessorKey: "nombreSucursal" as keyof Sucursal,
-      className: "font-semibold",
+      className: "font-semibold text-primary",
     },
     {
       header: "Dirección",
       accessorKey: "direccion" as keyof Sucursal,
       cell: (row: Sucursal) => (
-        <div className="flex items-center gap-1">
-          <MapPin className="h-3 w-3 text-muted-foreground" />
-          <span>{row.direccion || "-"}</span>
+        <div className="flex items-center gap-1 text-muted-foreground">
+          <MapPin className="h-3 w-3" />
+          <span className="text-sm">{row.direccion || "-"}</span>
         </div>
       ),
     },
-    { header: "Teléfono", accessorKey: "telefono" as keyof Sucursal },
+    { 
+      header: "Teléfono", 
+      accessorKey: "telefono" as keyof Sucursal,
+      className: "font-mono text-xs",
+    },
     {
-      header: "Principal",
+      header: "Estado",
       accessorKey: "esPrincipal" as keyof Sucursal,
       cell: (row: Sucursal) =>
         row.esPrincipal ? (
-          <span className="inline-flex items-center rounded-full border border-primary text-primary px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2">
-            Principal
-          </span>
-        ) : null,
+          <Badge variant="default" className="gap-1 bg-blue-500/10 text-blue-600 border-blue-200 hover:bg-blue-500/20 shadow-none text-[11px] h-5">
+            <CheckCircle className="h-3 w-3" /> Principal
+          </Badge>
+        ) : (
+          <Badge variant="secondary" className="bg-muted/50 text-muted-foreground shadow-none text-[11px] h-5">
+            Secundaria
+          </Badge>
+        ),
     },
     {
       header: "Acciones",
       className: "text-right",
       cell: (row: Sucursal) => (
-        <div className="flex justify-end gap-2">
+        <div className="flex justify-end gap-1">
           <Button
             variant="ghost"
-            size="icon"
+            size="sm"
             onClick={() => handleEditar(row)}
             title="Editar"
+            className="h-8 w-8 p-0"
           >
             <Edit2 className="h-4 w-4" />
           </Button>
           <Button
             variant="ghost"
-            size="icon"
-            className="text-destructive"
-            onClick={() => handleEliminar(row)}
+            size="sm"
+            className="text-destructive h-8 w-8 p-0 hover:text-destructive hover:bg-destructive/10"
+            onClick={() => setEliminarId(row.id)}
             title="Eliminar"
           >
             <Trash2 className="h-4 w-4" />
@@ -142,28 +170,25 @@ export function PaginaSucursales() {
   ];
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">Sucursales</h1>
-        <p className="text-muted-foreground">
-          Gestión de tiendas, almacenes y puntos de venta.
-        </p>
-      </div>
+    <div className="space-y-4">
+      <ModuleTabBar tabs={tabsConfig} />
 
-      <DataTable
-        data={sucursales || []}
-        columns={columns}
-        // Pagination logic not implemented in hook yet, passing simple structure if needed or just data
-        // DataTable expects pagination object if we want pagination controls at bottom.
-        // For now, passing undefined pagination or handling client side pagination if DataTable supports it.
-        // Assuming DataTable component handles simple array if pagination prop is missing or we can ignore it for < 10 items.
-
-        actionElement={
-          <Button onClick={handleCrear}>
+      <Card className="rounded-xl border border-muted/20 bg-card shadow-sm overflow-hidden">
+        <CardHeader className="bg-muted/5 border-b pb-4 flex flex-row items-center justify-between space-y-0">
+          <div className="space-y-1">
+            <CardTitle className="text-lg">Sucursales y Locales</CardTitle>
+            <CardDescription>
+              Gestión de tiendas, almacenes y puntos de venta de la empresa.
+            </CardDescription>
+          </div>
+          <Button onClick={handleCrear} size="sm">
             <Plus className="mr-2 h-4 w-4" /> Nueva Sucursal
           </Button>
-        }
-      />
+        </CardHeader>
+        <CardContent className="p-6">
+          <DataTable data={sucursales || []} columns={columns} />
+        </CardContent>
+      </Card>
 
       <Dialog open={dialogoOpen} onOpenChange={setDialogoOpen}>
         <DialogContent>
@@ -180,6 +205,40 @@ export function PaginaSucursales() {
           />
         </DialogContent>
       </Dialog>
+
+      <AlertDialog
+        open={eliminarId !== null}
+        onOpenChange={(open) => !open && setEliminarId(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Está absolutamente seguro?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta acción no se puede deshacer. La sucursal seleccionada será
+              eliminada.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={() => {
+                if (eliminarId) {
+                  eliminarMutation.mutate(eliminarId, {
+                    onSuccess: () => {
+                      toast.success("Sucursal eliminada");
+                      setEliminarId(null);
+                    },
+                    onError: () => toast.error("Error al eliminar sucursal"),
+                  });
+                }
+              }}
+            >
+              {eliminarMutation.isPending ? "Eliminando..." : "Sí, eliminar"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

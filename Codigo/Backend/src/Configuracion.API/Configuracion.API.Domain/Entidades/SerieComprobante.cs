@@ -15,7 +15,7 @@ namespace Configuracion.API.Domain.Entidades
         public long IdTipoComprobante { get; set; }
 
         [ForeignKey("IdTipoComprobante")]
-        public TipoComprobante? TipoComprobante { get; set; }
+        public virtual TipoComprobante? TipoComprobante { get; set; }
 
         [Required]
         [MaxLength(10)]

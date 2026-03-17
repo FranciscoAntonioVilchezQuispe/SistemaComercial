@@ -10,14 +10,7 @@ import {
 import { DataTable } from "@/components/ui/DataTable";
 import { Loading } from "@compartido/componentes/feedback/Loading";
 import { MensajeError } from "@compartido/componentes/feedback/MensajeError";
-
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
 import {
   AlertDialog,
@@ -29,11 +22,12 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-
 import { useProveedores, useEliminarProveedor } from "../hooks/useProveedores";
 import { Proveedor } from "../types/proveedor.types";
 import { ProveedorForm } from "../componentes/ProveedorForm";
 import { useTipoDocumento } from "@/features/configuracion/hooks/useTipoDocumento";
+import { ModuleTabBar } from "@/componentes/shared/ModuleTabBar";
+import { RUTAS_TITULOS } from "@/config/rutasTitulos";
 
 export default function PaginaProveedores() {
   const [dialogoOpen, setDialogoOpen] = useState(false);
@@ -48,7 +42,11 @@ export default function PaginaProveedores() {
   // Tipos de documento desde configuracion.tipo_documento
   const { data: tiposDocumento } = useTipoDocumento();
 
-  // Eliminación ahora mediante AlertDialog: abrir con setEliminarId
+  const tabsCompras = [
+    { label: RUTAS_TITULOS["/proveedores/ordenes"], to: "/proveedores/ordenes" },
+    { label: RUTAS_TITULOS["/compras/lista"], to: "/compras/lista" },
+    { label: RUTAS_TITULOS["/proveedores"], to: "/proveedores" },
+  ];
 
   const proveedoresFiltrados =
     proveedores?.filter(
@@ -57,6 +55,7 @@ export default function PaginaProveedores() {
         p.numeroDocumento.includes(filtro),
     ) || [];
 
+// ... columnas ...
   const columnas = [
     {
       header: "Doc.",
@@ -139,22 +138,11 @@ export default function PaginaProveedores() {
   if (error) return <MensajeError mensaje="Error al cargar proveedores" />;
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">Gestión de Proveedores</h1>
-        <p className="text-muted-foreground">
-          Directorio de proveedores y gestión de compras.
-        </p>
-      </div>
+    <div className="space-y-4">
+      <ModuleTabBar tabs={tabsCompras} />
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Directorio</CardTitle>
-          <CardDescription>
-            Lista completa de proveedores registrados.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
+      <Card className="shadow-none border-muted/20">
+        <CardContent className="pt-6">
           <DataTable
             data={proveedoresFiltrados}
             columns={columnas}
@@ -166,6 +154,7 @@ export default function PaginaProveedores() {
                   setProveedorSeleccionado(null);
                   setDialogoOpen(true);
                 }}
+                size="sm"
               >
                 <Plus className="mr-2 h-4 w-4" /> Nuevo Proveedor
               </Button>

@@ -9,6 +9,9 @@ namespace Inventario.API.Domain.Entidades.Referencias
         [Column("id_detalle")]
         public long Id { get; set; }
 
+        [Column("id_tabla")]
+        public int IdTabla { get; set; }
+
         [Column("codigo")]
         public string Codigo { get; set; } = null!;
 

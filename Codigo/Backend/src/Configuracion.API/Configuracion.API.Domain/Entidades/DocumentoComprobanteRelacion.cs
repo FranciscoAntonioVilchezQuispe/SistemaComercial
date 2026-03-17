@@ -21,5 +21,8 @@ namespace Configuracion.API.Domain.Entidades
         // Navegación opcional
         [ForeignKey("IdTipoComprobante")]
         public virtual TipoComprobante TipoComprobante { get; set; } = null!;
+
+        // Nueva navegación por código
+        public virtual DocumentoIdentidadRegla? TipoDocumento { get; set; }
     }
 }

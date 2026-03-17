@@ -23,6 +23,7 @@ export interface Compra {
   moneda: string; // 'PEN', 'USD'
   tipoCambio: number;
   estado: string; // 'BORRADOR', 'CONFIRMADO', 'ANULADO'
+  tipoOperacion?: string;
   observaciones?: string;
 
   // Totales
@@ -52,6 +53,7 @@ export interface CompraFormData {
   numeroComprobante: string;
   fechaEmision: Date;
   tipoCambio: number;
+  tipoOperacion: string;
   observaciones?: string;
 
   detalles: {
@@ -90,6 +92,7 @@ export interface CrearCompraPayload {
   total: number;
   saldoPendiente: number;
   idEstadoPago: number;
+  tipoOperacion: string;
   observaciones?: string;
   detalles: DetalleCompraPayload[];
 }

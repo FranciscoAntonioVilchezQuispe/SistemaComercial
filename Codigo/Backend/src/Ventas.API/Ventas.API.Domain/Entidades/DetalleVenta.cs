@@ -41,6 +41,23 @@ namespace Ventas.API.Domain.Entidades
         [Column("total_item", TypeName = "decimal(12,2)")]
         public decimal TotalItem { get; set; }
 
+        [MaxLength(2)]
+        [Column("codigo_afectacion_igv")]
+        public string? CodigoAfectacionIgv { get; set; }
+
+        [MaxLength(4)]
+        [Column("codigo_tributo")]
+        public string? CodigoTributo { get; set; }
+
+        [Column("precio_unitario_base", TypeName = "decimal(12,4)")]
+        public decimal? PrecioUnitarioBase { get; set; }
+
+        [Column("descuento_item", TypeName = "decimal(12,4)")]
+        public decimal DescuentoItem { get; set; } = 0;
+
+        [Column("valor_item", TypeName = "decimal(12,4)")]
+        public decimal? ValorItem { get; set; }
+
         [ForeignKey("IdVenta")]
         public virtual Venta Venta { get; set; } = null!;
     }

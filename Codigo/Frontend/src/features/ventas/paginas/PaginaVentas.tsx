@@ -6,24 +6,33 @@ import { useVentas } from "../hooks/useVentas";
 import { TablaVentas } from "../componentes/ventas/TablaVentas";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { SelectorRangoFecha } from "@/compartido/componentes/formularios/SelectorRangoFecha";
 import { ExportadorTabla } from "@/compartido/componentes/tablas/ExportadorTabla";
 import { VentaFiltros, Venta } from "../tipos/ventas.types";
+import { ModuleTabBar } from "@/componentes/shared/ModuleTabBar";
+import { RUTAS_TITULOS } from "@/config/rutasTitulos";
 
 export function PaginaVentas() {
   const navigate = useNavigate();
   const [filtros, setFiltros] = useState<VentaFiltros>({});
 
-  const { data, isLoading } = useVentas(filtros, 1, 100); // Simplificado para este ejemplo
+  const { data, isLoading } = useVentas(filtros, 1, 100);
 
   const handleVerDetalle = (_venta: Venta) => {
     toast.info("Próximamente: ver detalle de venta");
   };
 
   const handleNuevoPOS = () => {
-    navigate("/pos");
+    navigate("/ventas/pos");
   };
+
+  const tabsVentas = [
+    { label: RUTAS_TITULOS["/ventas/pos"], to: "/ventas/pos" },
+    { label: RUTAS_TITULOS["/ventas/lista"], to: "/ventas/lista" },
+    { label: RUTAS_TITULOS["/ventas/cotizaciones"], to: "/ventas/cotizaciones" },
+    { label: RUTAS_TITULOS["/clientes"], to: "/clientes" },
+  ];
 
   const columnasExportar = [
     { clave: "numeroComprobante" as keyof Venta, titulo: "Comprobante" },
@@ -32,32 +41,23 @@ export function PaginaVentas() {
   ];
 
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex justify-between items-center flex-wrap gap-4">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Ventas</h1>
-          <p className="text-muted-foreground">
-            Gestiona y visualiza el histórico de ventas realizadas.
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <ExportadorTabla
-            datos={data?.datos || []}
-            nombreArchivo="ventas"
-            columnas={columnasExportar}
-          />
-          <Button onClick={handleNuevoPOS}>
-            <Plus className="mr-2 h-4 w-4" />
-            Nueva Venta (POS)
-          </Button>
-        </div>
+    <div className="space-y-4">
+      <ModuleTabBar tabs={tabsVentas} />
+
+      <div className="flex justify-end gap-2">
+        <ExportadorTabla
+          datos={data?.datos || []}
+          nombreArchivo="ventas"
+          columnas={columnasExportar}
+        />
+        <Button onClick={handleNuevoPOS} size="sm">
+          <Plus className="mr-2 h-4 w-4" />
+          Nueva Venta (POS)
+        </Button>
       </div>
 
       <Card>
-        <CardHeader>
-          <CardTitle>Filtros de Búsqueda</CardTitle>
-        </CardHeader>
-        <CardContent>
+        <CardContent className="pt-6">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className="relative">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -90,6 +90,7 @@ export function PaginaVentas() {
                 variant="ghost"
                 onClick={() => setFiltros({})}
                 title="Limpiar filtros"
+                size="sm"
               >
                 Limpiar
               </Button>

@@ -137,7 +137,7 @@ const PaginaKardexPeriodos = lazy(() =>
 );
 const PaginaKardexReporte = lazy(() =>
   import("@/features/inventario/paginas/PaginaKardexReporte").then((m) => ({
-    default: m.default,
+    default: m.PaginaKardexReporte,
   })),
 );
 const PaginaTraslados = lazy(() =>
@@ -306,7 +306,7 @@ export const ruteador = createBrowserRouter(
           ),
         },
         {
-          path: "compras/ordenes-compra",
+          path: "proveedores/ordenes",
           element: (
             <Suspense fallback={<CargandoPagina />}>
               <PaginaOrdenesCompra />
@@ -314,7 +314,7 @@ export const ruteador = createBrowserRouter(
           ),
         },
         {
-          path: "compras/proveedores",
+          path: "proveedores",
           element: (
             <Suspense fallback={<CargandoPagina />}>
               <PaginaProveedores />

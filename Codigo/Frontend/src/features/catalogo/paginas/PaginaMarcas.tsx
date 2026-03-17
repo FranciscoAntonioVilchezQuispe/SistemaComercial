@@ -17,9 +17,10 @@ import {
 import { Loading } from "@compartido/componentes/feedback/Loading";
 import { MensajeError } from "@compartido/componentes/feedback/MensajeError";
 import { Marca, MarcaFormData } from "../tipos/catalogo.types";
+import { ModuleTabBar } from "@/componentes/shared/ModuleTabBar";
+import { RUTAS_TITULOS } from "@/config/rutasTitulos";
 import { DataTable } from "@/components/ui/DataTable";
 import { usePagination } from "@/hooks/usePagination";
-import { CatalogoHeader } from "../componentes/comunes/CatalogoHeader";
 
 export function PaginaMarcas() {
   const [dialogoAbierto, setDialogoAbierto] = useState(false);
@@ -129,16 +130,23 @@ export function PaginaMarcas() {
     },
   ];
 
-  return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">Marcas</h1>
-        <p className="text-muted-foreground">
-          Gestiona las marcas de tus productos para una clasificación precisa.
-        </p>
-      </div>
+  const tabsCatalogo = [
+    { label: RUTAS_TITULOS["/catalogo/productos"], to: "/catalogo/productos" },
+    { label: RUTAS_TITULOS["/catalogo/categorias"], to: "/catalogo/categorias" },
+    { label: RUTAS_TITULOS["/catalogo/marcas"], to: "/catalogo/marcas" },
+    { label: RUTAS_TITULOS["/catalogo/unidades-medida"], to: "/catalogo/unidades-medida" },
+    { label: RUTAS_TITULOS["/catalogo/listas-precios"], to: "/catalogo/listas-precios" },
+  ];
 
-      <CatalogoHeader />
+  return (
+    <div className="space-y-4">
+      <ModuleTabBar tabs={tabsCatalogo} />
+
+      <div className="flex justify-end mb-2">
+        <Button onClick={manejarAbrirCrear} size="sm">
+          <Plus className="mr-2 h-4 w-4" /> Nueva Marca
+        </Button>
+      </div>
 
       <DataTable
         data={marcas}
@@ -150,15 +158,6 @@ export function PaginaMarcas() {
         onActiveFilterChange={cambiarFiltroActivo}
         searchPlaceholder="Buscar por nombre o país..."
         isLoading={isLoading}
-        actionElement={
-          <Button
-            onClick={manejarAbrirCrear}
-            className="bg-blue-600 hover:bg-blue-700 text-white rounded-full px-6"
-          >
-            <Plus className="mr-2 h-4 w-4" />
-            Nuevo
-          </Button>
-        }
       />
 
       <Dialog open={dialogoAbierto} onOpenChange={setDialogoAbierto}>

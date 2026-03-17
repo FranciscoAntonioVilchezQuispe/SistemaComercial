@@ -16,6 +16,21 @@ namespace Inventario.API.Endpoints
     {
         public static void MapMovimientosEndpoints(this IEndpointRouteBuilder app)
         {
+            app.MapGet("/api/inventario/tipos-movimiento", async (IInventarioDbContext context) =>
+            {
+                var tipos = await context.TiposMovimiento
+                    .Where(t => t.IdTabla == 6)
+                    .Select(t => new TipoMovimientoDto
+                    {
+                        Id = t.Id,
+                        Codigo = t.Codigo,
+                        Nombre = t.Nombre
+                    })
+                    .ToListAsync();
+
+                return Results.Ok(tipos);
+            }).WithTags("Configuracion Inventario");
+
             var grupo = app.MapGroup("/api/inventario/movimientos").WithTags("Movimientos");
             
             grupo.MapGet("/", async (long? idProducto, long? idAlmacen, IInventarioDbContext context, int pagina = 1, int limite = 10) =>

@@ -166,18 +166,27 @@ namespace Compras.API.Infrastructure.Migrations
 
                     b.Property<string>("AfectacionIgv")
                         .IsRequired()
-                        .HasMaxLength(1)
-                        .HasColumnType("character varying(1)")
+                        .HasMaxLength(2)
+                        .HasColumnType("character varying(2)")
                         .HasColumnName("afectacion_igv");
 
                     b.Property<decimal>("Cantidad")
                         .HasColumnType("decimal(10,3)")
                         .HasColumnName("cantidad");
 
+                    b.Property<string>("CodigoTributo")
+                        .HasMaxLength(4)
+                        .HasColumnType("character varying(4)")
+                        .HasColumnName("codigo_tributo");
+
                     b.Property<string>("Descripcion")
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)")
                         .HasColumnName("descripcion");
+
+                    b.Property<decimal>("DescuentoItem")
+                        .HasColumnType("decimal(12,4)")
+                        .HasColumnName("descuento_item");
 
                     b.Property<DateTime?>("FechaActualizacion")
                         .HasColumnType("timestamp with time zone")
@@ -191,6 +200,10 @@ namespace Compras.API.Infrastructure.Migrations
                         .HasColumnType("bigint")
                         .HasColumnName("id_compra");
 
+                    b.Property<long>("IdComprao")
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_comprao");
+
                     b.Property<long>("IdProducto")
                         .HasColumnType("bigint")
                         .HasColumnName("id_producto");
@@ -198,6 +211,10 @@ namespace Compras.API.Infrastructure.Migrations
                     b.Property<long?>("IdVariante")
                         .HasColumnType("bigint")
                         .HasColumnName("id_variante");
+
+                    b.Property<decimal?>("PrecioUnitarioBase")
+                        .HasColumnType("decimal(12,4)")
+                        .HasColumnName("precio_unitario_base");
 
                     b.Property<decimal>("PrecioUnitarioCompra")
                         .HasColumnType("decimal(12,2)")
@@ -218,11 +235,15 @@ namespace Compras.API.Infrastructure.Migrations
                         .HasColumnType("character varying(50)")
                         .HasColumnName("usuario_creacion");
 
+                    b.Property<decimal?>("ValorItem")
+                        .HasColumnType("decimal(12,4)")
+                        .HasColumnName("valor_item");
+
                     b.HasKey("Id")
                         .HasName("pk_detalle_compra");
 
-                    b.HasIndex("IdCompra")
-                        .HasDatabaseName("ix_detalle_compra_id_compra");
+                    b.HasIndex("IdComprao")
+                        .HasDatabaseName("ix_detalle_compra_id_comprao");
 
                     b.ToTable("detalle_compra", "compras");
                 });
@@ -370,6 +391,21 @@ namespace Compras.API.Infrastructure.Migrations
                         .HasColumnType("boolean")
                         .HasColumnName("activado");
 
+                    b.Property<string>("CodigoMotivo")
+                        .HasMaxLength(2)
+                        .HasColumnType("character varying(2)")
+                        .HasColumnName("codigo_motivo");
+
+                    b.Property<string>("CodigoTipoComprobanteRef")
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)")
+                        .HasColumnName("codigo_tipo_comprobante_ref");
+
+                    b.Property<string>("DescripcionMotivo")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("descripcion_motivo");
+
                     b.Property<DateTime?>("FechaActualizacion")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("fecha_modificacion");
@@ -405,11 +441,21 @@ namespace Compras.API.Infrastructure.Migrations
                         .HasColumnType("character varying(20)")
                         .HasColumnName("numero_comprobante");
 
+                    b.Property<string>("NumeroRef")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("numero_ref");
+
                     b.Property<string>("SerieComprobante")
                         .IsRequired()
                         .HasMaxLength(10)
                         .HasColumnType("character varying(10)")
                         .HasColumnName("serie_comprobante");
+
+                    b.Property<string>("SerieRef")
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)")
+                        .HasColumnName("serie_ref");
 
                     b.Property<decimal>("Subtotal")
                         .HasColumnType("decimal(12,2)")
@@ -807,10 +853,10 @@ namespace Compras.API.Infrastructure.Migrations
                 {
                     b.HasOne("Compras.API.Domain.Entidades.Compra", "Compra")
                         .WithMany("Detalles")
-                        .HasForeignKey("IdCompra")
+                        .HasForeignKey("IdComprao")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("fk_detalle_compra_compras_id_compra");
+                        .HasConstraintName("fk_detalle_compra_compras_id_comprao");
 
                     b.Navigation("Compra");
                 });

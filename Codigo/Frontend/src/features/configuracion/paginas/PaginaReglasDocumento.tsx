@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus, Edit2, Trash2, Link } from "lucide-react";
+import { Plus, Edit2, Trash2, Link, CheckCircle, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -11,13 +11,6 @@ import { DataTable } from "@/components/ui/DataTable";
 import { Loading } from "@compartido/componentes/feedback/Loading";
 import { MensajeError } from "@compartido/componentes/feedback/MensajeError";
 import { toast } from "sonner";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { ReglaDocumento } from "@configuracion/services/reglasDocumentoService";
 import {
   useReglasDocumentosCRUD,
@@ -40,6 +33,16 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { ModuleTabBar } from "@/componentes/shared/ModuleTabBar";
+import { RUTAS_TITULOS } from "@/config/rutasTitulos";
 
 export function PaginaReglasDocumento() {
   const [dialogoReglaOpen, setDialogoReglaOpen] = useState(false);
@@ -61,6 +64,18 @@ export function PaginaReglasDocumento() {
   const actualizarRelaciones = useActualizarRelaciones();
   const [eliminarId, setEliminarId] = useState<number | null>(null);
 
+  const tabsConfig = [
+    { label: RUTAS_TITULOS["/configuracion/empresa"], to: "/configuracion/empresa" },
+    { label: RUTAS_TITULOS["/configuracion/sucursales"], to: "/configuracion/sucursales" },
+    { label: RUTAS_TITULOS["/configuracion/impuestos"], to: "/configuracion/impuestos" },
+    { label: RUTAS_TITULOS["/configuracion/metodos-pago"], to: "/configuracion/metodos-pago" },
+    { label: RUTAS_TITULOS["/configuracion/comprobantes"], to: "/configuracion/comprobantes" },
+    { label: RUTAS_TITULOS["/configuracion/reglas-sunat"], to: "/configuracion/reglas-sunat" },
+    { label: RUTAS_TITULOS["/configuracion/operaciones-sunat"], to: "/configuracion/operaciones-sunat" },
+    { label: RUTAS_TITULOS["/configuracion/matriz-sunat"], to: "/configuracion/matriz-sunat" },
+    { label: RUTAS_TITULOS["/configuracion/tablas-generales"], to: "/configuracion/tablas-generales" },
+  ];
+
   const handleGuardarRegla = (datos: any) => {
     guardarRegla.mutate(datos, {
       onSuccess: () => {
@@ -73,11 +88,6 @@ export function PaginaReglasDocumento() {
             (e.response?.data?.message || e.message || "Error desconocido"),
         ),
     });
-  };
-
-  // Ahora la eliminación se realiza mediante AlertDialog: abrir con setEliminarId
-  const handleEliminarRegla = (regla: ReglaDocumento) => {
-    setEliminarId(regla.id ?? null);
   };
 
   const handleOpenRelaciones = (regla: ReglaDocumento) => {
@@ -120,49 +130,62 @@ export function PaginaReglasDocumento() {
     {
       header: "Código SUNAT",
       accessorKey: "codigo",
-      className: "font-mono font-bold",
+      cell: (row: ReglaDocumento) => (
+        <span className="font-mono font-bold bg-muted/50 text-muted-foreground border border-muted/20 px-2 py-0.5 rounded text-[11px]">
+          {row.codigo}
+        </span>
+      ),
     },
     {
       header: "Nombre",
       accessorKey: "nombre",
+      className: "font-semibold text-primary",
     },
     {
       header: "Longitud",
       accessorKey: "longitud",
+      className: "text-muted-foreground font-mono text-center",
     },
     {
       header: "Tipo",
       accessorKey: "esNumerico",
-      cell: (row: ReglaDocumento) =>
-        row.esNumerico ? "Numérico" : "Alfanumérico",
+      cell: (row: ReglaDocumento) => (
+        <span className="text-xs">{row.esNumerico ? "Numérico" : "Alfanumérico"}</span>
+      ),
     },
     {
       header: "Estado",
       accessorKey: "activado",
       cell: (row: ReglaDocumento) => (
-        <span
-          className={`text-xs px-2 py-0.5 rounded-full ${row.activado ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}
-        >
-          {row.activado ? "Activo" : "Inactivo"}
-        </span>
+        row.activado ? (
+          <Badge variant="default" className="gap-1 bg-green-500/10 text-green-600 border-green-200 hover:bg-green-500/20 shadow-none text-[11px] h-5">
+            <CheckCircle className="h-3 w-3" /> Activo
+          </Badge>
+        ) : (
+          <Badge variant="secondary" className="gap-1 bg-muted/50 text-muted-foreground shadow-none text-[11px] h-5">
+            <XCircle className="h-3 w-3" /> Inactivo
+          </Badge>
+        )
       ),
     },
     {
       header: "Acciones",
       className: "text-right",
       cell: (row: ReglaDocumento) => (
-        <div className="flex justify-end gap-2">
+        <div className="flex justify-end gap-1">
           <Button
             variant="ghost"
-            size="icon"
+            size="sm"
             title="Gestionar Comprobantes Permitidos"
             onClick={() => handleOpenRelaciones(row)}
+            className="h-8 w-8 p-0"
           >
-            <Link className="h-4 w-4 text-blue-600" />
+            <Link className="h-4 w-4 text-primary" />
           </Button>
           <Button
             variant="ghost"
-            size="icon"
+            size="sm"
+            className="h-8 w-8 p-0"
             onClick={() => {
               setReglaSeleccionada(row);
               setDialogoReglaOpen(true);
@@ -172,9 +195,9 @@ export function PaginaReglasDocumento() {
           </Button>
           <Button
             variant="ghost"
-            size="icon"
-            className="text-destructive"
-            onClick={() => handleEliminarRegla(row)}
+            size="sm"
+            className="text-destructive h-8 w-8 p-0 hover:text-destructive hover:bg-destructive/10"
+            onClick={() => setEliminarId(row.id ?? null)}
           >
             <Trash2 className="h-4 w-4" />
           </Button>
@@ -188,36 +211,28 @@ export function PaginaReglasDocumento() {
     return <MensajeError mensaje="Error al cargar las reglas de documentos" />;
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-start">
-        <div>
-          <h1 className="text-3xl font-bold text-slate-900">
-            Tipos de Documento (Identidad)
-          </h1>
-          <p className="text-muted-foreground">
-            Mantenimiento de documentos de identidad permitidos (DNI, RUC, etc.)
-            y su configuración SUNAT.
-          </p>
-        </div>
-        <Button
-          onClick={() => {
-            setReglaSeleccionada(null);
-            setDialogoReglaOpen(true);
-          }}
-        >
-          <Plus className="mr-2 h-4 w-4" /> Nuevo Tipo
-        </Button>
-      </div>
+    <div className="space-y-4">
+      <ModuleTabBar tabs={tabsConfig} />
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Listado de Documentos Identidad</CardTitle>
-          <CardDescription>
-            Defina la longitud y formato de los documentos permitidos para
-            clientes y proveedores.
-          </CardDescription>
+      <Card className="rounded-xl border border-muted/20 bg-card shadow-sm overflow-hidden">
+        <CardHeader className="bg-muted/5 border-b pb-4 flex flex-row items-center justify-between space-y-0">
+          <div className="space-y-1">
+            <CardTitle className="text-lg">Tipos de Documento (Identidad)</CardTitle>
+            <CardDescription>
+              Mantenimiento de documentos de identidad permitidos (DNI, RUC, etc.).
+            </CardDescription>
+          </div>
+          <Button
+            size="sm"
+            onClick={() => {
+              setReglaSeleccionada(null);
+              setDialogoReglaOpen(true);
+            }}
+          >
+            <Plus className="mr-2 h-4 w-4" /> Nuevo Tipo
+          </Button>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-6">
           <DataTable data={(reglas || []) as any[]} columns={columnas} />
         </CardContent>
       </Card>
@@ -249,16 +264,17 @@ export function PaginaReglasDocumento() {
             <DialogTitle>Comprobantes Permitidos</DialogTitle>
             <CardDescription>
               Seleccione los comprobantes que se pueden emitir/recibir con el
-              documento: <b>{docParaRelacion}</b>
+              documento: <b className="text-primary">{docParaRelacion}</b>
             </CardDescription>
           </DialogHeader>
 
           <div className="space-y-4 py-4">
-            <div className="grid grid-cols-1 gap-2 border rounded-md p-4 max-h-[300px] overflow-y-auto">
+            <div className="grid grid-cols-1 gap-1 border border-muted/20 rounded-lg p-2 max-h-[300px] overflow-y-auto bg-muted/5">
               {tiposComprobante?.map((tipo) => (
                 <div
                   key={tipo.id}
-                  className="flex items-center space-x-3 p-2 hover:bg-slate-50 rounded-md transition-colors"
+                  className="flex items-center space-x-3 p-2 hover:bg-muted/20 rounded-md transition-colors cursor-pointer"
+                  onClick={() => toggleRelacion(tipo.id)}
                 >
                   <Checkbox
                     id={`tipo-${tipo.id}`}
@@ -267,23 +283,26 @@ export function PaginaReglasDocumento() {
                   />
                   <label
                     htmlFor={`tipo-${tipo.id}`}
-                    className="text-sm font-medium leading-none cursor-pointer"
+                    className="text-sm font-medium leading-none cursor-pointer flex-1"
                   >
-                    {tipo.codigo} - {tipo.nombre}
+                    <span className="font-mono text-[11px] text-muted-foreground mr-2">{tipo.codigo}</span>
+                    {tipo.nombre}
                   </label>
                 </div>
               ))}
             </div>
           </div>
 
-          <div className="flex justify-end gap-2">
+          <div className="flex justify-end gap-2 pt-4 border-t">
             <Button
               variant="outline"
+              size="sm"
               onClick={() => setDialogoRelacionesOpen(false)}
             >
               Cancelar
             </Button>
             <Button
+              size="sm"
               onClick={handleGuardarRelaciones}
               disabled={actualizarRelaciones.isPending}
             >
@@ -294,6 +313,7 @@ export function PaginaReglasDocumento() {
           </div>
         </DialogContent>
       </Dialog>
+
       <AlertDialog
         open={eliminarId !== null}
         onOpenChange={(open) => !open && setEliminarId(null)}

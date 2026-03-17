@@ -7,6 +7,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { ModuleTabBar } from "@/componentes/shared/ModuleTabBar";
+import { RUTAS_TITULOS } from "@/config/rutasTitulos";
 import { CategoriaForm } from "../componentes/categorias/CategoriaForm";
 import {
   useCategorias,
@@ -19,7 +21,6 @@ import { MensajeError } from "@compartido/componentes/feedback/MensajeError";
 import { Categoria, CategoriaFormData } from "../tipos/catalogo.types";
 import { DataTable } from "@/components/ui/DataTable";
 import { usePagination } from "@/hooks/usePagination";
-import { CatalogoHeader } from "../componentes/comunes/CatalogoHeader";
 
 export function PaginaCategorias() {
   const [dialogoAbierto, setDialogoAbierto] = useState(false);
@@ -131,16 +132,23 @@ export function PaginaCategorias() {
     },
   ];
 
-  return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">Categorías</h1>
-        <p className="text-muted-foreground">
-          Gestión de categorías de productos.
-        </p>
-      </div>
+  const tabsCatalogo = [
+    { label: RUTAS_TITULOS["/catalogo/productos"], to: "/catalogo/productos" },
+    { label: RUTAS_TITULOS["/catalogo/categorias"], to: "/catalogo/categorias" },
+    { label: RUTAS_TITULOS["/catalogo/marcas"], to: "/catalogo/marcas" },
+    { label: RUTAS_TITULOS["/catalogo/unidades-medida"], to: "/catalogo/unidades-medida" },
+    { label: RUTAS_TITULOS["/catalogo/listas-precios"], to: "/catalogo/listas-precios" },
+  ];
 
-      <CatalogoHeader />
+  return (
+    <div className="space-y-4">
+      <ModuleTabBar tabs={tabsCatalogo} />
+
+      <div className="flex justify-end mb-2">
+        <Button onClick={manejarAbrirCrear} size="sm">
+          <Plus className="mr-2 h-4 w-4" /> Nueva Categoría
+        </Button>
+      </div>
 
       <DataTable
         data={categorias}
@@ -152,15 +160,6 @@ export function PaginaCategorias() {
         onActiveFilterChange={cambiarFiltroActivo}
         searchPlaceholder="Buscar por nombre o descripción..."
         isLoading={isLoading}
-        actionElement={
-          <Button
-            onClick={manejarAbrirCrear}
-            className="bg-blue-600 hover:bg-blue-700 text-white rounded-full px-6"
-          >
-            <Plus className="mr-2 h-4 w-4" />
-            Nuevo
-          </Button>
-        }
       />
 
       <Dialog open={dialogoAbierto} onOpenChange={setDialogoAbierto}>

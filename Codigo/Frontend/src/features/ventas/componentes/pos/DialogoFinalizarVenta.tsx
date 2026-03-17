@@ -21,6 +21,15 @@ import { useSeries } from "../../hooks/useVentas";
 import { formatearMoneda } from "@compartido/utilidades/moneda";
 
 import { useTipoComprobante } from "@/features/configuracion/hooks/useTipoComprobante";
+import { useComprobantesPorDocumento } from "@/features/configuracion/hooks/useComprobantesPorDocumento";
+import { useTiposOperacionSunat } from "@/features/configuracion/hooks/useTiposOperacionSunat";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface DialogoFinalizarVentaProps {
   open: boolean;
@@ -37,6 +46,7 @@ interface DialogoFinalizarVentaProps {
     tipoComprobante: string,
     serie: string,
     numero: number,
+    tipoOperacion?: string,
   ) => Promise<void>;
   tipoComprobanteSeleccionado?: string;
 }
@@ -55,11 +65,23 @@ export function DialogoFinalizarVenta({
   onConfirmar,
   tipoComprobanteSeleccionado,
 }: DialogoFinalizarVentaProps) {
-  const { data: tiposComprobante = [], isLoading: cargandoTipos } =
-    useTipoComprobante("VENTA");
+  // Carga filtrada de comprobantes segun el documento del cliente (DNI/RUC)
+  const { data: tiposComprobanteRules = [], isLoading: cargandoTiposRules } =
+    useComprobantesPorDocumento(cliente.idTipoDocumento?.toString());
+
+  // Si no hay reglas (cliente nuevo o error), fallback al hook general
+  const { data: tiposComprobanteGen = [] } = useTipoComprobante("VENTA");
+
+  const tiposComprobante =
+    tiposComprobanteRules.length > 0 ? tiposComprobanteRules : tiposComprobanteGen;
+
+  const { data: tiposOperacion = [] } =
+    useTiposOperacionSunat();
+
   const [tipoComprobante, setTipoComprobante] = useState(
     tipoComprobanteSeleccionado || "",
   );
+  const [tipoOperacion, setTipoOperacion] = useState("0101"); // Venta Interna por defecto
   const [procesando, setProcesando] = useState(false);
   const [serieSeleccionada, setSerieSeleccionada] = useState<any>(null);
 
@@ -98,6 +120,7 @@ export function DialogoFinalizarVenta({
         tipoComprobante,
         serieSeleccionada.serie,
         serieSeleccionada.correlativoActual + 1,
+        tipoOperacion,
       );
       onOpenChange(false);
     } catch (error) {
@@ -202,9 +225,9 @@ export function DialogoFinalizarVenta({
                 onValueChange={setTipoComprobante}
                 className="mt-2 space-y-2"
               >
-                {cargandoTipos ? (
+                {cargandoTiposRules ? (
                   <p className="text-sm text-muted-foreground animate-pulse">
-                    Cargando tipos...
+                    Cargando permitidos...
                   </p>
                 ) : (
                   tiposComprobante.map((tipo) => (
@@ -228,8 +251,25 @@ export function DialogoFinalizarVenta({
               </RadioGroup>
             </div>
 
-            <div className="space-y-2">
-              <Label className="text-sm font-medium">Serie y Correlativo</Label>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label className="text-sm font-medium">Tipo Operación SUNAT</Label>
+                <Select value={tipoOperacion} onValueChange={setTipoOperacion}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Seleccione operación" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {tiposOperacion.map((op) => (
+                      <SelectItem key={op.id} value={op.codigo}>
+                        {op.codigo} - {op.nombre}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-sm font-medium">Serie y Correlativo</Label>
               <div className="border rounded-lg p-3 bg-muted/30 h-[100px] flex flex-col justify-center">
                 {cargandoSeries ? (
                   <p className="text-sm text-center animate-pulse">

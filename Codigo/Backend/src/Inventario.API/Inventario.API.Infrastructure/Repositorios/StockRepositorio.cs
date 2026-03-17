@@ -37,6 +37,13 @@ namespace Inventario.API.Infrastructure.Repositorios
                 .ToListAsync();
         }
 
+        public async Task<IEnumerable<Stock>> ObtenerPorProductoAsync(long idProducto)
+        {
+            return await _context.Stocks
+                .Where(s => s.IdProducto == idProducto)
+                .ToListAsync();
+        }
+
         public async Task<IEnumerable<Stock>> ObtenerTodoAsync()
         {
             return await _context.Stocks.ToListAsync();

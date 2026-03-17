@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus, Edit2, Trash2, Percent } from "lucide-react";
+import { Plus, Edit2, Trash2, Percent, CheckCircle, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -30,6 +30,15 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { ModuleTabBar } from "@/componentes/shared/ModuleTabBar";
+import { RUTAS_TITULOS } from "@/config/rutasTitulos";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 export function PaginaImpuestos() {
   const [dialogoOpen, setDialogoOpen] = useState(false);
@@ -43,6 +52,18 @@ export function PaginaImpuestos() {
   const actualizarMutation = useActualizarImpuesto();
   const eliminarMutation = useEliminarImpuesto();
 
+  const tabsConfig = [
+    { label: RUTAS_TITULOS["/configuracion/empresa"], to: "/configuracion/empresa" },
+    { label: RUTAS_TITULOS["/configuracion/sucursales"], to: "/configuracion/sucursales" },
+    { label: RUTAS_TITULOS["/configuracion/impuestos"], to: "/configuracion/impuestos" },
+    { label: RUTAS_TITULOS["/configuracion/metodos-pago"], to: "/configuracion/metodos-pago" },
+    { label: RUTAS_TITULOS["/configuracion/comprobantes"], to: "/configuracion/comprobantes" },
+    { label: RUTAS_TITULOS["/configuracion/reglas-sunat"], to: "/configuracion/reglas-sunat" },
+    { label: RUTAS_TITULOS["/configuracion/operaciones-sunat"], to: "/configuracion/operaciones-sunat" },
+    { label: RUTAS_TITULOS["/configuracion/matriz-sunat"], to: "/configuracion/matriz-sunat" },
+    { label: RUTAS_TITULOS["/configuracion/tablas-generales"], to: "/configuracion/tablas-generales" },
+  ];
+
   const handleCrear = () => {
     setRegistroSeleccionado(null);
     setDialogoOpen(true);
@@ -52,8 +73,6 @@ export function PaginaImpuestos() {
     setRegistroSeleccionado(impuesto);
     setDialogoOpen(true);
   };
-
-  // Eliminación via AlertDialog: usar setEliminarId para abrir diálogo
 
   const handleGuardar = (datos: ImpuestoFormData) => {
     if (registroSeleccionado) {
@@ -85,50 +104,59 @@ export function PaginaImpuestos() {
     {
       header: "Código",
       accessorKey: "codigo" as keyof Impuesto,
-      className: "font-mono font-medium",
+      cell: (row: Impuesto) => (
+        <span className="font-mono font-bold bg-muted/50 text-muted-foreground border border-muted/20 px-2 py-0.5 rounded text-[11px]">
+          {row.codigo}
+        </span>
+      ),
     },
     {
-      header: "Nombre",
+      header: "Nombre del Impuesto",
       accessorKey: "nombre" as keyof Impuesto,
-      className: "font-semibold",
+      className: "font-semibold text-primary",
     },
     {
       header: "Porcentaje",
       accessorKey: "porcentaje" as keyof Impuesto,
       cell: (row: Impuesto) => (
-        <div className="flex items-center gap-1 font-mono">
-          <Percent className="h-3 w-3 text-muted-foreground" />
+        <div className="flex items-center gap-1 font-mono font-bold text-blue-600">
+          <Percent className="h-3 w-3" />
           <span>{row.porcentaje.toFixed(2)}%</span>
         </div>
       ),
     },
     {
-      header: "Es IGV",
+      header: "Estado",
       accessorKey: "esIgv" as keyof Impuesto,
       cell: (row: Impuesto) =>
         row.esIgv ? (
-          <Badge variant="outline" className="border-blue-500 text-blue-500">
-            IGV Principal
+          <Badge variant="default" className="gap-1 bg-blue-500/10 text-blue-600 border-blue-200 hover:bg-blue-500/20 shadow-none text-[11px] h-5">
+            <CheckCircle className="h-3 w-3" /> Principal (IGV)
           </Badge>
-        ) : null,
+        ) : (
+          <Badge variant="secondary" className="bg-muted/50 text-muted-foreground shadow-none text-[11px] h-5">
+            Otros
+          </Badge>
+        ),
     },
     {
       header: "Acciones",
       className: "text-right",
       cell: (row: Impuesto) => (
-        <div className="flex justify-end gap-2">
+        <div className="flex justify-end gap-1">
           <Button
             variant="ghost"
-            size="icon"
+            size="sm"
             onClick={() => handleEditar(row)}
             title="Editar"
+            className="h-8 w-8 p-0"
           >
             <Edit2 className="h-4 w-4" />
           </Button>
           <Button
             variant="ghost"
-            size="icon"
-            className="text-destructive"
+            size="sm"
+            className="text-destructive h-8 w-8 p-0 hover:text-destructive hover:bg-destructive/10"
             onClick={() => setEliminarId(row.id)}
             title="Eliminar"
           >
@@ -140,23 +168,25 @@ export function PaginaImpuestos() {
   ];
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">Impuestos y Tasas</h1>
-        <p className="text-muted-foreground">
-          Gestión de impuestos aplicables a ventas y compras (IGV, IVA, etc.).
-        </p>
-      </div>
+    <div className="space-y-4">
+      <ModuleTabBar tabs={tabsConfig} />
 
-      <DataTable
-        data={impuestos || []}
-        columns={columns}
-        actionElement={
-          <Button onClick={handleCrear}>
+      <Card className="rounded-xl border border-muted/20 bg-card shadow-sm overflow-hidden">
+        <CardHeader className="bg-muted/5 border-b pb-4 flex flex-row items-center justify-between space-y-0">
+          <div className="space-y-1">
+            <CardTitle className="text-lg">Impuestos y Tasas</CardTitle>
+            <CardDescription>
+              Gestión de impuestos aplicables a ventas y compras (IGV, IVA, etc.).
+            </CardDescription>
+          </div>
+          <Button onClick={handleCrear} size="sm">
             <Plus className="mr-2 h-4 w-4" /> Nuevo Impuesto
           </Button>
-        }
-      />
+        </CardHeader>
+        <CardContent className="p-6">
+          <DataTable data={impuestos || []} columns={columns} />
+        </CardContent>
+      </Card>
 
       <Dialog open={dialogoOpen} onOpenChange={setDialogoOpen}>
         <DialogContent>

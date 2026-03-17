@@ -17,10 +17,11 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { ModuleTabBar } from "@/componentes/shared/ModuleTabBar";
+import { RUTAS_TITULOS } from "@/config/rutasTitulos";
 import { DataTable } from "@/components/ui/DataTable";
 import { toast } from "sonner";
 import { ListaPrecio } from "../tipos/catalogo.types";
-import { CatalogoHeader } from "../componentes/comunes/CatalogoHeader";
 import {
   useListasPrecios,
   useEliminarListaPrecio,
@@ -84,29 +85,29 @@ export function PaginaListasPrecios() {
     },
   ];
 
-  return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold flex items-center gap-2">
-          Listas de Precios
-        </h1>
-        <p className="text-muted-foreground">
-          Define diferentes niveles de precios para tus productos
-        </p>
-      </div>
+  const tabsCatalogo = [
+    { label: RUTAS_TITULOS["/catalogo/productos"], to: "/catalogo/productos" },
+    { label: RUTAS_TITULOS["/catalogo/categorias"], to: "/catalogo/categorias" },
+    { label: RUTAS_TITULOS["/catalogo/marcas"], to: "/catalogo/marcas" },
+    { label: RUTAS_TITULOS["/catalogo/unidades-medida"], to: "/catalogo/unidades-medida" },
+    { label: RUTAS_TITULOS["/catalogo/listas-precios"], to: "/catalogo/listas-precios" },
+  ];
 
-      <CatalogoHeader />
+  return (
+    <div className="space-y-4">
+      <ModuleTabBar tabs={tabsCatalogo} />
+
+      <div className="flex justify-end mb-2">
+        <Button onClick={handleNuevo} size="sm">
+          <Plus className="mr-2 h-4 w-4" /> Nueva Lista
+        </Button>
+      </div>
 
       <DataTable
         data={listas?.datos || []}
         columns={columnas}
         isLoading={isLoading}
         searchPlaceholder="Buscar lista..."
-        actionElement={
-          <Button onClick={handleNuevo}>
-            <Plus className="mr-2 h-4 w-4" /> Nuevo
-          </Button>
-        }
       />
 
       <Dialog open={dialogoOpen} onOpenChange={setDialogoOpen}>

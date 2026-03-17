@@ -11,9 +11,9 @@ namespace Configuracion.API.Domain.Entidades
         public override long Id { get; set; }
 
         [Required]
-        [MaxLength(2)]
+        [MaxLength(4)]
         [Column("codigo")]
-        public string Codigo { get; set; } = null!; // Código SUNAT (ej. 01, 02, 11)
+        public string Codigo { get; set; } = null!; // Código SUNAT (ej. 01, 0101, 11)
 
         [Required]
         [MaxLength(200)]

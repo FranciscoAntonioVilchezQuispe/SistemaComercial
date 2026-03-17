@@ -9,7 +9,8 @@ const BASE_URL = "/operaciones-sunat";
 export const servicioTipoOperacion = {
   obtenerTodos: async (): Promise<TipoOperacionSunat[]> => {
     const response: any = await apiConfiguracion.get(BASE_URL);
-    return response.datos || response.data || response;
+    const lista = response.datos || response.data || response;
+    return Array.isArray(lista) ? lista : [];
   },
 
   crear: async (

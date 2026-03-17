@@ -56,6 +56,26 @@ namespace Ventas.API.Domain.Entidades
         [Column("id_estado")]
         public long IdEstado { get; set; }
 
+        [MaxLength(10)]
+        [Column("codigo_tipo_comprobante_ref")]
+        public string? CodigoTipoComprobanteRef { get; set; }
+
+        [MaxLength(10)]
+        [Column("serie_ref")]
+        public string? SerieRef { get; set; }
+
+        [MaxLength(20)]
+        [Column("numero_ref")]
+        public string? NumeroRef { get; set; }
+
+        [MaxLength(2)]
+        [Column("codigo_motivo")]
+        public string? CodigoMotivo { get; set; }
+
+        [MaxLength(200)]
+        [Column("descripcion_motivo")]
+        public string? DescripcionMotivo { get; set; }
+
         [ForeignKey("IdVentaReferencia")]
         public virtual Venta Venta { get; set; } = null!;
 

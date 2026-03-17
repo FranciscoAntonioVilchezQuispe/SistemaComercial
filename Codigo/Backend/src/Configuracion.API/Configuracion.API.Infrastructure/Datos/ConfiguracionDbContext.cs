@@ -48,6 +48,37 @@ namespace Configuracion.API.Infrastructure.Datos
             modelBuilder.Entity<DocumentoComprobanteRelacion>().ToTable("regla_documento_comprobante", "configuracion");
             modelBuilder.Entity<TipoOperacionSunat>().ToTable("tipo_operacion_sunat", "configuracion");
             modelBuilder.Entity<MatrizReglaSunat>().ToTable("matriz_regla_sunat", "configuracion");
+
+            // Configuración de Relaciones (Fluent API)
+
+            // 1. Serie_comprobante -> Tipo_comprobante
+            modelBuilder.Entity<SerieComprobante>()
+                .HasOne(s => s.TipoComprobante)
+                .WithMany()
+                .HasForeignKey(s => s.IdTipoComprobante)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // 2. Regla_documento_comprobante -> Tipo_documento (Por Código)
+            modelBuilder.Entity<DocumentoComprobanteRelacion>()
+                .HasOne(r => r.TipoDocumento)
+                .WithMany()
+                .HasPrincipalKey(d => d.Codigo)
+                .HasForeignKey(r => r.CodigoDocumento)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // 3. Regla_documento_comprobante -> Tipo_comprobante
+            modelBuilder.Entity<DocumentoComprobanteRelacion>()
+                .HasOne(r => r.TipoComprobante)
+                .WithMany()
+                .HasForeignKey(r => r.IdTipoComprobante)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // 4. Sucursal -> Empresa
+            modelBuilder.Entity<Sucursal>()
+                .HasOne(s => s.Empresa)
+                .WithMany()
+                .HasForeignKey(s => s.IdEmpresa)
+                .OnDelete(DeleteBehavior.Restrict);
         }
 
     }

@@ -6,9 +6,9 @@ const BASE_URL = "/sucursales";
 export const servicioSucursal = {
   obtenerTodas: async (): Promise<Sucursal[]> => {
     const response: any = await apiConfiguracion.get(BASE_URL);
-    // Asumiendo que retorna { data: [...] } o directamente [...]
-    // Si usa ToReturnList, response.data es el array
-    return response.datos || response.data || response;
+    // Manejo robusto del array de datos (datos, data o el objeto mismo)
+    const lista = response.datos || response.data || response;
+    return Array.isArray(lista) ? lista : [];
   },
 
   crear: async (datos: SucursalFormData): Promise<Sucursal> => {

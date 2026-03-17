@@ -30,8 +30,24 @@ const createApiInstance = (baseURL: string): AxiosInstance => {
   // Interceptor para manejar respuestas estandarizadas o errores
   instance.interceptors.response.use(
     (response: AxiosResponse) => {
+      const data = response.data;
+      
+      // Si la respuesta tiene un formato estandarizado con un status interno
+      // y ese status indica un error (distinto de 200 o 201), lanzamos error.
+      if (data && typeof data.status === 'number' && ![200, 201].includes(data.status)) {
+        const mensajeError = data.message || "Error en la operación";
+        toast.error(mensajeError, {
+          description: `Código Interno: ${data.status}`,
+        });
+        
+        // Creamos un error personalizado para que sea capturado por el bloque catch/error
+        const error = new Error(mensajeError);
+        (error as any).response = response;
+        throw error;
+      }
+
       // Devolvemos el data directamente que contiene el Wrapper ToReturn/ToReturnList
-      return response.data;
+      return data;
     },
     (error) => {
       if (error.response?.status === 401) {

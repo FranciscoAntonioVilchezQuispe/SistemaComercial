@@ -15,6 +15,8 @@ import {
 } from "@/components/ui/select";
 import { InventarioFiltros, StockProducto } from "../tipos/inventario.types";
 import { ExportadorTabla } from "@/compartido/componentes/tablas/ExportadorTabla";
+import { ModuleTabBar } from "@/componentes/shared/ModuleTabBar";
+import { RUTAS_TITULOS } from "@/config/rutasTitulos";
 
 export function PaginaStock() {
   const [filtros, setFiltros] = useState<InventarioFiltros>({});
@@ -24,13 +26,20 @@ export function PaginaStock() {
 
   const handleVerKardex = (_item: StockProducto) => {
     toast.info("Próximamente: ver Kardex");
-    // Redirigir a página de Kardex con params
   };
 
   const handleAjustar = (_item: StockProducto) => {
     toast.info("Próximamente: ajuste de stock");
-    // Abrir modal de ajuste
   };
+
+  const tabsInventario = [
+    { label: RUTAS_TITULOS["/inventario/stock"], to: "/inventario/stock" },
+    { label: RUTAS_TITULOS["/inventario/movimientos"], to: "/inventario/movimientos" },
+    { label: RUTAS_TITULOS["/inventario/traslados"], to: "/inventario/traslados" },
+    { label: RUTAS_TITULOS["/inventario/kardex/reporte"], to: "/inventario/kardex/reporte" },
+    { label: RUTAS_TITULOS["/inventario/kardex/periodos"], to: "/inventario/kardex/periodos" },
+    { label: RUTAS_TITULOS["/inventario/almacenes"], to: "/inventario/almacenes" },
+  ];
 
   const columnasExportar = [
     { clave: "producto" as any, titulo: "Producto" },
@@ -40,33 +49,25 @@ export function PaginaStock() {
   ];
 
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex justify-between items-center flex-wrap gap-4">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">
-            Stock de Inventario
-          </h1>
-          <p className="text-muted-foreground">
-            Consulta y gestiona las existencias en tiempo real por almacén.
-          </p>
-        </div>
-        <div className="flex items-center gap-2 flex-wrap">
-          <ExportadorTabla
-            datos={data?.datos || []}
-            nombreArchivo="stock_inventario"
-            columnas={columnasExportar}
-          />
-          <Button variant="default">
-            <Plus className="mr-2 h-4 w-4" />
-            Nuevo Movimiento
-          </Button>
-        </div>
+    <div className="space-y-4">
+      <ModuleTabBar tabs={tabsInventario} />
+
+      <div className="flex justify-end gap-2 mb-2">
+        <ExportadorTabla
+          datos={data?.datos || []}
+          nombreArchivo="stock_inventario"
+          columnas={columnasExportar}
+        />
+        <Button variant="default" size="sm">
+          <Plus className="mr-2 h-4 w-4" />
+          Nuevo Movimiento
+        </Button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="bg-primary/5 border-primary/20">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <Card className="bg-primary/5 border-primary/20 shadow-none">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
+            <CardTitle className="text-sm font-medium text-primary">
               Total Productos
             </CardTitle>
             <Package className="h-4 w-4 text-primary" />
@@ -78,9 +79,9 @@ export function PaginaStock() {
             </p>
           </CardContent>
         </Card>
-        <Card className="bg-destructive/5 border-destructive/20">
+        <Card className="bg-destructive/5 border-destructive/20 shadow-none">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Stock Bajo</CardTitle>
+            <CardTitle className="text-sm font-medium text-destructive">Stock Bajo</CardTitle>
             <AlertTriangle className="h-4 w-4 text-destructive" />
           </CardHeader>
           <CardContent>
@@ -94,9 +95,9 @@ export function PaginaStock() {
             </p>
           </CardContent>
         </Card>
-        <Card className="bg-green-500/5 border-green-500/20">
+        <Card className="bg-green-500/5 border-green-500/20 shadow-none">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Almacenes</CardTitle>
+            <CardTitle className="text-sm font-medium text-green-600">Almacenes</CardTitle>
             <History className="h-4 w-4 text-green-500" />
           </CardHeader>
           <CardContent>
@@ -108,11 +109,8 @@ export function PaginaStock() {
         </Card>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Búsqueda y Filtros</CardTitle>
-        </CardHeader>
-        <CardContent>
+      <Card className="shadow-none border-muted/20">
+        <CardContent className="pt-6">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className="relative col-span-1 md:col-span-2">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -146,6 +144,7 @@ export function PaginaStock() {
               onClick={() =>
                 setFiltros({ ...filtros, bajoStock: !filtros.bajoStock })
               }
+              size="sm"
             >
               <AlertTriangle className="mr-2 h-4 w-4" />
               {filtros.bajoStock ? "Ver Todos" : "Sólo Stock Bajo"}
@@ -154,7 +153,7 @@ export function PaginaStock() {
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className="shadow-none border-muted/20">
         <CardContent className="pt-6">
           <TablaStock
             stock={data?.datos || []}

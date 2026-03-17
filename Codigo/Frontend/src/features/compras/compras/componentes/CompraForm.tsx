@@ -50,6 +50,14 @@ import {
 } from "@/features/catalogo/hooks/useProductos";
 import { useReglasDocumentos } from "@/configuracion/hooks/useReglasDocumentos";
 import { useSeriesPorTipo } from "@/features/configuracion/hooks/useSeriesComprobante";
+import { useTiposOperacionSunat } from "@/features/configuracion/hooks/useTiposOperacionSunat";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 import {
   limpiarSoloNumeros,
@@ -77,6 +85,7 @@ const compraSchema = z.object({
   fechaEmision: z.date(),
   fechaVencimiento: z.date().optional().nullable(),
   tipoCambio: z.coerce.number().min(0.001, "TC inválido"),
+  tipoOperacion: z.string().min(1, "Operación requerida"),
   observaciones: z.string().optional(),
   detalles: z
     .array(
@@ -249,6 +258,7 @@ export function CompraForm({
   };
 
   const { data: almacenes } = useAlmacenes();
+  const { data: tiposOperacion = [] } = useTiposOperacionSunat();
   // Se quitó la carga masiva inicial de productos
 
   const form = useForm<CompraFormValues>({
@@ -264,6 +274,7 @@ export function CompraForm({
       fechaEmision: new Date(),
       fechaVencimiento: null,
       tipoCambio: 1.0,
+      tipoOperacion: "0101", // Venta/Compra Interna
       observaciones: "",
       detalles: [
         {
@@ -439,6 +450,7 @@ export function CompraForm({
       total: total,
       saldoPendiente: total, // Inicialmente el saldo es el total
       idEstadoPago: 1, // 1: Pendiente (Asumiendo ID)
+      tipoOperacion: values.tipoOperacion,
       observaciones: values.observaciones,
       detalles: values.detalles.map((d) => ({
         idProducto: d.idProducto,
@@ -774,6 +786,36 @@ export function CompraForm({
                 placeholder="Soles/Dólares"
                 disabled={seccionBloqueada || readOnly}
               />
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="tipoOperacion"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Operación SUNAT</FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                  value={field.value}
+                  disabled={readOnly}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Tipo Operación" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {tiposOperacion.map((op) => (
+                      <SelectItem key={op.id} value={op.codigo}>
+                        {op.codigo} - {op.nombre}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
             )}
           />
         </div>

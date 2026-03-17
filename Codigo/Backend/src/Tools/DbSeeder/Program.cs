@@ -1,6 +1,7 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -56,85 +57,193 @@ class Program
 
     static async Task Main(string[] args)
     {
-        Console.WriteLine("Iniciando DbSeeder V9 (Regex Perfection)...");
+        Console.WriteLine("Iniciando DbSeeder V12 (Robust Recovery)...");
 
         try
         {
-            var schemas = TableSchemaMap.Values.Distinct().ToList();
-            Console.WriteLine("Limpiando esquemas...");
-            foreach (var s in schemas)
+            if (args.Length > 0 && args[0].Equals("RESET", StringComparison.OrdinalIgnoreCase))
             {
-                await ExecuteSqlAsync($"DROP SCHEMA IF EXISTS {s} CASCADE;");
-            }
-
-            Console.WriteLine("Creando esquemas...");
-            await ExecuteSqlAsync(string.Join("\n", schemas.Select(s => $"CREATE SCHEMA IF NOT EXISTS {s};")));
-
-            string schemaPath = @"E:\ProyectosNuevos\SistemaComercial\Codigo\BaseDeDatos\schema_full.sql";
-            if (File.Exists(schemaPath))
-            {
-                Console.WriteLine($"Procesando Schema {schemaPath}...");
-                string content = File.ReadAllText(schemaPath);
-
-                content = content.Replace("fecha_create", "fecha_creacion");
-                content = content.Replace("usuario_create", "usuario_creacion");
-                content = content.Replace("fecha_update", "fecha_modificacion");
-                content = content.Replace("usuario_update", "usuario_modificacion");
-                content = content.Replace("update_fecha_update_column", "update_fecha_modificacion_column");
-
-                // Regex corregido V9: 
-                // UPDATE no consume ON
-                // ON no consume TABLE
-                string pattern = @"\b(TABLE|REFERENCES|INTO|UPDATE(?!\s+ON\b)|ON(?!\s+TABLE\b)|FROM|JOIN)\s+(?:(IF\s+EXISTS)\s+)?([a-zA-Z0-9_]+)\b";
-
-                string transformed = Regex.Replace(content, pattern, match =>
+                Console.WriteLine("!!! MODO RESET INICIADO !!!");
+                var schemas = TableSchemaMap.Values.Distinct().ToList();
+                Console.WriteLine("Borrando esquemas (CASCADE)...");
+                foreach (var s in schemas)
                 {
-                    string keyword = match.Groups[1].Value;
-                    string ifExists = match.Groups[2].Value;
-                    string tableName = match.Groups[3].Value;
-
-                    if (tableName.Contains(".")) return match.Value;
-
-                    if (TableSchemaMap.TryGetValue(tableName, out string? schema))
+                    await ExecuteSqlAsync($"DROP SCHEMA IF EXISTS {s} CASCADE;");
+                }
+                
+                Console.WriteLine("Limpiando funciones en public...");
+                await ExecuteSqlAsync("DROP FUNCTION IF EXISTS public.update_fecha_modificacion_column() CASCADE;");
+                
+                string baseDir = AppContext.BaseDirectory;
+                string projectRoot = Path.GetFullPath(Path.Combine(baseDir, "..", "..", "..", "..", "..", ".."));
+                
+                string[] baseScripts = { 
+                    "00_init_schemas.sql", 
+                    "01_base_schema.sql", 
+                };
+                foreach (var script in baseScripts)
+                {
+                    string path = Path.Combine(projectRoot, "scripts", script);
+                    if (File.Exists(path))
                     {
-                        string fullTable = $"{schema}.{tableName}";
-                        string middle = string.IsNullOrEmpty(ifExists) ? "" : $"{ifExists} ";
-                        return $"{keyword} {middle}{fullTable}";
+                        Console.WriteLine($"\n>>> EJECUTANDO: {script}...");
+                        await ExecuteSqlAsync(File.ReadAllText(path));
                     }
-                    return match.Value;
-                }, RegexOptions.IgnoreCase);
+                }
 
-                string debugPath = @"E:\ProyectosNuevos\SistemaComercial\Codigo\BaseDeDatos\debug_schema_final_v9.sql";
-                await File.WriteAllTextAsync(debugPath, transformed);
+                Console.WriteLine("\n>>> EJECUTANDO BOOTSTRAP DE TABLAS FALTANTES...");
+                string bootstrapPath = Path.Combine(projectRoot, "scripts", "02_bootstrap_sunat.sql");
+                if (File.Exists(bootstrapPath)) 
+                    await ExecuteSqlAsync(File.ReadAllText(bootstrapPath));
 
-                await ExecuteSqlAsync(transformed);
-                Console.WriteLine("Schema ejecutado correctamente.");
+                Console.WriteLine("\n>>> LIMPANDO HISTORIAL DE MIGRACIONES PARA RECONSTRUCCIÓN...");
+                await ExecuteSqlAsync("TRUNCATE TABLE public.\"__EFMigrationsHistory\" RESTART IDENTITY CASCADE;");
+
+                string[] nextScripts = { 
+                    "03_base_data.sql", 
+                    "04_delta_schema.sql",
+                    "05_sunat_master_data.sql",
+                    "06_sunat_improvements_views.sql",
+                    "07_sync_ef_history.sql"
+                };
+                foreach (var script in nextScripts)
+                {
+                    string path = Path.Combine(projectRoot, "scripts", script);
+                    if (File.Exists(path))
+                    {
+                        Console.WriteLine($"\n>>> EJECUTANDO: {script}...");
+                        await ExecuteSqlAsync(File.ReadAllText(path));
+                    }
+                }
+                Console.WriteLine("\n=== RESET COMPLETADO ===");
+                return;
             }
 
-            string seedPath = @"E:\ProyectosNuevos\SistemaComercial\Codigo\BaseDeDatos\seeds_catalogo.sql";
-            if (File.Exists(seedPath))
+            if (args.Length > 0 && File.Exists(args[0]))
             {
-                Console.WriteLine($"Procesando Seeds {seedPath}...");
-                string content = File.ReadAllText(seedPath);
-                await ExecuteSqlAsync(content);
-                Console.WriteLine("Seeds ejecutados correctamente.");
+                string filePath = args[0];
+                Console.WriteLine($"Ejecutando script: {filePath}...");
+                await ExecuteSqlAsync(File.ReadAllText(filePath));
+                Console.WriteLine("Script ejecutado exitosamente.");
+                return;
             }
 
-            Console.WriteLine("=== PROCESO FINALIZADO EXITOSAMENTE ===");
+            Console.WriteLine("Uso: DbSeeder [RESET | <path_to_sql>]");
         }
         catch (Exception ex)
         {
-            await File.WriteAllTextAsync("error_dbseeder_v9.log", ex.ToString());
-            Console.WriteLine($"\n!!! ERROR FATAL !!! Saved to error_dbseeder_v9.log");
+            Console.WriteLine($"\n!!! ERROR CRÍTICO !!! {ex.Message}");
         }
     }
 
     static async Task ExecuteSqlAsync(string sql)
     {
+        if (sql.Contains("-- TOC entry"))
+        {
+            var blocks = sql.Split(new[] { "-- TOC entry" }, StringSplitOptions.None);
+            Console.WriteLine($"Procesando {blocks.Length} bloques...");
+            int success = 0; int fail = 0;
+
+            foreach (var block in blocks)
+            {
+                if (string.IsNullOrWhiteSpace(block)) continue;
+                string blockSql = "-- TOC entry" + block;
+                if (await ExecuteInternalAsync(blockSql, false)) success++; else fail++;
+            }
+            Console.WriteLine($"Resultado: {success} exitosos, {fail} fallidos.");
+        }
+        else
+        {
+            await ExecuteInternalAsync(sql, true);
+        }
+    }
+
+    static async Task<bool> ExecuteInternalAsync(string sql, bool showResults)
+    {
+        var lines = sql.Split('\n')
+            .Where(l => !l.TrimStart().StartsWith("SET transaction_timeout", StringComparison.OrdinalIgnoreCase))
+            .Where(l => !l.TrimStart().StartsWith("SET idle_in_transaction_session_timeout", StringComparison.OrdinalIgnoreCase))
+            .Where(l => !l.TrimStart().StartsWith("SET lock_timeout", StringComparison.OrdinalIgnoreCase))
+            .Where(l => !l.TrimStart().StartsWith("SET statement_timeout", StringComparison.OrdinalIgnoreCase))
+            .Where(l => !l.TrimStart().StartsWith("SET client_min_messages", StringComparison.OrdinalIgnoreCase))
+            .Where(l => !l.Contains("OWNER TO", StringComparison.OrdinalIgnoreCase))
+            .Where(l => !l.Contains("set_config('search_path'", StringComparison.OrdinalIgnoreCase));
+
+        string sanitizedSql = string.Join("\n", lines).Trim();
+        if (string.IsNullOrWhiteSpace(sanitizedSql)) return true;
+
         using var conn = new NpgsqlConnection(ConnectionString);
-        await conn.OpenAsync();
-        using var cmd = new NpgsqlCommand(sql, conn);
-        cmd.CommandTimeout = 600;
-        await cmd.ExecuteNonQueryAsync();
+        try 
+        {
+            await conn.OpenAsync();
+            
+            string trimmedSql = sanitizedSql.Trim();
+            bool isSelect = Regex.IsMatch(trimmedSql, @"^(?i)(--.*?\n|/\*.*?\*/|)\s*SELECT");
+
+            if (showResults && isSelect)
+            {
+                using var cmd = new NpgsqlCommand(sanitizedSql, conn);
+                cmd.CommandTimeout = 600;
+                using var reader = await cmd.ExecuteReaderAsync();
+                for (int i = 0; i < reader.FieldCount; i++) Console.Write($"{reader.GetName(i)}\t");
+                Console.WriteLine("\n" + new string('-', 50));
+                while (await reader.ReadAsync())
+                {
+                    for (int i = 0; i < reader.FieldCount; i++) Console.Write($"{reader.GetValue(i)}\t");
+                    Console.WriteLine();
+                }
+            }
+            else
+            {
+                var statements = new List<string>();
+                var currentBatch = new StringBuilder();
+                bool inBlock = false;
+
+                foreach (var line in sanitizedSql.Split('\n'))
+                {
+                    string trimmed = line.Trim();
+                    if (trimmed.Contains("$$") || trimmed.StartsWith("DO ")) inBlock = !inBlock;
+                    
+                    currentBatch.AppendLine(line);
+                    
+                    if (!inBlock && trimmed.EndsWith(";"))
+                    {
+                        statements.Add(currentBatch.ToString().Trim(';').Trim());
+                        currentBatch.Clear();
+                    }
+                }
+                if (currentBatch.Length > 0) statements.Add(currentBatch.ToString().Trim());
+
+                int totalAffected = 0;
+                foreach (var stmt in statements.Where(s => !string.IsNullOrWhiteSpace(s)))
+                {
+                    using var cmd = new NpgsqlCommand(stmt, conn);
+                    cmd.CommandTimeout = 600;
+                    try 
+                    {
+                        int affected = await cmd.ExecuteNonQueryAsync();
+                        if (affected > 0)
+                        {
+                            totalAffected += affected;
+                            if (showResults) Console.WriteLine($"[EXITO] {stmt.Substring(0, Math.Min(50, stmt.Length))}... -> {affected} filas");
+                        }
+                    }
+                    catch (Exception exStatement)
+                    {
+                        if (showResults) Console.WriteLine($"\n[ERROR] en sentencia: {stmt.Substring(0, Math.Min(100, stmt.Length))}...\nMENSAJE: {exStatement.Message}");
+                    }
+                }
+                if (showResults && totalAffected > 0) Console.WriteLine($"Filas afectadas totales: {totalAffected}");
+            }
+            return true;
+        }
+        catch (Exception ex)
+        {
+            if (showResults || (!ex.Message.Contains("ya existe") && !ex.Message.Contains("already exists")))
+            {
+                Console.WriteLine($"\n!!! ERROR EN SQL !!! {ex.Message}");
+            }
+            return false;
+        }
     }
 }

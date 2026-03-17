@@ -6,7 +6,10 @@ const BASE_URL = "/impuestos";
 export const servicioImpuesto = {
   obtenerTodos: async (): Promise<Impuesto[]> => {
     const response: any = await apiConfiguracion.get(BASE_URL);
-    return response.data || response;
+    // Manejo robusto del array de datos
+    if (Array.isArray(response)) return response;
+    if (response && Array.isArray(response.data)) return response.data;
+    return [];
   },
 
   crear: async (datos: ImpuestoFormData): Promise<Impuesto> => {

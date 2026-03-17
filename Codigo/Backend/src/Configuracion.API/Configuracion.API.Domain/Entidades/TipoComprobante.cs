@@ -41,5 +41,21 @@ namespace Configuracion.API.Domain.Entidades
 
         [Column("es_orden_compra")]
         public bool EsOrdenCompra { get; set; }
+
+        [Column("es_emitible")]
+        public bool EsEmitible { get; set; } = true;
+
+        [Column("es_referenciable")]
+        public bool EsReferenciable { get; set; }
+
+        [Required]
+        [MaxLength(10)]
+        [Column("movimiento_stock_venta")]
+        public string MovimientoStockVenta { get; set; } = "NEUTRO";
+
+        [Required]
+        [MaxLength(10)]
+        [Column("movimiento_stock_compra")]
+        public string MovimientoStockCompra { get; set; } = "NEUTRO";
     }
 }

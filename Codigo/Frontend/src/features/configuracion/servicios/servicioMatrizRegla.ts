@@ -9,14 +9,16 @@ const BASE_URL = "/configuracion/matriz-sunat";
 export const servicioMatrizRegla = {
   obtenerTodas: async (): Promise<MatrizReglaSunat[]> => {
     const response: any = await apiConfiguracion.get(BASE_URL);
-    return response.datos || response.data || response;
+    const lista = response.datos || response.data || response;
+    return Array.isArray(lista) ? lista : [];
   },
 
   obtenerPorOperacion: async (codigo: string): Promise<MatrizReglaSunat[]> => {
     const response: any = await apiConfiguracion.get(
       `${BASE_URL}/operacion/${codigo}`,
     );
-    return response.datos || response.data || response;
+    const lista = response.datos || response.data || response;
+    return Array.isArray(lista) ? lista : [];
   },
 
   crear: async (datos: MatrizReglaSunatFormData): Promise<MatrizReglaSunat> => {

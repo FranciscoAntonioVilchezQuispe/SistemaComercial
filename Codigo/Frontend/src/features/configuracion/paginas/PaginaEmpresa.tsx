@@ -6,6 +6,24 @@ import { MensajeError } from "@compartido/componentes/feedback/MensajeError";
 import { useEmpresa, useActualizarEmpresa } from "../hooks/useEmpresa";
 import { EmpresaFormData } from "../tipos/empresa.types";
 import { toast } from "sonner";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { ModuleTabBar } from "@/componentes/shared/ModuleTabBar";
+import { RUTAS_TITULOS } from "@/config/rutasTitulos";
 
 export function PaginaEmpresa() {
   const { data: empresa, isLoading, error } = useEmpresa();
@@ -15,6 +33,8 @@ export function PaginaEmpresa() {
     register,
     handleSubmit,
     reset,
+    setValue,
+    watch,
     formState: { errors, isDirty },
   } = useForm<EmpresaFormData>();
 
@@ -32,56 +52,53 @@ export function PaginaEmpresa() {
       onError: (err) => {
         toast.error("Error al actualizar empresa: " + err.message);
       },
-      onSettled: () => {
-        // Optionally reset isDirty, but react-hook-form handles it if we reset with new values or if values match.
-        // Usually we might want to refetch or just let the mutation update the cache.
-      },
     });
   };
 
-  if (isLoading) return <Loading mensaje="Cargando datos de empresa..." />;
+  const tabsConfig = [
+    { label: RUTAS_TITULOS["/configuracion/empresa"], to: "/configuracion/empresa" },
+    { label: RUTAS_TITULOS["/configuracion/sucursales"], to: "/configuracion/sucursales" },
+    { label: RUTAS_TITULOS["/configuracion/impuestos"], to: "/configuracion/impuestos" },
+    { label: RUTAS_TITULOS["/configuracion/metodos-pago"], to: "/configuracion/metodos-pago" },
+    { label: RUTAS_TITULOS["/configuracion/comprobantes"], to: "/configuracion/comprobantes" },
+    { label: RUTAS_TITULOS["/configuracion/reglas-sunat"], to: "/configuracion/reglas-sunat" },
+    { label: RUTAS_TITULOS["/configuracion/operaciones-sunat"], to: "/configuracion/operaciones-sunat" },
+    { label: RUTAS_TITULOS["/configuracion/matriz-sunat"], to: "/configuracion/matriz-sunat" },
+    { label: RUTAS_TITULOS["/configuracion/tablas-generales"], to: "/configuracion/tablas-generales" },
 
-  // If 404, we might want to handle it optionally to allow creation, but for now just show error.
+  ];
+
+  if (isLoading) return <Loading mensaje="Cargando datos de empresa..." />;
   if (error) return <MensajeError mensaje={error.message} />;
 
-  const inputClass =
-    "flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50";
-  const labelClass =
-    "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70";
+  const labelClass = "text-sm font-medium leading-none";
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">Datos de la Empresa</h1>
-        <p className="text-muted-foreground">
-          Gestión de la información corporativa y fiscal.
-        </p>
-      </div>
+    <div className="space-y-4">
+      <ModuleTabBar tabs={tabsConfig} />
 
-      <div className="rounded-xl border bg-card text-card-foreground shadow">
-        <div className="flex flex-col space-y-1.5 p-6">
-          <h3 className="font-semibold leading-none tracking-tight">
-            Editar Información
-          </h3>
-          <p className="text-sm text-muted-foreground">
-            Actualice los detalles que se mostrarán en reportes y comprobantes.
-          </p>
-        </div>
-        <div className="p-6 pt-0">
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      <Card className="rounded-xl border border-muted/20 bg-card shadow-sm overflow-hidden">
+        <CardHeader className="bg-muted/5 border-b pb-4">
+          <CardTitle className="text-lg">Información Corporativa</CardTitle>
+          <CardDescription>
+            Configure los detalles legales y de contacto de su empresa.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="p-6">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* RUC */}
               <div className="space-y-2">
-                <label className={labelClass}>RUC</label>
-                <input
-                  className={inputClass}
+                <Label className={labelClass}>RUC</Label>
+                <Input
+                  className="bg-muted/20 h-9"
                   {...register("ruc", {
                     required: "El RUC es requerido",
                     maxLength: 11,
                   })}
                 />
                 {errors.ruc && (
-                  <p className="text-sm text-destructive">
+                  <p className="text-[11px] text-destructive font-medium">
                     {errors.ruc.message}
                   </p>
                 )}
@@ -89,15 +106,15 @@ export function PaginaEmpresa() {
 
               {/* Razón Social */}
               <div className="space-y-2">
-                <label className={labelClass}>Razón Social</label>
-                <input
-                  className={inputClass}
+                <Label className={labelClass}>Razón Social</Label>
+                <Input
+                  className="bg-muted/20 h-9"
                   {...register("razonSocial", {
                     required: "La Razón Social es requerida",
                   })}
                 />
                 {errors.razonSocial && (
-                  <p className="text-sm text-destructive">
+                  <p className="text-[11px] text-destructive font-medium">
                     {errors.razonSocial.message}
                   </p>
                 )}
@@ -105,24 +122,21 @@ export function PaginaEmpresa() {
 
               {/* Nombre Comercial */}
               <div className="space-y-2">
-                <label className={labelClass}>Nombre Comercial</label>
-                <input
-                  className={inputClass}
-                  {...register("nombreComercial")}
-                />
+                <Label className={labelClass}>Nombre Comercial</Label>
+                <Input className="bg-muted/20 h-9" {...register("nombreComercial")} />
               </div>
 
               {/* Dirección Fiscal */}
               <div className="space-y-2 md:col-span-2">
-                <label className={labelClass}>Dirección Fiscal</label>
-                <input
-                  className={inputClass}
+                <Label className={labelClass}>Dirección Fiscal</Label>
+                <Input
+                  className="bg-muted/20 h-9"
                   {...register("direccionFiscal", {
                     required: "La Dirección es requerida",
                   })}
                 />
                 {errors.direccionFiscal && (
-                  <p className="text-sm text-destructive">
+                  <p className="text-[11px] text-destructive font-medium">
                     {errors.direccionFiscal.message}
                   </p>
                 )}
@@ -130,46 +144,50 @@ export function PaginaEmpresa() {
 
               {/* Teléfono */}
               <div className="space-y-2">
-                <label className={labelClass}>Teléfono</label>
-                <input className={inputClass} {...register("telefono")} />
+                <Label className={labelClass}>Teléfono</Label>
+                <Input className="bg-muted/20 h-9" {...register("telefono")} />
               </div>
 
               {/* Correo de Contacto */}
               <div className="space-y-2">
-                <label className={labelClass}>Correo de Contacto</label>
-                <input
+                <Label className={labelClass}>Correo de Contacto</Label>
+                <Input
                   type="email"
-                  className={inputClass}
+                  className="bg-muted/20 h-9"
                   {...register("correoContacto")}
                 />
               </div>
 
               {/* Sitio Web */}
               <div className="space-y-2">
-                <label className={labelClass}>Sitio Web</label>
-                <input className={inputClass} {...register("sitioWeb")} />
-              </div>
-
-              {/* URL Logo */}
-              <div className="space-y-2">
-                <label className={labelClass}>URL de Logo</label>
-                <input className={inputClass} {...register("logoUrl")} />
+                <Label className={labelClass}>Sitio Web</Label>
+                <Input className="bg-muted/20 h-9" {...register("sitioWeb")} />
               </div>
 
               {/* Moneda Principal */}
               <div className="space-y-2">
-                <label className={labelClass}>Moneda Principal</label>
-                <select className={inputClass} {...register("monedaPrincipal")}>
-                  <option value="PEN">Soles (PEN)</option>
-                  <option value="USD">Dólares (USD)</option>
-                </select>
+                <Label className={labelClass}>Moneda Principal</Label>
+                <Select
+                  onValueChange={(val) => setValue("monedaPrincipal", val)}
+                  value={watch("monedaPrincipal")}
+                >
+                  <SelectTrigger className="bg-muted/20 h-9">
+                    <SelectValue placeholder="Seleccione moneda" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="PEN">Soles (PEN)</SelectItem>
+                    <SelectItem value="USD">Dólares (USD)</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
 
-            <div className="flex justify-end pt-4">
+            <div className="flex justify-end pt-4 border-t">
               <Button
                 type="submit"
+                size="sm"
                 disabled={!isDirty || actualizarMutation.isPending}
+                className="px-8"
               >
                 {actualizarMutation.isPending
                   ? "Guardando..."
@@ -177,8 +195,8 @@ export function PaginaEmpresa() {
               </Button>
             </div>
           </form>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }

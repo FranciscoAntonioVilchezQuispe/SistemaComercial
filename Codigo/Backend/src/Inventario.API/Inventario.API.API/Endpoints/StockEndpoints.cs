@@ -1,10 +1,13 @@
-using Inventario.API.Domain.Entidades;
+using Inventario.API.Application.Interfaces;
 using Inventario.API.Domain.Interfaces;
+using Inventario.API.Domain.Entidades;
 using Inventario.API.Application.DTOs;
+using Inventario.API.Application.Comandos;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Nucleo.Comun.Application.Wrappers;
+using MediatR;
 
 namespace Inventario.API.Endpoints
 {
@@ -14,6 +17,13 @@ namespace Inventario.API.Endpoints
         {
             var grupo = app.MapGroup("/api/inventario/stock").WithTags("Stock");
             
+            grupo.MapPost("/ajuste", async (AjusteStockDto dto, IMediator mediator) =>
+            {
+                var comando = new AjustarStockComando(dto.IdProducto, dto.IdAlmacen, dto.NuevaCantidad, dto.Motivo);
+                await mediator.Send(comando);
+                return Results.Ok(new { mensaje = "Ajuste de stock realizado correctamente" });
+            });
+
             grupo.MapGet("/", async (long? idAlmacen, IStockRepositorio repo) =>
             {
                 IEnumerable<Stock> stockList;
@@ -26,6 +36,24 @@ namespace Inventario.API.Endpoints
                     stockList = await repo.ObtenerTodoAsync();
                 }
 
+                var dtos = stockList.Select(s => new StockDto
+                {
+                    Id = s.Id,
+                    IdProducto = s.IdProducto,
+                    IdVariante = s.IdVariante,
+                    IdAlmacen = s.IdAlmacen,
+                    CantidadActual = s.CantidadActual,
+                    CantidadReservada = s.CantidadReservada,
+                    UbicacionFisica = s.UbicacionFisica,
+                    FechaActualizacion = s.FechaActualizacion ?? s.FechaCreacion
+                }).ToList();
+
+                return Results.Ok(new ToReturnList<StockDto>(dtos));
+            });
+
+            grupo.MapGet("/producto/{idProducto}", async (long idProducto, IStockRepositorio repo) =>
+            {
+                var stockList = await repo.ObtenerPorProductoAsync(idProducto);
                 var dtos = stockList.Select(s => new StockDto
                 {
                     Id = s.Id,

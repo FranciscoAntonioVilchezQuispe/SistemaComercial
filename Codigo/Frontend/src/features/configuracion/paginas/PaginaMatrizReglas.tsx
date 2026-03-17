@@ -20,13 +20,6 @@ import {
 import { DataTable } from "@/components/ui/DataTable";
 import { Loading } from "@compartido/componentes/feedback/Loading";
 import { MensajeError } from "@compartido/componentes/feedback/MensajeError";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
@@ -37,6 +30,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { toast } from "sonner";
 import {
   useMatrizReglas,
@@ -51,11 +51,13 @@ import {
   MatrizReglaSunatFormData,
   NIVEL_OBLIGATORIEDAD,
 } from "../tipos/matrizRegla.types";
+import { ModuleTabBar } from "@/componentes/shared/ModuleTabBar";
+import { RUTAS_TITULOS } from "@/config/rutasTitulos";
 
 const NIVEL_BADGE_STYLES: Record<number, string> = {
-  0: "bg-slate-100 text-slate-700",
-  1: "bg-blue-100 text-blue-800",
-  2: "bg-amber-100 text-amber-800",
+  0: "bg-slate-500/10 text-slate-600 border-slate-200",
+  1: "bg-blue-500/10 text-blue-600 border-blue-200",
+  2: "bg-amber-500/10 text-amber-600 border-amber-200",
 };
 
 function FormularioMatriz({
@@ -89,13 +91,13 @@ function FormularioMatriz({
             setForm((p) => ({ ...p, idTipoOperacion: Number(v) }))
           }
         >
-          <SelectTrigger>
+          <SelectTrigger className="h-9">
             <SelectValue placeholder="Seleccionar operación..." />
           </SelectTrigger>
           <SelectContent>
             {(operaciones || []).map((op) => (
               <SelectItem key={op.id} value={String(op.id)}>
-                <span className="font-mono font-bold mr-2">{op.codigo}</span>
+                <span className="font-mono font-bold mr-2 text-[11px]">{op.codigo}</span>
                 {op.nombre}
               </SelectItem>
             ))}
@@ -111,13 +113,13 @@ function FormularioMatriz({
             setForm((p) => ({ ...p, idTipoComprobante: Number(v) }))
           }
         >
-          <SelectTrigger>
+          <SelectTrigger className="h-9">
             <SelectValue placeholder="Seleccionar comprobante..." />
           </SelectTrigger>
           <SelectContent>
             {(comprobantes || []).map((comp) => (
               <SelectItem key={comp.id} value={String(comp.id)}>
-                <span className="font-mono font-bold mr-2">{comp.codigo}</span>
+                <span className="font-mono font-bold mr-2 text-[11px]">{comp.codigo}</span>
                 {comp.nombre}
               </SelectItem>
             ))}
@@ -133,7 +135,7 @@ function FormularioMatriz({
             setForm((p) => ({ ...p, nivelObligatoriedad: Number(v) }))
           }
         >
-          <SelectTrigger>
+          <SelectTrigger className="h-9">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -146,26 +148,28 @@ function FormularioMatriz({
         </Select>
       </div>
 
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-3 py-2">
         <Switch
           id="activo"
           checked={form.activo}
           onCheckedChange={(v) => setForm((p) => ({ ...p, activo: v }))}
         />
-        <Label htmlFor="activo">Activo</Label>
+        <Label htmlFor="activo" className="cursor-pointer">Activo</Label>
       </div>
 
-      <div className="flex justify-end gap-2 pt-2">
-        <Button variant="outline" onClick={alCancelar}>
+      <div className="flex justify-end gap-2 pt-4 border-t">
+        <Button variant="outline" size="sm" onClick={alCancelar} className="h-9 px-4">
           Cancelar
         </Button>
         <Button
           disabled={
             cargando || !form.idTipoOperacion || !form.idTipoComprobante
           }
+          size="sm"
           onClick={() => alEnviar(form)}
+          className="h-9 px-6"
         >
-          {cargando ? "Guardando..." : "Guardar"}
+          {cargando ? "Guardando..." : "Guardar Regla"}
         </Button>
       </div>
     </div>
@@ -183,6 +187,18 @@ export function PaginaMatrizReglas() {
   const crear = useCrearMatrizRegla();
   const actualizar = useActualizarMatrizRegla();
   const eliminar = useEliminarMatrizRegla();
+
+  const tabsConfig = [
+    { label: RUTAS_TITULOS["/configuracion/empresa"], to: "/configuracion/empresa" },
+    { label: RUTAS_TITULOS["/configuracion/sucursales"], to: "/configuracion/sucursales" },
+    { label: RUTAS_TITULOS["/configuracion/impuestos"], to: "/configuracion/impuestos" },
+    { label: RUTAS_TITULOS["/configuracion/metodos-pago"], to: "/configuracion/metodos-pago" },
+    { label: RUTAS_TITULOS["/configuracion/comprobantes"], to: "/configuracion/comprobantes" },
+    { label: RUTAS_TITULOS["/configuracion/reglas-sunat"], to: "/configuracion/reglas-sunat" },
+    { label: RUTAS_TITULOS["/configuracion/operaciones-sunat"], to: "/configuracion/operaciones-sunat" },
+    { label: RUTAS_TITULOS["/configuracion/matriz-sunat"], to: "/configuracion/matriz-sunat" },
+    { label: RUTAS_TITULOS["/configuracion/tablas-generales"], to: "/configuracion/tablas-generales" },
+  ];
 
   const handleGuardar = (datos: MatrizReglaSunatFormData) => {
     if (seleccionado) {
@@ -213,10 +229,10 @@ export function PaginaMatrizReglas() {
       accessorKey: "tipoOperacion" as keyof MatrizReglaSunat,
       cell: (row: MatrizReglaSunat) => (
         <div className="flex items-center gap-2">
-          <span className="font-mono font-bold text-xs bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded">
+          <span className="font-mono font-bold text-[11px] bg-muted px-2 py-0.5 rounded border border-muted/20">
             {row.tipoOperacion?.codigo ?? row.idTipoOperacion}
           </span>
-          <span className="text-sm">{row.tipoOperacion?.nombre}</span>
+          <span className="text-sm font-medium">{row.tipoOperacion?.nombre}</span>
         </div>
       ),
     },
@@ -225,10 +241,10 @@ export function PaginaMatrizReglas() {
       accessorKey: "tipoComprobante" as keyof MatrizReglaSunat,
       cell: (row: MatrizReglaSunat) => (
         <div className="flex items-center gap-2">
-          <span className="font-mono font-bold text-xs bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded">
+          <span className="font-mono font-bold text-[11px] bg-muted px-2 py-0.5 rounded border border-muted/20">
             {row.tipoComprobante?.codigo ?? row.idTipoComprobante}
           </span>
-          <span className="text-sm">{row.tipoComprobante?.nombre}</span>
+          <span className="text-sm font-medium">{row.tipoComprobante?.nombre}</span>
         </div>
       ),
     },
@@ -236,11 +252,12 @@ export function PaginaMatrizReglas() {
       header: "Obligatoriedad",
       accessorKey: "nivelObligatoriedad" as keyof MatrizReglaSunat,
       cell: (row: MatrizReglaSunat) => (
-        <span
-          className={`text-xs font-semibold px-2 py-0.5 rounded-full ${NIVEL_BADGE_STYLES[row.nivelObligatoriedad] ?? ""}`}
+        <Badge 
+          variant="outline"
+          className={`text-[10px] font-semibold px-2 py-0.5 rounded-full shadow-none ${NIVEL_BADGE_STYLES[row.nivelObligatoriedad] ?? ""}`}
         >
           {NIVEL_OBLIGATORIEDAD[row.nivelObligatoriedad] ?? "Desconocido"}
-        </span>
+        </Badge>
       ),
     },
     {
@@ -248,11 +265,11 @@ export function PaginaMatrizReglas() {
       accessorKey: "activo" as keyof MatrizReglaSunat,
       cell: (row: MatrizReglaSunat) =>
         row.activo ? (
-          <Badge variant="default" className="gap-1">
+          <Badge variant="default" className="gap-1 bg-green-500/10 text-green-600 border-green-200 hover:bg-green-500/20 shadow-none text-[11px] h-5">
             <CheckCircle className="h-3 w-3" /> Activo
           </Badge>
         ) : (
-          <Badge variant="secondary" className="gap-1">
+          <Badge variant="secondary" className="gap-1 bg-muted/50 text-muted-foreground shadow-none text-[11px] h-5">
             <XCircle className="h-3 w-3" /> Inactivo
           </Badge>
         ),
@@ -261,21 +278,22 @@ export function PaginaMatrizReglas() {
       header: "Acciones",
       className: "text-right",
       cell: (row: MatrizReglaSunat) => (
-        <div className="flex justify-end gap-2">
+        <div className="flex justify-end gap-1">
           <Button
             variant="ghost"
-            size="icon"
+            size="sm"
             onClick={() => {
               setSeleccionado(row);
               setDialogoOpen(true);
             }}
+            className="h-8 w-8 p-0"
           >
             <Edit2 className="h-4 w-4" />
           </Button>
           <Button
             variant="ghost"
-            size="icon"
-            className="text-destructive"
+            size="sm"
+            className="text-destructive h-8 w-8 p-0 hover:text-destructive hover:bg-destructive/10"
             onClick={() => setEliminarId(row.id)}
           >
             <Trash2 className="h-4 w-4" />
@@ -289,38 +307,29 @@ export function PaginaMatrizReglas() {
   if (error) return <MensajeError mensaje="Error al cargar la matriz" />;
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">Matriz de Reglas SUNAT</h1>
-        <p className="text-muted-foreground mt-1">
-          Define qué comprobantes son válidos para cada tipo de operación SUNAT
-          y su nivel de obligatoriedad.
-        </p>
-      </div>
+    <div className="space-y-4">
+      <ModuleTabBar tabs={tabsConfig} />
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Relaciones Operación ↔ Comprobante</CardTitle>
-          <CardDescription>
-            Ejemplo: La operación "Venta Interna (01)" puede usar "Factura (01)"
-            como Principal y "Boleta (03)" como Complementaria.
-          </CardDescription>
+      <Card className="rounded-xl border border-muted/20 bg-card shadow-sm overflow-hidden">
+        <CardHeader className="bg-muted/5 border-b pb-4 flex flex-row items-center justify-between space-y-0">
+          <div className="space-y-1">
+            <CardTitle className="text-lg">Relaciones Operación ↔ Comprobante</CardTitle>
+            <CardDescription>
+              Define qué comprobantes son válidos para cada tipo de operación SUNAT.
+            </CardDescription>
+          </div>
+          <Button
+            size="sm"
+            onClick={() => {
+              setSeleccionado(null);
+              setDialogoOpen(true);
+            }}
+          >
+            <Plus className="mr-2 h-4 w-4" /> Nueva Regla
+          </Button>
         </CardHeader>
-        <CardContent>
-          <DataTable
-            data={reglas || []}
-            columns={columnas}
-            actionElement={
-              <Button
-                onClick={() => {
-                  setSeleccionado(null);
-                  setDialogoOpen(true);
-                }}
-              >
-                <Plus className="mr-2 h-4 w-4" /> Nueva Regla
-              </Button>
-            }
-          />
+        <CardContent className="p-6">
+          <DataTable data={reglas || []} columns={columnas} />
         </CardContent>
       </Card>
 

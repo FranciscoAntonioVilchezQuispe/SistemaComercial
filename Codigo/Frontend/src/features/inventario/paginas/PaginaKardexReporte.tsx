@@ -3,7 +3,6 @@ import { useForm, Controller } from "react-hook-form";
 import { toast } from "sonner";
 import {
   Search,
-  FileSpreadsheet,
   Download,
   RefreshCcw,
   Database,
@@ -25,12 +24,24 @@ import {
   SelectValue,
 } from "@/componentes/ui/select";
 
-import { ContenedorPagina } from "@/compartido/componentes/ContenedorPagina";
 import { BuscadorProductoOscuro } from "../componentes/BuscadorProductoOscuro";
 import { kardexService } from "../servicios/servicioKardex";
 import { servicioInventario } from "../servicios/servicioInventario";
 import { KardexReporteDto } from "../tipos/kardex";
 import { formatearMoneda } from "@/compartido/utilidades";
+
+import { ModuleTabBar } from "@/componentes/shared/ModuleTabBar";
+import { RUTAS_TITULOS } from "@/config/rutasTitulos";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/componentes/ui/alert-dialog";
 
 type FormBusqueda = {
   almacenId: number;
@@ -39,11 +50,12 @@ type FormBusqueda = {
   hasta: string;
 };
 
-export default function PaginaKardexReporte() {
+export function PaginaKardexReporte() {
   const [cargando, setCargando] = useState(false);
   const [recalculando, setRecalculando] = useState(false);
   const [sincronizando, setSincronizando] = useState(false);
   const [reporte, setReporte] = useState<KardexReporteDto | null>(null);
+  const [confirmarSincronizacion, setConfirmarSincronizacion] = useState(false);
 
   // Estados para Almacenes
   const [almacenes, setAlmacenes] = useState<
@@ -136,13 +148,6 @@ export default function PaginaKardexReporte() {
   };
 
   const ejecutarSincronizacion = async () => {
-    if (
-      !window.confirm(
-        "¿Está seguro de sincronizar compras y ventas históricas? Este proceso buscará documentos que no estén en el Kardex y los agregará.",
-      )
-    )
-      return;
-
     try {
       setSincronizando(true);
       const mensaje = await servicioInventario.sincronizarHistorico();
@@ -156,14 +161,22 @@ export default function PaginaKardexReporte() {
       toast.error("Error al sincronizar datos históricos");
     } finally {
       setSincronizando(false);
+      setConfirmarSincronizacion(false);
     }
   };
 
+  const tabsKardex = [
+    { label: RUTAS_TITULOS["/inventario/stock"], to: "/inventario/stock" },
+    { label: RUTAS_TITULOS["/inventario/movimientos"], to: "/inventario/movimientos" },
+    { label: RUTAS_TITULOS["/inventario/traslados"], to: "/inventario/traslados" },
+    { label: RUTAS_TITULOS["/inventario/kardex/reporte"], to: "/inventario/kardex/reporte" },
+    { label: RUTAS_TITULOS["/inventario/kardex/periodos"], to: "/inventario/kardex/periodos" },
+    { label: RUTAS_TITULOS["/inventario/almacenes"], to: "/inventario/almacenes" },
+  ];
+
   return (
-    <ContenedorPagina
-      titulo="Formato 13.1: Registro de Inventario Permanente Valorizado"
-      descripcion="Consulta el libro electrónico (Kardex) oficial requerido por SUNAT"
-    >
+    <div className="space-y-4">
+      <ModuleTabBar tabs={tabsKardex} />
       <div className="flex flex-col gap-6 mt-4">
         {/* Filtros */}
         <Card>
@@ -257,10 +270,6 @@ export default function PaginaKardexReporte() {
           <Card className="overflow-hidden border shadow-sm">
             <CardHeader className="bg-slate-50 border-b pb-4 flex flex-row justify-between items-start">
               <div>
-                <CardTitle className="text-slate-800 flex items-center gap-2">
-                  <FileSpreadsheet className="w-5 h-5 text-green-600" />
-                  FORMATO 13.1: REGISTRO DE INVENTARIO PERMANENTE VALORIZADO
-                </CardTitle>
                 <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-x-8 gap-y-2 text-sm text-slate-600">
                   <p>
                     <span className="font-semibold text-slate-900">
@@ -513,6 +522,31 @@ export default function PaginaKardexReporte() {
           </Card>
         )}
       </div>
-    </ContenedorPagina>
+
+      {/* AlertDialog de Sincronización */}
+      <AlertDialog
+        open={confirmarSincronizacion}
+        onOpenChange={setConfirmarSincronizacion}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Sincronizar histórico?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Este proceso buscará documentos de compras y ventas históricos que no figuren en el Kardex y los regularizará automáticamente. ¿Desea continuar?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-primary text-primary-foreground hover:bg-primary/90"
+              onClick={ejecutarSincronizacion}
+              disabled={sincronizando}
+            >
+              {sincronizando ? "Sincronizando..." : "Sí, sincronizar"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </div>
   );
 }

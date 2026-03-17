@@ -68,6 +68,9 @@ namespace Configuracion.API.Infrastructure.Migrations
                     b.HasKey("Id")
                         .HasName("pk_regla_documento_comprobante");
 
+                    b.HasIndex("CodigoDocumento")
+                        .HasDatabaseName("ix_regla_documento_comprobante_codigo_documento");
+
                     b.HasIndex("IdTipoComprobante")
                         .HasDatabaseName("ix_regla_documento_comprobante_id_tipo_comprobante");
 
@@ -87,15 +90,27 @@ namespace Configuracion.API.Infrastructure.Migrations
                         .HasColumnType("boolean")
                         .HasColumnName("activado");
 
+                    b.Property<bool>("AplicaSinRuc")
+                        .HasColumnType("boolean")
+                        .HasColumnName("aplica_sin_ruc");
+
                     b.Property<string>("Codigo")
                         .IsRequired()
                         .HasMaxLength(10)
                         .HasColumnType("character varying(10)")
                         .HasColumnName("codigo");
 
+                    b.Property<bool>("EsEmpresa")
+                        .HasColumnType("boolean")
+                        .HasColumnName("es_empresa");
+
                     b.Property<bool>("EsNumerico")
                         .HasColumnType("boolean")
                         .HasColumnName("es_numerico");
+
+                    b.Property<bool>("EsPersonaNatural")
+                        .HasColumnType("boolean")
+                        .HasColumnName("es_persona_natural");
 
                     b.Property<bool>("Estado")
                         .HasColumnType("boolean")
@@ -112,6 +127,10 @@ namespace Configuracion.API.Infrastructure.Migrations
                     b.Property<int>("Longitud")
                         .HasColumnType("integer")
                         .HasColumnName("longitud");
+
+                    b.Property<int?>("LongitudMaxima")
+                        .HasColumnType("integer")
+                        .HasColumnName("longitud_maxima");
 
                     b.Property<string>("Nombre")
                         .IsRequired()
@@ -132,6 +151,9 @@ namespace Configuracion.API.Infrastructure.Migrations
 
                     b.HasKey("Id")
                         .HasName("pk_tipo_documento");
+
+                    b.HasAlternateKey("Codigo")
+                        .HasName("ak_tipo_documento_codigo");
 
                     b.ToTable("tipo_documento", "configuracion");
                 });
@@ -729,9 +751,17 @@ namespace Configuracion.API.Infrastructure.Migrations
                         .HasColumnType("boolean")
                         .HasColumnName("es_compra");
 
+                    b.Property<bool>("EsEmitible")
+                        .HasColumnType("boolean")
+                        .HasColumnName("es_emitible");
+
                     b.Property<bool>("EsOrdenCompra")
                         .HasColumnType("boolean")
                         .HasColumnName("es_orden_compra");
+
+                    b.Property<bool>("EsReferenciable")
+                        .HasColumnType("boolean")
+                        .HasColumnName("es_referenciable");
 
                     b.Property<bool>("EsVenta")
                         .HasColumnType("boolean")
@@ -744,6 +774,18 @@ namespace Configuracion.API.Infrastructure.Migrations
                     b.Property<DateTime>("FechaCreacion")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("fecha_creacion");
+
+                    b.Property<string>("MovimientoStockCompra")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)")
+                        .HasColumnName("movimiento_stock_compra");
+
+                    b.Property<string>("MovimientoStockVenta")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)")
+                        .HasColumnName("movimiento_stock_venta");
 
                     b.Property<bool>("MueveStock")
                         .HasColumnType("boolean")
@@ -797,8 +839,8 @@ namespace Configuracion.API.Infrastructure.Migrations
 
                     b.Property<string>("Codigo")
                         .IsRequired()
-                        .HasMaxLength(2)
-                        .HasColumnType("character varying(2)")
+                        .HasMaxLength(4)
+                        .HasColumnType("character varying(4)")
                         .HasColumnName("codigo");
 
                     b.Property<DateTime?>("FechaActualizacion")
@@ -834,14 +876,24 @@ namespace Configuracion.API.Infrastructure.Migrations
 
             modelBuilder.Entity("Configuracion.API.Domain.Entidades.DocumentoComprobanteRelacion", b =>
                 {
+                    b.HasOne("Configuracion.API.Domain.Entidades.DocumentoIdentidadRegla", "TipoDocumento")
+                        .WithMany()
+                        .HasForeignKey("CodigoDocumento")
+                        .HasPrincipalKey("Codigo")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_regla_documento_comprobante_tipo_documento_codigo_documento");
+
                     b.HasOne("Configuracion.API.Domain.Entidades.TipoComprobante", "TipoComprobante")
                         .WithMany()
                         .HasForeignKey("IdTipoComprobante")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("fk_regla_documento_comprobante_tipo_comprobante_id_tipo_compro");
 
                     b.Navigation("TipoComprobante");
+
+                    b.Navigation("TipoDocumento");
                 });
 
             modelBuilder.Entity("Configuracion.API.Domain.Entidades.MatrizReglaSunat", b =>
@@ -870,7 +922,7 @@ namespace Configuracion.API.Infrastructure.Migrations
                     b.HasOne("Configuracion.API.Domain.Entidades.TipoComprobante", "TipoComprobante")
                         .WithMany()
                         .HasForeignKey("IdTipoComprobante")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("fk_series_comprobantes_tipo_comprobante_id_tipo_comprobante");
 
@@ -882,7 +934,7 @@ namespace Configuracion.API.Infrastructure.Migrations
                     b.HasOne("Configuracion.API.Domain.Entidades.Empresa", "Empresa")
                         .WithMany()
                         .HasForeignKey("IdEmpresa")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("fk_sucursal_empresa_id_empresa");
 

@@ -44,6 +44,26 @@ namespace Compras.API.Domain.Entidades
         [Column("total", TypeName = "decimal(12,2)")]
         public decimal Total { get; set; }
 
+        [MaxLength(10)]
+        [Column("codigo_tipo_comprobante_ref")]
+        public string? CodigoTipoComprobanteRef { get; set; }
+
+        [MaxLength(10)]
+        [Column("serie_ref")]
+        public string? SerieRef { get; set; }
+
+        [MaxLength(20)]
+        [Column("numero_ref")]
+        public string? NumeroRef { get; set; }
+
+        [MaxLength(2)]
+        [Column("codigo_motivo")]
+        public string? CodigoMotivo { get; set; }
+
+        [MaxLength(200)]
+        [Column("descripcion_motivo")]
+        public string? DescripcionMotivo { get; set; }
+
         [ForeignKey("IdCompraReferencia")]
         public virtual Compra Compra { get; set; } = null!;
 

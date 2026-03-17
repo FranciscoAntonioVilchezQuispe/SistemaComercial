@@ -9,14 +9,16 @@ const BASE_URL = "/series";
 export const servicioSerieComprobante = {
   obtenerTodas: async (): Promise<SerieComprobante[]> => {
     const response: any = await apiConfiguracion.get(BASE_URL);
-    return response.datos || response.data || response;
+    const lista = response.datos || response.data || response;
+    return Array.isArray(lista) ? lista : [];
   },
 
   obtenerPorTipo: async (idTipo: number): Promise<SerieComprobante[]> => {
     const response: any = await apiConfiguracion.get(
       `${BASE_URL}/tipo/${idTipo}`,
     );
-    return response.datos || response.data || response;
+    const lista = response.datos || response.data || response;
+    return Array.isArray(lista) ? lista : [];
   },
 
   crear: async (datos: SerieComprobanteFormData): Promise<SerieComprobante> => {

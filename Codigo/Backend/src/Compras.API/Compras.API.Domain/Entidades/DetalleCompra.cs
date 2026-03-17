@@ -33,11 +33,24 @@ namespace Compras.API.Domain.Entidades
         public decimal Subtotal { get; set; }
 
         [Required]
-        [MaxLength(1)]
+        [MaxLength(2)]
         [Column("afectacion_igv")]
-        public string AfectacionIgv { get; set; } = "G";
+        public string AfectacionIgv { get; set; } = "10";
 
-        [ForeignKey("IdCompra")]
+        [MaxLength(4)]
+        [Column("codigo_tributo")]
+        public string? CodigoTributo { get; set; }
+
+        [Column("precio_unitario_base", TypeName = "decimal(12,4)")]
+        public decimal? PrecioUnitarioBase { get; set; }
+
+        [Column("descuento_item", TypeName = "decimal(12,4)")]
+        public decimal DescuentoItem { get; set; } = 0;
+
+        [Column("valor_item", TypeName = "decimal(12,4)")]
+        public decimal? ValorItem { get; set; }
+
+        [ForeignKey("IdComprao")]
         public virtual Compra Compra { get; set; } = null!;
     }
 }

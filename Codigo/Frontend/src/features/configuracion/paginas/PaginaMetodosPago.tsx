@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus, Edit2, Trash2, Banknote, CreditCard } from "lucide-react";
+import { Plus, Edit2, Trash2, Banknote, CreditCard, CheckCircle, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -29,6 +29,16 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { ModuleTabBar } from "@/componentes/shared/ModuleTabBar";
+import { RUTAS_TITULOS } from "@/config/rutasTitulos";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 
 export function PaginaMetodosPago() {
   const [dialogoOpen, setDialogoOpen] = useState(false);
@@ -42,6 +52,18 @@ export function PaginaMetodosPago() {
   const actualizarMutation = useActualizarMetodoPago();
   const eliminarMutation = useEliminarMetodoPago();
 
+  const tabsConfig = [
+    { label: RUTAS_TITULOS["/configuracion/empresa"], to: "/configuracion/empresa" },
+    { label: RUTAS_TITULOS["/configuracion/sucursales"], to: "/configuracion/sucursales" },
+    { label: RUTAS_TITULOS["/configuracion/impuestos"], to: "/configuracion/impuestos" },
+    { label: RUTAS_TITULOS["/configuracion/metodos-pago"], to: "/configuracion/metodos-pago" },
+    { label: RUTAS_TITULOS["/configuracion/comprobantes"], to: "/configuracion/comprobantes" },
+    { label: RUTAS_TITULOS["/configuracion/reglas-sunat"], to: "/configuracion/reglas-sunat" },
+    { label: RUTAS_TITULOS["/configuracion/operaciones-sunat"], to: "/configuracion/operaciones-sunat" },
+    { label: RUTAS_TITULOS["/configuracion/matriz-sunat"], to: "/configuracion/matriz-sunat" },
+    { label: RUTAS_TITULOS["/configuracion/tablas-generales"], to: "/configuracion/tablas-generales" },
+  ];
+
   const handleCrear = () => {
     setRegistroSeleccionado(null);
     setDialogoOpen(true);
@@ -51,8 +73,6 @@ export function PaginaMetodosPago() {
     setRegistroSeleccionado(metodo);
     setDialogoOpen(true);
   };
-
-  // Eliminación ahora via AlertDialog: setEliminarId para abrir diálogo
 
   const handleGuardar = (datos: MetodoPagoFormData) => {
     if (registroSeleccionado) {
@@ -84,47 +104,50 @@ export function PaginaMetodosPago() {
     {
       header: "Código",
       accessorKey: "codigo" as keyof MetodoPago,
-      className: "font-mono font-medium",
+      cell: (row: MetodoPago) => (
+        <span className="font-mono font-bold bg-muted/50 text-muted-foreground border border-muted/20 px-2 py-0.5 rounded text-[11px]">
+          {row.codigo}
+        </span>
+      ),
     },
     {
-      header: "Nombre",
+      header: "Nombre del Método",
       accessorKey: "nombre" as keyof MetodoPago,
-      className: "font-semibold",
+      className: "font-semibold text-primary",
     },
     {
       header: "Tipo",
       accessorKey: "esEfectivo" as keyof MetodoPago,
       cell: (row: MetodoPago) => (
-        <div className="flex items-center gap-2">
-          {row.esEfectivo ? (
-            <div className="flex items-center text-green-600">
-              <Banknote className="h-4 w-4 mr-1" /> Efectivo
-            </div>
-          ) : (
-            <div className="flex items-center text-blue-600">
-              <CreditCard className="h-4 w-4 mr-1" /> Otros
-            </div>
-          )}
-        </div>
+        row.esEfectivo ? (
+          <Badge variant="outline" className="gap-1 bg-green-500/10 text-green-600 border-green-200 hover:bg-green-500/20 shadow-none text-[11px] h-5">
+            <Banknote className="h-3 w-3" /> Efectivo
+          </Badge>
+        ) : (
+          <Badge variant="outline" className="gap-1 bg-blue-500/10 text-blue-600 border-blue-200 hover:bg-blue-500/20 shadow-none text-[11px] h-5">
+            <CreditCard className="h-3 w-3" /> Digital / Otros
+          </Badge>
+        )
       ),
     },
     {
       header: "Acciones",
       className: "text-right",
       cell: (row: MetodoPago) => (
-        <div className="flex justify-end gap-2">
+        <div className="flex justify-end gap-1">
           <Button
             variant="ghost"
-            size="icon"
+            size="sm"
             onClick={() => handleEditar(row)}
             title="Editar"
+            className="h-8 w-8 p-0"
           >
             <Edit2 className="h-4 w-4" />
           </Button>
           <Button
             variant="ghost"
-            size="icon"
-            className="text-destructive"
+            size="sm"
+            className="text-destructive h-8 w-8 p-0 hover:text-destructive hover:bg-destructive/10"
             onClick={() => setEliminarId(row.id)}
             title="Eliminar"
           >
@@ -136,24 +159,25 @@ export function PaginaMetodosPago() {
   ];
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">Métodos de Pago</h1>
-        <p className="text-muted-foreground">
-          Gestión de formas de cobro (Efectivo, Tarjeta, Transferencia, Yape,
-          etc.).
-        </p>
-      </div>
+    <div className="space-y-4">
+      <ModuleTabBar tabs={tabsConfig} />
 
-      <DataTable
-        data={metodos || []}
-        columns={columns}
-        actionElement={
-          <Button onClick={handleCrear}>
+      <Card className="rounded-xl border border-muted/20 bg-card shadow-sm overflow-hidden">
+        <CardHeader className="bg-muted/5 border-b pb-4 flex flex-row items-center justify-between space-y-0">
+          <div className="space-y-1">
+            <CardTitle className="text-lg">Métodos de Pago</CardTitle>
+            <CardDescription>
+              Gestión de formas de cobro (Efectivo, Tarjeta, Transferencia, Yape, etc.).
+            </CardDescription>
+          </div>
+          <Button onClick={handleCrear} size="sm">
             <Plus className="mr-2 h-4 w-4" /> Nuevo Método
           </Button>
-        }
-      />
+        </CardHeader>
+        <CardContent className="p-6">
+          <DataTable data={metodos || []} columns={columns} />
+        </CardContent>
+      </Card>
 
       <Dialog open={dialogoOpen} onOpenChange={setDialogoOpen}>
         <DialogContent>

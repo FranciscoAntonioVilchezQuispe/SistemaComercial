@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { Plus, Eye, Trash2 } from "lucide-react";
 import { useLocation } from "react-router-dom";
 import { formatFecha } from "@compartido/utilidades";
-
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -13,17 +12,9 @@ import {
 import { DataTable } from "@/components/ui/DataTable";
 import { Loading } from "@compartido/componentes/feedback/Loading";
 import { MensajeError } from "@compartido/componentes/feedback/MensajeError";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-
-// Correction: imports for specific hooks
 import { useCompras, useCompra, useEliminarCompra } from "../hooks/useCompras";
 import {
   AlertDialog,
@@ -36,7 +27,9 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Compra } from "../types/compra.types";
-import { CompraForm } from "../componentes/CompraForm"; // Form component for creating
+import { CompraForm } from "../componentes/CompraForm";
+import { ModuleTabBar } from "@/componentes/shared/ModuleTabBar";
+import { RUTAS_TITULOS } from "@/config/rutasTitulos";
 
 export default function PaginaCompras() {
   const location = useLocation();
@@ -55,6 +48,14 @@ export default function PaginaCompras() {
     idAVisualizar || 0,
   );
   const eliminarMutation = useEliminarCompra();
+
+  const tabsCompras = [
+    { label: RUTAS_TITULOS["/proveedores/ordenes"], to: "/proveedores/ordenes" },
+    { label: RUTAS_TITULOS["/compras/lista"], to: "/compras/lista" },
+    { label: RUTAS_TITULOS["/proveedores"], to: "/proveedores" },
+  ];
+
+// ... useEffects ...
 
   useEffect(() => {
     if (compraDetalle && !modoCreacion) {
@@ -103,6 +104,7 @@ export default function PaginaCompras() {
         c.id.toString().includes(filtro),
     ) || [];
 
+// ... columnas ...
   const columnas = [
     {
       header: "Fecha",
@@ -181,22 +183,11 @@ export default function PaginaCompras() {
   if (error) return <MensajeError mensaje="Error al cargar compras" />;
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">Gestión de Compras</h1>
-        <p className="text-muted-foreground">
-          Registro de ingresos de mercadería y gestión de costos.
-        </p>
-      </div>
+    <div className="space-y-4">
+      <ModuleTabBar tabs={tabsCompras} />
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Historial de Compras</CardTitle>
-          <CardDescription>
-            Documentos registrados en el sistema.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
+      <Card className="shadow-none border-muted/20">
+        <CardContent className="pt-6">
           <DataTable
             data={comprasFiltradas}
             columns={columnas}
@@ -210,6 +201,7 @@ export default function PaginaCompras() {
                   setModoCreacion(true);
                   setDialogoOpen(true);
                 }}
+                size="sm"
               >
                 <Plus className="mr-2 h-4 w-4" /> Registrar Compra
               </Button>
