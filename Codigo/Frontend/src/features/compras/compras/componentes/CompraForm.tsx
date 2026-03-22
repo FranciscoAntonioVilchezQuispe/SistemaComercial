@@ -76,28 +76,46 @@ import { CrearCompraPayload } from "../types/compra.types";
 // Schema de validación
 
 const compraSchema = z.object({
-  idProveedor: z.coerce.number().min(1, "Seleccione un proveedor"),
-  idAlmacen: z.coerce.number().min(1, "Seleccione un almacén"),
-  idMoneda: z.coerce.number().min(1, "Seleccione moneda"),
-  tipoComprobante: z.string().min(1, "Tipo requerido"),
-  serieComprobante: z.string().min(1, "Serie requerida"),
-  numeroComprobante: z.string().min(1, "Número requerido"),
-  fechaEmision: z.date(),
+  idProveedor: z.coerce.number({
+    invalid_type_error: "Seleccione un proveedor válido",
+    required_error: "El proveedor es obligatorio",
+  }).min(1, "Debe seleccionar un proveedor"),
+  idAlmacen: z.coerce.number({
+    invalid_type_error: "Seleccione un almacén válido",
+    required_error: "El almacén es obligatorio",
+  }).min(1, "Debe seleccionar un almacén"),
+  idMoneda: z.coerce.number({
+    invalid_type_error: "Seleccione una moneda válida",
+  }).min(1, "La moneda es requerida"),
+  tipoComprobante: z.string().min(1, "El tipo de comprobante es requerido"),
+  serieComprobante: z.string().min(1, "La serie es requerida"),
+  numeroComprobante: z.string().min(1, "El número de comprobante es requerido"),
+  fechaEmision: z.date({
+    required_error: "La fecha de emisión es obligatoria",
+  }),
   fechaVencimiento: z.date().optional().nullable(),
-  tipoCambio: z.coerce.number().min(0.001, "TC inválido"),
-  tipoOperacion: z.string().min(1, "Operación requerida"),
+  tipoCambio: z.coerce.number({
+    invalid_type_error: "El tipo de cambio debe ser un número",
+  }).min(0.001, "El tipo de cambio debe ser mayor a 0"),
+  tipoOperacion: z.string().min(1, "La operación SUNAT es requerida"),
   observaciones: z.string().optional(),
   detalles: z
     .array(
       z.object({
-        idProducto: z.coerce.number().min(1, "Producto requerido"),
-        cantidad: z.coerce.number().min(0.01, "Cantidad inválida"),
-        precioUnitario: z.coerce.number().min(0, "Precio inválido"),
+        idProducto: z.coerce.number({
+          invalid_type_error: "Producto no válido",
+        }).min(1, "El producto es requerido"),
+        cantidad: z.coerce.number({
+          invalid_type_error: "La cantidad debe ser un número",
+        }).min(0.01, "La cantidad mínima es 0.01"),
+        precioUnitario: z.coerce.number({
+          invalid_type_error: "El precio debe ser un número",
+        }).min(0, "El precio no puede ser negativo"),
         afectacionIgv: z.enum(["G", "E", "I"]).default("G"),
         unidadMedida: z.string().optional(),
       }),
     )
-    .min(1, "Debe agregar al menos un producto"),
+    .min(1, "Debe agregar al menos un producto a la compra"),
 });
 
 type CompraFormValues = z.infer<typeof compraSchema>;
@@ -572,252 +590,300 @@ export function CompraForm({
           </div>
         )}
 
-        {/* Cabecera del Documento */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <FormField
-            control={form.control}
-            name="idProveedor"
-            render={({ field }) => (
-              <FormItem className="col-span-3">
-                <FormLabel>Proveedor</FormLabel>
-                <FormControl>
-                  <SelectorProveedorV2
-                    value={field.value}
-                    onChange={(p) => {
-                      field.onChange(p?.id || 0);
-                      if (!p) {
-                        form.setValue("tipoComprobante", "");
-                      }
-                    }}
-                    proveedores={listaProveedores}
-                    onSearch={handleSearchProveedor}
-                    onTipoDocChange={setCodigoDocumentoProv}
-                    disabled={readOnly}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+        {/* CABECERA: Bloque Entidad y Almacén */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-x-4 gap-y-6">
+          <div className="md:col-span-3">
+            <FormField
+              control={form.control}
+              name="idProveedor"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Proveedor</FormLabel>
+                  <FormControl>
+                    <SelectorProveedorV2
+                      value={field.value}
+                      onChange={(p) => {
+                        field.onChange(p?.id || 0);
+                        if (!p) {
+                          form.setValue("tipoComprobante", "");
+                        }
+                      }}
+                      proveedores={listaProveedores}
+                      onSearch={handleSearchProveedor}
+                      onTipoDocChange={setCodigoDocumentoProv}
+                      disabled={readOnly}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
 
-          <FormField
-            control={form.control}
-            name="idAlmacen"
-            render={({ field }) => (
-              <FormItem className="col-span-1">
-                <FormLabel>Almacén Destino</FormLabel>
-                <FormControl>
-                  <select
-                    className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+          <div className="md:col-span-1">
+            <FormField
+              control={form.control}
+              name="idAlmacen"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Almacén Destino</FormLabel>
+                  <FormControl>
+                    <select
+                      className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                      value={field.value}
+                      onChange={(e) => field.onChange(Number(e.target.value))}
+                      disabled={readOnly}
+                    >
+                      <option value={0}>Seleccione Almacén</option>
+                      {almacenes?.map((a) => (
+                        <option key={a.id} value={a.id}>
+                          {a.nombreAlmacen}
+                        </option>
+                      ))}
+                    </select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          {/* Bloque Comprobante */}
+          <div className="md:col-span-1">
+            <FormField
+              control={form.control}
+              name="fechaEmision"
+              render={({ field }) => (
+                <FormItem className="flex flex-col">
+                  <FormLabel>Fecha Emisión</FormLabel>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant={"outline"}
+                          className={cn(
+                            "w-full pl-3 text-left font-normal",
+                            !field.value && "text-muted-foreground",
+                          )}
+                        >
+                          {field.value ? (
+                            format(field.value, "PPP", { locale: es })
+                          ) : (
+                            <span>Seleccione fecha</span>
+                          )}
+                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    {!readOnly && (
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={field.value}
+                          onSelect={field.onChange}
+                          disabled={(date) =>
+                            date > new Date() || date < new Date("1900-01-01")
+                          }
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    )}
+                  </Popover>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          <div className="md:col-span-1">
+            <FormField
+              control={form.control}
+              name="fechaVencimiento"
+              render={({ field }) => (
+                <FormItem className="flex flex-col">
+                  <FormLabel>Vencimiento (Opcional)</FormLabel>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant={"outline"}
+                          className={cn(
+                            "w-full pl-3 text-left font-normal",
+                            !field.value && "text-muted-foreground",
+                          )}
+                        >
+                          {field.value ? (
+                            format(field.value, "PPP", { locale: es })
+                          ) : (
+                            <span>Seleccione fecha</span>
+                          )}
+                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    {!readOnly && (
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={field.value ?? undefined}
+                          onSelect={field.onChange}
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    )}
+                  </Popover>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          <div className="md:col-span-1">
+            <FormField
+              control={form.control}
+              name="tipoComprobante"
+              render={({ field }) => (
+                <SelectorTipoComprobante
+                  label="Tipo Comprobante"
+                  value={field.value}
+                  onChange={(val) => field.onChange(val.toString())}
+                  placeholder="Tipo (Factura)"
+                  disabled={
+                    readOnly ||
+                    seccionBloqueada ||
+                    (proveedorSeleccionado && idsPermitidos.length === 1)
+                  }
+                  codigoDocumento={codigoDocumentoProv}
+                  modulo="COMPRA"
+                />
+              )}
+            />
+          </div>
+
+          <div className="md:col-span-1">
+            <div className="flex gap-2 items-end">
+              <div className="w-[80px]">
+                <FormField
+                  control={form.control}
+                  name="serieComprobante"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Serie</FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          placeholder="F001"
+                          disabled={seccionBloqueada || readOnly}
+                          className="font-mono"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              <div className="flex-1">
+                <FormField
+                  control={form.control}
+                  name="numeroComprobante"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Número</FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          placeholder="000123"
+                          onChange={(e) =>
+                            field.onChange(limpiarSoloNumeros(e.target.value))
+                          }
+                          onBlur={() =>
+                            field.onChange(padIzquierda(field.value))
+                          }
+                          disabled={seccionBloqueada || readOnly}
+                          className="font-mono"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Bloque Financiero y SUNAT */}
+          <div className="md:col-span-1">
+            <FormField
+              control={form.control}
+              name="idMoneda"
+              render={({ field }) => (
+                <SelectorCatalogo
+                  codigo={ComprasConstantes.TablasGenerales.TIPO_MONEDA}
+                  label="Moneda"
+                  value={field.value}
+                  onChange={(val: string) => field.onChange(Number(val))}
+                  placeholder="Soles/Dólares"
+                  disabled={seccionBloqueada || readOnly}
+                />
+              )}
+            />
+          </div>
+
+          <div className="md:col-span-1">
+            <FormField
+              control={form.control}
+              name="tipoCambio"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Tipo Cambio (TC)</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="text"
+                      {...field}
+                      onChange={(e) =>
+                        field.onChange(limpiarDecimal(e.target.value))
+                      }
+                      disabled={seccionBloqueada || readOnly}
+                      className="font-mono text-right"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          <div className="md:col-span-2">
+            <FormField
+              control={form.control}
+              name="tipoOperacion"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Operación SUNAT</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
                     value={field.value}
-                    onChange={(e) => field.onChange(Number(e.target.value))}
                     disabled={readOnly}
                   >
-                    <option value={0}>Seleccione Almacén</option>
-                    {almacenes?.map((a) => (
-                      <option key={a.id} value={a.id}>
-                        {a.nombreAlmacen}
-                      </option>
-                    ))}
-                  </select>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="fechaEmision"
-            render={({ field }) => (
-              <FormItem className="flex flex-col mt-2">
-                <FormLabel>Fecha Emisión</FormLabel>
-                <Popover>
-                  <PopoverTrigger asChild>
                     <FormControl>
-                      <Button
-                        variant={"outline"}
-                        className={cn(
-                          "w-full pl-3 text-left font-normal",
-                          !field.value && "text-muted-foreground",
-                        )}
-                      >
-                        {field.value ? (
-                          format(field.value, "PPP", { locale: es })
-                        ) : (
-                          <span>Seleccione fecha</span>
-                        )}
-                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                      </Button>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Tipo Operación" />
+                      </SelectTrigger>
                     </FormControl>
-                  </PopoverTrigger>
-                  {!readOnly && (
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar
-                        mode="single"
-                        selected={field.value}
-                        onSelect={field.onChange}
-                        disabled={(date) =>
-                          date > new Date() || date < new Date("1900-01-01")
-                        }
-                        initialFocus
-                      />
-                    </PopoverContent>
-                  )}
-                </Popover>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="fechaVencimiento"
-            render={({ field }) => (
-              <FormItem className="flex flex-col mt-2">
-                <FormLabel>Vencimiento (Opcional)</FormLabel>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <FormControl>
-                      <Button
-                        variant={"outline"}
-                        className={cn(
-                          "w-full pl-3 text-left font-normal",
-                          !field.value && "text-muted-foreground",
-                        )}
-                      >
-                        {field.value ? (
-                          format(field.value, "PPP", { locale: es })
-                        ) : (
-                          <span>Seleccione fecha</span>
-                        )}
-                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                      </Button>
-                    </FormControl>
-                  </PopoverTrigger>
-                  {!readOnly && (
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar
-                        mode="single"
-                        selected={field.value ?? undefined}
-                        onSelect={field.onChange}
-                        initialFocus
-                      />
-                    </PopoverContent>
-                  )}
-                </Popover>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {/* Comprobante Info */}
-          <FormField
-            control={form.control}
-            name="tipoComprobante"
-            render={({ field }) => (
-              <SelectorTipoComprobante
-                label="Tipo Comprobante"
-                value={field.value}
-                onChange={(val) => field.onChange(val.toString())}
-                placeholder="Tipo (Factura)"
-                disabled={
-                  readOnly ||
-                  seccionBloqueada ||
-                  (proveedorSeleccionado && idsPermitidos.length === 1)
-                }
-                codigoDocumento={codigoDocumentoProv}
-                modulo="COMPRA"
-              />
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="serieComprobante"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Serie</FormLabel>
-                <FormControl>
-                  <Input
-                    {...field}
-                    placeholder="F001"
-                    disabled={seccionBloqueada || readOnly}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="numeroComprobante"
-            render={({ field }) => (
-              <FormItem className={!readOnly ? "hidden" : ""}>
-                <FormLabel>Número</FormLabel>
-                <FormControl>
-                  <Input
-                    {...field}
-                    placeholder="000123"
-                    onChange={(e) =>
-                      field.onChange(limpiarSoloNumeros(e.target.value))
-                    }
-                    onBlur={() => field.onChange(padIzquierda(field.value))}
-                    disabled={seccionBloqueada || readOnly}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="idMoneda"
-            render={({ field }) => (
-              <SelectorCatalogo
-                codigo={ComprasConstantes.TablasGenerales.TIPO_MONEDA}
-                label="Moneda"
-                value={field.value}
-                onChange={(val: string) => field.onChange(Number(val))}
-                placeholder="Soles/Dólares"
-                disabled={seccionBloqueada || readOnly}
-              />
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="tipoOperacion"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Operación SUNAT</FormLabel>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                  value={field.value}
-                  disabled={readOnly}
-                >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Tipo Operación" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {tiposOperacion.map((op) => (
-                      <SelectItem key={op.id} value={op.codigo}>
-                        {op.codigo} - {op.nombre}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+                    <SelectContent>
+                      {tiposOperacion.map((op) => (
+                        <SelectItem key={op.id} value={op.codigo}>
+                          {op.codigo} - {op.nombre}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
         </div>
 
         <Separator className="my-4" />
@@ -829,7 +895,7 @@ export function CompraForm({
             {fields.map((field, index) => (
               <div
                 key={field.id}
-                className="grid grid-cols-12 gap-2 mb-2 items-end"
+                className="grid grid-cols-12 gap-2 mb-2 items-start"
               >
                 <div className="col-span-3">
                   <FormField
@@ -846,10 +912,16 @@ export function CompraForm({
                             field.onChange(id);
                           }}
                           onProductSelect={(prod) => {
-                            if (prod?.unidadMedida?.codigo) {
+                            if (prod) {
+                              if (prod.unidadMedida?.codigo) {
+                                form.setValue(
+                                  `detalles.${index}.unidadMedida`,
+                                  prod.unidadMedida.codigo,
+                                );
+                              }
                               form.setValue(
-                                `detalles.${index}.unidadMedida`,
-                                prod.unidadMedida.codigo,
+                                `detalles.${index}.precioUnitario`,
+                                prod.precioVentaPublico || 0,
                               );
                             }
                           }}

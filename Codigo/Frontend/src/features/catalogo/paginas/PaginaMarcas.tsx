@@ -10,6 +10,7 @@ import {
 import { MarcaForm } from "../componentes/marcas/MarcaForm";
 import {
   useMarcas,
+  useMarca,
   useCrearMarca,
   useActualizarMarca,
   useEliminarMarca,
@@ -24,7 +25,7 @@ import { usePagination } from "@/hooks/usePagination";
 
 export function PaginaMarcas() {
   const [dialogoAbierto, setDialogoAbierto] = useState(false);
-  const [marcaAModificar, setMarcaAModificar] = useState<Marca | undefined>();
+  const [idMarcaAModificar, setIdMarcaAModificar] = useState<number | null>(null);
 
   const {
     paginacion,
@@ -35,6 +36,7 @@ export function PaginaMarcas() {
   } = usePagination();
 
   const { data, isLoading, error } = useMarcas(paginacion);
+  const { data: marcaDetalle, isLoading: cargandoDetalle } = useMarca(idMarcaAModificar || 0);
   const crearMarca = useCrearMarca();
   const actualizarMarca = useActualizarMarca();
   const eliminarMarca = useEliminarMarca();
@@ -42,24 +44,24 @@ export function PaginaMarcas() {
   const marcas = data?.datos || [];
 
   const manejarAbrirCrear = () => {
-    setMarcaAModificar(undefined);
+    setIdMarcaAModificar(null);
     setDialogoAbierto(true);
   };
 
-  const manejarAbrirEditar = (marca: Marca) => {
-    setMarcaAModificar(marca);
+  const manejarAbrirEditar = (id: number) => {
+    setIdMarcaAModificar(id);
     setDialogoAbierto(true);
   };
 
   const manejarCerrar = () => {
     setDialogoAbierto(false);
-    setMarcaAModificar(undefined);
+    setIdMarcaAModificar(null);
   };
 
   const manejarEnviar = (datos: MarcaFormData) => {
-    if (marcaAModificar) {
+    if (idMarcaAModificar) {
       actualizarMarca.mutate(
-        { id: marcaAModificar.id, datos },
+        { id: idMarcaAModificar, datos },
         { onSuccess: manejarCerrar },
       );
     } else {
@@ -111,7 +113,7 @@ export function PaginaMarcas() {
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => manejarAbrirEditar(marca)}
+            onClick={() => manejarAbrirEditar(marca.id)}
             title="Editar"
           >
             <Edit2 className="h-4 w-4" />
@@ -164,15 +166,23 @@ export function PaginaMarcas() {
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle>
-              {marcaAModificar ? "Editar Marca" : "Nueva Marca"}
+              {idMarcaAModificar ? "Editar Marca" : "Nueva Marca"}
             </DialogTitle>
           </DialogHeader>
-          <MarcaForm
-            datosIniciales={marcaAModificar}
-            alEnviar={manejarEnviar}
-            alCancelar={manejarCerrar}
-            cargando={crearMarca.isPending || actualizarMarca.isPending}
-          />
+
+          {idMarcaAModificar && cargandoDetalle ? (
+            <div className="py-20 flex justify-center items-center">
+              <Loading mensaje="Cargando detalle de la marca..." />
+            </div>
+          ) : (
+            <MarcaForm
+              key={idMarcaAModificar || "nuevo"}
+              datosIniciales={marcaDetalle}
+              alEnviar={manejarEnviar}
+              alCancelar={manejarCerrar}
+              cargando={crearMarca.isPending || actualizarMarca.isPending}
+            />
+          )}
         </DialogContent>
       </Dialog>
     </div>

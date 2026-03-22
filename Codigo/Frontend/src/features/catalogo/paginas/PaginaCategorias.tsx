@@ -12,6 +12,7 @@ import { RUTAS_TITULOS } from "@/config/rutasTitulos";
 import { CategoriaForm } from "../componentes/categorias/CategoriaForm";
 import {
   useCategorias,
+  useCategoria,
   useCrearCategoria,
   useActualizarCategoria,
   useEliminarCategoria,
@@ -24,9 +25,7 @@ import { usePagination } from "@/hooks/usePagination";
 
 export function PaginaCategorias() {
   const [dialogoAbierto, setDialogoAbierto] = useState(false);
-  const [categoriaAModificar, setCategoriaAModificar] = useState<
-    Categoria | undefined
-  >();
+  const [idCategoriaAModificar, setIdCategoriaAModificar] = useState<number | null>(null);
 
   const {
     paginacion,
@@ -37,6 +36,7 @@ export function PaginaCategorias() {
   } = usePagination();
 
   const { data, isLoading, error } = useCategorias(paginacion);
+  const { data: categoriaDetalle, isLoading: cargandoDetalle } = useCategoria(idCategoriaAModificar || 0);
   const crearCategoria = useCrearCategoria();
   const actualizarCategoria = useActualizarCategoria();
   const eliminarCategoria = useEliminarCategoria();
@@ -44,24 +44,24 @@ export function PaginaCategorias() {
   const categorias = data?.datos || [];
 
   const manejarAbrirCrear = () => {
-    setCategoriaAModificar(undefined);
+    setIdCategoriaAModificar(null);
     setDialogoAbierto(true);
   };
 
-  const manejarAbrirEditar = (categoria: Categoria) => {
-    setCategoriaAModificar(categoria);
+  const manejarAbrirEditar = (id: number) => {
+    setIdCategoriaAModificar(id);
     setDialogoAbierto(true);
   };
 
   const manejarCerrar = () => {
     setDialogoAbierto(false);
-    setCategoriaAModificar(undefined);
+    setIdCategoriaAModificar(null);
   };
 
   const manejarEnviar = (datos: CategoriaFormData) => {
-    if (categoriaAModificar) {
+    if (idCategoriaAModificar) {
       actualizarCategoria.mutate(
-        { id: categoriaAModificar.id, datos },
+        { id: idCategoriaAModificar, datos },
         { onSuccess: manejarCerrar },
       );
     } else {
@@ -113,7 +113,7 @@ export function PaginaCategorias() {
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => manejarAbrirEditar(cat)}
+            onClick={() => manejarAbrirEditar(cat.id)}
             title="Editar"
           >
             <Edit2 className="h-4 w-4" />
@@ -166,15 +166,23 @@ export function PaginaCategorias() {
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle>
-              {categoriaAModificar ? "Editar Categoría" : "Nueva Categoría"}
+              {idCategoriaAModificar ? "Editar Categoría" : "Nueva Categoría"}
             </DialogTitle>
           </DialogHeader>
-          <CategoriaForm
-            datosIniciales={categoriaAModificar}
-            alEnviar={manejarEnviar}
-            alCancelar={manejarCerrar}
-            cargando={crearCategoria.isPending || actualizarCategoria.isPending}
-          />
+
+          {idCategoriaAModificar && cargandoDetalle ? (
+            <div className="py-20 flex justify-center items-center">
+              <Loading mensaje="Cargando detalle de la categoría..." />
+            </div>
+          ) : (
+            <CategoriaForm
+              key={idCategoriaAModificar || "nuevo"}
+              datosIniciales={categoriaDetalle}
+              alEnviar={manejarEnviar}
+              alCancelar={manejarCerrar}
+              cargando={crearCategoria.isPending || actualizarCategoria.isPending}
+            />
+          )}
         </DialogContent>
       </Dialog>
     </div>

@@ -21,7 +21,7 @@ namespace Configuracion.API.Endpoints
     {
         public static void MapTipoOperacionSunatEndpoints(this IEndpointRouteBuilder app)
         {
-            var grupo = app.MapGroup("/api/operaciones-sunat").WithTags("Operaciones SUNAT");
+            var grupo = app.MapGroup("/api/tiposoperacionsunat").WithTags("Operaciones SUNAT");
 
             grupo.MapGet("/", async (ITipoOperacionSunatRepositorio repo) =>
             {

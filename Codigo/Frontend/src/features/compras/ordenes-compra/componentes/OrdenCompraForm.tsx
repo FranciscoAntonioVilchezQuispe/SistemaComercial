@@ -2,7 +2,7 @@ import React from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { CalendarIcon, Trash2, Plus, Check } from "lucide-react";
+import { CalendarIcon, Trash2, Plus } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "sonner";
 
@@ -21,18 +21,12 @@ import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-  PopoverAnchor,
 } from "@/components/ui/popover";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandItem,
-  CommandList,
-} from "@/components/ui/command";
 import { Calendar } from "@/components/ui/calendar";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
+
+import { SelectorProducto } from "@/compartido/componentes/formularios/SelectorProducto";
 
 import { useRegistrarOrdenCompra } from "../hooks/useOrdenesCompra";
 import { useProveedores } from "@/features/compras/proveedores/hooks/useProveedores";
@@ -43,22 +37,36 @@ import { SelectorProveedorV2 } from "@/compartido/componentes/formularios/Select
 import { EstadoOrdenCompra } from "../../constantes";
 
 const ordenCompraSchema = z.object({
-  codigoOrden: z.string().min(1, "Código requerido"),
-  idProveedor: z.coerce.number().min(1, "Seleccione un proveedor"),
-  idAlmacenDestino: z.coerce.number().min(1, "Seleccione un almacén"),
-  fechaEmision: z.date(),
+  codigoOrden: z.string().min(1, "El código de orden es requerido"),
+  idProveedor: z.coerce.number({
+    invalid_type_error: "Seleccione un proveedor válido",
+    required_error: "El proveedor es obligatorio",
+  }).min(1, "Debe seleccionar un proveedor"),
+  idAlmacenDestino: z.coerce.number({
+    invalid_type_error: "Seleccione un almacén válido",
+    required_error: "El almacén es obligatorio",
+  }).min(1, "Debe seleccionar un almacén"),
+  fechaEmision: z.date({
+    required_error: "La fecha de emisión es obligatoria",
+  }),
   fechaEntregaEstimada: z.date().optional(),
   idEstado: z.coerce.number().optional().default(EstadoOrdenCompra.Pendiente),
   observaciones: z.string().optional(),
   detalles: z
     .array(
       z.object({
-        idProducto: z.coerce.number().min(1, "Producto requerido"),
-        cantidadSolicitada: z.coerce.number().min(0.01, "Cantidad inválida"),
-        precioUnitarioPactado: z.coerce.number().min(0, "Precio inválido"),
+        idProducto: z.coerce.number({
+          invalid_type_error: "Producto no válido",
+        }).min(1, "El producto es requerido"),
+        cantidadSolicitada: z.coerce.number({
+          invalid_type_error: "La cantidad debe ser un número",
+        }).min(0.01, "La cantidad mínima es 0.01"),
+        precioUnitarioPactado: z.coerce.number({
+          invalid_type_error: "El precio debe ser un número",
+        }).min(0, "El precio no puede ser negativo"),
       }),
     )
-    .min(1, "Debe agregar al menos un producto"),
+    .min(1, "Debe agregar al menos un producto a la orden"),
 });
 
 type OrdenCompraFormValues = z.infer<typeof ordenCompraSchema>;
@@ -68,95 +76,6 @@ interface OrdenCompraFormProps {
   onCancel: () => void;
 }
 
-const ProductInput = ({
-  value,
-  onChange,
-  productos,
-  placeholder = "Buscar producto...",
-  onSearch,
-}: {
-  value: number;
-  onChange: (id: number) => void;
-  productos: any[];
-  placeholder?: string;
-  onSearch: (term: string) => void;
-}) => {
-  const [open, setOpen] = React.useState(false);
-  const [inputValue, setInputValue] = React.useState("");
-
-  React.useEffect(() => {
-    if (value) {
-      const selected = productos.find((p) => p.id === value);
-      if (selected) {
-        setInputValue(selected.nombre);
-      }
-    }
-  }, [value, productos]);
-
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      if (open) return;
-      e.preventDefault();
-      onSearch(inputValue);
-      setOpen(true);
-    }
-  };
-
-  return (
-    <Command className="overflow-visible bg-transparent" shouldFilter={false}>
-      <Popover open={open} onOpenChange={setOpen}>
-        <PopoverAnchor asChild>
-          <div className="relative w-full">
-            <Input
-              placeholder={placeholder}
-              value={inputValue}
-              onChange={(e) => {
-                const newValue = e.target.value;
-                setInputValue(newValue);
-                if (newValue === "") {
-                  onChange(0);
-                  setOpen(false);
-                }
-              }}
-              onKeyDown={handleKeyDown}
-              className="pr-8"
-            />
-          </div>
-        </PopoverAnchor>
-        <PopoverContent
-          className="w-[300px] p-0"
-          align="start"
-          onOpenAutoFocus={(e) => e.preventDefault()}
-        >
-          <CommandList>
-            <CommandEmpty>Presiona Enter para buscar.</CommandEmpty>
-            <CommandGroup>
-              {productos.map((producto) => (
-                <CommandItem
-                  key={producto.id}
-                  value={producto.id.toString()}
-                  onSelect={() => {
-                    onChange(producto.id);
-                    setInputValue(producto.nombre);
-                    setOpen(false);
-                  }}
-                >
-                  <Check
-                    className={cn(
-                      "mr-2 h-4 w-4",
-                      value === producto.id ? "opacity-100" : "opacity-0",
-                    )}
-                  />
-                  {producto.nombre}
-                </CommandItem>
-              ))}
-            </CommandGroup>
-          </CommandList>
-        </PopoverContent>
-      </Popover>
-    </Command>
-  );
-};
 
 export function OrdenCompraForm({ onSuccess, onCancel }: OrdenCompraFormProps) {
   const registrar = useRegistrarOrdenCompra();
@@ -230,31 +149,13 @@ export function OrdenCompraForm({ onSuccess, onCancel }: OrdenCompraFormProps) {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <FormField
-            control={form.control}
-            name="codigoOrden"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Código Orden</FormLabel>
-                <FormControl>
-                  <Input
-                    {...field}
-                    placeholder="OC-00000000"
-                    disabled
-                    className="bg-muted font-bold"
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
+        {/* FILA 1: Proveedor - Jerarquía Máxima */}
+        <div className="grid grid-cols-1 gap-4">
           <FormField
             control={form.control}
             name="idProveedor"
             render={({ field }) => (
-              <FormItem className="col-span-3">
+              <FormItem className="col-span-full">
                 <FormLabel>Proveedor</FormLabel>
                 <SelectorProveedorV2
                   value={field.value}
@@ -266,7 +167,10 @@ export function OrdenCompraForm({ onSuccess, onCancel }: OrdenCompraFormProps) {
               </FormItem>
             )}
           />
+        </div>
 
+        {/* FILA 2: Datos Administrativos y de Control */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
           <FormField
             control={form.control}
             name="idAlmacenDestino"
@@ -296,7 +200,7 @@ export function OrdenCompraForm({ onSuccess, onCancel }: OrdenCompraFormProps) {
             control={form.control}
             name="fechaEmision"
             render={({ field }) => (
-              <FormItem className="flex flex-col mt-2">
+              <FormItem className="flex flex-col">
                 <FormLabel>Fecha Emisión</FormLabel>
                 <Popover>
                   <PopoverTrigger asChild>
@@ -338,7 +242,7 @@ export function OrdenCompraForm({ onSuccess, onCancel }: OrdenCompraFormProps) {
             control={form.control}
             name="fechaEntregaEstimada"
             render={({ field }) => (
-              <FormItem className="flex flex-col mt-2">
+              <FormItem className="flex flex-col">
                 <FormLabel>Entrega Estimada</FormLabel>
                 <Popover>
                   <PopoverTrigger asChild>
@@ -372,6 +276,30 @@ export function OrdenCompraForm({ onSuccess, onCancel }: OrdenCompraFormProps) {
               </FormItem>
             )}
           />
+
+          <FormField
+            control={form.control}
+            name="codigoOrden"
+            render={({ field }) => (
+              <FormItem>
+                <div className="flex flex-col gap-1">
+                  <FormLabel>Código Orden</FormLabel>
+                  <span className="text-[10px] font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider leading-none">
+                    Auto
+                  </span>
+                </div>
+                <FormControl>
+                  <Input
+                    {...field}
+                    placeholder="OC-00000000"
+                    disabled
+                    className="bg-muted font-bold h-9"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
         </div>
 
         <Separator className="my-4" />
@@ -382,7 +310,7 @@ export function OrdenCompraForm({ onSuccess, onCancel }: OrdenCompraFormProps) {
             {fields.map((field, index) => (
               <div
                 key={field.id}
-                className="grid grid-cols-12 gap-2 mb-2 items-end"
+                className="grid grid-cols-12 gap-2 mb-2 items-start"
               >
                 <div className="col-span-4">
                   <FormField
@@ -393,9 +321,17 @@ export function OrdenCompraForm({ onSuccess, onCancel }: OrdenCompraFormProps) {
                         <FormLabel className={index !== 0 ? "sr-only" : ""}>
                           Producto
                         </FormLabel>
-                        <ProductInput
+                        <SelectorProducto
                           value={field.value}
                           onChange={(id) => field.onChange(id)}
+                          onProductSelect={(prod) => {
+                            if (prod) {
+                              form.setValue(
+                                `detalles.${index}.precioUnitarioPactado`,
+                                prod.precioVentaPublico || 0,
+                              );
+                            }
+                          }}
                           productos={productos}
                           onSearch={setTerminoBusqueda}
                         />

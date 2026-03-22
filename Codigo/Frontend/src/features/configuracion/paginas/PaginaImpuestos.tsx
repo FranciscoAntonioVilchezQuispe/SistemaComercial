@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus, Edit2, Trash2, Percent, CheckCircle, XCircle } from "lucide-react";
+import { Plus, Edit2, Trash2, Percent, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -13,6 +13,7 @@ import { Loading } from "@compartido/componentes/feedback/Loading";
 import { MensajeError } from "@compartido/componentes/feedback/MensajeError";
 import {
   useImpuestos,
+  useImpuesto,
   useCrearImpuesto,
   useActualizarImpuesto,
   useEliminarImpuesto,
@@ -42,11 +43,11 @@ import {
 
 export function PaginaImpuestos() {
   const [dialogoOpen, setDialogoOpen] = useState(false);
-  const [registroSeleccionado, setRegistroSeleccionado] =
-    useState<Impuesto | null>(null);
+  const [idRegistroAEditar, setIdRegistroAEditar] = useState<number | null>(null);
   const [eliminarId, setEliminarId] = useState<number | null>(null);
 
   const { data: impuestos, isLoading, error } = useImpuestos();
+  const { data: registroDetalle, isLoading: cargandoDetalle } = useImpuesto(idRegistroAEditar || 0);
 
   const crearMutation = useCrearImpuesto();
   const actualizarMutation = useActualizarImpuesto();
@@ -65,23 +66,24 @@ export function PaginaImpuestos() {
   ];
 
   const handleCrear = () => {
-    setRegistroSeleccionado(null);
+    setIdRegistroAEditar(null);
     setDialogoOpen(true);
   };
 
-  const handleEditar = (impuesto: Impuesto) => {
-    setRegistroSeleccionado(impuesto);
+  const handleEditar = (id: number) => {
+    setIdRegistroAEditar(id);
     setDialogoOpen(true);
   };
 
   const handleGuardar = (datos: ImpuestoFormData) => {
-    if (registroSeleccionado) {
+    if (idRegistroAEditar) {
       actualizarMutation.mutate(
-        { id: registroSeleccionado.id, datos },
+        { id: idRegistroAEditar, datos },
         {
           onSuccess: () => {
             toast.success("Impuesto actualizado");
             setDialogoOpen(false);
+            setIdRegistroAEditar(null);
           },
           onError: (err) => toast.error("Error al actualizar: " + err.message),
         },
@@ -147,7 +149,7 @@ export function PaginaImpuestos() {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => handleEditar(row)}
+            onClick={() => handleEditar(row.id)}
             title="Editar"
             className="h-8 w-8 p-0"
           >
@@ -192,15 +194,26 @@ export function PaginaImpuestos() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
-              {registroSeleccionado ? "Editar Impuesto" : "Nuevo Impuesto"}
+              {idRegistroAEditar ? "Editar Impuesto" : "Nuevo Impuesto"}
             </DialogTitle>
           </DialogHeader>
-          <ImpuestoForm
-            datosIniciales={registroSeleccionado || undefined}
-            alEnviar={handleGuardar}
-            alCancelar={() => setDialogoOpen(false)}
-            cargando={crearMutation.isPending || actualizarMutation.isPending}
-          />
+
+          {idRegistroAEditar && cargandoDetalle ? (
+            <div className="py-20 flex justify-center items-center">
+              <Loading mensaje="Cargando detalle del impuesto..." />
+            </div>
+          ) : (
+            <ImpuestoForm
+              key={idRegistroAEditar || "nuevo"}
+              datosIniciales={registroDetalle || undefined}
+              alEnviar={handleGuardar}
+              alCancelar={() => {
+                setDialogoOpen(false);
+                setIdRegistroAEditar(null);
+              }}
+              cargando={crearMutation.isPending || actualizarMutation.isPending}
+            />
+          )}
         </DialogContent>
       </Dialog>
 

@@ -6,6 +6,7 @@ export interface ReglaDocumento {
   codigo: string;
   nombre: string;
   longitud: number;
+  longitudMaxima?: number;
   esNumerico: boolean;
   estado: boolean;
   activado: boolean;

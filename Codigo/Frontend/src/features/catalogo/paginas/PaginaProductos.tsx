@@ -13,6 +13,7 @@ import { DataTable } from "@/components/ui/DataTable";
 import { ProductoForm } from "../componentes/productos/ProductoForm";
 import {
   useProductos,
+  useProducto,
   useCrearProducto,
   useActualizarProducto,
   useEliminarProducto,
@@ -25,9 +26,7 @@ import { MensajeError } from "@compartido/componentes/feedback/MensajeError";
 
 export function PaginaProductos() {
   const [dialogoAbierto, setDialogoAbierto] = useState(false);
-  const [productoAModificar, setProductoAModificar] = useState<Producto | null>(
-    null,
-  );
+  const [idProductoAEditar, setIdProductoAEditar] = useState<number | null>(null);
 
   const {
     paginacion,
@@ -38,9 +37,11 @@ export function PaginaProductos() {
   } = usePagination();
 
   const { data, isLoading, error } = useProductos(paginacion);
+  const { data: respDetalle, isLoading: cargandoDetalle } = useProducto(idProductoAEditar || 0);
   const crearProducto = useCrearProducto();
   const actualizarProducto = useActualizarProducto();
   const eliminarProducto = useEliminarProducto();
+  const productoDetalle = respDetalle as any; // Usamos el objeto directamente ya que el servicio hace response.data
 
   const productos = data?.datos || [];
 
@@ -48,25 +49,25 @@ export function PaginaProductos() {
   if (error) return <MensajeError mensaje={error.message} />;
 
   const manejarAbrirCrear = () => {
-    setProductoAModificar(null);
+    setIdProductoAEditar(null);
     setDialogoAbierto(true);
   };
 
-  const manejarAbrirEditar = (producto: Producto) => {
-    setProductoAModificar(producto);
+  const manejarAbrirEditar = (id: number) => {
+    setIdProductoAEditar(id);
     setDialogoAbierto(true);
   };
 
   const manejarCerrar = () => {
     setDialogoAbierto(false);
-    setProductoAModificar(null);
+    setIdProductoAEditar(null);
   };
 
   const manejarEnviar = async (datos: any) => {
     try {
-      if (productoAModificar) {
+      if (idProductoAEditar) {
         await actualizarProducto.mutateAsync({
-          id: productoAModificar.id,
+          id: idProductoAEditar,
           datos,
         });
         toast.success("Producto actualizado correctamente");
@@ -159,7 +160,7 @@ export function PaginaProductos() {
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => manejarAbrirEditar(producto)}
+            onClick={() => manejarAbrirEditar(producto.id)}
             title="Editar"
           >
             <Edit2 className="h-4 w-4" />
@@ -212,15 +213,23 @@ export function PaginaProductos() {
         <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
-              {productoAModificar ? "Editar Producto" : "Nuevo Producto"}
+              {idProductoAEditar ? "Editar Producto" : "Nuevo Producto"}
             </DialogTitle>
           </DialogHeader>
-          <ProductoForm
-            datosIniciales={productoAModificar}
-            alEnviar={manejarEnviar}
-            alCancelar={manejarCerrar}
-            cargando={crearProducto.isPending || actualizarProducto.isPending}
-          />
+          
+          {idProductoAEditar && cargandoDetalle ? (
+            <div className="py-20 flex justify-center items-center">
+              <Loading mensaje="Cargando detalle del producto..." />
+            </div>
+          ) : (
+            <ProductoForm
+              key={idProductoAEditar || "nuevo"}
+              datosIniciales={idProductoAEditar ? productoDetalle : null}
+              alEnviar={manejarEnviar}
+              alCancelar={manejarCerrar}
+              cargando={crearProducto.isPending || actualizarProducto.isPending}
+            />
+          )}
         </DialogContent>
       </Dialog>
     </div>

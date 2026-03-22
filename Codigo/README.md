@@ -151,6 +151,32 @@ Variables extraíbles y leídas desde los respectivos archivos de entorno (`apps
 [COMANDOS PARA TESTS NO DISPONIBLES EN EL CÓDIGO ACTUAL]
 ```
 
+## 📜 Estándares de Desarrollo
+
+El proyecto sigue una serie de estándares rigurosos para mantener la calidad y escalabilidad:
+
+### Backend (.NET)
+1. **Arquitectura Limpia (Clean Architecture):** Separación estricta de responsabilidades en capas: *Domain*, *Application*, *Infrastructure* y *API*.
+2. **Patrón CQRS con MediatR:** Las operaciones de lectura y escritura están desacopladas. Los controladores solo despachan comandos o consultas.
+3. **Validación de Comandos:** Uso de **FluentValidation** en el backend para validar la integridad de los datos antes de que lleguen a la capa de dominio.
+4. **Respuestas Estandarizadas:** Todas las APIs devuelven un formato consistente usando wrappers como `ToReturn<T>` y `PagedResponse<T>`.
+5. **Logging Estructurado:** Implementación de **Serilog** para una trazabilidad detallada en archivos y consola.
+6. **Carga de Datos por ID:** Los formularios de edición siempre consultan el detalle fresco al backend mediante el ID, garantizando datos completos.
+
+### Frontend (React/TS)
+1. **Estructura Basada en Features:** Organización del código por funcionalidad (`src/features/...`) agrupando componentes, hooks, servicios y tipos.
+2. **Gestión de Estado y Caché:** Uso de **TanStack Query** (React Query) para el manejo eficiente de datos asíncronos y caché.
+3. **Sincronización de Catálogos:** Los formularios esperan la carga completa de catálogos maestros antes de permitir la interacción.
+4. **UI Dinámica y Premium:** Uso mandatorio de *Lucide Icons*, animaciones de *Framer Motion* y componentes de *Radix UI*.
+5. **Validación con Zod:** Esquemas de validación estrictos en el cliente sincronizados con los tipos de TypeScript.
+
+## 🚀 Próximos Estándares Sugeridos
+Para llevar el proyecto al siguiente nivel, se recomienda implementar:
+- **Pruebas Automatizadas:** Incorporar tests unitarios con `xUnit` en backend y `Vitest`/`Playwright` en frontend.
+- **Documentación Viva:** Habilitar **Swagger/OpenAPI** en todos los microservicios para facilitar la integración.
+- **CI/CD Pipelines:** Automatizar la compilación y despliegue usando GitHub Actions o Azure DevOps.
+- **Métrica de Calidad:** Integración de **SonarQube** para el análisis estático de código.
+
 ## 🤝 Cómo Contribuir
 
 1. Crea tu Feature Branch (`git checkout -b feature/CaracteristicaIncreible`).

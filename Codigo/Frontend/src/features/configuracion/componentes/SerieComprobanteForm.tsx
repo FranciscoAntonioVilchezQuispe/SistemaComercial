@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -147,7 +148,7 @@ export function SerieComprobanteForm({
 
         {/* Mantenemos un input local para el padding, pero controlamos en submit y en Zod */}
         <div className="space-y-2">
-          <FormLabel>Correlativo Actual</FormLabel>
+          <Label>Correlativo Actual</Label>
           <Input
             value={inputCorrelativo}
             onChange={(e) => {

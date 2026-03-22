@@ -39,6 +39,7 @@ export interface Producto {
   // Configuración de inventario
   tieneVariantes: boolean;
   permiteInventarioNegativo: boolean;
+  metodoValuacion: string;
 
   // Configuración fiscal
   gravadoImpuesto: boolean;
@@ -81,6 +82,7 @@ export interface ProductoFormData {
   // Configuración de inventario
   tieneVariantes: boolean;
   permiteInventarioNegativo: boolean;
+  metodoValuacion: string;
 
   // Configuración fiscal
   gravadoImpuesto: boolean;

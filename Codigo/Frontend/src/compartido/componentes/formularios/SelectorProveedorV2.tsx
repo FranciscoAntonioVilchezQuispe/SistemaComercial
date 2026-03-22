@@ -1,12 +1,13 @@
 import React from "react";
-import { Check, Plus, Search } from "lucide-react";
+import { Check, Plus, Search, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { toast } from "sonner";
 import {
   Popover,
   PopoverContent,
-  PopoverTrigger,
+  PopoverAnchor,
 } from "@/components/ui/popover";
 import {
   Command,
@@ -55,7 +56,7 @@ export const SelectorProveedorV2: React.FC<SelectorProveedorProps> = ({
   const reglasMap = React.useMemo(() => {
     if (!configReglas?.reglas) return {};
     return configReglas.reglas.reduce((acc: any, curr) => {
-      acc[curr.codigo] = curr;
+      if (curr.id) acc[curr.id.toString()] = curr;
       return acc;
     }, {});
   }, [configReglas]);
@@ -82,14 +83,70 @@ export const SelectorProveedorV2: React.FC<SelectorProveedorProps> = ({
 
   const regla = reglasMap[tipoDoc];
 
-  const handleCrearRapido = () => {
-    // ... (sin cambios)
+  const handleCrearRapido = async () => {
+    const largoMinimo = regla?.longitud || 0;
+    const largoMaximo = regla?.longitudMaxima || regla?.longitud || 0;
+
+    if (!numDoc || !razonSocial) {
+      toast.error("Complete el documento y razón social");
+      return;
+    }
+
+    if (numDoc.length < largoMinimo) {
+      toast.error(`El número de documento debe tener al menos ${largoMinimo} caracteres`);
+      return;
+    }
+
+    if (largoMaximo > 0 && numDoc.length > largoMaximo) {
+      toast.error(`El número de documento no puede exceder los ${largoMaximo} caracteres`);
+      return;
+    }
+
+    try {
+      const nuevo = await crearProveedor.mutateAsync({
+        idTipoDocumento: Number(tipoDoc),
+        numeroDocumento: numDoc,
+        razonSocial: razonSocial,
+        nombreComercial: razonSocial,
+        direccion: "Sin dirección",
+        email: "proveedor@ejemplo.com",
+        telefono: "",
+        activado: true,
+      });
+
+      if (nuevo) {
+        // Manejar respuesta envuelta en ToReturn o directa
+        const proveedorFinal = (nuevo as any).datos || nuevo;
+        onChange(proveedorFinal);
+        toast.success("Proveedor registrado y seleccionado");
+      }
+    } catch (error: any) {
+      console.error(error);
+      toast.error("Error al registrar proveedor rápido");
+    }
+  };
+
+  const handleClear = () => {
+    onChange(null);
+    setRazonSocial("");
+    setNumDoc("");
+    setTipoDoc("1"); // Reset a DNI
+    if (onTipoDocChange) onTipoDocChange("");
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      if (open) return;
+      e.preventDefault();
+      onSearch(razonSocial);
+      setOpen(true);
+    }
   };
 
   return (
     <div className="flex flex-col gap-2 w-full">
       <div className="flex gap-2 items-end">
-        <div className="w-16">
+        <div className="w-40">
           <SelectorTipoDocumento
             value={tipoDoc}
             onChange={(val: string) => {
@@ -103,6 +160,7 @@ export const SelectorProveedorV2: React.FC<SelectorProveedorProps> = ({
               }
             }}
             hideLabel
+            hideMessage={true}
             disabled={disabled}
           />
         </div>
@@ -111,76 +169,89 @@ export const SelectorProveedorV2: React.FC<SelectorProveedorProps> = ({
           <Input
             placeholder="Nº Documento"
             value={numDoc}
+            maxLength={regla?.longitudMaxima || regla?.longitud}
             onChange={(e) => {
               const val = regla?.esNumerico
                 ? limpiarSoloNumeros(e.target.value)
                 : e.target.value;
-              if (regla && val.length <= regla.longitud) {
-                setNumDoc(val);
-              } else if (!regla) {
-                setNumDoc(val);
-              }
+              setNumDoc(val);
             }}
             className="text-center font-mono"
             disabled={disabled}
           />
         </div>
 
-        <div className="flex-1 relative">
-          <Popover open={open} onOpenChange={setOpen}>
-            <PopoverTrigger asChild>
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Razón Social o Buscar..."
-                  value={razonSocial}
-                  onChange={(e) => {
-                    const val = e.target.value;
-                    setRazonSocial(val);
-                    onSearch(val);
-                    if (val.length >= 3) setOpen(true);
-                    if (!val) {
-                      onChange(null);
-                      setNumDoc("");
-                    }
-                  }}
-                  className="pl-9"
-                  disabled={disabled}
-                />
-              </div>
-            </PopoverTrigger>
-            <PopoverContent className="w-[500px] p-0" align="start">
-              <Command shouldFilter={false}>
-                <CommandList>
-                  <CommandEmpty>No se encontraron resultados.</CommandEmpty>
-                  <CommandGroup heading="Proveedores Existentes">
-                    {proveedores.map((p) => (
-                      <CommandItem
-                        key={p.id}
-                        onSelect={() => {
-                          onChange(p);
+        <div className="flex-1">
+          <Command className="overflow-visible bg-transparent font-normal" shouldFilter={false}>
+            <Popover open={open} onOpenChange={setOpen}>
+              <div className="relative w-full">
+                <PopoverAnchor asChild>
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      placeholder="Buscar proveedor (Enter)..."
+                      value={razonSocial}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setRazonSocial(val);
+                        if (val === "") {
+                          onChange(null);
                           setOpen(false);
-                        }}
+                        }
+                      }}
+                      onKeyDown={handleKeyDown}
+                      className="pl-9 pr-10"
+                      disabled={disabled}
+                    />
+                    {razonSocial && !disabled && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="absolute right-0 top-0 h-9 w-9 text-muted-foreground hover:text-foreground"
+                        onClick={handleClear}
                       >
-                        <Check
-                          className={cn(
-                            "mr-2 h-4 w-4",
-                            value === p.id ? "opacity-100" : "opacity-0",
-                          )}
-                        />
-                        <div className="flex flex-col">
-                          <span className="font-semibold">{p.razonSocial}</span>
-                          <span className="text-xs text-muted-foreground">
-                            {p.numeroDocumento}
-                          </span>
-                        </div>
-                      </CommandItem>
-                    ))}
-                  </CommandGroup>
-                </CommandList>
-              </Command>
-            </PopoverContent>
-          </Popover>
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    )}
+                  </div>
+                </PopoverAnchor>
+                <PopoverContent 
+                  className="w-[500px] p-0" 
+                  align="start"
+                  onOpenAutoFocus={(e) => e.preventDefault()}
+                >
+                  <CommandList className="max-h-[300px] overflow-y-auto">
+                    <CommandEmpty>Presiona Enter para buscar.</CommandEmpty>
+                    <CommandGroup heading="Proveedores Existentes">
+                      {proveedores.map((p) => (
+                        <CommandItem
+                          key={p.id}
+                          onSelect={() => {
+                            onChange(p);
+                            setOpen(false);
+                          }}
+                        >
+                          <Check
+                            className={cn(
+                              "mr-2 h-4 w-4",
+                              value === p.id ? "opacity-100" : "opacity-0",
+                            )}
+                          />
+                          <div className="flex flex-col">
+                            <span className="font-semibold">{p.razonSocial}</span>
+                            <span className="text-xs text-muted-foreground">
+                              {p.numeroDocumento} - {p.nombreComercial}
+                            </span>
+                          </div>
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </CommandList>
+                </PopoverContent>
+              </div>
+            </Popover>
+          </Command>
         </div>
 
         <div className="flex items-center gap-1">

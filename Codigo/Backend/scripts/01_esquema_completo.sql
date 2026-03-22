@@ -1,3 +1,12 @@
+CREATE SCHEMA IF NOT EXISTS catalogo;
+CREATE SCHEMA IF NOT EXISTS clientes;
+CREATE SCHEMA IF NOT EXISTS compras;
+CREATE SCHEMA IF NOT EXISTS configuracion;
+CREATE SCHEMA IF NOT EXISTS contabilidad;
+CREATE SCHEMA IF NOT EXISTS identidad;
+CREATE SCHEMA IF NOT EXISTS inventario;
+CREATE SCHEMA IF NOT EXISTS ventas;
+CREATE SCHEMA IF NOT EXISTS vistas;
 --
 --
 
@@ -348,6 +357,7 @@ CREATE TABLE catalogo.productos (
     fecha_modificacion timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
     usuario_modificacion character varying(100),
     id_tipo_producto bigint,
+    metodo_valuacion character varying(2) DEFAULT '' NOT NULL,
     CONSTRAINT productos_precio_compra_check CHECK ((precio_compra >= (0)::numeric)),
     CONSTRAINT productos_precio_venta_distribuidor_check CHECK ((precio_venta_distribuidor >= (0)::numeric)),
     CONSTRAINT productos_precio_venta_mayorista_check CHECK ((precio_venta_mayorista >= (0)::numeric)),
@@ -5068,21 +5078,48 @@ ALTER TABLE ONLY ventas.ventas
 --
 
 ALTER TABLE ONLY ventas.ventas
-    ADD CONSTRAINT fk_venta_estado_pago FOREIGN KEY (id_estado_pago) REFERENCES configuracion.tablas_generales_detalle(id_detalle);
 
+DO $$ 
+BEGIN 
+    -- series_comprobantes -> tipo_comprobante
+    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'fk_series_tipo_comp') THEN
+        ALTER TABLE configuracion.series_comprobantes 
+        ADD CONSTRAINT fk_series_tipo_comp FOREIGN KEY (id_tipo_comprobante) 
+        REFERENCES configuracion.tipo_comprobante(id_tipo_comprobante);
+    END IF;
 
---
--- TOC entry 5527 (class 2606 OID 20810)
--- Name: ventas fk_venta_tipo_comprobante; Type: FK CONSTRAINT; Schema: ventas; Owner: postgres
---
+    -- matriz_regla_sunat -> tipo_comprobante
+    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'fk_matriz_tipo_comp') THEN
+        ALTER TABLE configuracion.matriz_regla_sunat 
+        ADD CONSTRAINT fk_matriz_tipo_comp FOREIGN KEY (id_tipo_comprobante) 
+        REFERENCES configuracion.tipo_comprobante(id_tipo_comprobante);
+    END IF;
 
-ALTER TABLE ONLY ventas.ventas
-    ADD CONSTRAINT fk_venta_tipo_comprobante FOREIGN KEY (id_tipo_comprobante) REFERENCES configuracion.tablas_generales_detalle(id_detalle);
+    -- matriz_regla_sunat -> tipo_operacion_sunat
+    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'fk_matriz_tipo_oper') THEN
+        ALTER TABLE configuracion.matriz_regla_sunat 
+        ADD CONSTRAINT fk_matriz_tipo_oper FOREIGN KEY (id_tipo_operacion) 
+        REFERENCES configuracion.tipo_operacion_sunat(id_tipo_operacion);
+    END IF;
 
+    -- regla_documento_comprobante -> tipo_comprobante
+    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'fk_regla_doc_tipo_comp') THEN
+        ALTER TABLE configuracion.regla_documento_comprobante 
+        ADD CONSTRAINT fk_regla_doc_tipo_comp FOREIGN KEY (id_tipo_comprobante) 
+        REFERENCES configuracion.tipo_comprobante(id_tipo_comprobante);
+    END IF;
+END $$;
 
--- Completed on 2026-01-29 17:44:15
+-- FIX PARA ORDENES DE COMPRA
+ALTER TABLE compras.ordenes_compra ADD COLUMN IF NOT EXISTS id_tipo_comprobante BIGINT;
+ALTER TABLE compras.ordenes_compra ADD COLUMN IF NOT EXISTS serie VARCHAR(10);
+ALTER TABLE compras.ordenes_compra ADD COLUMN IF NOT EXISTS numero VARCHAR(20);
 
---
---
-
-
+-- MEJORAS ESTRUCTURALES SUNAT
+ALTER TABLE configuracion.tipo_comprobante  ADD COLUMN IF NOT EXISTS es_emitible BOOLEAN NOT NULL DEFAULT true,  ADD COLUMN IF NOT EXISTS es_referenciable BOOLEAN NOT NULL DEFAULT false,  ADD COLUMN IF NOT EXISTS movimiento_stock_venta VARCHAR(10) NOT NULL DEFAULT 'NEUTRO',  ADD COLUMN IF NOT EXISTS movimiento_stock_compra VARCHAR(10) NOT NULL DEFAULT 'NEUTRO',  ADD COLUMN IF NOT EXISTS es_venta BOOLEAN NOT NULL DEFAULT false,  ADD COLUMN IF NOT EXISTS es_compra BOOLEAN NOT NULL DEFAULT false,  ADD COLUMN IF NOT EXISTS es_orden_compra BOOLEAN NOT NULL DEFAULT false;
+ALTER TABLE configuracion.tipo_documento  ADD COLUMN IF NOT EXISTS es_persona_natural BOOLEAN NOT NULL DEFAULT false,  ADD COLUMN IF NOT EXISTS es_empresa BOOLEAN NOT NULL DEFAULT false,  ADD COLUMN IF NOT EXISTS aplica_sin_ruc BOOLEAN NOT NULL DEFAULT false,  ADD COLUMN IF NOT EXISTS longitud_maxima INTEGER;
+ALTER TABLE ventas.notas  ADD COLUMN IF NOT EXISTS codigo_tipo_comprobante_ref VARCHAR(10),  ADD COLUMN IF NOT EXISTS serie_ref                   VARCHAR(10),  ADD COLUMN IF NOT EXISTS numero_ref                  VARCHAR(20),  ADD COLUMN IF NOT EXISTS codigo_motivo               VARCHAR(2),  ADD COLUMN IF NOT EXISTS descripcion_motivo          VARCHAR(200);
+ALTER TABLE compras.notas  ADD COLUMN IF NOT EXISTS codigo_tipo_comprobante_ref VARCHAR(10),  ADD COLUMN IF NOT EXISTS serie_ref                   VARCHAR(10),  ADD COLUMN IF NOT EXISTS numero_ref                  VARCHAR(20),  ADD COLUMN IF NOT EXISTS codigo_motivo               VARCHAR(2),  ADD COLUMN IF NOT EXISTS descripcion_motivo          VARCHAR(200);
+ALTER TABLE compras.detalle_compra ALTER COLUMN afectacion_igv TYPE VARCHAR(2);
+ALTER TABLE ventas.detalle_venta  ADD COLUMN IF NOT EXISTS codigo_afectacion_igv  VARCHAR(2),  ADD COLUMN IF NOT EXISTS codigo_tributo          VARCHAR(4),  ADD COLUMN IF NOT EXISTS precio_unitario_base    NUMERIC(12,4),  ADD COLUMN IF NOT EXISTS descuento_item          NUMERIC(12,4) DEFAULT 0,  ADD COLUMN IF NOT EXISTS valor_item              NUMERIC(12,4);
+ALTER TABLE compras.detalle_compra  ADD COLUMN IF NOT EXISTS codigo_tributo          VARCHAR(4),  ADD COLUMN IF NOT EXISTS precio_unitario_base    NUMERIC(12,4),  ADD COLUMN IF NOT EXISTS descuento_item          NUMERIC(12,4) DEFAULT 0,  ADD COLUMN IF NOT EXISTS valor_item              NUMERIC(12,4);

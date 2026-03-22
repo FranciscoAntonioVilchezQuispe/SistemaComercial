@@ -1,16 +1,16 @@
-﻿-- Script para agregar menÃºs de CatÃ¡logo faltantes
+-- Script para agregar menús de Catálogo faltantes
 -- Fecha: 2026-01-29
--- DescripciÃ³n: Agrega menÃºs para Unidades de Medida y Listas de Precios
+-- Descripción: Agrega menús para Unidades de Medida y Listas de Precios
 
--- Primero, obtener el ID del menÃº padre "CatÃ¡logo"
--- Asumiendo que el cÃ³digo del menÃº CatÃ¡logo es 'CATALOGO'
+-- Primero, obtener el ID del menú padre "Catálogo"
+-- Asumiendo que el código del menú Catálogo es 'CATALOGO'
 
--- Insertar menÃº para Unidades de Medida
+-- Insertar menú para Unidades de Medida
 INSERT INTO identidad.menus (codigo, nombre, descripcion, ruta, icono, orden, id_menu_padre, activado, fecha_creacion, usuario_creacion)
 SELECT 
     'CAT_UNIDADES_MEDIDA',
     'Unidades de Medida',
-    'GestiÃ³n de unidades de medida',
+    'Gestión de unidades de medida',
     '/catalogo/unidades-medida',
     'Ruler',
     30,
@@ -21,12 +21,12 @@ SELECT
 FROM identidad.menus
 WHERE codigo = 'CATALOGO';
 
--- Insertar menÃº para Listas de Precios
+-- Insertar menú para Listas de Precios
 INSERT INTO identidad.menus (codigo, nombre, descripcion, ruta, icono, orden, id_menu_padre, activado, fecha_creacion, usuario_creacion)
 SELECT 
     'CAT_LISTAS_PRECIOS',
     'Listas de Precios',
-    'GestiÃ³n de listas de precios',
+    'Gestión de listas de precios',
     '/catalogo/listas-precios',
     'DollarSign',
     40,
@@ -37,7 +37,7 @@ SELECT
 FROM identidad.menus
 WHERE codigo = 'CATALOGO';
 
--- Asignar permisos de menÃº al rol Administrador (asumiendo id_rol = 1)
+-- Asignar permisos de menú al rol Administrador (asumiendo id_rol = 1)
 -- Primero para Unidades de Medida
 INSERT INTO identidad.roles_menus (id_rol, id_menu, activado, fecha_creacion, usuario_creacion)
 SELECT 
@@ -60,7 +60,7 @@ SELECT
 FROM identidad.menus
 WHERE codigo = 'CAT_LISTAS_PRECIOS';
 
--- Verificar los menÃºs insertados
+-- Verificar los menús insertados
 SELECT 
     m.id_menu,
     m.codigo,
@@ -75,7 +75,7 @@ ORDER BY m.orden;
 
 SELECT 'Menus Nuevos' as tabla, count(*)::bigint FROM identidad.menus WHERE codigo IN ('CAT_UNIDADES_MEDIDA', 'CAT_LISTAS_PRECIOS');
 -- =====================================================
--- Script de InicializaciÃ³n: Sistema de Permisos Granulares
+-- Script de Inicialización: Sistema de Permisos Granulares
 -- Base de Datos: sistema_comercial
 -- Esquema: identidad
 -- =====================================================
@@ -161,7 +161,7 @@ CREATE TABLE IF NOT EXISTS identidad.usuarios_roles (
 );
 
 -- =====================================================
--- 2. CREAR ÃNDICES
+-- 2. CREAR ÍNDICES
 -- =====================================================
 
 CREATE INDEX IF NOT EXISTS idx_menus_codigo ON identidad.menus(codigo);
@@ -190,78 +190,78 @@ VALUES
 ON CONFLICT (codigo) DO NOTHING;
 
 -- =====================================================
--- 4. INSERTAR DATOS INICIALES - MENÃšS
+-- 4. INSERTAR DATOS INICIALES - MENÚS
 -- =====================================================
 
--- MenÃºs principales (sin padre)
+-- Menús principales (sin padre)
 INSERT INTO identidad.menus (codigo, nombre, descripcion, ruta, icono, orden) 
 VALUES
     ('DASHBOARD', 'Dashboard', 'Panel principal del sistema', '/dashboard', 'dashboard', 1),
-    ('VENTAS', 'Ventas', 'MÃ³dulo de gestiÃ³n de ventas', '/ventas', 'shopping-cart', 2),
-    ('COMPRAS', 'Compras', 'MÃ³dulo de gestiÃ³n de compras', '/compras', 'shopping-bag', 3),
-    ('INVENTARIO', 'Inventario', 'MÃ³dulo de gestiÃ³n de inventario', '/inventario', 'warehouse', 4),
-    ('CLIENTES', 'Clientes', 'MÃ³dulo de gestiÃ³n de clientes', '/clientes', 'users', 5),
-    ('CATALOGO', 'CatÃ¡logo', 'MÃ³dulo de gestiÃ³n de productos', '/catalogo', 'book', 6),
-    ('CONTABILIDAD', 'Contabilidad', 'MÃ³dulo de contabilidad', '/contabilidad', 'calculator', 7),
-    ('CONFIGURACION', 'ConfiguraciÃ³n', 'ConfiguraciÃ³n del sistema', '/configuracion', 'settings', 8),
-    ('IDENTIDAD', 'Identidad', 'GestiÃ³n de usuarios y permisos', '/identidad', 'shield', 9)
+    ('VENTAS', 'Ventas', 'Módulo de gestión de ventas', '/ventas', 'shopping-cart', 2),
+    ('COMPRAS', 'Compras', 'Módulo de gestión de compras', '/compras', 'shopping-bag', 3),
+    ('INVENTARIO', 'Inventario', 'Módulo de gestión de inventario', '/inventario', 'warehouse', 4),
+    ('CLIENTES', 'Clientes', 'Módulo de gestión de clientes', '/clientes', 'users', 5),
+    ('CATALOGO', 'Catálogo', 'Módulo de gestión de productos', '/catalogo', 'book', 6),
+    ('CONTABILIDAD', 'Contabilidad', 'Módulo de contabilidad', '/contabilidad', 'calculator', 7),
+    ('CONFIGURACION', 'Configuración', 'Configuración del sistema', '/configuracion', 'settings', 8),
+    ('IDENTIDAD', 'Identidad', 'Gestión de usuarios y permisos', '/identidad', 'shield', 9)
 ON CONFLICT (codigo) DO NOTHING;
 
--- SubmenÃºs de VENTAS
+-- Submenús de VENTAS
 INSERT INTO identidad.menus (codigo, nombre, descripcion, ruta, icono, orden, id_menu_padre) 
 VALUES
     ('VENTAS_LISTA', 'Lista de Ventas', 'Ver todas las ventas', '/ventas/lista', 'list', 1, (SELECT id_menu FROM identidad.menus WHERE codigo = 'VENTAS')),
     ('VENTAS_NUEVA', 'Nueva Venta', 'Registrar nueva venta', '/ventas/nueva', 'plus', 2, (SELECT id_menu FROM identidad.menus WHERE codigo = 'VENTAS')),
     ('VENTAS_COTIZACIONES', 'Cotizaciones', 'Gestionar cotizaciones', '/ventas/cotizaciones', 'file-text', 3, (SELECT id_menu FROM identidad.menus WHERE codigo = 'VENTAS')),
-    ('VENTAS_CAJAS', 'Cajas', 'GestiÃ³n de cajas', '/ventas/cajas', 'credit-card', 4, (SELECT id_menu FROM identidad.menus WHERE codigo = 'VENTAS'))
+    ('VENTAS_CAJAS', 'Cajas', 'Gestión de cajas', '/ventas/cajas', 'credit-card', 4, (SELECT id_menu FROM identidad.menus WHERE codigo = 'VENTAS'))
 ON CONFLICT (codigo) DO NOTHING;
 
--- SubmenÃºs de COMPRAS
+-- Submenús de COMPRAS
 INSERT INTO identidad.menus (codigo, nombre, descripcion, ruta, icono, orden, id_menu_padre) 
 VALUES
     ('COMPRAS_LISTA', 'Lista de Compras', 'Ver todas las compras', '/compras/lista', 'list', 1, (SELECT id_menu FROM identidad.menus WHERE codigo = 'COMPRAS')),
     ('COMPRAS_NUEVA', 'Nueva Compra', 'Registrar nueva compra', '/compras/nueva', 'plus', 2, (SELECT id_menu FROM identidad.menus WHERE codigo = 'COMPRAS')),
-    ('COMPRAS_ORDENES', 'Ã“rdenes de Compra', 'Gestionar Ã³rdenes', '/compras/ordenes', 'clipboard', 3, (SELECT id_menu FROM identidad.menus WHERE codigo = 'COMPRAS')),
-    ('COMPRAS_PROVEEDORES', 'Proveedores', 'GestiÃ³n de proveedores', '/compras/proveedores', 'truck', 4, (SELECT id_menu FROM identidad.menus WHERE codigo = 'COMPRAS'))
+    ('COMPRAS_ORDENES', 'Órdenes de Compra', 'Gestionar órdenes', '/compras/ordenes', 'clipboard', 3, (SELECT id_menu FROM identidad.menus WHERE codigo = 'COMPRAS')),
+    ('COMPRAS_PROVEEDORES', 'Proveedores', 'Gestión de proveedores', '/compras/proveedores', 'truck', 4, (SELECT id_menu FROM identidad.menus WHERE codigo = 'COMPRAS'))
 ON CONFLICT (codigo) DO NOTHING;
 
--- SubmenÃºs de INVENTARIO
+-- Submenús de INVENTARIO
 INSERT INTO identidad.menus (codigo, nombre, descripcion, ruta, icono, orden, id_menu_padre) 
 VALUES
     ('INVENTARIO_STOCK', 'Stock', 'Consultar stock disponible', '/inventario/stock', 'package', 1, (SELECT id_menu FROM identidad.menus WHERE codigo = 'INVENTARIO')),
     ('INVENTARIO_MOVIMIENTOS', 'Movimientos', 'Movimientos de inventario', '/inventario/movimientos', 'repeat', 2, (SELECT id_menu FROM identidad.menus WHERE codigo = 'INVENTARIO')),
-    ('INVENTARIO_ALMACENES', 'Almacenes', 'GestiÃ³n de almacenes', '/inventario/almacenes', 'home', 3, (SELECT id_menu FROM identidad.menus WHERE codigo = 'INVENTARIO'))
+    ('INVENTARIO_ALMACENES', 'Almacenes', 'Gestión de almacenes', '/inventario/almacenes', 'home', 3, (SELECT id_menu FROM identidad.menus WHERE codigo = 'INVENTARIO'))
 ON CONFLICT (codigo) DO NOTHING;
 
--- SubmenÃºs de CATALOGO
+-- Submenús de CATALOGO
 INSERT INTO identidad.menus (codigo, nombre, descripcion, ruta, icono, orden, id_menu_padre) 
 VALUES
-    ('CATALOGO_PRODUCTOS', 'Productos', 'GestiÃ³n de productos', '/catalogo/productos', 'box', 1, (SELECT id_menu FROM identidad.menus WHERE codigo = 'CATALOGO')),
-    ('CATALOGO_CATEGORIAS', 'CategorÃ­as', 'GestiÃ³n de categorÃ­as', '/catalogo/categorias', 'folder', 2, (SELECT id_menu FROM identidad.menus WHERE codigo = 'CATALOGO')),
-    ('CATALOGO_MARCAS', 'Marcas', 'GestiÃ³n de marcas', '/catalogo/marcas', 'tag', 3, (SELECT id_menu FROM identidad.menus WHERE codigo = 'CATALOGO')),
-    ('CATALOGO_PRECIOS', 'Listas de Precios', 'GestiÃ³n de precios', '/catalogo/precios', 'dollar-sign', 4, (SELECT id_menu FROM identidad.menus WHERE codigo = 'CATALOGO'))
+    ('CATALOGO_PRODUCTOS', 'Productos', 'Gestión de productos', '/catalogo/productos', 'box', 1, (SELECT id_menu FROM identidad.menus WHERE codigo = 'CATALOGO')),
+    ('CATALOGO_CATEGORIAS', 'Categorías', 'Gestión de categorías', '/catalogo/categorias', 'folder', 2, (SELECT id_menu FROM identidad.menus WHERE codigo = 'CATALOGO')),
+    ('CATALOGO_MARCAS', 'Marcas', 'Gestión de marcas', '/catalogo/marcas', 'tag', 3, (SELECT id_menu FROM identidad.menus WHERE codigo = 'CATALOGO')),
+    ('CATALOGO_PRECIOS', 'Listas de Precios', 'Gestión de precios', '/catalogo/precios', 'dollar-sign', 4, (SELECT id_menu FROM identidad.menus WHERE codigo = 'CATALOGO'))
 ON CONFLICT (codigo) DO NOTHING;
 
--- SubmenÃºs de IDENTIDAD
+-- Submenús de IDENTIDAD
 INSERT INTO identidad.menus (codigo, nombre, descripcion, ruta, icono, orden, id_menu_padre) 
 VALUES
-    ('IDENTIDAD_USUARIOS', 'Usuarios', 'GestiÃ³n de usuarios', '/identidad/usuarios', 'user', 1, (SELECT id_menu FROM identidad.menus WHERE codigo = 'IDENTIDAD')),
-    ('IDENTIDAD_ROLES', 'Roles', 'GestiÃ³n de roles', '/identidad/roles', 'users', 2, (SELECT id_menu FROM identidad.menus WHERE codigo = 'IDENTIDAD')),
-    ('IDENTIDAD_PERMISOS', 'Permisos', 'AsignaciÃ³n de permisos', '/identidad/permisos', 'lock', 3, (SELECT id_menu FROM identidad.menus WHERE codigo = 'IDENTIDAD'))
+    ('IDENTIDAD_USUARIOS', 'Usuarios', 'Gestión de usuarios', '/identidad/usuarios', 'user', 1, (SELECT id_menu FROM identidad.menus WHERE codigo = 'IDENTIDAD')),
+    ('IDENTIDAD_ROLES', 'Roles', 'Gestión de roles', '/identidad/roles', 'users', 2, (SELECT id_menu FROM identidad.menus WHERE codigo = 'IDENTIDAD')),
+    ('IDENTIDAD_PERMISOS', 'Permisos', 'Asignación de permisos', '/identidad/permisos', 'lock', 3, (SELECT id_menu FROM identidad.menus WHERE codigo = 'IDENTIDAD'))
 ON CONFLICT (codigo) DO NOTHING;
 
 -- =====================================================
--- 5. VERIFICACIÃ“N
+-- 5. VERIFICACIÓN
 -- =====================================================
 
 -- Contar registros insertados
 SELECT 'Tipos de Permiso' as tabla, COUNT(*) as total FROM identidad.tipos_permiso
 UNION ALL
-SELECT 'MenÃºs', COUNT(*) FROM identidad.menus
+SELECT 'Menús', COUNT(*) FROM identidad.menus
 UNION ALL
-SELECT 'Roles-MenÃºs', COUNT(*) FROM identidad.roles_menus
+SELECT 'Roles-Menús', COUNT(*) FROM identidad.roles_menus
 UNION ALL
-SELECT 'Roles-MenÃºs-Permisos', COUNT(*) FROM identidad.roles_menus_permisos
+SELECT 'Roles-Menús-Permisos', COUNT(*) FROM identidad.roles_menus_permisos
 UNION ALL
 SELECT 'Usuarios-Roles', COUNT(*) FROM identidad.usuarios_roles;
 
@@ -276,7 +276,7 @@ SELECT 'Usuarios-Roles', COUNT(*) FROM identidad.usuarios_roles;
 -- 1. CATALOGO BASE
 -- =====================================================
 INSERT INTO catalogo.categorias (nombre_categoria, descripcion, usuario_creacion)
-VALUES ('General', 'CategorÃ­a por defecto', 'SEEDER')
+VALUES ('General', 'Categoría por defecto', 'SEEDER')
 ON CONFLICT DO NOTHING;
 
 INSERT INTO catalogo.marcas (nombre_marca, pais_origen, usuario_creacion)
@@ -305,7 +305,7 @@ BEGIN
         precio_venta_publico, stock_minimo, usuario_creacion
     )
     VALUES (
-        'PROD-001', 'Producto de Prueba', 'Este es un producto generado automÃ¡ticamente',
+        'PROD-001', 'Producto de Prueba', 'Este es un producto generado automáticamente',
         v_id_categoria, v_id_marca, v_id_unidad,
         100.00, 10, 'SEEDER'
     )
@@ -471,20 +471,20 @@ INSERT INTO configuracion.tablas_generales VALUES (5, 'TIPO_PRODUCTO', 'Tipos de
 INSERT INTO configuracion.tablas_generales VALUES (6, 'TIPO_MOVIMIENTO_INVENTARIO', 'Tipos de Movimiento de Inventario', NULL, true, '2026-01-27 20:38:29.873586-05', 'SISTEMA', NULL, NULL, true);
 INSERT INTO configuracion.tablas_generales VALUES (7, 'TIPO_CUENTA_CONTABLE', 'Tipos de Cuenta Contable', NULL, true, '2026-01-27 20:38:29.87462-05', 'SISTEMA', NULL, NULL, true);
 INSERT INTO configuracion.tablas_generales VALUES (8, 'ESTADO_VENTA', 'Estados de Venta', NULL, true, '2026-01-27 20:38:29.875555-05', 'SISTEMA', NULL, NULL, true);
-INSERT INTO configuracion.tablas_generales VALUES (9, 'ESTADO_COTIZACION', 'Estados de CotizaciÃƒÂ³n', NULL, true, '2026-01-27 20:38:29.876572-05', 'SISTEMA', NULL, NULL, true);
+INSERT INTO configuracion.tablas_generales VALUES (9, 'ESTADO_COTIZACION', 'Estados de CotizaciÃ³n', NULL, true, '2026-01-27 20:38:29.876572-05', 'SISTEMA', NULL, NULL, true);
 INSERT INTO configuracion.tablas_generales VALUES (10, 'ESTADO_CAJA', 'Estados de Caja', NULL, true, '2026-01-27 20:38:29.877676-05', 'SISTEMA', NULL, NULL, true);
 INSERT INTO configuracion.tablas_generales VALUES (11, 'ESTADO_ORDEN_COMPRA', 'Estados de Orden de Compra', NULL, true, '2026-01-27 20:38:29.878602-05', 'SISTEMA', NULL, NULL, true);
 INSERT INTO configuracion.tablas_generales VALUES (12, 'ESTADO_ASIENTO', 'Estados de Asiento Contable', NULL, true, '2026-01-27 20:38:29.879531-05', 'SISTEMA', NULL, NULL, true);
 INSERT INTO configuracion.tablas_generales VALUES (13, 'ESTADO_PAGO', 'Estados de Pago', NULL, true, '2026-01-27 20:38:29.880536-05', 'SISTEMA', NULL, NULL, true);
 INSERT INTO configuracion.tablas_generales_detalle VALUES (1, 1, 'DNI', 'Documento Nacional de Identidad', NULL, 1, true, '2026-01-27 20:38:29.865474-05', 'SISTEMA', NULL, NULL, true);
-INSERT INTO configuracion.tablas_generales_detalle VALUES (2, 1, 'RUC', 'Registro ÃƒÅ¡nico de Contribuyentes', NULL, 2, true, '2026-01-27 20:38:29.865474-05', 'SISTEMA', NULL, NULL, true);
-INSERT INTO configuracion.tablas_generales_detalle VALUES (3, 1, 'CE', 'Carnet de ExtranjerÃƒÂ­a', NULL, 3, true, '2026-01-27 20:38:29.865474-05', 'SISTEMA', NULL, NULL, true);
+INSERT INTO configuracion.tablas_generales_detalle VALUES (2, 1, 'RUC', 'Registro Ãšnico de Contribuyentes', NULL, 2, true, '2026-01-27 20:38:29.865474-05', 'SISTEMA', NULL, NULL, true);
+INSERT INTO configuracion.tablas_generales_detalle VALUES (3, 1, 'CE', 'Carnet de ExtranjerÃ­a', NULL, 3, true, '2026-01-27 20:38:29.865474-05', 'SISTEMA', NULL, NULL, true);
 INSERT INTO configuracion.tablas_generales_detalle VALUES (4, 1, 'PAS', 'Pasaporte', NULL, 4, true, '2026-01-27 20:38:29.865474-05', 'SISTEMA', NULL, NULL, true);
 INSERT INTO configuracion.tablas_generales_detalle VALUES (5, 2, 'BOL', 'Boleta de Venta', NULL, 1, true, '2026-01-27 20:38:29.870018-05', 'SISTEMA', NULL, NULL, true);
 INSERT INTO configuracion.tablas_generales_detalle VALUES (6, 2, 'FAC', 'Factura', NULL, 2, true, '2026-01-27 20:38:29.870018-05', 'SISTEMA', NULL, NULL, true);
 INSERT INTO configuracion.tablas_generales_detalle VALUES (7, 2, 'NVT', 'Nota de Venta', NULL, 3, true, '2026-01-27 20:38:29.870018-05', 'SISTEMA', NULL, NULL, true);
 INSERT INTO configuracion.tablas_generales_detalle VALUES (8, 2, 'TK', 'Ticket', NULL, 4, true, '2026-01-27 20:38:29.870018-05', 'SISTEMA', NULL, NULL, true);
-INSERT INTO configuracion.tablas_generales_detalle VALUES (9, 3, 'PUB', 'PÃƒÂºblico General', NULL, 1, true, '2026-01-27 20:38:29.871144-05', 'SISTEMA', NULL, NULL, true);
+INSERT INTO configuracion.tablas_generales_detalle VALUES (9, 3, 'PUB', 'PÃºblico General', NULL, 1, true, '2026-01-27 20:38:29.871144-05', 'SISTEMA', NULL, NULL, true);
 INSERT INTO configuracion.tablas_generales_detalle VALUES (10, 3, 'CORP', 'Corporativo', NULL, 2, true, '2026-01-27 20:38:29.871144-05', 'SISTEMA', NULL, NULL, true);
 INSERT INTO configuracion.tablas_generales_detalle VALUES (11, 3, 'VIP', 'Cliente VIP', NULL, 3, true, '2026-01-27 20:38:29.871144-05', 'SISTEMA', NULL, NULL, true);
 INSERT INTO configuracion.tablas_generales_detalle VALUES (12, 4, 'ING', 'Ingreso', NULL, 1, true, '2026-01-27 20:38:29.87213-05', 'SISTEMA', NULL, NULL, true);
@@ -517,7 +517,7 @@ INSERT INTO configuracion.tablas_generales VALUES (36, 9, 'CVT', 'Convertida a V
 INSERT INTO configuracion.tablas_generales VALUES (14, 'TIPO_MONEDA', 'Tipos de Moneda', NULL, true, '2026-02-12 20:00:00', 'SISTEMA', NULL, NULL, true);
 
 INSERT INTO configuracion.tablas_generales_detalle VALUES (51, 14, 'PEN', 'Sol', 'S/', 1, true, '2026-02-12 20:00:00', 'SISTEMA', NULL, NULL, true);
-INSERT INTO configuracion.tablas_generales_detalle VALUES (52, 14, 'USD', 'DÃ³lar Americano', '$', 2, true, '2026-02-12 20:00:00', 'SISTEMA', NULL, NULL, true);
+INSERT INTO configuracion.tablas_generales_detalle VALUES (52, 14, 'USD', 'Dólar Americano', '$', 2, true, '2026-02-12 20:00:00', 'SISTEMA', NULL, NULL, true);
 INSERT INTO configuracion.tablas_generales_detalle VALUES (37, 10, 'ABI', 'Abierta', NULL, 1, true, '2026-01-27 20:38:29.878144-05', 'SISTEMA', NULL, NULL, true);
 INSERT INTO configuracion.tablas_generales_detalle VALUES (38, 10, 'CIE', 'Cerrada', NULL, 2, true, '2026-01-27 20:38:29.878144-05', 'SISTEMA', NULL, NULL, true);
 INSERT INTO configuracion.tablas_generales_detalle VALUES (39, 11, 'BOR', 'Borrador', NULL, 1, true, '2026-01-27 20:38:29.879005-05', 'SISTEMA', NULL, NULL, true);
@@ -529,38 +529,38 @@ INSERT INTO configuracion.tablas_generales_detalle VALUES (44, 12, 'PEN', 'Pendi
 INSERT INTO configuracion.tablas_generales_detalle VALUES (45, 12, 'ANU', 'Anulado', NULL, 3, true, '2026-01-27 20:38:29.880009-05', 'SISTEMA', NULL, NULL, true);
 INSERT INTO configuracion.tablas_generales_detalle VALUES (46, 13, 'PAG', 'Pagado', NULL, 1, true, '2026-01-27 20:38:29.881027-05', 'SISTEMA', NULL, NULL, true);
 INSERT INTO configuracion.tablas_generales_detalle VALUES (47, 13, 'PAR', 'Parcial', NULL, 2, true, '2026-01-27 20:38:29.881027-05', 'SISTEMA', NULL, NULL, true);
-INSERT INTO configuracion.tablas_generales_detalle VALUES (48, 13, 'CRE', 'A CrÃƒÂ©dito', NULL, 3, true, '2026-01-27 20:38:29.881027-05', 'SISTEMA', NULL, NULL, true);
+INSERT INTO configuracion.tablas_generales_detalle VALUES (48, 13, 'CRE', 'A CrÃ©dito', NULL, 3, true, '2026-01-27 20:38:29.881027-05', 'SISTEMA', NULL, NULL, true);
 INSERT INTO configuracion.tablas_generales_detalle VALUES (49, 13, 'PEN', 'Pendiente', NULL, 4, true, '2026-01-27 20:38:29.881027-05', 'SISTEMA', NULL, NULL, true);
 INSERT INTO configuracion.tablas_generales_detalle VALUES (50, 13, 'ANU', 'Anulado', NULL, 5, true, '2026-01-27 20:38:29.881027-05', 'SISTEMA', NULL, NULL, true);
 INSERT INTO identidad.menus VALUES (1, 'DASHBOARD', 'Dashboard', 'Panel principal del sistema', '/dashboard', 'dashboard', 1, NULL, true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
-INSERT INTO identidad.menus VALUES (2, 'VENTAS', 'Ventas', 'MÃ³dulo de gestiÃ³n de ventas', '/ventas', 'shopping-cart', 2, NULL, true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
-INSERT INTO identidad.menus VALUES (3, 'COMPRAS', 'Compras', 'MÃ³dulo de gestiÃ³n de compras', '/compras', 'shopping-bag', 3, NULL, true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
-INSERT INTO identidad.menus VALUES (4, 'INVENTARIO', 'Inventario', 'MÃ³dulo de gestiÃ³n de inventario', '/inventario', 'warehouse', 4, NULL, true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
-INSERT INTO identidad.menus VALUES (5, 'CLIENTES', 'Clientes', 'MÃ³dulo de gestiÃ³n de clientes', '/clientes', 'users', 5, NULL, true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
-INSERT INTO identidad.menus VALUES (6, 'CATALOGO', 'CatÃ¡logo', 'MÃ³dulo de gestiÃ³n de productos', '/catalogo', 'book', 6, NULL, true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
-INSERT INTO identidad.menus VALUES (7, 'CONTABILIDAD', 'Contabilidad', 'MÃ³dulo de contabilidad', '/contabilidad', 'calculator', 7, NULL, true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
-INSERT INTO identidad.menus VALUES (8, 'CONFIGURACION', 'ConfiguraciÃ³n', 'ConfiguraciÃ³n del sistema', '/configuracion', 'settings', 8, NULL, true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
-INSERT INTO identidad.menus VALUES (9, 'IDENTIDAD', 'Identidad', 'GestiÃ³n de usuarios y permisos', '/identidad', 'shield', 9, NULL, true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
+INSERT INTO identidad.menus VALUES (2, 'VENTAS', 'Ventas', 'Módulo de gestión de ventas', '/ventas', 'shopping-cart', 2, NULL, true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
+INSERT INTO identidad.menus VALUES (3, 'COMPRAS', 'Compras', 'Módulo de gestión de compras', '/compras', 'shopping-bag', 3, NULL, true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
+INSERT INTO identidad.menus VALUES (4, 'INVENTARIO', 'Inventario', 'Módulo de gestión de inventario', '/inventario', 'warehouse', 4, NULL, true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
+INSERT INTO identidad.menus VALUES (5, 'CLIENTES', 'Clientes', 'Módulo de gestión de clientes', '/clientes', 'users', 5, NULL, true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
+INSERT INTO identidad.menus VALUES (6, 'CATALOGO', 'Catálogo', 'Módulo de gestión de productos', '/catalogo', 'book', 6, NULL, true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
+INSERT INTO identidad.menus VALUES (7, 'CONTABILIDAD', 'Contabilidad', 'Módulo de contabilidad', '/contabilidad', 'calculator', 7, NULL, true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
+INSERT INTO identidad.menus VALUES (8, 'CONFIGURACION', 'Configuración', 'Configuración del sistema', '/configuracion', 'settings', 8, NULL, true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
+INSERT INTO identidad.menus VALUES (9, 'IDENTIDAD', 'Identidad', 'Gestión de usuarios y permisos', '/identidad', 'shield', 9, NULL, true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
 INSERT INTO identidad.menus VALUES (10, 'VENTAS_LISTA', 'Lista de Ventas', 'Ver todas las ventas', '/ventas/lista', 'list', 1, 2, true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
 INSERT INTO identidad.menus VALUES (11, 'VENTAS_NUEVA', 'Nueva Venta', 'Registrar nueva venta', '/ventas/nueva', 'plus', 2, 2, true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
 INSERT INTO identidad.menus VALUES (12, 'VENTAS_COTIZACIONES', 'Cotizaciones', 'Gestionar cotizaciones', '/ventas/cotizaciones', 'file-text', 3, 2, true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
-INSERT INTO identidad.menus VALUES (13, 'VENTAS_CAJAS', 'Cajas', 'GestiÃ³n de cajas', '/ventas/cajas', 'credit-card', 4, 2, true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
+INSERT INTO identidad.menus VALUES (13, 'VENTAS_CAJAS', 'Cajas', 'Gestión de cajas', '/ventas/cajas', 'credit-card', 4, 2, true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
 INSERT INTO identidad.menus VALUES (14, 'COMPRAS_LISTA', 'Lista de Compras', 'Ver todas las compras', '/compras/lista', 'list', 1, 3, true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
 INSERT INTO identidad.menus VALUES (15, 'COMPRAS_NUEVA', 'Nueva Compra', 'Registrar nueva compra', '/compras/nueva', 'plus', 2, 3, true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
-INSERT INTO identidad.menus VALUES (16, 'COMPRAS_ORDENES', 'Ã“rdenes de Compra', 'Gestionar Ã³rdenes', '/compras/ordenes', 'clipboard', 3, 3, true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
-INSERT INTO identidad.menus VALUES (17, 'COMPRAS_PROVEEDORES', 'Proveedores', 'GestiÃ³n de proveedores', '/compras/proveedores', 'truck', 4, 3, true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
+INSERT INTO identidad.menus VALUES (16, 'COMPRAS_ORDENES', 'Órdenes de Compra', 'Gestionar órdenes', '/compras/ordenes', 'clipboard', 3, 3, true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
+INSERT INTO identidad.menus VALUES (17, 'COMPRAS_PROVEEDORES', 'Proveedores', 'Gestión de proveedores', '/compras/proveedores', 'truck', 4, 3, true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
 INSERT INTO identidad.menus VALUES (18, 'INVENTARIO_STOCK', 'Stock', 'Consultar stock disponible', '/inventario/stock', 'package', 1, 4, true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
 INSERT INTO identidad.menus VALUES (19, 'INVENTARIO_MOVIMIENTOS', 'Movimientos', 'Movimientos de inventario', '/inventario/movimientos', 'repeat', 2, 4, true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
-INSERT INTO identidad.menus VALUES (20, 'INVENTARIO_ALMACENES', 'Almacenes', 'GestiÃ³n de almacenes', '/inventario/almacenes', 'home', 3, 4, true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
-INSERT INTO identidad.menus VALUES (21, 'CATALOGO_PRODUCTOS', 'Productos', 'GestiÃ³n de productos', '/catalogo/productos', 'box', 1, 6, true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
-INSERT INTO identidad.menus VALUES (22, 'CATALOGO_CATEGORIAS', 'CategorÃ­as', 'GestiÃ³n de categorÃ­as', '/catalogo/categorias', 'folder', 2, 6, true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
-INSERT INTO identidad.menus VALUES (23, 'CATALOGO_MARCAS', 'Marcas', 'GestiÃ³n de marcas', '/catalogo/marcas', 'tag', 3, 6, true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
-INSERT INTO identidad.menus VALUES (24, 'CATALOGO_PRECIOS', 'Listas de Precios', 'GestiÃ³n de precios', '/catalogo/precios', 'dollar-sign', 4, 6, true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
-INSERT INTO identidad.menus VALUES (25, 'IDENTIDAD_USUARIOS', 'Usuarios', 'GestiÃ³n de usuarios', '/identidad/usuarios', 'user', 1, 9, true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
-INSERT INTO identidad.menus VALUES (26, 'IDENTIDAD_ROLES', 'Roles', 'GestiÃ³n de roles', '/identidad/roles', 'users', 2, 9, true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
-INSERT INTO identidad.menus VALUES (27, 'IDENTIDAD_PERMISOS', 'Permisos', 'AsignaciÃ³n de permisos', '/identidad/permisos', 'lock', 3, 9, true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
+INSERT INTO identidad.menus VALUES (20, 'INVENTARIO_ALMACENES', 'Almacenes', 'Gestión de almacenes', '/inventario/almacenes', 'home', 3, 4, true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
+INSERT INTO identidad.menus VALUES (21, 'CATALOGO_PRODUCTOS', 'Productos', 'Gestión de productos', '/catalogo/productos', 'box', 1, 6, true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
+INSERT INTO identidad.menus VALUES (22, 'CATALOGO_CATEGORIAS', 'Categorías', 'Gestión de categorías', '/catalogo/categorias', 'folder', 2, 6, true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
+INSERT INTO identidad.menus VALUES (23, 'CATALOGO_MARCAS', 'Marcas', 'Gestión de marcas', '/catalogo/marcas', 'tag', 3, 6, true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
+INSERT INTO identidad.menus VALUES (24, 'CATALOGO_PRECIOS', 'Listas de Precios', 'Gestión de precios', '/catalogo/precios', 'dollar-sign', 4, 6, true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
+INSERT INTO identidad.menus VALUES (25, 'IDENTIDAD_USUARIOS', 'Usuarios', 'Gestión de usuarios', '/identidad/usuarios', 'user', 1, 9, true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
+INSERT INTO identidad.menus VALUES (26, 'IDENTIDAD_ROLES', 'Roles', 'Gestión de roles', '/identidad/roles', 'users', 2, 9, true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
+INSERT INTO identidad.menus VALUES (27, 'IDENTIDAD_PERMISOS', 'Permisos', 'Asignación de permisos', '/identidad/permisos', 'lock', 3, 9, true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
 INSERT INTO identidad.roles VALUES (1, 'ADMINISTRADOR', 'Acceso total al sistema', true, '2026-01-27 17:36:28.866902', 'SYSTEM', '2026-01-27 17:36:28.866902', NULL);
-INSERT INTO identidad.roles VALUES (2, 'VENDEDOR', 'Acceso a mÃ³dulo de ventas y clientes', true, '2026-01-27 17:36:28.866902', 'SYSTEM', '2026-01-27 17:36:28.866902', NULL);
+INSERT INTO identidad.roles VALUES (2, 'VENDEDOR', 'Acceso a módulo de ventas y clientes', true, '2026-01-27 17:36:28.866902', 'SYSTEM', '2026-01-27 17:36:28.866902', NULL);
 INSERT INTO identidad.roles VALUES (3, 'CAJERO', 'Acceso a apertura/cierre de caja y cobros', true, '2026-01-27 17:36:28.866902', 'SYSTEM', '2026-01-27 17:36:28.866902', NULL);
 INSERT INTO identidad.roles VALUES (4, 'ALMACENERO', 'Acceso a inventarios y kardex', true, '2026-01-27 17:36:28.866902', 'SYSTEM', '2026-01-27 17:36:28.866902', NULL);
 INSERT INTO identidad.tipos_permiso VALUES (1, 'CREATE', 'Crear', 'Permite crear nuevos registros', true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
@@ -578,22 +578,22 @@ INSERT INTO public."__EFMigrationsHistory" VALUES ('20260127221140_Inicial', '8.
 INSERT INTO public."__EFMigrationsHistory" VALUES ('20260127221706_AjusteEsquema', '8.0.8');
 INSERT INTO public."__EFMigrationsHistory" VALUES ('20260129221256_AgregarTiposComprobante', '8.0.0');
 INSERT INTO ventas.metodos_pago VALUES (1, 'EFE', 'Efectivo', false, true, '2026-01-27 17:36:28.866902', 'SYSTEM', '2026-01-27 17:36:28.866902', NULL);
-INSERT INTO ventas.metodos_pago VALUES (2, 'TAR', 'Tarjeta CrÃ©dito/DÃ©bito', true, true, '2026-01-27 17:36:28.866902', 'SYSTEM', '2026-01-27 17:36:28.866902', NULL);
+INSERT INTO ventas.metodos_pago VALUES (2, 'TAR', 'Tarjeta Crédito/Débito', true, true, '2026-01-27 17:36:28.866902', 'SYSTEM', '2026-01-27 17:36:28.866902', NULL);
 INSERT INTO ventas.metodos_pago VALUES (3, 'TRA', 'Transferencia Bancaria', true, true, '2026-01-27 17:36:28.866902', 'SYSTEM', '2026-01-27 17:36:28.866902', NULL);
 INSERT INTO ventas.metodos_pago VALUES (4, 'YAP', 'Yape/Plin', true, true, '2026-01-27 17:36:28.866902', 'SYSTEM', '2026-01-27 17:36:28.866902', NULL);
--- Script para agregar menÃºs de CatÃ¡logo faltantes
+-- Script para agregar menús de Catálogo faltantes
 -- Fecha: 2026-01-29
--- DescripciÃ³n: Agrega menÃºs para Unidades de Medida y Listas de Precios
+-- Descripción: Agrega menús para Unidades de Medida y Listas de Precios
 
--- Primero, obtener el ID del menÃº padre "CatÃ¡logo"
--- Asumiendo que el cÃ³digo del menÃº CatÃ¡logo es 'CATALOGO'
+-- Primero, obtener el ID del menú padre "Catálogo"
+-- Asumiendo que el código del menú Catálogo es 'CATALOGO'
 
--- Insertar menÃº para Unidades de Medida
+-- Insertar menú para Unidades de Medida
 INSERT INTO identidad.menus (codigo, nombre, descripcion, ruta, icono, orden, id_menu_padre, activado, fecha_creacion, usuario_creacion)
 SELECT 
     'CAT_UNIDADES_MEDIDA',
     'Unidades de Medida',
-    'GestiÃ³n de unidades de medida',
+    'Gestión de unidades de medida',
     '/catalogo/unidades-medida',
     'Ruler',
     30,
@@ -604,12 +604,12 @@ SELECT
 FROM identidad.menus
 WHERE codigo = 'CATALOGO';
 
--- Insertar menÃº para Listas de Precios
+-- Insertar menú para Listas de Precios
 INSERT INTO identidad.menus (codigo, nombre, descripcion, ruta, icono, orden, id_menu_padre, activado, fecha_creacion, usuario_creacion)
 SELECT 
     'CAT_LISTAS_PRECIOS',
     'Listas de Precios',
-    'GestiÃ³n de listas de precios',
+    'Gestión de listas de precios',
     '/catalogo/listas-precios',
     'DollarSign',
     40,
@@ -620,7 +620,7 @@ SELECT
 FROM identidad.menus
 WHERE codigo = 'CATALOGO';
 
--- Asignar permisos de menÃº al rol Administrador (asumiendo id_rol = 1)
+-- Asignar permisos de menú al rol Administrador (asumiendo id_rol = 1)
 -- Primero para Unidades de Medida
 INSERT INTO identidad.roles_menus (id_rol, id_menu, activado, fecha_creacion, usuario_creacion)
 SELECT 
@@ -643,7 +643,7 @@ SELECT
 FROM identidad.menus
 WHERE codigo = 'CAT_LISTAS_PRECIOS';
 
--- Verificar los menÃºs insertados
+-- Verificar los menús insertados
 SELECT 
     m.id_menu,
     m.codigo,
@@ -655,3 +655,290 @@ FROM identidad.menus m
 LEFT JOIN identidad.menus mp ON m.id_menu_padre = mp.id_menu
 WHERE m.codigo IN ('CAT_UNIDADES_MEDIDA', 'CAT_LISTAS_PRECIOS')
 ORDER BY m.orden;
+
+-- DATOS MAESTROS SUNAT
+
+-- PASO 0: LIMPIEZA
+-- ============================================================================
+
+-- Primero las tablas que dependen de otras
+TRUNCATE configuracion.matriz_regla_sunat        RESTART IDENTITY CASCADE;
+TRUNCATE configuracion.regla_documento_comprobante RESTART IDENTITY CASCADE;
+TRUNCATE configuracion.series_comprobantes       RESTART IDENTITY CASCADE;
+
+-- Limpiar campos de referencia en notas (ahora que sabemos que existen las columnas)
+UPDATE ventas.notas  SET codigo_tipo_comprobante_ref=NULL, serie_ref=NULL, numero_ref=NULL;
+UPDATE compras.notas SET codigo_tipo_comprobante_ref=NULL, serie_ref=NULL, numero_ref=NULL;
+
+-- Luego las tablas maestras
+TRUNCATE configuracion.tipo_operacion_sunat      RESTART IDENTITY CASCADE;
+TRUNCATE configuracion.tipo_comprobante          RESTART IDENTITY CASCADE;
+TRUNCATE configuracion.tipo_documento            RESTART IDENTITY CASCADE;
+
+-- ============================================================================
+-- PASO 2: INSERT tipo_documento (Catálogo 06 SUNAT)
+-- ============================================================================
+
+INSERT INTO configuracion.tipo_documento
+  (codigo, nombre, longitud, longitud_maxima, es_numerico,
+   es_persona_natural, es_empresa, aplica_sin_ruc,
+   estado, activado, fecha_creacion, usuario_creacion)
+VALUES
+  ('0', 'SIN DOCUMENTO', 1, 1, false, true, false, true, true, true, NOW(), 'SYSTEM'),
+  ('1', 'DNI', 8, 8, true, true, false, false, true, true, NOW(), 'SYSTEM'),
+  ('4', 'CARNET DE EXTRANJERIA', 9, 12, false, true, false, false, true, true, NOW(), 'SYSTEM'),
+  ('6', 'RUC', 11, 11, true, false, true, false, true, true, NOW(), 'SYSTEM'),
+  ('7', 'PASAPORTE', 6, 17, false, true, false, false, true, true, NOW(), 'SYSTEM'),
+  ('A', 'CEDULA DIPLOMATICA de IDENTIDAD', 6, 15, false, true, false, false, true, true, NOW(), 'SYSTEM'),
+  ('B', 'DOC. IDENTIDAD PAIS DE RESIDENCIA', 6, 15, false, true, false, false, true, true, NOW(), 'SYSTEM');
+
+-- ============================================================================
+-- PASO 3: INSERT tipo_comprobante (Catálogos 01 y 52 SUNAT)
+-- ============================================================================
+
+INSERT INTO configuracion.tipo_comprobante
+  (codigo, nombre, mueve_stock, tipo_movimiento_stock, movimiento_stock_venta, movimiento_stock_compra,
+   es_venta, es_compra, es_orden_compra, es_emitible, es_referenciable,
+   activado, fecha_creacion, usuario_creacion)
+VALUES
+  ('01', 'FACTURA', true, 'SALIDA', 'SALIDA', 'NEUTRO', true, false, false, true, true, true, NOW(), 'SYSTEM'),
+  ('03', 'BOLETA DE VENTA', true, 'SALIDA', 'SALIDA', 'NEUTRO', true, false, false, true, true, true, NOW(), 'SYSTEM'),
+  ('02', 'RECIBO POR HONORARIOS', false, 'NEUTRO', 'NEUTRO', 'NEUTRO', true, false, false, true, true, true, NOW(), 'SYSTEM'),
+  ('04', 'LIQUIDACION DE COMPRA', true, 'ENTRADA', 'NEUTRO', 'ENTRADA', false, true, false, true, true, true, NOW(), 'SYSTEM'),
+  ('07', 'NOTA DE CREDITO', true, 'DEPENDIENTE', 'ENTRADA', 'SALIDA', false, false, false, true, true, true, NOW(), 'SYSTEM'),
+  ('08', 'NOTA DE DEBITO', false, 'NEUTRO', 'NEUTRO', 'NEUTRO', false, false, false, true, true, true, NOW(), 'SYSTEM'),
+  ('09', 'GUIA DE REMISION REMITENTE', false, 'NEUTRO', 'NEUTRO', 'NEUTRO', false, false, false, false, true, true, NOW(), 'SYSTEM'),
+  ('31', 'GUIA DE REMISION TRANSPORTISTA', false, 'NEUTRO', 'NEUTRO', 'NEUTRO', false, false, false, false, true, true, NOW(), 'SYSTEM'),
+  ('50', 'DUA', false, 'NEUTRO', 'NEUTRO', 'NEUTRO', false, false, false, false, true, true, NOW(), 'SYSTEM'),
+  ('52', 'DESPACHO SIMPLIFICADO', false, 'NEUTRO', 'NEUTRO', 'NEUTRO', false, false, false, false, true, true, NOW(), 'SYSTEM'),
+  ('87', 'NOTA DE CREDITO ESPECIAL', false, 'NEUTRO', 'NEUTRO', 'NEUTRO', false, false, false, false, true, true, NOW(), 'SYSTEM'),
+  ('88', 'NOTA DE DEBITO ESPECIAL', false, 'NEUTRO', 'NEUTRO', 'NEUTRO', false, false, false, false, true, true, NOW(), 'SYSTEM');
+
+-- ============================================================================
+-- PASO 4: INSERT tipo_operacion_sunat (Catálogo 51 SUNAT)
+-- ============================================================================
+
+INSERT INTO configuracion.tipo_operacion_sunat (codigo, nombre)
+VALUES
+  ('0101', 'VENTA INTERNA'), ('0112', 'VENTA INTERNA - GASTOS DEDUCIBLES'), ('0113', 'VENTA INTERNA - NRUS'),
+  ('0200', 'EXPORTACION DE BIENES'), ('0201', 'EXPORTACION DE SERVICIOS'), ('0202', 'EXPORTACION - HOSPEDAJE'),
+  ('0300', 'NO ONEROSA - ADQUISICION DE BIENES'), ('0401', 'TRASLADO ENTRE ESTABLECIMIENTOS'),
+  ('1001', 'OPERACION SUJETA A DETRACCION'), ('2001', 'OPERACION SUJETA A PERCEPCION');
+
+-- ============================================================================
+-- PASO 5: REGLAS Y SERIES (INSERCIONES INDIVIDUALES PARA ASEGURAR PERSISTENCIA)
+-- ============================================================================
+INSERT INTO configuracion.regla_documento_comprobante (codigo_documento, id_tipo_comprobante) VALUES ('6', (SELECT id_tipo_comprobante FROM configuracion.tipo_comprobante WHERE codigo = '01'));
+INSERT INTO configuracion.regla_documento_comprobante (codigo_documento, id_tipo_comprobante) VALUES ('6', (SELECT id_tipo_comprobante FROM configuracion.tipo_comprobante WHERE codigo = '03'));
+INSERT INTO configuracion.regla_documento_comprobante (codigo_documento, id_tipo_comprobante) VALUES ('1', (SELECT id_tipo_comprobante FROM configuracion.tipo_comprobante WHERE codigo = '03'));
+INSERT INTO configuracion.regla_documento_comprobante (codigo_documento, id_tipo_comprobante) VALUES ('6', (SELECT id_tipo_comprobante FROM configuracion.tipo_comprobante WHERE codigo = '02'));
+INSERT INTO configuracion.regla_documento_comprobante (codigo_documento, id_tipo_comprobante) VALUES ('6', (SELECT id_tipo_comprobante FROM configuracion.tipo_comprobante WHERE codigo = '07'));
+INSERT INTO configuracion.regla_documento_comprobante (codigo_documento, id_tipo_comprobante) VALUES ('1', (SELECT id_tipo_comprobante FROM configuracion.tipo_comprobante WHERE codigo = '07'));
+
+INSERT INTO configuracion.series_comprobantes (serie, correlativo_actual, id_tipo_comprobante) VALUES ('F001', 0, (SELECT id_tipo_comprobante FROM configuracion.tipo_comprobante WHERE codigo = '01'));
+INSERT INTO configuracion.series_comprobantes (serie, correlativo_actual, id_tipo_comprobante) VALUES ('B001', 0, (SELECT id_tipo_comprobante FROM configuracion.tipo_comprobante WHERE codigo = '03'));
+INSERT INTO configuracion.series_comprobantes (serie, correlativo_actual, id_tipo_comprobante) VALUES ('FC01', 0, (SELECT id_tipo_comprobante FROM configuracion.tipo_comprobante WHERE codigo = '07'));
+INSERT INTO configuracion.series_comprobantes (serie, correlativo_actual, id_tipo_comprobante) VALUES ('FD01', 0, (SELECT id_tipo_comprobante FROM configuracion.tipo_comprobante WHERE codigo = '08'));
+
+INSERT INTO configuracion.matriz_regla_sunat (id_tipo_comprobante, id_tipo_operacion, nivel_obligatoriedad) VALUES ((SELECT id_tipo_comprobante FROM configuracion.tipo_comprobante WHERE codigo = '01'), (SELECT id_tipo_operacion FROM configuracion.tipo_operacion_sunat WHERE codigo = '0101'), 1);
+INSERT INTO configuracion.matriz_regla_sunat (id_tipo_comprobante, id_tipo_operacion, nivel_obligatoriedad) VALUES ((SELECT id_tipo_comprobante FROM configuracion.tipo_comprobante WHERE codigo = '03'), (SELECT id_tipo_operacion FROM configuracion.tipo_operacion_sunat WHERE codigo = '0101'), 1);
+INSERT INTO configuracion.matriz_regla_sunat (id_tipo_comprobante, id_tipo_operacion, nivel_obligatoriedad) VALUES ((SELECT id_tipo_comprobante FROM configuracion.tipo_comprobante WHERE codigo = '07'), (SELECT id_tipo_operacion FROM configuracion.tipo_operacion_sunat WHERE codigo = '0101'), 1);
+INSERT INTO configuracion.matriz_regla_sunat (id_tipo_comprobante, id_tipo_operacion, nivel_obligatoriedad) VALUES ((SELECT id_tipo_comprobante FROM configuracion.tipo_comprobante WHERE codigo = '08'), (SELECT id_tipo_operacion FROM configuracion.tipo_operacion_sunat WHERE codigo = '0101'), 1);
+INSERT INTO configuracion.matriz_regla_sunat (id_tipo_comprobante, id_tipo_operacion, nivel_obligatoriedad) VALUES ((SELECT id_tipo_comprobante FROM configuracion.tipo_comprobante WHERE codigo = '04'), (SELECT id_tipo_operacion FROM configuracion.tipo_operacion_sunat WHERE codigo = '0101'), 1);
+INSERT INTO configuracion.matriz_regla_sunat (id_tipo_comprobante, id_tipo_operacion, nivel_obligatoriedad) VALUES ((SELECT id_tipo_comprobante FROM configuracion.tipo_comprobante WHERE codigo = '04'), (SELECT id_tipo_operacion FROM configuracion.tipo_operacion_sunat WHERE codigo = '0300'), 1);
+
+-- PRODUCTOS DEMO
+
+-- ==============================================================================
+-- SCRIPT: DATOS DE PRUEBA ADICIONALES (PRODUCTOS Y MAESTRAS)
+-- ==============================================================================
+
+-- 1. INSERTAR CATEGORÍAS
+INSERT INTO catalogo.categorias (nombre_categoria, descripcion, usuario_creacion)
+VALUES 
+    ('Electrónica', 'Dispositivos electrónicos, hogar y oficina', 'SEEDER'),
+    ('Línea Blanca', 'Electrodomésticos grandes', 'SEEDER'),
+    ('Ferretería', 'Herramientas y construcción', 'SEEDER')
+ON CONFLICT DO NOTHING;
+
+-- 2. INSERTAR MARCAS
+INSERT INTO catalogo.marcas (nombre_marca, pais_origen, usuario_creacion)
+VALUES 
+    ('Samsung', 'Corea del Sur', 'SEEDER'),
+    ('LG', 'Corea del Sur', 'SEEDER'),
+    ('Bosch', 'Alemania', 'SEEDER'),
+    ('Truper', 'México', 'SEEDER'),
+    ('ASUS', 'Taiwán', 'SEEDER'),
+    ('Xiaomi', 'China', 'SEEDER')
+ON CONFLICT DO NOTHING;
+
+-- 3. INSERTAR PRODUCTOS
+-- Usamos bloques DO para asegurar la consistencia y buscar las IDs foráneas 
+-- sin importar los valores generados por la secuencia (SERIAL).
+DO $$
+DECLARE
+    v_id_und bigint;
+    
+    v_id_cat_electro bigint;
+    v_id_cat_blanca bigint;
+    v_id_cat_ferre bigint;
+
+    v_id_mar_samsung bigint;
+    v_id_mar_lg bigint;
+    v_id_mar_bosch bigint;
+    v_id_mar_truper bigint;
+    v_id_mar_asus bigint;
+    v_id_mar_xiaomi bigint;
+BEGIN
+    -- Obtener la Unidad de Medida (Asumiendo que UND ya fue generada en 03_base_data.sql)
+    SELECT id_unidad INTO v_id_und FROM catalogo.unidades_medida WHERE simbolo = 'UND' LIMIT 1;
+    IF v_id_und IS NULL THEN
+        -- Fallback por si la UND no existe, forzamos un ID dummy
+        v_id_und := 1;
+    END IF;
+
+    -- Extraer IDs de Categorías
+    SELECT id_categoria INTO v_id_cat_electro FROM catalogo.categorias WHERE nombre_categoria = 'Electrónica' LIMIT 1;
+    SELECT id_categoria INTO v_id_cat_blanca FROM catalogo.categorias WHERE nombre_categoria = 'Línea Blanca' LIMIT 1;
+    SELECT id_categoria INTO v_id_cat_ferre FROM catalogo.categorias WHERE nombre_categoria = 'Ferretería' LIMIT 1;
+
+    -- Extraer IDs de Marcas
+    SELECT id_marca INTO v_id_mar_samsung FROM catalogo.marcas WHERE nombre_marca = 'Samsung' LIMIT 1;
+    SELECT id_marca INTO v_id_mar_lg FROM catalogo.marcas WHERE nombre_marca = 'LG' LIMIT 1;
+    SELECT id_marca INTO v_id_mar_bosch FROM catalogo.marcas WHERE nombre_marca = 'Bosch' LIMIT 1;
+    SELECT id_marca INTO v_id_mar_truper FROM catalogo.marcas WHERE nombre_marca = 'Truper' LIMIT 1;
+    SELECT id_marca INTO v_id_mar_asus FROM catalogo.marcas WHERE nombre_marca = 'ASUS' LIMIT 1;
+    SELECT id_marca INTO v_id_mar_xiaomi FROM catalogo.marcas WHERE nombre_marca = 'Xiaomi' LIMIT 1;
+
+    -- PRODUCTO 1: Smart TV
+    INSERT INTO catalogo.productos (
+        codigo_producto, nombre_producto, descripcion, 
+        id_categoria, id_marca, id_unidad, 
+        precio_venta_publico, stock_minimo, usuario_creacion, metodo_valuacion
+    ) VALUES (
+        'TV-SAM-001', 'Smart TV 55" 4K UHD', 'Televisor inteligente Samsung con resolución 4K',
+        v_id_cat_electro, v_id_mar_samsung, v_id_und,
+        1899.00, 5, 'SEEDER', 'PE'
+    ) ON CONFLICT DO NOTHING;
+
+    -- PRODUCTO 2: Laptop
+    INSERT INTO catalogo.productos (
+        codigo_producto, nombre_producto, descripcion, 
+        id_categoria, id_marca, id_unidad, 
+        precio_venta_publico, stock_minimo, usuario_creacion, metodo_valuacion
+    ) VALUES (
+        'LAP-ASU-001', 'Laptop ASUS ZenBook 14"', 'Laptop ultra delgada, procesador Intel i7, 16GB RAM',
+        v_id_cat_electro, v_id_mar_asus, v_id_und,
+        4299.00, 3, 'SEEDER', 'PE'
+    ) ON CONFLICT DO NOTHING;
+
+    -- PRODUCTO 3: Smartphone
+    INSERT INTO catalogo.productos (
+        codigo_producto, nombre_producto, descripcion, 
+        id_categoria, id_marca, id_unidad, 
+        precio_venta_publico, stock_minimo, usuario_creacion, metodo_valuacion
+    ) VALUES (
+        'CEL-XIA-001', 'Smartphone Xiaomi Redmi Note 13', 'Teléfono móvil Xiaomi 256GB / 8GB RAM',
+        v_id_cat_electro, v_id_mar_xiaomi, v_id_und,
+        1199.00, 10, 'SEEDER', 'PE'
+    ) ON CONFLICT DO NOTHING;
+
+    -- PRODUCTO 4: Refrigeradora
+    INSERT INTO catalogo.productos (
+        codigo_producto, nombre_producto, descripcion, 
+        id_categoria, id_marca, id_unidad, 
+        precio_venta_publico, stock_minimo, usuario_creacion, metodo_valuacion
+    ) VALUES (
+        'REF-LG-001', 'Refrigeradora LG Inverter 600L', 'Refrigeradora de gran capacidad con tecnología Inverter LG',
+        v_id_cat_blanca, v_id_mar_lg, v_id_und,
+        2899.00, 2, 'SEEDER', 'PE'
+    ) ON CONFLICT DO NOTHING;
+
+    -- PRODUCTO 5: Lavadora
+    INSERT INTO catalogo.productos (
+        codigo_producto, nombre_producto, descripcion, 
+        id_categoria, id_marca, id_unidad, 
+        precio_venta_publico, stock_minimo, usuario_creacion, metodo_valuacion
+    ) VALUES (
+        'LAV-BOS-001', 'Lavadora Bosch Carga Frontal 9kg', 'Lavadora inteligente Bosch 9 kilogramos con secado',
+        v_id_cat_blanca, v_id_mar_bosch, v_id_und,
+        1850.50, 4, 'SEEDER', 'PE'
+    ) ON CONFLICT DO NOTHING;
+
+    -- PRODUCTO 6: Taladro
+    INSERT INTO catalogo.productos (
+        codigo_producto, nombre_producto, descripcion, 
+        id_categoria, id_marca, id_unidad, 
+        precio_venta_publico, stock_minimo, usuario_creacion, metodo_valuacion
+    ) VALUES (
+        'HER-TRU-001', 'Taladro Percutor 1/2" 700W', 'Taladro industrial percutor marca Truper, 700 watts de potencia',
+        v_id_cat_ferre, v_id_mar_truper, v_id_und,
+        199.90, 10, 'SEEDER', 'PE'
+    ) ON CONFLICT DO NOTHING;
+
+    -- PRODUCTO 7: Set de Herramientas
+    INSERT INTO catalogo.productos (
+        codigo_producto, nombre_producto, descripcion, 
+        id_categoria, id_marca, id_unidad, 
+        precio_venta_publico, stock_minimo, usuario_creacion, metodo_valuacion
+    ) VALUES (
+        'HER-TRU-002', 'Set de Herramientas Mecánicas 50 Pzs', 'Maletín con llaves, dados y otras herramientas mecánicas Truper',
+        v_id_cat_ferre, v_id_mar_truper, v_id_und,
+        299.90, 8, 'SEEDER', 'PE'
+    ) ON CONFLICT DO NOTHING;
+
+END $$;
+
+-- SEMILLAS ADICIONALES (CLIENTES/PROVEEDORES)
+
+-- 2. DATOS SEMILLA (Proveedores)
+-- =====================================================
+-- Proveedor 1 (RUC)
+INSERT INTO compras.proveedores (
+    numero_documento, razon_social, nombre_comercial, direccion, 
+    telefono, email, id_tipo_documento, usuario_creacion
+)
+SELECT 
+    '20601234567', 'Distribuidora Alimentos S.A.C.', 'Alisac', 'Av. Los Próceres 456, Lima',
+    '01-4445566', 'ventas@alisac.com.pe', id_regla, 'SYSTEM'
+FROM configuracion.tipo_documento 
+WHERE codigo = '6' AND NOT EXISTS (SELECT 1 FROM compras.proveedores WHERE numero_documento = '20601234567')
+LIMIT 1;
+
+-- Proveedor 2 (RUC secundario)
+INSERT INTO compras.proveedores (
+    numero_documento, razon_social, nombre_comercial, direccion, 
+    telefono, email, id_tipo_documento, usuario_creacion
+)
+SELECT 
+    '10445566779', 'Juan Pérez Suministros', 'JP Suministros', 'Calle Las Lilas 123, Surco',
+    '999888777', 'juan.perez@email.com', id_regla, 'SYSTEM'
+FROM configuracion.tipo_documento 
+WHERE codigo = '6' AND NOT EXISTS (SELECT 1 FROM compras.proveedores WHERE numero_documento = '10445566779')
+LIMIT 1;
+
+-- 3. DATOS SEMILLA (Clientes)
+-- =====================================================
+-- Cliente 1 (RUC)
+INSERT INTO clientes.clientes (
+    numero_documento, razon_social, nombre_comercial, direccion, 
+    telefono, email, id_tipo_documento, usuario_creacion
+)
+SELECT 
+    '20556677881', 'Constructora Horizonte S.A.', 'Horizonte', 'Av. Javier Prado 1500, San Isidro',
+    '01-2223344', 'compras@horizonte.com.pe', id_regla, 'SYSTEM'
+FROM configuracion.tipo_documento 
+WHERE codigo = '6' AND NOT EXISTS (SELECT 1 FROM clientes.clientes WHERE numero_documento = '20556677881')
+LIMIT 1;
+
+-- Cliente 2 (DNI)
+INSERT INTO clientes.clientes (
+    numero_documento, razon_social, nombre_comercial, direccion, 
+    telefono, email, id_tipo_documento, usuario_creacion
+)
+SELECT 
+    '45678901', 'María García López', 'María García', 'Urb. Los Pinos F-12, Arequipa',
+    '987654321', 'maria.garcia@outlook.com', id_regla, 'SYSTEM'
+FROM configuracion.tipo_documento 
+WHERE codigo = '1' AND NOT EXISTS (SELECT 1 FROM clientes.clientes WHERE numero_documento = '45678901')
+LIMIT 1;

@@ -12,6 +12,11 @@ export const servicioImpuesto = {
     return [];
   },
 
+  obtenerPorId: async (id: number): Promise<Impuesto> => {
+    const response: any = await apiConfiguracion.get(`${BASE_URL}/${id}`);
+    return response.data;
+  },
+
   crear: async (datos: ImpuestoFormData): Promise<Impuesto> => {
     const response: any = await apiConfiguracion.post(BASE_URL, datos);
     return response.data;

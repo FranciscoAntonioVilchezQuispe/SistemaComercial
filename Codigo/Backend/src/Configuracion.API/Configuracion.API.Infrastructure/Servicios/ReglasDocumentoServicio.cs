@@ -27,7 +27,7 @@ namespace Configuracion.API.Infrastructure.Servicios
         {
             var reglas = await _context.DocumentoIdentidadReglas
                 .AsNoTracking()
-                .Where(r => r.Estado && r.Activado)
+                .Where(r => r.Estado && r.Activado && r.EsDocumentoIdentidad)
                 .ToListAsync();
 
             var relaciones = await _context.DocumentoComprobanteRelaciones
@@ -45,7 +45,10 @@ namespace Configuracion.API.Infrastructure.Servicios
 
         public async Task<IEnumerable<DocumentoIdentidadRegla>> ListarReglasAsync()
         {
-            return await _context.DocumentoIdentidadReglas.AsNoTracking().ToListAsync();
+            return await _context.DocumentoIdentidadReglas
+                .AsNoTracking()
+                .Where(r => r.EsDocumentoIdentidad)
+                .ToListAsync();
         }
 
         public async Task<DocumentoIdentidadRegla?> ObtenerReglaPorIdAsync(long id)

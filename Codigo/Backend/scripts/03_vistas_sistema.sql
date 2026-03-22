@@ -67,24 +67,6 @@ END $$;
 UPDATE configuracion.tipo_documento SET es_documento_identidad = true, es_documento_relacionado = false 
 WHERE codigo IN ('1', '6', '4', '7', '0');
 
--- Insertar Catálogo 52 (Documento Relacionado)
-INSERT INTO configuracion.tipo_documento (codigo, nombre, longitud, es_numerico, es_documento_identidad, es_documento_relacionado)
-VALUES 
-('01', 'FACTURA', 10, false, false, true),
-('03', 'BOLETA DE VENTA', 10, false, false, true),
-('04', 'LIQUIDACION DE COMPRA', 10, false, false, true),
-('07', 'NOTA DE CREDITO', 10, false, false, true),
-('08', 'NOTA DE DEBITO', 10, false, false, true),
-('09', 'GUIA DE REMISION REMITENTE', 10, false, false, true),
-('31', 'GUIA DE REMISION TRANSPORTISTA', 10, false, false, true),
-('50', 'DECLARACION UNICA DE ADUANAS', 15, false, false, true),
-('52', 'DESPACHO SIMPLIFICADO - IMPORTACION', 15, false, false, true),
-('87', 'NOTA DE CREDITO ESPECIAL', 10, false, false, true),
-('88', 'NOTA DE DEBITO ESPECIAL', 10, false, false, true)
-ON CONFLICT (codigo) DO UPDATE 
-SET es_documento_relacionado = true, 
-    nombre = EXCLUDED.nombre;
-
 -- ------------------------------------------------------------------------------
 -- 3. CATÁLOGOS 09 Y 10: MOTIVOS DE NC Y ND
 -- ------------------------------------------------------------------------------

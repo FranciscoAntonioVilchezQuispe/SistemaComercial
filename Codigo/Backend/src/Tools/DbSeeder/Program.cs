@@ -78,8 +78,7 @@ class Program
                 string projectRoot = Path.GetFullPath(Path.Combine(baseDir, "..", "..", "..", "..", "..", ".."));
                 
                 string[] baseScripts = { 
-                    "00_init_schemas.sql", 
-                    "01_base_schema.sql", 
+                    "01_esquema_completo.sql"
                 };
                 foreach (var script in baseScripts)
                 {
@@ -91,20 +90,13 @@ class Program
                     }
                 }
 
-                Console.WriteLine("\n>>> EJECUTANDO BOOTSTRAP DE TABLAS FALTANTES...");
-                string bootstrapPath = Path.Combine(projectRoot, "scripts", "02_bootstrap_sunat.sql");
-                if (File.Exists(bootstrapPath)) 
-                    await ExecuteSqlAsync(File.ReadAllText(bootstrapPath));
-
                 Console.WriteLine("\n>>> LIMPANDO HISTORIAL DE MIGRACIONES PARA RECONSTRUCCIÓN...");
                 await ExecuteSqlAsync("TRUNCATE TABLE public.\"__EFMigrationsHistory\" RESTART IDENTITY CASCADE;");
 
                 string[] nextScripts = { 
-                    "03_base_data.sql", 
-                    "04_delta_schema.sql",
-                    "05_sunat_master_data.sql",
-                    "06_sunat_improvements_views.sql",
-                    "07_sync_ef_history.sql"
+                    "02_datos_maestros.sql",
+                    "03_vistas_sistema.sql",
+                    "04_sincronizacion_ef.sql"
                 };
                 foreach (var script in nextScripts)
                 {

@@ -25,7 +25,7 @@ import {
 import { ModuleTabBar } from "@/componentes/shared/ModuleTabBar";
 import { RUTAS_TITULOS } from "@/config/rutasTitulos";
 
-import { useClientes, useEliminarCliente } from "../hooks/useClientes";
+import { useClientes, useCliente, useEliminarCliente } from "../hooks/useClientes";
 import { Cliente } from "../types/cliente.types";
 import { ClienteForm } from "../componentes/ClienteForm";
 import { useCatalogo } from "@/features/configuracion/hooks/useCatalogo";
@@ -33,12 +33,12 @@ import { useTipoDocumento } from "@/features/configuracion/hooks/useTipoDocument
 
 export function PaginaClientes() {
   const [dialogoOpen, setDialogoOpen] = useState(false);
-  const [clienteSeleccionado, setClienteSeleccionado] =
-    useState<Cliente | null>(null);
+  const [idClienteAEditar, setIdClienteAEditar] = useState<number | null>(null);
   const [filtro, setFiltro] = useState("");
   const [eliminarId, setEliminarId] = useState<number | null>(null);
 
   const { data: clientes, isLoading, error } = useClientes();
+  const { data: clienteDetalle, isLoading: cargandoDetalle } = useCliente(idClienteAEditar || 0);
   const eliminarCliente = useEliminarCliente();
 
   // Cargamos tipos de documento desde configuracion.tipo_documento y
@@ -132,7 +132,7 @@ export function PaginaClientes() {
             size="sm"
             className="h-8 w-8 p-0"
             onClick={() => {
-              setClienteSeleccionado(row);
+              setIdClienteAEditar(row.id);
               setDialogoOpen(true);
             }}
           >
@@ -162,7 +162,7 @@ export function PaginaClientes() {
         <Button
           size="sm"
           onClick={() => {
-            setClienteSeleccionado(null);
+            setIdClienteAEditar(null);
             setDialogoOpen(true);
           }}
         >
@@ -218,21 +218,33 @@ export function PaginaClientes() {
         <DialogContent className="max-w-3xl">
           <DialogHeader>
             <DialogTitle>
-              {clienteSeleccionado
+              {idClienteAEditar
                 ? "Editar Cliente"
                 : "Registrar Nuevo Cliente"}
             </DialogTitle>
           </DialogHeader>
-          <ClienteForm
-            cliente={clienteSeleccionado || undefined}
-            onSuccess={() => {
-              toast.success(
-                clienteSeleccionado ? "Cliente actualizado" : "Cliente creado",
-              );
-              setDialogoOpen(false);
-            }}
-            onCancel={() => setDialogoOpen(false)}
-          />
+          
+          {idClienteAEditar && cargandoDetalle ? (
+            <div className="py-20 flex justify-center items-center">
+              <Loading mensaje="Cargando detalle del cliente..." />
+            </div>
+          ) : (
+            <ClienteForm
+              key={idClienteAEditar || "nuevo"}
+              cliente={clienteDetalle || undefined}
+              onSuccess={() => {
+                toast.success(
+                  idClienteAEditar ? "Cliente actualizado" : "Cliente creado",
+                );
+                setDialogoOpen(false);
+                setIdClienteAEditar(null);
+              }}
+              onCancel={() => {
+                setDialogoOpen(false);
+                setIdClienteAEditar(null);
+              }}
+            />
+          )}
         </DialogContent>
       </Dialog>
     </div>

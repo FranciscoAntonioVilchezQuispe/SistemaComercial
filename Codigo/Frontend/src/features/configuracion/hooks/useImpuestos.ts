@@ -15,6 +15,14 @@ export const useImpuestos = (): UseQueryResult<Impuesto[], Error> => {
   });
 };
 
+export const useImpuesto = (id: number): UseQueryResult<Impuesto, Error> => {
+  return useQuery<Impuesto, Error>({
+    queryKey: ["impuestos", id],
+    queryFn: () => servicioImpuesto.obtenerPorId(id),
+    enabled: !!id,
+  });
+};
+
 export const useCrearImpuesto = (): UseMutationResult<
   Impuesto,
   Error,

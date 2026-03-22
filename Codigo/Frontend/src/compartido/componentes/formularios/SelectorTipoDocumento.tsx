@@ -24,6 +24,7 @@ interface SelectorTipoDocumentoProps {
   disabled?: boolean;
   hideLabel?: boolean;
   soloCodigo?: boolean;
+  hideMessage?: boolean;
 }
 
 export const SelectorTipoDocumento: React.FC<SelectorTipoDocumentoProps> = ({
@@ -34,6 +35,7 @@ export const SelectorTipoDocumento: React.FC<SelectorTipoDocumentoProps> = ({
   disabled = false,
   hideLabel = false,
   soloCodigo = false,
+  hideMessage = false,
 }) => {
   const { data: tipos, isLoading, isError } = useTipoDocumento();
 
@@ -80,7 +82,7 @@ export const SelectorTipoDocumento: React.FC<SelectorTipoDocumentoProps> = ({
           ))}
         </SelectContent>
       </Select>
-      <FormMessage />
+      {!hideMessage && <FormMessage />}
     </FormItem>
   );
 };

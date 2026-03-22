@@ -29,6 +29,7 @@ import { useUnidadesMedida } from "../../hooks/useUnidadesMedida";
 import { useEffect } from "react";
 import { limpiarDecimal } from "@compartido/utilidades";
 import { toast } from "sonner";
+import { Loading } from "@compartido/componentes/feedback/Loading";
 
 const formSchema = z.object({
   // Información básica
@@ -67,6 +68,7 @@ const formSchema = z.object({
   // Configuración de inventario
   tieneVariantes: z.boolean(),
   permiteInventarioNegativo: z.boolean(),
+  metodoValuacion: z.string().min(1, "Debe seleccionar un método"),
 
   // Configuración fiscal
   gravadoImpuesto: z.boolean(),
@@ -97,19 +99,21 @@ export function ProductoForm({
   cargando,
 }: Props) {
   // Hooks para cargar listas desplegables
-  const { data: categoriasData } = useCategorias({
+  const { data: categoriasData, isLoading: cargandoCategorias } = useCategorias({
     activo: true,
     pageSize: 100,
     pageNumber: 1,
     search: "",
   });
-  const { data: marcasData } = useMarcas({
+  const { data: marcasData, isLoading: cargandoMarcas } = useMarcas({
     activo: true,
     pageSize: 100,
     pageNumber: 1,
     search: "",
   });
-  const { data: unidadesData } = useUnidadesMedida(true);
+  const { data: unidadesData, isLoading: cargandoUnidades } = useUnidadesMedida(true);
+
+  const cargandoCatalogos = cargandoCategorias || cargandoMarcas || cargandoUnidades;
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -131,6 +135,7 @@ export function ProductoForm({
       stockMaximo: 100,
       tieneVariantes: false,
       permiteInventarioNegativo: false,
+      metodoValuacion: "PE",
       gravadoImpuesto: true,
       porcentajeImpuesto: 18,
       imagenPrincipalUrl: "",
@@ -158,13 +163,14 @@ export function ProductoForm({
         stockMaximo: datosIniciales.stockMaximo,
         tieneVariantes: datosIniciales.tieneVariantes,
         permiteInventarioNegativo: datosIniciales.permiteInventarioNegativo,
+        metodoValuacion: datosIniciales.metodoValuacion || "PE",
         gravadoImpuesto: datosIniciales.gravadoImpuesto,
         porcentajeImpuesto: datosIniciales.porcentajeImpuesto,
         imagenPrincipalUrl: datosIniciales.imagenPrincipalUrl || "",
         activo: datosIniciales.activo,
       });
     }
-  }, [datosIniciales, form]);
+  }, [datosIniciales, form, cargandoCatalogos]);
 
   const gravadoImpuesto = form.watch("gravadoImpuesto");
 
@@ -189,8 +195,14 @@ export function ProductoForm({
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(alEnviar, onInvalid)}
-        className="space-y-4"
+        className="space-y-4 relative"
       >
+        {cargandoCatalogos && (
+          <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-background/60 backdrop-blur-sm rounded-lg">
+            <Loading mensaje="Sincronizando catálogos de marcas y categorías..." />
+          </div>
+        )}
+
         <Tabs defaultValue="general" className="w-full">
           <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 h-auto">
             <TabsTrigger value="general">General</TabsTrigger>
@@ -209,7 +221,7 @@ export function ProductoForm({
                   <FormItem>
                     <FormLabel>Código *</FormLabel>
                     <FormControl>
-                      <Input placeholder="COD-001" {...field} />
+                      <Input placeholder="COD-001" {...field} value={field.value ?? ""} disabled={cargandoCatalogos} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -222,7 +234,7 @@ export function ProductoForm({
                   <FormItem>
                     <FormLabel>Nombre *</FormLabel>
                     <FormControl>
-                      <Input placeholder="Nombre del producto" {...field} />
+                      <Input placeholder="Nombre del producto" {...field} value={field.value ?? ""} disabled={cargandoCatalogos} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -241,6 +253,8 @@ export function ProductoForm({
                       placeholder="Descripción detallada"
                       className="resize-none"
                       {...field}
+                      value={field.value ?? ""}
+                      disabled={cargandoCatalogos}
                     />
                   </FormControl>
                   <FormMessage />
@@ -258,6 +272,7 @@ export function ProductoForm({
                     <Select
                       onValueChange={field.onChange}
                       value={field.value ? field.value.toString() : undefined}
+                      disabled={cargandoCatalogos}
                     >
                       <FormControl>
                         <SelectTrigger>
@@ -286,6 +301,7 @@ export function ProductoForm({
                     <Select
                       onValueChange={field.onChange}
                       value={field.value ? field.value.toString() : undefined}
+                      disabled={cargandoCatalogos}
                     >
                       <FormControl>
                         <SelectTrigger>
@@ -317,6 +333,7 @@ export function ProductoForm({
                     <Select
                       onValueChange={field.onChange}
                       value={field.value ? field.value.toString() : undefined}
+                      disabled={cargandoCatalogos}
                     >
                       <FormControl>
                         <SelectTrigger>
@@ -348,7 +365,7 @@ export function ProductoForm({
                   <FormItem>
                     <FormLabel>Código de Barras</FormLabel>
                     <FormControl>
-                      <Input placeholder="7501234567890" {...field} />
+                      <Input placeholder="7501234567890" {...field} value={field.value ?? ""} disabled={cargandoCatalogos} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -361,7 +378,7 @@ export function ProductoForm({
                   <FormItem>
                     <FormLabel>SKU</FormLabel>
                     <FormControl>
-                      <Input placeholder="SKU-001" {...field} />
+                      <Input placeholder="SKU-001" {...field} value={field.value ?? ""} disabled={cargandoCatalogos} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -385,6 +402,8 @@ export function ProductoForm({
                         inputMode="decimal"
                         placeholder="0.00"
                         {...field}
+                        value={field.value ?? ""}
+                        disabled={cargandoCatalogos}
                         onChange={(e) =>
                           field.onChange(limpiarDecimal(e.target.value))
                         }
@@ -407,6 +426,8 @@ export function ProductoForm({
                         inputMode="decimal"
                         placeholder="0.00"
                         {...field}
+                        value={field.value ?? ""}
+                        disabled={cargandoCatalogos}
                         onChange={(e) =>
                           field.onChange(limpiarDecimal(e.target.value))
                         }
@@ -434,6 +455,8 @@ export function ProductoForm({
                         inputMode="decimal"
                         placeholder="0.00"
                         {...field}
+                        value={field.value ?? ""}
+                        disabled={cargandoCatalogos}
                         onChange={(e) =>
                           field.onChange(limpiarDecimal(e.target.value))
                         }
@@ -456,6 +479,8 @@ export function ProductoForm({
                         inputMode="decimal"
                         placeholder="0.00"
                         {...field}
+                        value={field.value ?? ""}
+                        disabled={cargandoCatalogos}
                         onChange={(e) =>
                           field.onChange(limpiarDecimal(e.target.value))
                         }
@@ -486,6 +511,8 @@ export function ProductoForm({
                         inputMode="decimal"
                         placeholder="0"
                         {...field}
+                        value={field.value ?? ""}
+                        disabled={cargandoCatalogos}
                         onChange={(e) =>
                           field.onChange(limpiarDecimal(e.target.value))
                         }
@@ -510,6 +537,8 @@ export function ProductoForm({
                         inputMode="decimal"
                         placeholder="0"
                         {...field}
+                        value={field.value ?? ""}
+                        disabled={cargandoCatalogos}
                         onChange={(e) =>
                           field.onChange(limpiarDecimal(e.target.value))
                         }
@@ -540,6 +569,7 @@ export function ProductoForm({
                       <Switch
                         checked={field.value}
                         onCheckedChange={field.onChange}
+                        disabled={cargandoCatalogos}
                       />
                     </FormControl>
                   </FormItem>
@@ -563,8 +593,39 @@ export function ProductoForm({
                       <Switch
                         checked={field.value}
                         onCheckedChange={field.onChange}
+                        disabled={cargandoCatalogos}
                       />
                     </FormControl>
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="metodoValuacion"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Método de Valuación *</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      value={field.value}
+                      disabled={cargandoCatalogos}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Seleccione método" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="PE">PEPS (P. Entrar, P. Salir)</SelectItem>
+                        <SelectItem value="PP">Promedio Ponderado</SelectItem>
+                        <SelectItem value="UE">UEPS (Ú. Entrar, P. Salir)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormDescription>
+                      Método para costeo de inventario
+                    </FormDescription>
+                    <FormMessage />
                   </FormItem>
                 )}
               />
@@ -591,6 +652,7 @@ export function ProductoForm({
                       <Switch
                         checked={field.value}
                         onCheckedChange={field.onChange}
+                        disabled={cargandoCatalogos}
                       />
                     </FormControl>
                   </FormItem>
@@ -610,6 +672,7 @@ export function ProductoForm({
                         placeholder="18.00"
                         disabled={!gravadoImpuesto}
                         {...field}
+                        value={field.value ?? ""}
                         onChange={(e) =>
                           field.onChange(limpiarDecimal(e.target.value))
                         }
@@ -634,6 +697,8 @@ export function ProductoForm({
                         type="url"
                         placeholder="https://ejemplo.com/imagen.jpg"
                         {...field}
+                        value={field.value ?? ""}
+                        disabled={cargandoCatalogos}
                       />
                     </FormControl>
                     <FormDescription>
@@ -659,6 +724,7 @@ export function ProductoForm({
                       <Switch
                         checked={field.value}
                         onCheckedChange={field.onChange}
+                        disabled={cargandoCatalogos}
                       />
                     </FormControl>
                   </FormItem>
@@ -669,10 +735,10 @@ export function ProductoForm({
         </Tabs>
 
         <div className="flex justify-end gap-3 pt-4">
-          <Button type="button" variant="outline" onClick={alCancelar}>
+          <Button type="button" variant="outline" onClick={alCancelar} disabled={cargandoCatalogos}>
             Cancelar
           </Button>
-          <Button type="submit" disabled={cargando}>
+          <Button type="submit" disabled={cargando || cargandoCatalogos}>
             {cargando
               ? "Guardando..."
               : datosIniciales

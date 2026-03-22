@@ -2,18 +2,14 @@
 
 Esta carpeta contiene la secuencia oficial y consolidada para restaurar la base de datos PostgreSQL desde cero, asegurando la integridad referencial y el cumplimiento con SUNAT.
 
-## Secuencia Maestra de Restauración (00-07)
+## Secuencia Maestra de Restauración Consolidada (01-04)
 
-Para una restauración completa, ejecute los scripts en el siguiente orden exacto:
+Para una restauración completa, ejecute los scripts en el siguiente orden:
 
-1.  **`00_init_schemas.sql`**: Crea los esquemas (`configuracion`, `ventas`, `compras`, `catalogo`, `inventario`, `identidad`, `contabilidad`).
-2.  **`01_base_schema.sql`**: Define la estructura base de las tablas principales (Importado de pg_dump).
-3.  **`02_bootstrap_sunat.sql`**: Garantiza la existencia de tablas críticas SUNAT y añade restricciones de integridad (FKs) y valores por defecto.
-4.  **`03_base_data.sql`**: Carga los datos maestros iniciales del sistema.
-5.  **`04_delta_schema.sql`**: Aplica cambios estructurales (deltas) generados por las migraciones de EF Core.
-6.  **`05_sunat_master_data.sql`**: Puebla los catálogos SUNAT, reglas matriz, tipos de operación y series de comprobantes (F001, B001, etc.).
-7.  **`06_sunat_improvements_views.sql`**: Crea las vistas del esquema `vistas` optimizadas para el frontend y catálogos de notas (NC/ND).
-8.  **`07_sync_ef_history.sql`**: Sincroniza la tabla `__EFMigrationsHistory` para que coincida con el estado actual del esquema.
+1.  **`01_esquema_completo.sql`**: Define todos los esquemas, tablas base, tablas SUNAT y correcciones estructurales.
+2.  **`02_datos_maestros.sql`**: Carga menús, permisos, catálogos SUNAT, productos demo y registros semilla para clientes/proveedores.
+3.  **`03_vistas_sistema.sql`**: Crea las vistas del esquema `vistas` optimizadas para el frontend.
+4.  **`04_sincronizacion_ef.sql`**: Sincroniza la tabla `__EFMigrationsHistory` con el estado consolidado.
 
 ---
 

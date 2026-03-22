@@ -1,5 +1,5 @@
-import { Menu, Bell, User, LayoutGrid } from "lucide-react";
-import { useLocation } from "react-router-dom";
+import { Menu, Bell, User, LayoutGrid, ArrowLeft } from "lucide-react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -18,10 +18,13 @@ interface PropiedadesHeader {
 
 export function Header({ alAlternarSidebar }: PropiedadesHeader) {
   const { pathname } = useLocation();
+  const navigate = useNavigate();
   const notificacionesPendientes = 3;
 
   // Obtener título dinámico del mapa de rutas
   const tituloPagina = RUTAS_TITULOS[pathname] || "";
+
+  const esDashboard = pathname === "/dashboard";
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 h-[44px]">
@@ -39,6 +42,18 @@ export function Header({ alAlternarSidebar }: PropiedadesHeader) {
           <h1 className="text-[15px] font-medium text-primary uppercase tracking-tight">
             {tituloPagina}
           </h1>
+
+          {!esDashboard && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => navigate("/dashboard")}
+              className="h-7 gap-1.5 ml-2 text-[11px] font-bold uppercase tracking-wider bg-background hover:bg-muted transition-all border-primary/20 hover:border-primary/40 shadow-sm"
+            >
+              <ArrowLeft className="h-3 w-3" />
+              Volver a Menus
+            </Button>
+          )}
         </div>
 
         {/* DERECHA: Logo y Acciones */}

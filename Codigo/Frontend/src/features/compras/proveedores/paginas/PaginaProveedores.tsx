@@ -22,7 +22,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { useProveedores, useEliminarProveedor } from "../hooks/useProveedores";
+import { useProveedores, useProveedor, useEliminarProveedor } from "../hooks/useProveedores";
 import { Proveedor } from "../types/proveedor.types";
 import { ProveedorForm } from "../componentes/ProveedorForm";
 import { useTipoDocumento } from "@/features/configuracion/hooks/useTipoDocumento";
@@ -31,11 +31,11 @@ import { RUTAS_TITULOS } from "@/config/rutasTitulos";
 
 export default function PaginaProveedores() {
   const [dialogoOpen, setDialogoOpen] = useState(false);
-  const [proveedorSeleccionado, setProveedorSeleccionado] =
-    useState<Proveedor | null>(null);
+  const [idProveedorAEditar, setIdProveedorAEditar] = useState<number | null>(null);
   const [filtro, setFiltro] = useState("");
 
   const { data: proveedores, isLoading, error } = useProveedores();
+  const { data: proveedorDetalle, isLoading: cargandoDetalle } = useProveedor(idProveedorAEditar || 0);
   const eliminarProveedor = useEliminarProveedor();
   const [eliminarId, setEliminarId] = useState<number | null>(null);
 
@@ -115,7 +115,7 @@ export default function PaginaProveedores() {
             variant="ghost"
             size="icon"
             onClick={() => {
-              setProveedorSeleccionado(row);
+              setIdProveedorAEditar(row.id);
               setDialogoOpen(true);
             }}
           >
@@ -151,7 +151,7 @@ export default function PaginaProveedores() {
             actionElement={
               <Button
                 onClick={() => {
-                  setProveedorSeleccionado(null);
+                  setIdProveedorAEditar(null);
                   setDialogoOpen(true);
                 }}
                 size="sm"
@@ -167,23 +167,35 @@ export default function PaginaProveedores() {
         <DialogContent className="max-w-3xl">
           <DialogHeader>
             <DialogTitle>
-              {proveedorSeleccionado
+              {idProveedorAEditar
                 ? "Editar Proveedor"
                 : "Registrar Nuevo Proveedor"}
             </DialogTitle>
           </DialogHeader>
-          <ProveedorForm
-            proveedor={proveedorSeleccionado || undefined}
-            onSuccess={() => {
-              toast.success(
-                proveedorSeleccionado
-                  ? "Proveedor actualizado"
-                  : "Proveedor creado",
-              );
-              setDialogoOpen(false);
-            }}
-            onCancel={() => setDialogoOpen(false)}
-          />
+
+          {idProveedorAEditar && cargandoDetalle ? (
+            <div className="py-20 flex justify-center items-center">
+              <Loading mensaje="Cargando detalle del proveedor..." />
+            </div>
+          ) : (
+            <ProveedorForm
+              key={idProveedorAEditar || "nuevo"}
+              proveedor={proveedorDetalle || undefined}
+              onSuccess={() => {
+                toast.success(
+                  idProveedorAEditar
+                    ? "Proveedor actualizado"
+                    : "Proveedor creado",
+                );
+                setDialogoOpen(false);
+                setIdProveedorAEditar(null);
+              }}
+              onCancel={() => {
+                setDialogoOpen(false);
+                setIdProveedorAEditar(null);
+              }}
+            />
+          )}
         </DialogContent>
       </Dialog>
       <AlertDialog

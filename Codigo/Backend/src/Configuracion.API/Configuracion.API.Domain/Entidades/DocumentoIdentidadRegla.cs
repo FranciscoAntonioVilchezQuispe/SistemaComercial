@@ -40,5 +40,11 @@ namespace Configuracion.API.Domain.Entidades
 
         [Column("longitud_maxima")]
         public int? LongitudMaxima { get; set; }
+
+        [Column("es_documento_relacionado")]
+        public bool EsDocumentoRelacionado { get; set; }
+
+        [Column("es_documento_identidad")]
+        public bool EsDocumentoIdentidad { get; set; } = true;
     }
 }
