@@ -23,10 +23,11 @@ namespace Configuracion.API.Endpoints
         {
             var grupo = app.MapGroup("/api/series").WithTags("Series de Comprobante");
 
-            grupo.MapGet("/", async (ISerieComprobanteRepositorio repo) =>
+            grupo.MapGet("/", async (ISerieComprobanteRepositorio repo, [AsParameters] Nucleo.Comun.Application.Paginacion.PagedRequest request) =>
             {
-                var series = await repo.ObtenerTodasAsync();
-                return Results.Ok(new ToReturnList<SerieComprobante>(series));
+                var (datos, total) = await repo.ObtenerPaginadoAsync(request.Search, request.Activo, request.PageNumber ?? 1, request.PageSize ?? 10);
+                var response = new Nucleo.Comun.Application.Paginacion.PagedResponse<SerieComprobante>(datos, request.PageNumber ?? 1, request.PageSize ?? 10, total);
+                return Results.Ok(response);
             });
 
             grupo.MapGet("/{id}", async (long id, ISerieComprobanteRepositorio repo) =>

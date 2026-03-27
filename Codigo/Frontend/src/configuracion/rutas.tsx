@@ -103,6 +103,11 @@ const PaginaVentas = lazy(() =>
     default: m.PaginaVentas,
   })),
 );
+const PaginaCotizaciones = lazy(() =>
+  import("@/features/ventas/paginas/PaginaCotizaciones").then((m) => ({
+    default: m.PaginaCotizaciones,
+  })),
+);
 const PaginaUnidadesMedida = lazy(() =>
   import("@/features/catalogo/paginas/PaginaUnidadesMedida").then((m) => ({
     default: m.default,
@@ -374,6 +379,14 @@ export const ruteador = createBrowserRouter(
           element: (
             <Suspense fallback={<CargandoPagina />}>
               <PaginaVentas />
+            </Suspense>
+          ),
+        },
+        {
+          path: "ventas/cotizaciones",
+          element: (
+            <Suspense fallback={<CargandoPagina />}>
+              <PaginaCotizaciones />
             </Suspense>
           ),
         },

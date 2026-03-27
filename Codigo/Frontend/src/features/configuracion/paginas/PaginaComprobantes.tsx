@@ -54,6 +54,8 @@ import {
 import { ModuleTabBar } from "@/componentes/shared/ModuleTabBar";
 import { RUTAS_TITULOS } from "@/config/rutasTitulos";
 
+import { usePagination } from "@/hooks/usePagination";
+
 export function PaginaComprobantes() {
   const [tabActual, setTabActual] = useState("tipos");
 
@@ -68,25 +70,47 @@ export function PaginaComprobantes() {
   const [eliminarTipoId, setEliminarTipoId] = useState<number | null>(null);
   const [eliminarSerieId, setEliminarSerieId] = useState<number | null>(null);
 
+  // Paginación para Tipos
+  const {
+    paginacion: pagTipo,
+    cambiarPagina: setPaginaTipo,
+    cambiarPageSize: setPageSizeTipo,
+    cambiarBusqueda: setBusquedaTipo,
+    cambiarFiltroActivo: setFiltroTipo,
+  } = usePagination();
+
+  // Paginación para Series
+  const {
+    paginacion: pagSerie,
+    cambiarPagina: setPaginaSerie,
+    cambiarPageSize: setPageSizeSerie,
+    cambiarBusqueda: setBusquedaSerie,
+    cambiarFiltroActivo: setFiltroSerie,
+  } = usePagination();
+
   // Hooks Tipos
   const {
-    data: tipos,
+    data: dataTipos,
     isLoading: loadingTipos,
     error: errorTipos,
-  } = useTiposComprobante();
+  } = useTiposComprobante(pagTipo);
   const crearTipo = useCrearTipoComprobante();
   const actualizarTipo = useActualizarTipoComprobante();
   const eliminarTipo = useEliminarTipoComprobante();
 
+  const tiposArr = dataTipos?.datos || [];
+
   // Hooks Series
   const {
-    data: series,
+    data: dataSeries,
     isLoading: loadingSeries,
     error: errorSeries,
-  } = useSeriesComprobante();
+  } = useSeriesComprobante(pagSerie);
   const crearSerie = useCrearSerieComprobante();
   const actualizarSerie = useActualizarSerieComprobante();
   const eliminarSerie = useEliminarSerieComprobante();
+
+  const seriesArr = dataSeries?.datos || [];
 
   const tabsConfig = [
     { label: RUTAS_TITULOS["/configuracion/empresa"], to: "/configuracion/empresa" },
@@ -207,7 +231,7 @@ export function PaginaComprobantes() {
       header: "Tipo",
       accessorKey: "idTipoComprobante" as keyof SerieComprobante,
       cell: (row: SerieComprobante) => {
-        const tipo = tipos?.find((t) => t.id === row.idTipoComprobante);
+        const tipo = dataTipos?.datos.find((t: TipoComprobante) => t.id === row.idTipoComprobante);
         return <span className="text-primary font-medium">{tipo ? tipo.nombre : row.idTipoComprobante}</span>;
       },
     },
@@ -250,10 +274,11 @@ export function PaginaComprobantes() {
     },
   ];
 
-  if (loadingTipos || loadingSeries)
-    return <Loading mensaje="Cargando configuración..." />;
-  if (errorTipos || errorSeries)
-    return <MensajeError mensaje="Error al cargar datos" />;
+  // Handlers para carga inicial (opcional, DataTable ya maneja su propio loading)
+  const hayError = errorTipos || errorSeries;
+
+  if (hayError)
+    return <MensajeError mensaje="Error al cargar los datos de configuración" />;
 
   return (
     <div className="space-y-4">
@@ -276,8 +301,15 @@ export function PaginaComprobantes() {
             </CardHeader>
             <CardContent className="p-6">
               <DataTable
-                data={tipos || []}
+                data={tiposArr}
                 columns={columnasTipos}
+                pagination={dataTipos}
+                onPageChange={setPaginaTipo}
+                onPageSizeChange={setPageSizeTipo}
+                onSearchChange={setBusquedaTipo}
+                onActiveFilterChange={setFiltroTipo}
+                isLoading={loadingTipos}
+                searchPlaceholder="Buscar por código o nombre..."
                 actionElement={
                   <Button
                     size="sm"
@@ -305,8 +337,15 @@ export function PaginaComprobantes() {
             </CardHeader>
             <CardContent className="p-6">
               <DataTable
-                data={series || []}
+                data={seriesArr}
                 columns={columnasSeries}
+                pagination={dataSeries}
+                onPageChange={setPaginaSerie}
+                onPageSizeChange={setPageSizeSerie}
+                onSearchChange={setBusquedaSerie}
+                onActiveFilterChange={setFiltroSerie}
+                isLoading={loadingSeries}
+                searchPlaceholder="Buscar por serie..."
                 actionElement={
                   <Button
                     size="sm"

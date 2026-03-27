@@ -1,16 +1,17 @@
 import { apiCompras } from "@/lib/axios";
 import { Proveedor, ProveedorFormData } from "../types/proveedor.types";
+import { PagedRequest, PagedResponse } from "@/types/pagination.types";
 
 const BASE_URL = "/proveedores";
 
 export const obtenerProveedores = async (
-  busqueda?: string,
-): Promise<Proveedor[]> => {
-  const params = busqueda ? { busqueda } : {};
+  paginacion?: PagedRequest,
+): Promise<PagedResponse<Proveedor>> => {
+  const params = paginacion || {};
   const respuesta: any = await apiCompras.get(BASE_URL, { params });
-  console.log("Respuesta Proveedores:", respuesta);
-  const data = respuesta.datos || respuesta.data || [];
-  return data.map((p: any) => ({
+  
+  const datosRaw = respuesta.datos || [];
+  const datosMapeados = datosRaw.map((p: any) => ({
     ...p,
     id: p.id ?? p.Id ?? p.idProveedor ?? 0,
     idTipoDocumento: p.idTipoDocumento ?? p.IdTipoDocumento ?? 0,
@@ -20,6 +21,11 @@ export const obtenerProveedores = async (
     telefono: p.telefono ?? p.Telefono ?? "",
     paginaWeb: p.paginaWeb ?? p.PaginaWeb ?? "",
   }));
+
+  return {
+    ...respuesta,
+    datos: datosMapeados,
+  };
 };
 
 export const obtenerProveedor = async (id: number): Promise<Proveedor> => {

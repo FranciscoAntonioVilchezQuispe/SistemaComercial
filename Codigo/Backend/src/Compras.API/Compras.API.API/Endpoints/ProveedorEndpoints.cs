@@ -14,10 +14,11 @@ namespace Compras.API.Endpoints
         {
             var grupo = app.MapGroup("/api/proveedores").WithTags("Proveedores");
 
-            grupo.MapGet("/", async (string? busqueda, IProveedorRepositorio repo) =>
+            grupo.MapGet("/", async ([Microsoft.AspNetCore.Mvc.AsParameters] Nucleo.Comun.Application.Paginacion.PagedRequest request, IProveedorRepositorio repo) =>
             {
-                var proveedores = await repo.ObtenerTodosAsync(busqueda);
-                return Results.Ok(new ToReturnList<Proveedor>(proveedores));
+                var (proveedores, total) = await repo.ObtenerPaginadoAsync(request.Search, request.Activo, request.PageNumber ?? 1, request.PageSize ?? 10);
+                var response = new Nucleo.Comun.Application.Paginacion.PagedResponse<Proveedor>(proveedores, request.PageNumber ?? 1, request.PageSize ?? 10, total);
+                return Results.Ok(response);
             });
 
             grupo.MapGet("/{id}", async (long id, IProveedorRepositorio repo) =>

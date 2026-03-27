@@ -41,6 +41,7 @@ namespace Compras.API.Application.Manejadores
                 if (orden != null)
                 {
                     orden.CompraId = null;
+                    orden.IdEstado = 41; // Aprobada (Volver a estar disponible)
                     _context.OrdenesCompra.Update(orden);
                 }
             }

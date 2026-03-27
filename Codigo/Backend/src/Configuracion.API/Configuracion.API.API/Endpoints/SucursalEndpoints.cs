@@ -14,10 +14,11 @@ namespace Configuracion.API.Endpoints
         {
             var grupo = app.MapGroup("/api/sucursales").WithTags("Sucursales");
 
-            grupo.MapGet("/", async (ISucursalRepositorio repo) =>
+            grupo.MapGet("/", async (ISucursalRepositorio repo, [AsParameters] Nucleo.Comun.Application.Paginacion.PagedRequest request) =>
             {
-                var sucursales = await repo.ObtenerTodasAsync();
-                return Results.Ok(new ToReturnList<Sucursal>(sucursales));
+                var (datos, total) = await repo.ObtenerPaginadoAsync(request.Search, request.Activo, request.PageNumber ?? 1, request.PageSize ?? 10);
+                var response = new Nucleo.Comun.Application.Paginacion.PagedResponse<Sucursal>(datos, request.PageNumber ?? 1, request.PageSize ?? 10, total);
+                return Results.Ok(response);
             });
 
             grupo.MapGet("/{id}", async (long id, ISucursalRepositorio repo) =>

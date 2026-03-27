@@ -8,10 +8,14 @@ import {
 import { servicioImpuesto } from "../servicios/servicioImpuesto";
 import { Impuesto, ImpuestoFormData } from "../tipos/impuesto.types";
 
-export const useImpuestos = (): UseQueryResult<Impuesto[], Error> => {
-  return useQuery<Impuesto[], Error>({
-    queryKey: ["impuestos"],
-    queryFn: servicioImpuesto.obtenerTodos,
+import { PagedRequest, PagedResponse } from "@/types/pagination.types";
+
+export const useImpuestos = (
+  paginacion?: PagedRequest,
+): UseQueryResult<PagedResponse<Impuesto>, Error> => {
+  return useQuery<PagedResponse<Impuesto>, Error>({
+    queryKey: ["impuestos", paginacion],
+    queryFn: () => servicioImpuesto.obtenerTodos(paginacion),
   });
 };
 

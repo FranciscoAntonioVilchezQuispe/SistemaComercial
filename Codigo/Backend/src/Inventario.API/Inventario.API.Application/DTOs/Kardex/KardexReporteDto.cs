@@ -16,6 +16,12 @@ namespace Inventario.API.Application.DTOs.Kardex
         public string DescripcionExistencia { get; set; } = string.Empty;
         public string CodigoUnidadMedida { get; set; } = string.Empty; // Tabla 6 (NIU: Unidades, KGM: Kilogramos...)
         public string MetodoValuacion { get; set; } = "1"; // Tabla 14 (1: Primeras Entradas Primeras Salidas, 9: Promedio PP)
+        
+        // Paginación
+        public int TotalItems { get; set; }
+        public int TotalPages { get; set; }
+        public int PageNumber { get; set; }
+        public int PageSize { get; set; }
 
         public List<KardexReporteItemDto> Detalles { get; set; } = new List<KardexReporteItemDto>();
     }

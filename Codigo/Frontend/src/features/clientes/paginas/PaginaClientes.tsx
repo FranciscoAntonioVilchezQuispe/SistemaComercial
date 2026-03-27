@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus, Edit2, Trash2, Search } from "lucide-react";
+import { Plus, Edit2, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -10,7 +10,6 @@ import {
 import { DataTable } from "@/components/ui/DataTable";
 import { Loading } from "@compartido/componentes/feedback/Loading";
 import { MensajeError } from "@compartido/componentes/feedback/MensajeError";
-import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import {
   AlertDialog,
@@ -31,13 +30,16 @@ import { ClienteForm } from "../componentes/ClienteForm";
 import { useCatalogo } from "@/features/configuracion/hooks/useCatalogo";
 import { useTipoDocumento } from "@/features/configuracion/hooks/useTipoDocumento";
 
+import { usePagination } from "@/hooks/usePagination";
+
 export function PaginaClientes() {
+  const { paginacion, cambiarPagina, cambiarPageSize, cambiarBusqueda, cambiarFiltroActivo } = usePagination();
   const [dialogoOpen, setDialogoOpen] = useState(false);
   const [idClienteAEditar, setIdClienteAEditar] = useState<number | null>(null);
-  const [filtro, setFiltro] = useState("");
   const [eliminarId, setEliminarId] = useState<number | null>(null);
 
-  const { data: clientes, isLoading, error } = useClientes();
+  const { data, isLoading, error } = useClientes(paginacion);
+  const clientes = data?.datos || [];
   const { data: clienteDetalle, isLoading: cargandoDetalle } = useCliente(idClienteAEditar || 0);
   const eliminarCliente = useEliminarCliente();
 
@@ -65,13 +67,6 @@ export function PaginaClientes() {
       },
     });
   };
-
-  const clientesFiltrados =
-    clientes?.filter(
-      (c) =>
-        c.razonSocial.toLowerCase().includes(filtro.toLowerCase()) ||
-        c.numeroDocumento.includes(filtro),
-    ) || [];
 
   const columnas = [
     {
@@ -170,22 +165,18 @@ export function PaginaClientes() {
         </Button>
       </div>
 
-      <div className="rounded-xl border border-muted/20 bg-card shadow-sm overflow-hidden">
-        <div className="p-6">
-          <div className="flex justify-between items-center mb-6 gap-4 flex-wrap">
-            <div className="relative flex-1 max-w-sm">
-              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Buscar por nombre o documento..."
-                className="pl-9 h-9 bg-muted/20"
-                value={filtro}
-                onChange={(e) => setFiltro(e.target.value)}
-              />
-            </div>
-          </div>
-
-          <DataTable data={clientesFiltrados} columns={columnas} />
-        </div>
+      <div className="rounded-xl border border-muted/20 bg-card shadow-sm overflow-hidden p-6">
+        <DataTable 
+          data={clientes} 
+          columns={columnas} 
+          pagination={data}
+          onPageChange={cambiarPagina}
+          onPageSizeChange={cambiarPageSize}
+          onSearchChange={cambiarBusqueda}
+          onActiveFilterChange={cambiarFiltroActivo}
+          isLoading={isLoading}
+          searchPlaceholder="Buscar por nombre o documento..."
+        />
       </div>
 
       {/* AlertDialog eliminar */}

@@ -11,13 +11,14 @@ import {
   TipoComprobanteFormData,
 } from "../tipos/tipoComprobante.types";
 
-export const useTiposComprobante = (): UseQueryResult<
-  TipoComprobante[],
-  Error
-> => {
-  return useQuery<TipoComprobante[], Error>({
-    queryKey: ["tipos-comprobante"],
-    queryFn: servicioTipoComprobante.obtenerTodos,
+import { PagedRequest, PagedResponse } from "@/types/pagination.types";
+
+export const useTiposComprobante = (
+  paginacion?: PagedRequest & { modulo?: string },
+): UseQueryResult<PagedResponse<TipoComprobante>, Error> => {
+  return useQuery<PagedResponse<TipoComprobante>, Error>({
+    queryKey: ["tipos-comprobante", paginacion],
+    queryFn: () => servicioTipoComprobante.obtenerTodos(paginacion),
   });
 };
 

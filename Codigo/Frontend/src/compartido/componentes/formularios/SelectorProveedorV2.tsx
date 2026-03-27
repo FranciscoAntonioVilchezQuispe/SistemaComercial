@@ -66,9 +66,9 @@ export const SelectorProveedorV2: React.FC<SelectorProveedorProps> = ({
     if (value && proveedores.length > 0) {
       const p = proveedores.find((p) => p.id === value);
       if (p) {
-        setTipoDoc(p.idTipoDocumento.toString());
-        setNumDoc(p.numeroDocumento);
-        setRazonSocial(p.razonSocial);
+        setTipoDoc(p.idTipoDocumento?.toString() || "1");
+        setNumDoc(p.numeroDocumento || "");
+        setRazonSocial(p.razonSocial || "");
 
         // Notificar el código si existe
         if (onTipoDocChange && configReglas?.reglas) {

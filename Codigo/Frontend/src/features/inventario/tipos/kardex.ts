@@ -25,6 +25,10 @@ export interface KardexReporteDto {
   descripcionExistencia: string;
   codigoUnidadMedida: string;
   metodoValuacion: string;
+  totalItems: number;
+  totalPages: number;
+  pageNumber: number;
+  pageSize: number;
   detalles: KardexReporteItemDto[];
 }
 

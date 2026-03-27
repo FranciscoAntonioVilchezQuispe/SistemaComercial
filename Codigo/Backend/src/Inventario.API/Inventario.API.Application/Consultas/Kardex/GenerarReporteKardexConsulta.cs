@@ -12,6 +12,10 @@ namespace Inventario.API.Application.Consultas.Kardex
         public DateTime FechaInicio { get; set; }
         public DateTime FechaFin { get; set; }
         
+        // Paginación
+        public int PageNumber { get; set; } = 1;
+        public int PageSize { get; set; } = 100;
+        
         // Opcionales para llenar la cabecera
         public string RucEmpresa { get; set; } = "20000000000";
         public string RazonSocialEmpresa { get; set; } = "EMPRESA COMERCIALIZADORA S.A.";

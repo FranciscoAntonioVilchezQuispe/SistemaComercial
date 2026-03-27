@@ -20,7 +20,7 @@ namespace Inventario.API.Domain.Entidades.Integracion
         [Column("nombre")]
         public string Nombre { get; set; } = null!;
 
-        [Column("activo")]
-        public bool Activo { get; set; } = true;
+        [Column("activado")]
+        public bool Activado { get; set; } = true;
     }
 }

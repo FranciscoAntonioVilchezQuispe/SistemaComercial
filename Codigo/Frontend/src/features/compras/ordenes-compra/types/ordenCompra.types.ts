@@ -10,6 +10,7 @@ export interface DetalleOrdenCompra {
   // Datos expandidos opcionales para visualización si el backend los enviara enriquecidos,
   // aunque por defecto el DTO simple tal vez no los tenga, suele ser útil tenerlos definidos.
   nombreProducto?: string; 
+  unidadMedidaSimbolo?: string;
 }
 
 export interface OrdenCompra {

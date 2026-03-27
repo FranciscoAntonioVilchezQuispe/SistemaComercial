@@ -4,7 +4,11 @@ import {
   AjusteStockDTO,
   InventarioFiltros,
   MovimientoFiltros,
+  Traslado,
 } from "../tipos/inventario.types";
+import { PagedRequest, PagedResponse } from "@/types/pagination.types";
+import { MovimientoInventario, StockProducto } from "../tipos/inventario.types";
+import { Almacen } from "../almacenes/types/almacen.types";
 
 const API_URL = "/inventario";
 
@@ -12,11 +16,15 @@ export const servicioInventario = {
   /**
    * Obtiene el stock actual de productos
    */
-  obtenerStock: async (filtros: InventarioFiltros = {}) => {
+  obtenerStock: async (
+    paginacion?: PagedRequest,
+    filtros: InventarioFiltros = {},
+  ): Promise<PagedResponse<StockProducto>> => {
+    const params = { ...filtros, ...paginacion };
     const response: any = await apiInventario.get(`${API_URL}/stock`, {
-      params: filtros,
+      params,
     });
-    return response; // Contiene datos y total
+    return response;
   },
 
   /**
@@ -33,14 +41,14 @@ export const servicioInventario = {
    * Obtiene el historial de movimientos de inventario
    */
   obtenerMovimientos: async (
+    paginacion?: PagedRequest,
     filtros: MovimientoFiltros = {},
-    pagina: number = 1,
-    limite: number = 10,
-  ) => {
+  ): Promise<PagedResponse<MovimientoInventario>> => {
+    const params = { ...filtros, ...paginacion };
     const response: any = await apiInventario.get(`${API_URL}/movimientos`, {
-      params: { ...filtros, pagina, limite },
+      params,
     });
-    return response; // Contiene datos y total
+    return response;
   },
 
   /**
@@ -94,11 +102,28 @@ export const servicioInventario = {
   },
 
   /**
+   * Obtiene los tipos de movimientos configurados
+   */
+  obtenerTraslados: async (
+    paginacion?: PagedRequest,
+  ): Promise<PagedResponse<Traslado>> => {
+    const response: any = await apiInventario.get(`${API_URL}/traslados`, {
+      params: paginacion,
+    });
+    return response;
+  },
+
+  /**
    * Obtiene la lista de almacenes disponibles
    */
-  obtenerAlmacenes: async () => {
-    const response: any = await apiInventario.get(`${API_URL}/almacenes`);
-    return response.datos || response;
+  obtenerAlmacenes: async (
+    paginacion?: PagedRequest,
+  ): Promise<PagedResponse<Almacen>> => {
+    const params = paginacion || {};
+    const response: any = await apiInventario.get(`${API_URL}/almacenes`, {
+      params,
+    });
+    return response;
   },
 
   /**

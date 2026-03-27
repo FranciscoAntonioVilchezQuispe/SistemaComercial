@@ -14,6 +14,8 @@ namespace Compras.API.Application.DTOs
         public decimal PrecioUnitarioPactado { get; set; }
         public decimal Subtotal { get; set; }
         public decimal? CantidadRecibida { get; set; }
+        public string? NombreProducto { get; set; }
+        public string? UnidadMedidaSimbolo { get; set; }
     }
 
     public class OrdenCompraDto
@@ -30,6 +32,10 @@ namespace Compras.API.Application.DTOs
         public long? IdTipoComprobante { get; set; }
         public string? Serie { get; set; }
         public string? Numero { get; set; }
+        public string? RazonSocialProveedor { get; set; }
+        public long IdTipoDocumentoProveedor { get; set; }
+        public string? NumeroDocumentoProveedor { get; set; }
+        public string? NombreAlmacen { get; set; }
         public List<DetalleOrdenCompraDto> Detalles { get; set; } = new();
     }
 }

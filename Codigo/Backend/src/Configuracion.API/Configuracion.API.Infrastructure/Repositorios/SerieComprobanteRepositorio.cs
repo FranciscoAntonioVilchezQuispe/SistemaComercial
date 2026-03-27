@@ -40,6 +40,29 @@ namespace Configuracion.API.Infrastructure.Repositorios
             return await _context.SeriesComprobantes.ToListAsync();
         }
 
+        public async Task<(IEnumerable<SerieComprobante>, int)> ObtenerPaginadoAsync(string? search, bool? activo, int pageNumber, int pageSize)
+        {
+            var query = _context.SeriesComprobantes.AsNoTracking().AsQueryable();
+
+            if (!string.IsNullOrEmpty(search))
+            {
+                query = query.Where(s => s.Serie.Contains(search));
+            }
+
+            // Nota: SerieComprobante no parece tener activado/desactivado en la entidad vista, 
+            // pero mantengo el parámetro por consistencia si se añade luego.
+
+            int total = await query.CountAsync();
+            var datos = await query
+                .OrderBy(s => s.IdTipoComprobante)
+                .ThenBy(s => s.Serie)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return (datos, total);
+        }
+
         public async Task<IEnumerable<SerieComprobante>> ObtenerPorTipoAsync(long idTipoComprobante)
         {
             return await _context.SeriesComprobantes

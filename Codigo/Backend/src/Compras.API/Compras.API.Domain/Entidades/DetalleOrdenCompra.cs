@@ -33,5 +33,11 @@ namespace Compras.API.Domain.Entidades
 
         [ForeignKey("IdOrdenCompra")]
         public virtual OrdenCompra OrdenCompra { get; set; } = null!;
+
+        [NotMapped]
+        public string? NombreProducto { get; set; }
+
+        [NotMapped]
+        public string? UnidadMedidaSimbolo { get; set; }
     }
 }

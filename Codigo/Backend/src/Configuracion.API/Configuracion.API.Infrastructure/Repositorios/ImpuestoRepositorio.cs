@@ -39,6 +39,31 @@ namespace Configuracion.API.Infrastructure.Repositorios
             return await _context.Impuestos.ToListAsync();
         }
 
+        public async Task<(IEnumerable<Impuesto> Datos, int Total)> ObtenerPaginadoAsync(string? search, bool? activo, int pageNumber, int pageSize)
+        {
+            var query = _context.Impuestos.AsQueryable();
+
+            if (!string.IsNullOrEmpty(search))
+            {
+                search = search.ToLower();
+                query = query.Where(i => i.Nombre.ToLower().Contains(search) || i.CodigoSunat.ToLower().Contains(search));
+            }
+
+            if (activo.HasValue)
+            {
+                query = query.Where(i => i.Activado == activo.Value);
+            }
+
+            var total = await query.CountAsync();
+            var datos = await query
+                .OrderBy(i => i.Nombre)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return (datos, total);
+        }
+
         public async Task EliminarAsync(long id)
         {
             var entity = await _context.Impuestos.FindAsync(id);
@@ -80,6 +105,31 @@ namespace Configuracion.API.Infrastructure.Repositorios
         public async Task<IEnumerable<MetodoPago>> ObtenerTodosAsync()
         {
             return await _context.MetodosPago.ToListAsync();
+        }
+
+        public async Task<(IEnumerable<MetodoPago> Datos, int Total)> ObtenerPaginadoAsync(string? search, bool? activo, int pageNumber, int pageSize)
+        {
+            var query = _context.MetodosPago.AsQueryable();
+
+            if (!string.IsNullOrEmpty(search))
+            {
+                search = search.ToLower();
+                query = query.Where(m => m.Nombre.ToLower().Contains(search) || m.CodigoSunat.ToLower().Contains(search));
+            }
+
+            if (activo.HasValue)
+            {
+                query = query.Where(m => m.Activado == activo.Value);
+            }
+
+            var total = await query.CountAsync();
+            var datos = await query
+                .OrderBy(m => m.Nombre)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return (datos, total);
         }
 
         public async Task EliminarAsync(long id)

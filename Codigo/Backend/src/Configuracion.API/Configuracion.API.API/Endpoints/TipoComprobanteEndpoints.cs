@@ -29,19 +29,11 @@ namespace Configuracion.API.Endpoints
         {
             var grupo = app.MapGroup("/api/tipos-comprobante").WithTags("Tipos de Comprobante");
 
-            grupo.MapGet("/", async (string? modulo, ITipoComprobanteRepositorio repo) =>
+            grupo.MapGet("/", async (ITipoComprobanteRepositorio repo, [AsParameters] Nucleo.Comun.Application.Paginacion.PagedRequest request, string? modulo) =>
             {
-                var tipos = await repo.ObtenerTodosAsync();
-
-                if (!string.IsNullOrEmpty(modulo))
-                {
-                    modulo = modulo.ToUpper();
-                    if (modulo == "COMPRA") tipos = tipos.Where(t => t.EsCompra);
-                    else if (modulo == "VENTA") tipos = tipos.Where(t => t.EsVenta);
-                    else if (modulo == "ORDEN_COMPRA") tipos = tipos.Where(t => t.EsOrdenCompra);
-                }
-
-                return Results.Ok(new ToReturnList<TipoComprobante>(tipos));
+                var (datos, total) = await repo.ObtenerPaginadoAsync(request.Search, request.Activo, modulo, request.PageNumber ?? 1, request.PageSize ?? 10);
+                var response = new Nucleo.Comun.Application.Paginacion.PagedResponse<TipoComprobante>(datos, request.PageNumber ?? 1, request.PageSize ?? 10, total);
+                return Results.Ok(response);
             });
 
             grupo.MapGet("/{id}", async (long id, ITipoComprobanteRepositorio repo) =>

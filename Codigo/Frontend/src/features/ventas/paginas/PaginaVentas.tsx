@@ -1,23 +1,32 @@
-import { useState } from "react";
-import { Plus, Search, Filter } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { useVentas } from "../hooks/useVentas";
-import { TablaVentas } from "../componentes/ventas/TablaVentas";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
-import { SelectorRangoFecha } from "@/compartido/componentes/formularios/SelectorRangoFecha";
-import { ExportadorTabla } from "@/compartido/componentes/tablas/ExportadorTabla";
-import { VentaFiltros, Venta } from "../tipos/ventas.types";
+import { Venta } from "../tipos/ventas.types";
 import { ModuleTabBar } from "@/componentes/shared/ModuleTabBar";
 import { RUTAS_TITULOS } from "@/config/rutasTitulos";
+import { Plus, Eye, FileText, MoreHorizontal } from "lucide-react";
+
+import { usePagination } from "@/hooks/usePagination";
+import { DataTable } from "@/componentes/ui/DataTable";
+import { formatearMoneda, formatearFechaHora } from "@compartido/utilidades";
+import { Badge } from "@/components/ui/badge";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export function PaginaVentas() {
   const navigate = useNavigate();
-  const [filtros, setFiltros] = useState<VentaFiltros>({});
+  const { paginacion, cambiarPagina, cambiarPageSize, cambiarBusqueda } = usePagination();
 
-  const { data, isLoading } = useVentas(filtros, 1, 100);
+  const { data, isLoading } = useVentas(paginacion);
+  const ventas = data?.datos || [];
 
   const handleVerDetalle = (_venta: Venta) => {
     toast.info("Próximamente: ver detalle de venta");
@@ -34,10 +43,102 @@ export function PaginaVentas() {
     { label: RUTAS_TITULOS["/clientes"], to: "/clientes" },
   ];
 
-  const columnasExportar = [
-    { clave: "numeroComprobante" as keyof Venta, titulo: "Comprobante" },
-    { clave: "fecha" as keyof Venta, titulo: "Fecha" },
-    { clave: "total" as keyof Venta, titulo: "Total" },
+  const columns = [
+    {
+      header: "Comprobante",
+      accessorKey: "numeroComprobante" as keyof Venta,
+      cell: (venta: Venta) => (
+        <div className="flex flex-col">
+          <span className="font-medium">{venta.numeroComprobante}</span>
+          <span className="text-xs text-muted-foreground">
+            {venta.tipoComprobante || 'Venta'}
+          </span>
+        </div>
+      ),
+    },
+    {
+      header: "Fecha",
+      cell: (venta: Venta) => formatearFechaHora(venta.fecha),
+    },
+    {
+      header: "Cliente",
+      cell: (venta: Venta) =>
+        venta.cliente?.razonSocial || "Cliente General",
+    },
+    {
+      header: "Total",
+      cell: (venta: Venta) => (
+        <span className="font-bold">{formatearMoneda(venta.total)}</span>
+      ),
+    },
+    {
+      header: "Estado",
+      cell: (venta: Venta) => (
+        <Badge
+          variant={
+            venta.idEstado === 1 // Completada
+              ? "default"
+              : venta.idEstado === 2 // Pendiente
+                ? "secondary"
+                : "destructive" // Anulada
+          }
+        >
+          {venta.estado || "Completada"}
+        </Badge>
+      ),
+    },
+    {
+      header: "Pago",
+      cell: (venta: Venta) => (
+        <Badge
+          variant={venta.idEstadoPago === 1 ? "outline" : "secondary"}
+          className={
+            venta.idEstadoPago === 1 ? "border-green-500 text-green-500" : ""
+          }
+        >
+          {venta.estadoPago || "Pagado"}
+        </Badge>
+      ),
+    },
+    {
+      header: "Acciones",
+      className: "text-right",
+      cell: (venta: Venta) => (
+        <div className="flex items-center justify-end gap-2">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => handleVerDetalle(venta)}
+            title="Ver Detalle"
+          >
+            <Eye className="h-4 w-4" />
+          </Button>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon">
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>Comprobantes</DropdownMenuLabel>
+              <DropdownMenuItem onClick={() => toast.info("Próximamente: generar ticket")}>
+                <FileText className="mr-2 h-4 w-4" />
+                Ticket
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => toast.info("Próximamente: generar factura")}>
+                <FileText className="mr-2 h-4 w-4" />
+                Factura / Boleta
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem className="text-destructive">
+                Anular Venta
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      ),
+    },
   ];
 
   return (
@@ -45,11 +146,6 @@ export function PaginaVentas() {
       <ModuleTabBar tabs={tabsVentas} />
 
       <div className="flex justify-end gap-2">
-        <ExportadorTabla
-          datos={data?.datos || []}
-          nombreArchivo="ventas"
-          columnas={columnasExportar}
-        />
         <Button onClick={handleNuevoPOS} size="sm">
           <Plus className="mr-2 h-4 w-4" />
           Nueva Venta (POS)
@@ -57,56 +153,16 @@ export function PaginaVentas() {
       </div>
 
       <Card>
-        <CardContent className="pt-6">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="relative">
-              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="N° Comprobante..."
-                className="pl-8"
-                value={filtros.numeroComprobante || ""}
-                onChange={(e) =>
-                  setFiltros({ ...filtros, numeroComprobante: e.target.value })
-                }
-              />
-            </div>
-            <div className="col-span-1 md:col-span-2">
-              <SelectorRangoFecha
-                alCambiarRango={(rango) =>
-                  setFiltros({
-                    ...filtros,
-                    fechaInicio: rango?.from?.toISOString(),
-                    fechaFin: rango?.to?.toISOString(),
-                  })
-                }
-              />
-            </div>
-            <div className="flex items-center gap-2">
-              <Button variant="outline" className="w-full">
-                <Filter className="mr-2 h-4 w-4" />
-                Más Filtros
-              </Button>
-              <Button
-                variant="ghost"
-                onClick={() => setFiltros({})}
-                title="Limpiar filtros"
-                size="sm"
-              >
-                Limpiar
-              </Button>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardContent className="pt-6">
-          <TablaVentas
-            ventas={data?.datos || []}
+        <CardContent className="p-6">
+          <DataTable 
+            data={ventas} 
+            columns={columns} 
+            pagination={data}
+            onPageChange={cambiarPagina}
+            onPageSizeChange={cambiarPageSize}
+            onSearchChange={cambiarBusqueda}
             isLoading={isLoading}
-            onVerDetalle={handleVerDetalle}
-            onGenerarTicket={() => toast.info("Próximamente: generar ticket")}
-            onGenerarFactura={() => toast.info("Próximamente: generar factura")}
+            searchPlaceholder="Buscar por número o cliente..."
           />
         </CardContent>
       </Card>

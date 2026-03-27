@@ -50,7 +50,7 @@ namespace Compras.API.Domain.Entidades
         [Column("valor_item", TypeName = "decimal(12,4)")]
         public decimal? ValorItem { get; set; }
 
-        [ForeignKey("IdComprao")]
+        [ForeignKey("IdCompra")]
         public virtual Compra Compra { get; set; } = null!;
     }
 }

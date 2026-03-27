@@ -19,10 +19,32 @@ namespace Compras.API.Infrastructure.Repositorios
 
         public async Task<OrdenCompra?> ObtenerPorIdAsync(long id)
         {
-            return await _context.OrdenesCompra
+            var orden = await _context.OrdenesCompra
                 .Include(o => o.Detalles)
                 .Include(o => o.Proveedor)
                 .FirstOrDefaultAsync(o => o.Id == id);
+
+            if (orden != null)
+            {
+                orden.RazonSocialProveedor = orden.Proveedor?.RazonSocial;
+                orden.IdTipoDocumentoProveedor = orden.Proveedor?.IdTipoDocumento ?? 0;
+                orden.NumeroDocumentoProveedor = orden.Proveedor?.NumeroDocumento;
+
+                var almacen = await _context.AlmacenesRef.FirstOrDefaultAsync(a => a.Id == orden.IdAlmacenDestino);
+                orden.NombreAlmacen = almacen?.NombreAlmacen;
+
+                foreach (var detalle in orden.Detalles)
+                {
+                    var prod = await _context.ProductosRef.FirstOrDefaultAsync(p => p.Id == detalle.IdProducto);
+                    if (prod != null)
+                    {
+                        detalle.NombreProducto = prod.NombreProducto;
+                        var um = await _context.UnidadesMedidaRef.FirstOrDefaultAsync(u => u.Id == prod.IdUnidadMedida);
+                        detalle.UnidadMedidaSimbolo = um?.Simbolo;
+                    }
+                }
+            }
+            return orden;
         }
 
         public async Task<OrdenCompra> AgregarAsync(OrdenCompra orden)
@@ -96,10 +118,33 @@ namespace Compras.API.Infrastructure.Repositorios
 
         public async Task<IEnumerable<OrdenCompra>> ObtenerTodosAsync()
         {
-            return await _context.OrdenesCompra
+            var ordenes = await _context.OrdenesCompra
                 .Include(o => o.Proveedor)
                 .Include(o => o.Detalles)
+                .OrderByDescending(o => o.FechaCreacion)
                 .ToListAsync();
+
+            foreach (var orden in ordenes)
+            {
+                orden.RazonSocialProveedor = orden.Proveedor?.RazonSocial;
+                orden.IdTipoDocumentoProveedor = orden.Proveedor?.IdTipoDocumento ?? 0;
+                orden.NumeroDocumentoProveedor = orden.Proveedor?.NumeroDocumento;
+                var almacen = await _context.AlmacenesRef.FirstOrDefaultAsync(a => a.Id == orden.IdAlmacenDestino);
+                orden.NombreAlmacen = almacen?.NombreAlmacen;
+
+                foreach (var detalle in orden.Detalles)
+                {
+                    var prod = await _context.ProductosRef.FirstOrDefaultAsync(p => p.Id == detalle.IdProducto);
+                    if (prod != null)
+                    {
+                        detalle.NombreProducto = prod.NombreProducto;
+                        var um = await _context.UnidadesMedidaRef.FirstOrDefaultAsync(u => u.Id == prod.IdUnidadMedida);
+                        detalle.UnidadMedidaSimbolo = um?.Simbolo;
+                    }
+                }
+            }
+
+            return ordenes;
         }
 
         public async Task<IEnumerable<OrdenCompra>> ObtenerPorProveedorAsync(long idProveedor)
@@ -121,6 +166,57 @@ namespace Compras.API.Infrastructure.Repositorios
 
             string numeroFormateado = (serieComprobante.CorrelativoActual + 1).ToString().PadLeft(8, '0');
             return $"{serieComprobante.Serie}{numeroFormateado}";
+        }
+
+        public async Task<(IEnumerable<OrdenCompra> Datos, int Total)> ObtenerPaginadoAsync(string? busqueda, bool? activo, int pagina, int elementosPorPagina)
+        {
+            var query = _context.OrdenesCompra
+                .Include(o => o.Proveedor)
+                .Include(o => o.Detalles)
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(busqueda))
+            {
+                var term = busqueda.Trim().ToLower();
+                query = query.Where(o =>
+                    o.CodigoOrden.ToLower().Contains(term) ||
+                    (o.Proveedor != null && o.Proveedor.RazonSocial.ToLower().Contains(term)));
+            }
+
+            if (activo.HasValue)
+            {
+                query = query.Where(o => o.Activado == activo.Value);
+            }
+
+            var total = await query.CountAsync();
+
+            var ordenes = await query
+                .OrderByDescending(o => o.FechaCreacion)
+                .Skip((pagina - 1) * elementosPorPagina)
+                .Take(elementosPorPagina)
+                .ToListAsync();
+
+            foreach (var orden in ordenes)
+            {
+                orden.RazonSocialProveedor = orden.Proveedor?.RazonSocial;
+                orden.IdTipoDocumentoProveedor = orden.Proveedor?.IdTipoDocumento ?? 0;
+                orden.NumeroDocumentoProveedor = orden.Proveedor?.NumeroDocumento;
+                var almacen = await _context.AlmacenesRef.FirstOrDefaultAsync(a => a.Id == orden.IdAlmacenDestino);
+                orden.NombreAlmacen = almacen?.NombreAlmacen;
+
+                foreach (var detalle in orden.Detalles)
+                {
+                    var prod = await _context.ProductosRef.FirstOrDefaultAsync(p => p.Id == detalle.IdProducto);
+                    if (prod != null)
+                    {
+                        detalle.NombreProducto = prod.NombreProducto;
+                        var um = await _context.UnidadesMedidaRef.FirstOrDefaultAsync(u => u.Id == prod.IdUnidadMedida);
+                        detalle.UnidadMedidaSimbolo = um?.Simbolo;
+                    }
+                }
+            }
+
+            return (ordenes, total);
         }
     }
 }

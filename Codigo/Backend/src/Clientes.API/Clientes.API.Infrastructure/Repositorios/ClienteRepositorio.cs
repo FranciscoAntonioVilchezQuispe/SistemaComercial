@@ -59,12 +59,35 @@ namespace Clientes.API.Infrastructure.Repositorios
                     c.NumeroDocumento.Contains(term));
             }
 
-            if (string.IsNullOrWhiteSpace(busqueda))
+            return await query.Take(100).ToListAsync();
+        }
+
+        public async Task<(IEnumerable<Cliente> Datos, int Total)> ObtenerPaginadoAsync(string? search, bool? activo, int pageNumber, int pageSize)
+        {
+            var query = _context.Clientes.AsQueryable();
+
+            if (!string.IsNullOrEmpty(search))
             {
-                return await query.Take(20).ToListAsync();
+                search = search.ToLower();
+                query = query.Where(c => 
+                    c.RazonSocial.ToLower().Contains(search) || 
+                    c.NumeroDocumento.Contains(search) ||
+                    (c.NombreComercial != null && c.NombreComercial.ToLower().Contains(search)));
             }
 
-            return await query.ToListAsync();
+            if (activo.HasValue)
+            {
+                query = query.Where(c => c.Activado == activo.Value);
+            }
+
+            var total = await query.CountAsync();
+            var datos = await query
+                .OrderBy(c => c.RazonSocial)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return (datos, total);
         }
     }
 }

@@ -14,15 +14,19 @@ import {
   StockProducto,
   MovimientoInventario,
   KardexProducto,
+  Traslado,
 } from "../tipos/inventario.types";
+import { Almacen } from "../almacenes/types/almacen.types";
+import { PagedRequest, PagedResponse } from "@/types/pagination.types";
 import { toast } from "sonner";
 
 export const useStock = (
+  paginacion?: PagedRequest,
   filtros: InventarioFiltros = {},
-): UseQueryResult<{ datos: StockProducto[]; total: number }, Error> => {
+): UseQueryResult<PagedResponse<StockProducto>, Error> => {
   return useQuery({
-    queryKey: ["inventario", "stock", filtros],
-    queryFn: () => servicioInventario.obtenerStock(filtros),
+    queryKey: ["inventario", "stock", paginacion, filtros],
+    queryFn: () => servicioInventario.obtenerStock(paginacion, filtros),
   });
 };
 
@@ -37,14 +41,12 @@ export const useStockProducto = (
 };
 
 export const useMovimientos = (
+  paginacion?: PagedRequest,
   filtros: MovimientoFiltros = {},
-  pagina: number = 1,
-  limite: number = 10,
-): UseQueryResult<{ datos: MovimientoInventario[]; total: number }, Error> => {
+): UseQueryResult<PagedResponse<MovimientoInventario>, Error> => {
   return useQuery({
-    queryKey: ["inventario", "movimientos", filtros, pagina, limite],
-    queryFn: () =>
-      servicioInventario.obtenerMovimientos(filtros, pagina, limite),
+    queryKey: ["inventario", "movimientos", paginacion, filtros],
+    queryFn: () => servicioInventario.obtenerMovimientos(paginacion, filtros),
   });
 };
 
@@ -129,13 +131,34 @@ export const useTiposMovimiento = (): UseQueryResult<
   });
 };
 
-export const useAlmacenes = (): UseQueryResult<
-  { id: number; nombre: string }[],
-  Error
-> => {
+export const useTraslados = (
+  paginacion?: PagedRequest,
+): UseQueryResult<PagedResponse<Traslado>, Error> => {
+  return useQuery({
+    queryKey: ["inventario", "traslados", paginacion],
+    queryFn: () => servicioInventario.obtenerTraslados(paginacion),
+  });
+};
+
+export const useAlmacenes = (
+  paginacion?: PagedRequest,
+): UseQueryResult<PagedResponse<Almacen>, Error> => {
+  return useQuery({
+    queryKey: ["inventario", "almacenes", paginacion],
+    queryFn: () => servicioInventario.obtenerAlmacenes(paginacion),
+  });
+};
+
+export const useListaAlmacenes = (): UseQueryResult<Almacen[], Error> => {
   return useQuery({
     queryKey: ["inventario", "catalogos", "almacenes"],
-    queryFn: () => servicioInventario.obtenerAlmacenes(),
+    queryFn: async () => {
+      const resp = await servicioInventario.obtenerAlmacenes({
+        pageNumber: 1,
+        pageSize: 1000,
+      });
+      return resp.datos;
+    },
     staleTime: 1000 * 60 * 60, // 1 hora
   });
 };

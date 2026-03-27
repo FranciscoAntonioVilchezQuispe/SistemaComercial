@@ -10,5 +10,6 @@ namespace Compras.API.Domain.Interfaces
         Task<Compra> AgregarAsync(Compra compra);
         Task<IEnumerable<Compra>> ObtenerTodosAsync();
         Task<IEnumerable<Compra>> ObtenerPorProveedorAsync(long idProveedor);
+        Task<(IEnumerable<Compra> Datos, int Total)> ObtenerPaginadoAsync(string? busqueda, bool? activo, int pagina, int elementosPorPagina);
     }
 }

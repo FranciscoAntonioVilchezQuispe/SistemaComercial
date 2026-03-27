@@ -1,8 +1,10 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Nucleo.Comun.Application.Wrappers;
+using Nucleo.Comun.Domain;
 using System.Net;
 using System.Text.Json;
+using FluentValidation;
 
 namespace Nucleo.Comun.API.Middleware
 {
@@ -25,26 +27,49 @@ namespace Nucleo.Comun.API.Middleware
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Ocurrió una excepción no controlada: {Message}", ex.Message);
                 await ManejarExcepcionAsync(context, ex);
             }
         }
 
-        private static Task ManejarExcepcionAsync(HttpContext context, Exception exception)
+        private async Task ManejarExcepcionAsync(HttpContext context, Exception exception)
         {
             context.Response.ContentType = "application/json";
             
-            // Especialización por tipo de error
-            context.Response.StatusCode = exception switch
+            var status = exception switch
             {
-                KeyNotFoundException => (int)HttpStatusCode.NotFound,        // 404
-                UnauthorizedAccessException => (int)HttpStatusCode.Unauthorized, // 401
-                ArgumentException => (int)HttpStatusCode.BadRequest,         // 400
-                InvalidOperationException => (int)HttpStatusCode.Conflict,    // 409
-                _ => (int)HttpStatusCode.InternalServerError                // 500 (por defecto)
+                AppException => (int)HttpStatusCode.InternalServerError,
+                ValidationException => (int)HttpStatusCode.BadRequest,
+                KeyNotFoundException => (int)HttpStatusCode.NotFound,
+                UnauthorizedAccessException => (int)HttpStatusCode.Unauthorized,
+                ArgumentException => (int)HttpStatusCode.BadRequest,
+                InvalidOperationException => (int)HttpStatusCode.Conflict,
+                _ => (int)HttpStatusCode.InternalServerError
             };
 
-            var response = new ToReturnError<object>(exception.Message, context.Response.StatusCode);
+            context.Response.StatusCode = status;
+
+            var mensaje = exception switch
+            {
+                AppException appEx => appEx.Message,
+                ValidationException => "Error de validación en los datos enviados",
+                _ => "Error interno del servidor"
+            };
+            
+            // Logging estandar según GEMINI.md
+            Console.Error.WriteLine($"[ERROR] [GlobalMiddleware] [{context.Request.Method} {context.Request.Path}] → {exception.Message}");
+            if (exception is AppException ae)
+            {
+                Console.Error.WriteLine($"Detalle: Contexto={ae.Contexto} | Datos={ae.Detalle}");
+            }
+            Console.Error.WriteLine($"Stack: {exception.StackTrace}");
+
+            var response = new 
+            {
+                statusCode = status,
+                message = mensaje,
+                errors = exception is ValidationException vex ? vex.Errors.Select(e => new { property = e.PropertyName, error = e.ErrorMessage }) : null,
+                timestamp = DateTime.UtcNow
+            };
             
             var options = new JsonSerializerOptions
             {
@@ -52,7 +77,7 @@ namespace Nucleo.Comun.API.Middleware
             };
 
             var result = JsonSerializer.Serialize(response, options);
-            return context.Response.WriteAsync(result);
+            await context.Response.WriteAsync(result);
         }
     }
 }

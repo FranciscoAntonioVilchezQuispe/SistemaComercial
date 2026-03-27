@@ -20,7 +20,7 @@ namespace Nucleo.Comun.Application.Extensions
                 .MinimumLevel.Override("Microsoft.Hosting.Lifetime", LogEventLevel.Information)
                 .Enrich.FromLogContext()
                 .WriteTo.Console() 
-                .WriteTo.File(@"d:\Proyectos\SistemaComercial\Codigo\LogErrores\log-.txt", 
+                .WriteTo.File(@"d:\Personal\Proyectos\SistemaComercial\Codigo\LogErrores\log-.txt", 
                     rollingInterval: RollingInterval.Day,
                     restrictedToMinimumLevel: LogEventLevel.Error) // Log only errors to file as requested? 
                     // User said: "todos lo log de errores ... deben estar en esa carpeta"

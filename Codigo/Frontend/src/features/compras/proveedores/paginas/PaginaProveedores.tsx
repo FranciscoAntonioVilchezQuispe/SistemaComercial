@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useProveedores, useProveedor, useEliminarProveedor } from "../hooks/useProveedores";
 import { Proveedor } from "../types/proveedor.types";
+import { usePagination } from "@/hooks/usePagination";
 import { ProveedorForm } from "../componentes/ProveedorForm";
 import { useTipoDocumento } from "@/features/configuracion/hooks/useTipoDocumento";
 import { ModuleTabBar } from "@/componentes/shared/ModuleTabBar";
@@ -32,12 +33,21 @@ import { RUTAS_TITULOS } from "@/config/rutasTitulos";
 export default function PaginaProveedores() {
   const [dialogoOpen, setDialogoOpen] = useState(false);
   const [idProveedorAEditar, setIdProveedorAEditar] = useState<number | null>(null);
-  const [filtro, setFiltro] = useState("");
+  
+  const {
+    paginacion,
+    cambiarPagina,
+    cambiarPageSize,
+    cambiarBusqueda,
+    cambiarFiltroActivo,
+  } = usePagination();
 
-  const { data: proveedores, isLoading, error } = useProveedores();
+  const { data, isLoading, error } = useProveedores(paginacion);
   const { data: proveedorDetalle, isLoading: cargandoDetalle } = useProveedor(idProveedorAEditar || 0);
   const eliminarProveedor = useEliminarProveedor();
   const [eliminarId, setEliminarId] = useState<number | null>(null);
+
+  const proveedores = data?.datos || [];
 
   // Tipos de documento desde configuracion.tipo_documento
   const { data: tiposDocumento } = useTipoDocumento();
@@ -48,12 +58,6 @@ export default function PaginaProveedores() {
     { label: RUTAS_TITULOS["/proveedores"], to: "/proveedores" },
   ];
 
-  const proveedoresFiltrados =
-    proveedores?.filter(
-      (p) =>
-        p.razonSocial.toLowerCase().includes(filtro.toLowerCase()) ||
-        p.numeroDocumento.includes(filtro),
-    ) || [];
 
 // ... columnas ...
   const columnas = [
@@ -144,10 +148,15 @@ export default function PaginaProveedores() {
       <Card className="shadow-none border-muted/20">
         <CardContent className="pt-6">
           <DataTable
-            data={proveedoresFiltrados}
+            data={proveedores}
             columns={columnas}
-            onSearchChange={setFiltro}
+            pagination={data}
+            onPageChange={cambiarPagina}
+            onPageSizeChange={cambiarPageSize}
+            onSearchChange={cambiarBusqueda}
+            onActiveFilterChange={cambiarFiltroActivo}
             searchPlaceholder="Buscar por razón social o documento..."
+            isLoading={isLoading}
             actionElement={
               <Button
                 onClick={() => {

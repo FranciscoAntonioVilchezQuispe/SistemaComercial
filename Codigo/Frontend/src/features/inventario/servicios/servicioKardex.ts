@@ -7,11 +7,13 @@ export const kardexService = {
     productoId: number,
     desde: string,
     hasta: string,
+    pageNumber: number = 1,
+    pageSize: number = 100,
   ): Promise<KardexReporteDto> => {
     const response = await apiInventario.get<KardexReporteDto>(
       "/inventario/kardex/reporte",
       {
-        params: { almacenId, productoId, desde, hasta },
+        params: { almacenId, productoId, desde, hasta, pageNumber, pageSize },
       },
     );
     return response as any;

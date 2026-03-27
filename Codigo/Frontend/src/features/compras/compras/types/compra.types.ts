@@ -60,7 +60,9 @@ export interface CompraFormData {
     idProducto: number;
     cantidad: number;
     precioUnitario: number;
+    afectacionIgv: string;
   }[];
+  idOrdenCompraRef?: number | null;
 }
 
 export interface DetalleCompraPayload {
@@ -69,7 +71,7 @@ export interface DetalleCompraPayload {
   descripcion?: string;
   cantidad: number;
   precioUnitarioCompra: number;
-  afectacionIgv: "G" | "E" | "I";
+  afectacionIgv: string; // "10", "20", "30" (Catálogo SUNAT 07)
   subtotal: number;
 }
 

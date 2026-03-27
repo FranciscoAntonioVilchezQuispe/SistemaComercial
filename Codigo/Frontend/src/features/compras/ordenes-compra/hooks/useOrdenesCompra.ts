@@ -13,11 +13,14 @@ import {
   obtenerSiguienteNumero,
 } from "../servicios/ordenCompraService";
 import { OrdenCompra, OrdenCompraFormData } from "../types/ordenCompra.types";
+import { PagedRequest, PagedResponse } from "@/types/pagination.types";
 
-export const useOrdenesCompra = (): UseQueryResult<OrdenCompra[], Error> => {
+export const useOrdenesCompra = (
+  paginacion?: PagedRequest,
+): UseQueryResult<PagedResponse<OrdenCompra>, Error> => {
   return useQuery({
-    queryKey: ["ordenes-compra"],
-    queryFn: obtenerOrdenesCompra,
+    queryKey: ["ordenes-compra", paginacion],
+    queryFn: () => obtenerOrdenesCompra(paginacion),
   });
 };
 

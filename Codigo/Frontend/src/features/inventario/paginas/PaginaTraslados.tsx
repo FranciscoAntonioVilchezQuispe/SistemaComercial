@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { Plus, Package, Truck, CheckCircle, Clock } from "lucide-react";
 import { useTraslados } from "../hooks/useTraslados";
+import { usePagination } from "@/hooks/usePagination";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { DataTable } from "@/components/ui/DataTable";
+import { DataTable } from "@/componentes/ui/DataTable";
 import { Badge } from "@/components/ui/badge";
 import { Loading } from "@compartido/componentes/feedback/Loading";
 import { MensajeError } from "@compartido/componentes/feedback/MensajeError";
@@ -20,7 +21,14 @@ import { ModuleTabBar } from "@/componentes/shared/ModuleTabBar";
 import { RUTAS_TITULOS } from "@/config/rutasTitulos";
 
 export function PaginaTraslados() {
-  const { data: traslados, isLoading, error, refetch } = useTraslados();
+  const {
+    paginacion,
+    cambiarPagina,
+    cambiarPageSize,
+    cambiarBusqueda,
+  } = usePagination();
+
+  const { data: traslados, isLoading, error, refetch } = useTraslados(paginacion);
 
   const [modalNuevoOpen, setModalNuevoOpen] = useState(false);
   const [modalRecibirOpen, setModalRecibirOpen] = useState(false);
@@ -130,7 +138,7 @@ export function PaginaTraslados() {
           <CardContent>
             <div className="text-2xl font-bold">
               {
-                (traslados || [])?.filter(
+                (traslados?.datos || [])?.filter(
                   (t: any) => t.estado === "EN_TRANSITO",
                 ).length
               }
@@ -147,7 +155,7 @@ export function PaginaTraslados() {
           <CardContent>
             <div className="text-2xl font-bold">
               {
-                (traslados || [])?.filter((t: any) => t.estado === "RECIBIDO")
+                (traslados?.datos || [])?.filter((t: any) => t.estado === "RECIBIDO")
                   .length
               }
             </div>
@@ -165,7 +173,7 @@ export function PaginaTraslados() {
           <CardContent>
             <div className="text-2xl font-bold">
               {
-                (traslados || [])?.filter(
+                (traslados?.datos || [])?.filter(
                   (t: any) => (t.estado || "PENDIENTE") === "PENDIENTE",
                 ).length
               }
@@ -177,7 +185,14 @@ export function PaginaTraslados() {
 
       <Card className="shadow-none border-muted/20">
         <CardContent className="pt-6">
-          <DataTable data={traslados || []} columns={columnas} />
+          <DataTable
+            data={traslados?.datos || []}
+            columns={columnas}
+            pagination={traslados}
+            onPageChange={cambiarPagina}
+            onPageSizeChange={cambiarPageSize}
+            onSearchChange={cambiarBusqueda}
+          />
         </CardContent>
       </Card>
 

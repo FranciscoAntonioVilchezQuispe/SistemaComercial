@@ -3,37 +3,18 @@ import {
   Venta,
   VentaFormData,
   VentaFiltros,
-  RespuestaVentas,
 } from "../tipos/ventas.types";
+import { PagedRequest, PagedResponse } from "@/types/pagination.types";
 
 const BASE_URL = "/ventas";
 
 export const servicioVentas = {
   obtenerVentas: async (
-    filtros?: VentaFiltros,
-    pagina: number = 1,
-    elementosPorPagina: number = 10,
-  ): Promise<RespuestaVentas> => {
-    const params = new URLSearchParams();
-
-    if (filtros?.fechaInicio) params.append("fechaInicio", filtros.fechaInicio);
-    if (filtros?.fechaFin) params.append("fechaFin", filtros.fechaFin);
-    if (filtros?.idCliente)
-      params.append("idCliente", filtros.idCliente.toString());
-    if (filtros?.idEstado)
-      params.append("idEstado", filtros.idEstado.toString());
-    if (filtros?.idEstadoPago)
-      params.append("idEstadoPago", filtros.idEstadoPago.toString());
-    if (filtros?.numeroComprobante)
-      params.append("numeroComprobante", filtros.numeroComprobante);
-
-    params.append("pagina", pagina.toString());
-    params.append("elementosPorPagina", elementosPorPagina.toString());
-
-    const response: any = await apiVentas.get(
-      `${BASE_URL}?${params.toString()}`,
-    );
-    return response;
+    params?: PagedRequest,
+  ): Promise<PagedResponse<Venta>> => {
+    const response: any = await apiVentas.get(BASE_URL, { params });
+    // Handle both cases: response.datos or the response itself being the PagedResponse
+    return response.datos ? response : (response.data || response);
   },
 
   obtenerVentaPorId: async (id: number): Promise<Venta> => {
@@ -73,5 +54,12 @@ export const servicioVentas = {
       params: { idTipoComprobante, idAlmacen },
     });
     return response.datos || response.data || [];
+  },
+
+  obtenerCotizaciones: async (
+    params?: PagedRequest,
+  ): Promise<PagedResponse<any>> => {
+    const response: any = await apiVentas.get("/cotizaciones", { params });
+    return response.datos ? response : (response.data || response);
   },
 };

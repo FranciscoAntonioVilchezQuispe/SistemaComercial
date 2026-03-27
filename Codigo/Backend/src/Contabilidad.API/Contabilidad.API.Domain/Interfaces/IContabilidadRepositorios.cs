@@ -11,6 +11,7 @@ namespace Contabilidad.API.Domain.Interfaces
         Task ActualizarAsync(PlanCuenta cuenta);
         Task<IEnumerable<PlanCuenta>> ObtenerTodasAsync();
         Task<IEnumerable<PlanCuenta>> ObtenerPorNivelAsync(int nivel);
+        Task<(IEnumerable<PlanCuenta> Datos, int Total)> ObtenerPaginadoAsync(string? busqueda, int? nivel, int pagina, int elementosPorPagina);
     }
 
     public interface ICentroCostoRepositorio
@@ -19,5 +20,6 @@ namespace Contabilidad.API.Domain.Interfaces
         Task<CentroCosto> AgregarAsync(CentroCosto centro);
         Task ActualizarAsync(CentroCosto centro);
         Task<IEnumerable<CentroCosto>> ObtenerTodosAsync();
+        Task<(IEnumerable<CentroCosto> Datos, int Total)> ObtenerPaginadoAsync(string? busqueda, int pagina, int elementosPorPagina);
     }
 }

@@ -1,14 +1,18 @@
 import { apiConfiguracion } from "@/lib/axios";
 import { Sucursal, SucursalFormData } from "../tipos/sucursal.types";
+import { PagedRequest, PagedResponse } from "@/types/pagination.types";
 
 const BASE_URL = "/sucursales";
 
 export const servicioSucursal = {
-  obtenerTodas: async (): Promise<Sucursal[]> => {
-    const response: any = await apiConfiguracion.get(BASE_URL);
-    // Manejo robusto del array de datos (datos, data o el objeto mismo)
-    const lista = response.datos || response.data || response;
-    return Array.isArray(lista) ? lista : [];
+  obtenerTodas: async (params?: PagedRequest): Promise<PagedResponse<Sucursal>> => {
+    const response: any = await apiConfiguracion.get(BASE_URL, { params });
+    return response.datos || response.data || response;
+  },
+
+  obtenerPorId: async (id: number): Promise<Sucursal> => {
+    const response: any = await apiConfiguracion.get(`${BASE_URL}/${id}`);
+    return response.datos || response.data;
   },
 
   crear: async (datos: SucursalFormData): Promise<Sucursal> => {
@@ -16,14 +20,8 @@ export const servicioSucursal = {
     return response.datos || response.data;
   },
 
-  actualizar: async (
-    id: number,
-    datos: SucursalFormData,
-  ): Promise<Sucursal> => {
-    const response: any = await apiConfiguracion.put(
-      `${BASE_URL}/${id}`,
-      datos,
-    );
+  actualizar: async (id: number, datos: SucursalFormData): Promise<Sucursal> => {
+    const response: any = await apiConfiguracion.put(`${BASE_URL}/${id}`, datos);
     return response.datos || response.data;
   },
 

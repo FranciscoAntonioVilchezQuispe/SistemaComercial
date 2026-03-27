@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Search, ArrowUpDown } from "lucide-react";
 import { useMovimientos, useTiposMovimiento } from "../hooks/useInventario";
+import { usePagination } from "@/hooks/usePagination";
 import { TablaMovimientos } from "../componentes/movimientos/TablaMovimientos";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,10 +19,16 @@ import { ModuleTabBar } from "@/componentes/shared/ModuleTabBar";
 import { RUTAS_TITULOS } from "@/config/rutasTitulos";
 
 export function PaginaMovimientos() {
-  const [pagina] = useState(1);
+  const {
+    paginacion,
+    cambiarPagina,
+    cambiarPageSize,
+    cambiarBusqueda,
+  } = usePagination();
+  
   const [filtros, setFiltros] = useState<MovimientoFiltros>({});
 
-  const { data, isLoading } = useMovimientos(filtros, pagina, 10);
+  const { data, isLoading } = useMovimientos(paginacion, filtros);
   const { data: tipos } = useTiposMovimiento();
 
   const tabsInventario = [
@@ -52,20 +59,7 @@ export function PaginaMovimientos() {
               <Input
                 placeholder="Buscar por producto o ref..."
                 className="pl-8"
-                onChange={(e) => {
-                  const val = e.target.value;
-                  const parsed = Number(val);
-                  const isNumber = !Number.isNaN(parsed) && val.trim() !== "";
-                  const nuevos: any = { ...filtros };
-                  if (isNumber) {
-                    nuevos.idProducto = parsed;
-                    delete nuevos.busqueda;
-                  } else {
-                    nuevos.idProducto = undefined;
-                    nuevos.busqueda = val || undefined;
-                  }
-                  setFiltros(nuevos);
-                }}
+                onChange={(e) => cambiarBusqueda(e.target.value)}
               />
             </div>
             <Select
@@ -107,6 +101,10 @@ export function PaginaMovimientos() {
           <TablaMovimientos
             movimientos={data?.datos || []}
             isLoading={isLoading}
+            pagination={data}
+            onPageChange={cambiarPagina}
+            onPageSizeChange={cambiarPageSize}
+            onSearchChange={cambiarBusqueda}
           />
         </CardContent>
       </Card>

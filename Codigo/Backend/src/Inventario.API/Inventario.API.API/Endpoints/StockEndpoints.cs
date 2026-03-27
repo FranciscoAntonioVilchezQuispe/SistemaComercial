@@ -24,17 +24,9 @@ namespace Inventario.API.Endpoints
                 return Results.Ok(new { mensaje = "Ajuste de stock realizado correctamente" });
             });
 
-            grupo.MapGet("/", async (long? idAlmacen, IStockRepositorio repo) =>
+            grupo.MapGet("/", async ([Microsoft.AspNetCore.Mvc.AsParameters] Nucleo.Comun.Application.Paginacion.PagedRequest request, long? idAlmacen, long? idProducto, IStockRepositorio repo) =>
             {
-                IEnumerable<Stock> stockList;
-                if (idAlmacen.HasValue)
-                {
-                    stockList = await repo.ObtenerPorAlmacenAsync(idAlmacen.Value);
-                }
-                else
-                {
-                    stockList = await repo.ObtenerTodoAsync();
-                }
+                var (stockList, total) = await repo.ObtenerPaginadoAsync(idAlmacen, idProducto, request.PageNumber ?? 1, request.PageSize ?? 10);
 
                 var dtos = stockList.Select(s => new StockDto
                 {
@@ -48,7 +40,8 @@ namespace Inventario.API.Endpoints
                     FechaActualizacion = s.FechaActualizacion ?? s.FechaCreacion
                 }).ToList();
 
-                return Results.Ok(new ToReturnList<StockDto>(dtos));
+                var response = new Nucleo.Comun.Application.Paginacion.PagedResponse<StockDto>(dtos, request.PageNumber ?? 1, request.PageSize ?? 10, total);
+                return Results.Ok(response);
             });
 
             grupo.MapGet("/producto/{idProducto}", async (long idProducto, IStockRepositorio repo) =>

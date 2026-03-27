@@ -5,6 +5,7 @@
 import { Producto } from "@features/catalogo";
 
 export interface StockProducto {
+  id: number;
   idProducto: number;
   producto?: Producto;
   idAlmacen: number;
@@ -91,4 +92,26 @@ export interface MovimientoFiltros {
   idTipoMovimiento?: number;
   fechaInicio?: string;
   fechaFin?: string;
+}
+
+export interface Traslado {
+  id: number;
+  numeroTraslado: string;
+  almacenOrigenId: number;
+  almacenOrigenNombre: string;
+  almacenDestinoId: number;
+  almacenDestinoNombre: string;
+  fechaDespacho?: string;
+  fechaRecepcion?: string;
+  estado: string;
+  observaciones?: string;
+  detalles: TrasladoDetalle[];
+}
+
+export interface TrasladoDetalle {
+  productoId: number;
+  productoNombre: string;
+  cantidadSolicitada: number;
+  cantidadDespachada: number;
+  cantidadRecibida: number;
 }

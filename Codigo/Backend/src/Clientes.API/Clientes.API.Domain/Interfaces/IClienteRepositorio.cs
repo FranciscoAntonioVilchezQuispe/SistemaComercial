@@ -11,5 +11,6 @@ namespace Clientes.API.Domain.Interfaces
         Task ActualizarAsync(Cliente cliente);
         Task EliminarAsync(long id);
         Task<IEnumerable<Cliente>> ObtenerTodosAsync(string? busqueda = null);
+        Task<(IEnumerable<Cliente> Datos, int Total)> ObtenerPaginadoAsync(string? search, bool? activo, int pageNumber, int pageSize);
     }
 }

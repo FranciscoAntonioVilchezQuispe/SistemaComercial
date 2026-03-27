@@ -16,6 +16,7 @@ namespace Configuracion.API.Domain.Interfaces
         Task<Sucursal> AgregarAsync(Sucursal sucursal);
         Task ActualizarAsync(Sucursal sucursal);
         Task<IEnumerable<Sucursal>> ObtenerTodasAsync();
+        Task<(IEnumerable<Sucursal> Datos, int Total)> ObtenerPaginadoAsync(string? search, bool? activo, int pageNumber, int pageSize);
         Task EliminarAsync(long id);
     }
 }

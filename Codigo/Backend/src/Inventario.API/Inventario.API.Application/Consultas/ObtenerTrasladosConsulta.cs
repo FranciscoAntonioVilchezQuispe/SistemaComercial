@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Inventario.API.Application.Consultas
 {
-    public record ObtenerTrasladosConsulta : IRequest<List<TrasladoDto>>;
+    public record ObtenerTrasladosConsulta : Nucleo.Comun.Application.Paginacion.PagedRequest, IRequest<Nucleo.Comun.Application.Paginacion.PagedResponse<TrasladoDto>>;
 
     public class TrasladoDto
     {

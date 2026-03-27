@@ -54,7 +54,7 @@ namespace Configuracion.API.Endpoints
                     IdTipoOperacion = dto.IdTipoOperacion,
                     IdTipoComprobante = dto.IdTipoComprobante,
                     NivelObligatoriedad = dto.NivelObligatoriedad,
-                    Activo = dto.Activo,
+                    Activado = dto.Activo,
                     UsuarioCreacion = "SISTEMA",
                     FechaCreacion = DateTime.UtcNow
                 };
@@ -71,7 +71,7 @@ namespace Configuracion.API.Endpoints
                 regla.IdTipoOperacion = dto.IdTipoOperacion;
                 regla.IdTipoComprobante = dto.IdTipoComprobante;
                 regla.NivelObligatoriedad = dto.NivelObligatoriedad;
-                regla.Activo = dto.Activo;
+                regla.Activado = dto.Activo;
                 regla.UsuarioActualizacion = "SISTEMA";
                 regla.FechaActualizacion = DateTime.UtcNow;
 

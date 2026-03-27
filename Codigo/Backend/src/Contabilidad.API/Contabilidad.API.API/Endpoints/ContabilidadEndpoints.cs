@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Nucleo.Comun.Application.Wrappers;
+using Nucleo.Comun.Application.Paginacion;
 
 namespace Contabilidad.API.Endpoints
 {
@@ -13,10 +14,11 @@ namespace Contabilidad.API.Endpoints
         {
             var grupo = app.MapGroup("/api/plan-cuentas").WithTags("Plan de Cuentas");
 
-            grupo.MapGet("/", async (IPlanCuentaRepositorio repo) =>
+            grupo.MapGet("/", async ([AsParameters] PagedRequest request, int? nivel, IPlanCuentaRepositorio repo) =>
             {
-                var cuentas = await repo.ObtenerTodasAsync();
-                return Results.Ok(new ToReturnList<PlanCuenta>(cuentas));
+                var (datos, total) = await repo.ObtenerPaginadoAsync(request.Search, nivel, request.PageNumber ?? 1, request.PageSize ?? 100);
+                var response = new PagedResponse<PlanCuenta>(datos, total, request.PageNumber ?? 1, request.PageSize ?? 100);
+                return Results.Ok(response);
             });
 
             grupo.MapGet("/{id}", async (long id, IPlanCuentaRepositorio repo) =>
@@ -40,10 +42,11 @@ namespace Contabilidad.API.Endpoints
         {
             var grupo = app.MapGroup("/api/centros-costo").WithTags("Centros de Costo");
 
-            grupo.MapGet("/", async (ICentroCostoRepositorio repo) =>
+            grupo.MapGet("/", async ([AsParameters] PagedRequest request, ICentroCostoRepositorio repo) =>
             {
-                var centros = await repo.ObtenerTodosAsync();
-                return Results.Ok(new ToReturnList<CentroCosto>(centros));
+                var (datos, total) = await repo.ObtenerPaginadoAsync(request.Search, request.PageNumber ?? 1, request.PageSize ?? 100);
+                var response = new PagedResponse<CentroCosto>(datos, total, request.PageNumber ?? 1, request.PageSize ?? 100);
+                return Results.Ok(response);
             });
 
             grupo.MapGet("/{id}", async (long id, ICentroCostoRepositorio repo) =>

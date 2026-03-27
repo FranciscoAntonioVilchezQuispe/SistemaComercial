@@ -31,7 +31,7 @@ namespace Configuracion.API.Infrastructure.Repositorios
             return await _context.MatrizReglasSunat
                 .Include(m => m.TipoOperacion)
                 .Include(m => m.TipoComprobante)
-                .Where(m => m.TipoOperacion.Codigo == codigoOperacion && m.Activo == true)
+                .Where(m => m.TipoOperacion.Codigo == codigoOperacion && m.TipoOperacion.Activado == true && m.Activado == true)
                 .AsNoTracking()
                 .ToListAsync();
         }

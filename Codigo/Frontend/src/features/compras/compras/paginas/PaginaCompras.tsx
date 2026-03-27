@@ -16,6 +16,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { useCompras, useCompra, useEliminarCompra } from "../hooks/useCompras";
+import { usePagination } from "@/hooks/usePagination";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -39,14 +40,23 @@ export default function PaginaCompras() {
   ); // For viewing details
   const [modoCreacion, setModoCreacion] = useState(false);
   const [datosIniciales, setDatosIniciales] = useState<any>(null);
-  const [filtro, setFiltro] = useState("");
   const [idAVisualizar, setIdAVisualizar] = useState<number | null>(null);
   const [eliminarId, setEliminarId] = useState<number | null>(null);
 
-  const { data: compras, isLoading, error } = useCompras();
+  const {
+    paginacion,
+    cambiarPagina,
+    cambiarPageSize,
+    cambiarBusqueda,
+    cambiarFiltroActivo,
+  } = usePagination();
+
+  const { data, isLoading, error } = useCompras(paginacion);
   const { data: compraDetalle, isLoading: cargandoDetalle } = useCompra(
     idAVisualizar || 0,
   );
+  
+  const compras = data?.datos || [];
   const eliminarMutation = useEliminarCompra();
 
   const tabsCompras = [
@@ -80,12 +90,13 @@ export default function PaginaCompras() {
       const iniciales = {
         idProveedor: orden.idProveedor,
         idAlmacen: orden.idAlmacenDestino,
+        idOrdenCompraRef: orden.id,
         observaciones: `Carga desde Orden ${orden.codigoOrden}. ${orden.observaciones || ""}`,
         detalles: orden.detalles.map((d: any) => ({
           idProducto: d.idProducto,
           cantidad: d.cantidadSolicitada,
           precioUnitario: d.precioUnitarioPactado,
-          afectacionIgv: "G",
+          afectacionIgv: "10",
         })),
       };
       setDatosIniciales(iniciales);
@@ -96,13 +107,6 @@ export default function PaginaCompras() {
     }
   }, [location]);
 
-  const comprasFiltradas =
-    compras?.filter(
-      (c) =>
-        c.serieComprobante.includes(filtro) ||
-        c.numeroComprobante.includes(filtro) ||
-        c.id.toString().includes(filtro),
-    ) || [];
 
 // ... columnas ...
   const columnas = [
@@ -189,10 +193,15 @@ export default function PaginaCompras() {
       <Card className="shadow-none border-muted/20">
         <CardContent className="pt-6">
           <DataTable
-            data={comprasFiltradas}
+            data={compras}
             columns={columnas}
-            onSearchChange={setFiltro}
+            pagination={data}
+            onPageChange={cambiarPagina}
+            onPageSizeChange={cambiarPageSize}
+            onSearchChange={cambiarBusqueda}
+            onActiveFilterChange={cambiarFiltroActivo}
             searchPlaceholder="Buscar por número o proveedor..."
+            isLoading={isLoading}
             actionElement={
               <Button
                 onClick={() => {
@@ -258,7 +267,7 @@ export default function PaginaCompras() {
                       idProducto: d.idProducto,
                       cantidad: d.cantidad,
                       precioUnitario: d.precioUnitarioCompra,
-                      afectacionIgv: "G", // o d.afectacionIgv si viene de backend
+                      afectacionIgv: "10", // o d.afectacionIgv si viene de backend
                     })),
                   } as any
                 }

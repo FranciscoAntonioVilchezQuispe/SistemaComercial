@@ -59,11 +59,17 @@ const createApiInstance = (baseURL: string): AxiosInstance => {
 
       // Manejo de alertas automáticas
       const errorData = error.response?.data;
-      const mensaje =
+      let mensaje =
         errorData?.message ||
         errorData?.Message ||
         error.message ||
         "Ocurrió un error inesperado";
+
+      // Si hay errores de validación específicos del backend (FluentValidation), mostrar el primero
+      if (errorData?.errors && Array.isArray(errorData.errors) && errorData.errors.length > 0) {
+          const primerError = errorData.errors[0];
+          mensaje = primerError.error || primerError.message || mensaje;
+      }
 
       toast.error(mensaje, {
         description: `Código: ${error.response?.status || 500}`,

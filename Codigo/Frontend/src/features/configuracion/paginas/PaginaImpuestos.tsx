@@ -41,12 +41,16 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
+import { usePagination } from "@/hooks/usePagination";
+
 export function PaginaImpuestos() {
+  const { paginacion, cambiarPagina, cambiarPageSize, cambiarBusqueda, cambiarFiltroActivo } = usePagination();
   const [dialogoOpen, setDialogoOpen] = useState(false);
   const [idRegistroAEditar, setIdRegistroAEditar] = useState<number | null>(null);
   const [eliminarId, setEliminarId] = useState<number | null>(null);
 
-  const { data: impuestos, isLoading, error } = useImpuestos();
+  const { data, isLoading, error } = useImpuestos(paginacion);
+  const impuestos = data?.datos || [];
   const { data: registroDetalle, isLoading: cargandoDetalle } = useImpuesto(idRegistroAEditar || 0);
 
   const crearMutation = useCrearImpuesto();
@@ -186,7 +190,16 @@ export function PaginaImpuestos() {
           </Button>
         </CardHeader>
         <CardContent className="p-6">
-          <DataTable data={impuestos || []} columns={columns} />
+          <DataTable 
+            data={impuestos} 
+            columns={columns} 
+            pagination={data}
+            onPageChange={cambiarPagina}
+            onPageSizeChange={cambiarPageSize}
+            onSearchChange={cambiarBusqueda}
+            onActiveFilterChange={cambiarFiltroActivo}
+            isLoading={isLoading}
+          />
         </CardContent>
       </Card>
 

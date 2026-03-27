@@ -25,7 +25,10 @@ namespace Inventario.API.Application.Manejadores
 
         public async Task<long> Handle(CrearMovimientoInventarioComando request, CancellationToken cancellationToken)
         {
-            // 1. Validar Tipo Movimiento y obtener Código
+            Console.WriteLine($"[DEBUG] [Inventario.API] Iniciando procesamiento de movimiento: Prod={request.IdProducto}, Alm={request.IdAlmacen}, Tipo={request.IdTipoMovimiento}, Cant={request.Cantidad}");
+            try 
+            {
+                // 1. Validar Tipo Movimiento y obtener Código
             var tipoMovimiento = await _context.TiposMovimiento
                 .FirstOrDefaultAsync(t => t.Id == request.IdTipoMovimiento, cancellationToken);
 
@@ -139,16 +142,17 @@ namespace Inventario.API.Application.Manejadores
                     .FirstOrDefaultAsync(c => c.Id == request.IdTipoDocumento.Value, cancellationToken);
 
                 tipoComprobanteSunat = comprobante?.Codigo ?? "00";
+                Console.WriteLine($"[DEBUG] [Inventario.API] Comprobante SUNAT obtenido: {tipoComprobanteSunat} para Id {request.IdTipoDocumento}");
             }
 
             string motivoSunat = "99";
             switch (tipoMovimiento.Codigo)
             {
-                case "ING_COM": motivoSunat = "02"; break;
-                case "SAL_VEN": motivoSunat = "01"; break;
+                case "ING_COM": motivoSunat = "0101"; break; // Venta Interna/Genérico
+                case "SAL_VEN": motivoSunat = "0101"; break;
                 case "TRA_ALM":
-                case "ING_TRA": motivoSunat = "11"; break;
-                case "INV_INI": motivoSunat = "16"; break;
+                case "ING_TRA": motivoSunat = "0401"; break; // Traslado entre establecimientos
+                case "INV_INI": motivoSunat = "0101"; break;
             }
 
             // Validar Reglas SUNAT (Cruce Doc x Op)
@@ -157,8 +161,10 @@ namespace Inventario.API.Application.Manejadores
                 var nivelRelacion = await _validacionSunat.ValidarReglaAsync(motivoSunat, request.IdTipoDocumento.Value, cancellationToken);
                 if (nivelRelacion == 0)
                 {
+                    Console.WriteLine($"[ERROR] [Inventario.API] Regla SUNAT fallida: Operación [{motivoSunat}] no permitida con Documento [{tipoComprobanteSunat}].");
                     throw new Exception($"Regla SUNAT: Operación [{motivoSunat}] no permitida con Documento [{tipoComprobanteSunat}].");
                 }
+                Console.WriteLine($"[DEBUG] [Inventario.API] Regla SUNAT validada ok (Nivel {nivelRelacion}).");
             }
 
             var kardexDto = new RegistrarMovimientoKardexDto
@@ -187,9 +193,21 @@ namespace Inventario.API.Application.Manejadores
             if (factor > 0) await _kardexService.RegistrarEntradaAsync(kardexDto);
             else await _kardexService.RegistrarSalidaAsync(kardexDto);
 
+            Console.WriteLine($"[DEBUG] [Inventario.API] Persistiendo cambios en BD...");
             await _context.SaveChangesAsync(cancellationToken);
+            Console.WriteLine($"[DEBUG] [Inventario.API] Movimiento registrado exitosamente. ID: {movimiento.Id}");
 
             return movimiento.Id;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[ERROR] [Inventario.API] Error crítico en CrearMovimientoInventarioManejador:");
+                Console.WriteLine($"Mensaje: {ex.Message}");
+                if (ex.InnerException != null)
+                    Console.WriteLine($"Inner Exception: {ex.InnerException.Message}");
+                Console.WriteLine($"Stack: {ex.StackTrace}");
+                throw;
+            }
         }
     }
 }

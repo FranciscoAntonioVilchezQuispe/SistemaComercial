@@ -13,14 +13,15 @@ import {
   eliminarCliente,
 } from "../servicios/servicioClientes";
 import { Cliente, ClienteFormData } from "../types/cliente.types";
+import { PagedRequest, PagedResponse } from "@/types/pagination.types";
 
 export const useClientes = (
-  busqueda?: string,
+  paginacion?: PagedRequest,
   enabled: boolean = true,
-): UseQueryResult<Cliente[], Error> => {
+): UseQueryResult<PagedResponse<Cliente>, Error> => {
   return useQuery({
-    queryKey: ["clientes", busqueda],
-    queryFn: () => obtenerClientes(busqueda),
+    queryKey: ["clientes", paginacion],
+    queryFn: () => obtenerClientes(paginacion),
     enabled: enabled,
   });
 };

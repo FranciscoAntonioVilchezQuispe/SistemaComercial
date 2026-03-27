@@ -10,6 +10,7 @@ namespace Configuracion.API.Domain.Interfaces
         Task<TipoComprobante> AgregarAsync(TipoComprobante tipo);
         Task ActualizarAsync(TipoComprobante tipo);
         Task<IEnumerable<TipoComprobante>> ObtenerTodosAsync();
+        Task<(IEnumerable<TipoComprobante>, int)> ObtenerPaginadoAsync(string? search, bool? activo, string? modulo, int pageNumber, int pageSize);
         Task EliminarAsync(long id);
     }
 }

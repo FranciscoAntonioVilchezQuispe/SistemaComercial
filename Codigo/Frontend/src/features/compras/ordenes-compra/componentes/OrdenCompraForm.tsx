@@ -2,7 +2,7 @@ import React from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { CalendarIcon, Trash2, Plus } from "lucide-react";
+import { CalendarIcon, Trash2, Plus, ShoppingBag } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "sonner";
 
@@ -35,6 +35,7 @@ import { useProductos } from "@/features/catalogo/hooks/useProductos";
 import { APP_LOCALE, limpiarDecimal } from "@compartido/utilidades";
 import { SelectorProveedorV2 } from "@/compartido/componentes/formularios/SelectorProveedorV2";
 import { EstadoOrdenCompra } from "../../constantes";
+import { OrdenCompra } from "../types/ordenCompra.types";
 
 const ordenCompraSchema = z.object({
   codigoOrden: z.string().min(1, "El código de orden es requerido"),
@@ -74,10 +75,17 @@ type OrdenCompraFormValues = z.infer<typeof ordenCompraSchema>;
 interface OrdenCompraFormProps {
   onSuccess: () => void;
   onCancel: () => void;
+  data?: OrdenCompra;
+  readOnly?: boolean;
 }
 
 
-export function OrdenCompraForm({ onSuccess, onCancel }: OrdenCompraFormProps) {
+export function OrdenCompraForm({
+  onSuccess,
+  onCancel,
+  data,
+  readOnly = false,
+}: OrdenCompraFormProps) {
   const registrar = useRegistrarOrdenCompra();
   const [terminoBusqueda, setTerminoBusqueda] = React.useState("");
   const [busquedaProveedor, setBusquedaProveedor] = React.useState("");
@@ -118,6 +126,27 @@ export function OrdenCompraForm({ onSuccess, onCancel }: OrdenCompraFormProps) {
   });
 
   React.useEffect(() => {
+    if (data) {
+      form.reset({
+        codigoOrden: data.codigoOrden,
+        idProveedor: data.idProveedor,
+        idAlmacenDestino: data.idAlmacenDestino,
+        fechaEmision: new Date(data.fechaEmision),
+        fechaEntregaEstimada: data.fechaEntregaEstimada
+          ? new Date(data.fechaEntregaEstimada)
+          : undefined,
+        idEstado: data.idEstado,
+        observaciones: data.observaciones || "",
+        detalles: data.detalles.map((d) => ({
+          idProducto: d.idProducto,
+          cantidadSolicitada: d.cantidadSolicitada,
+          precioUnitarioPactado: d.precioUnitarioPactado,
+        })),
+      });
+    }
+  }, [data, form]);
+
+  React.useEffect(() => {
     if (almacenes && almacenes.length === 1) {
       form.setValue("idAlmacenDestino", almacenes[0].id);
     }
@@ -149,6 +178,30 @@ export function OrdenCompraForm({ onSuccess, onCancel }: OrdenCompraFormProps) {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        {readOnly && data?.codigoOrden && (
+          <div className="flex items-center justify-between gap-2 mb-2 bg-muted/50 p-4 rounded-lg border border-muted-foreground/10">
+            <div className="flex items-center gap-3">
+              <ShoppingBag className="h-6 w-6 text-primary" />
+              <div>
+                <h2 className="text-xl font-bold text-foreground">
+                  Orden de Compra: {data.codigoOrden}
+                </h2>
+                <p className="text-xs text-muted-foreground uppercase tracking-widest font-semibold">
+                  Visualización de documento
+                </p>
+              </div>
+            </div>
+            {data.idEstado && (
+              <div className="flex flex-col items-end">
+                <span className="text-[10px] uppercase font-bold text-muted-foreground mb-1">Estado</span>
+                <div className="px-3 py-1 bg-primary/10 text-primary rounded-full text-xs font-bold border border-primary/20">
+                  {data.idEstado === EstadoOrdenCompra.Pendiente ? "Pendiente" : 
+                   data.idEstado === EstadoOrdenCompra.Aprobada ? "Aprobada" : "Rechazada"}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
         {/* FILA 1: Proveedor - Jerarquía Máxima */}
         <div className="grid grid-cols-1 gap-4">
           <FormField
@@ -157,12 +210,22 @@ export function OrdenCompraForm({ onSuccess, onCancel }: OrdenCompraFormProps) {
             render={({ field }) => (
               <FormItem className="col-span-full">
                 <FormLabel>Proveedor</FormLabel>
-                <SelectorProveedorV2
-                  value={field.value}
-                  onChange={(p) => field.onChange(p?.id || 0)}
-                  proveedores={proveedores}
-                  onSearch={handleSearchProveedor}
-                />
+                {readOnly ? (
+                  <Input
+                    value={data?.razonSocialProveedor || `Prov. #${field.value}`}
+                    readOnly
+                    disabled
+                    className="bg-muted font-medium"
+                  />
+                ) : (
+                  <SelectorProveedorV2
+                    value={field.value}
+                    onChange={(p) => field.onChange(p?.id || 0)}
+                    proveedores={proveedores}
+                    onSearch={handleSearchProveedor}
+                    disabled={readOnly}
+                  />
+                )}
                 <FormMessage />
               </FormItem>
             )}
@@ -178,18 +241,28 @@ export function OrdenCompraForm({ onSuccess, onCancel }: OrdenCompraFormProps) {
               <FormItem>
                 <FormLabel>Almacén Destino</FormLabel>
                 <FormControl>
-                  <select
-                    className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-                    value={field.value}
-                    onChange={(e) => field.onChange(Number(e.target.value))}
-                  >
-                    <option value={0}>Seleccione Almacén</option>
-                    {almacenes?.map((a) => (
-                      <option key={a.id} value={a.id}>
-                        {a.nombreAlmacen}
-                      </option>
-                    ))}
-                  </select>
+                  {readOnly ? (
+                    <Input
+                      value={data?.nombreAlmacen || `Almacén #${field.value}`}
+                      readOnly
+                      disabled
+                      className="bg-muted font-medium"
+                    />
+                  ) : (
+                    <select
+                      className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                      value={field.value}
+                      onChange={(e) => field.onChange(Number(e.target.value))}
+                      disabled={readOnly}
+                    >
+                      <option value={0}>Seleccione Almacén</option>
+                      {almacenes?.map((a) => (
+                        <option key={a.id} value={a.id}>
+                          {a.nombreAlmacen}
+                        </option>
+                      ))}
+                    </select>
+                  )}
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -207,6 +280,7 @@ export function OrdenCompraForm({ onSuccess, onCancel }: OrdenCompraFormProps) {
                     <FormControl>
                       <Button
                         variant={"outline"}
+                        disabled={readOnly}
                         className={cn(
                           "w-full pl-3 text-left font-normal",
                           !field.value && "text-muted-foreground",
@@ -228,7 +302,7 @@ export function OrdenCompraForm({ onSuccess, onCancel }: OrdenCompraFormProps) {
                       onSelect={field.onChange}
                       locale={APP_LOCALE}
                       disabled={(date) =>
-                        date > new Date() || date < new Date("1900-01-01")
+                        readOnly || date > new Date() || date < new Date("1900-01-01")
                       }
                     />
                   </PopoverContent>
@@ -249,6 +323,7 @@ export function OrdenCompraForm({ onSuccess, onCancel }: OrdenCompraFormProps) {
                     <FormControl>
                       <Button
                         variant={"outline"}
+                        disabled={readOnly}
                         className={cn(
                           "w-full pl-3 text-left font-normal",
                           !field.value && "text-muted-foreground",
@@ -269,33 +344,10 @@ export function OrdenCompraForm({ onSuccess, onCancel }: OrdenCompraFormProps) {
                       selected={field.value}
                       onSelect={field.onChange}
                       locale={APP_LOCALE}
+                      disabled={readOnly}
                     />
                   </PopoverContent>
                 </Popover>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="codigoOrden"
-            render={({ field }) => (
-              <FormItem>
-                <div className="flex flex-col gap-1">
-                  <FormLabel>Código Orden</FormLabel>
-                  <span className="text-[10px] font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider leading-none">
-                    Auto
-                  </span>
-                </div>
-                <FormControl>
-                  <Input
-                    {...field}
-                    placeholder="OC-00000000"
-                    disabled
-                    className="bg-muted font-bold h-9"
-                  />
-                </FormControl>
                 <FormMessage />
               </FormItem>
             )}
@@ -321,20 +373,30 @@ export function OrdenCompraForm({ onSuccess, onCancel }: OrdenCompraFormProps) {
                         <FormLabel className={index !== 0 ? "sr-only" : ""}>
                           Producto
                         </FormLabel>
-                        <SelectorProducto
-                          value={field.value}
-                          onChange={(id) => field.onChange(id)}
-                          onProductSelect={(prod) => {
-                            if (prod) {
-                              form.setValue(
-                                `detalles.${index}.precioUnitarioPactado`,
-                                prod.precioVentaPublico || 0,
-                              );
-                            }
-                          }}
-                          productos={productos}
-                          onSearch={setTerminoBusqueda}
-                        />
+                        {readOnly ? (
+                          <Input
+                            value={data?.detalles[index]?.nombreProducto || `Prod. #${field.value}`}
+                            readOnly
+                            disabled
+                            className="bg-muted font-medium"
+                          />
+                        ) : (
+                          <SelectorProducto
+                            value={field.value}
+                            onChange={(id) => field.onChange(id)}
+                            onProductSelect={(prod) => {
+                              if (prod) {
+                                form.setValue(
+                                  `detalles.${index}.precioUnitarioPactado`,
+                                  prod.precioVentaPublico || 0,
+                                );
+                              }
+                            }}
+                            productos={productos}
+                            onSearch={setTerminoBusqueda}
+                            disabled={readOnly}
+                          />
+                        )}
                         <FormMessage />
                       </FormItem>
                     )}
@@ -356,10 +418,13 @@ export function OrdenCompraForm({ onSuccess, onCancel }: OrdenCompraFormProps) {
                       readOnly
                       disabled
                       value={
-                        productos.find(
-                          (p) =>
-                            p.id === form.watch(`detalles.${index}.idProducto`),
-                        )?.unidadMedida?.simbolo || "-"
+                        readOnly && data?.detalles[index]?.unidadMedidaSimbolo
+                          ? data.detalles[index].unidadMedidaSimbolo
+                          : productos.find(
+                              (p) =>
+                                p.id ===
+                                form.watch(`detalles.${index}.idProducto`),
+                            )?.unidadMedida?.simbolo || "-"
                       }
                     />
                   </div>
@@ -381,6 +446,7 @@ export function OrdenCompraForm({ onSuccess, onCancel }: OrdenCompraFormProps) {
                             onChange={(e) =>
                               field.onChange(limpiarDecimal(e.target.value))
                             }
+                            disabled={readOnly}
                           />
                         </FormControl>
                         <FormMessage />
@@ -405,6 +471,7 @@ export function OrdenCompraForm({ onSuccess, onCancel }: OrdenCompraFormProps) {
                             onChange={(e) =>
                               field.onChange(limpiarDecimal(e.target.value))
                             }
+                            disabled={readOnly}
                           />
                         </FormControl>
                         <FormMessage />
@@ -438,6 +505,8 @@ export function OrdenCompraForm({ onSuccess, onCancel }: OrdenCompraFormProps) {
                     size="icon"
                     type="button"
                     onClick={() => remove(index)}
+                    disabled={readOnly}
+                    className={cn("h-8 w-8", readOnly && "opacity-0 pointer-events-none")}
                   >
                     <Trash2 className="h-4 w-4 text-destructive" />
                   </Button>
@@ -445,21 +514,23 @@ export function OrdenCompraForm({ onSuccess, onCancel }: OrdenCompraFormProps) {
               </div>
             ))}
 
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() =>
-                append({
-                  idProducto: 0,
-                  cantidadSolicitada: 1,
-                  precioUnitarioPactado: 0,
-                })
-              }
-              className="mt-2"
-            >
-              <Plus className="h-4 w-4 mr-2" /> Agregar Item
-            </Button>
+            {!readOnly && (
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() =>
+                  append({
+                    idProducto: 0,
+                    cantidadSolicitada: 1,
+                    precioUnitarioPactado: 0,
+                  })
+                }
+                className="mt-2"
+              >
+                <Plus className="h-4 w-4 mr-2" /> Agregar Item
+              </Button>
+            )}
           </div>
 
           <div className="flex justify-end gap-4 text-xl font-bold">
@@ -477,21 +548,23 @@ export function OrdenCompraForm({ onSuccess, onCancel }: OrdenCompraFormProps) {
             <FormItem>
               <FormLabel>Observaciones</FormLabel>
               <FormControl>
-                <Textarea {...field} />
+                <Textarea {...field} disabled={readOnly} />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
 
-        <div className="flex justify-end gap-2 pt-4">
-          <Button type="button" variant="outline" onClick={onCancel}>
-            Cancelar
-          </Button>
-          <Button type="submit" disabled={registrar.isPending}>
-            {registrar.isPending ? "Procesando..." : "Guardar Orden"}
-          </Button>
-        </div>
+        {!readOnly && (
+          <div className="flex justify-end gap-2 pt-4">
+            <Button type="button" variant="outline" onClick={onCancel}>
+              Cancelar
+            </Button>
+            <Button type="submit" disabled={registrar.isPending}>
+              {registrar.isPending ? "Procesando..." : "Guardar Orden"}
+            </Button>
+          </div>
+        )}
       </form>
     </Form>
   );

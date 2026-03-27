@@ -19,8 +19,8 @@ namespace Configuracion.API.Domain.Entidades
         [Column("nivel_obligatoriedad")]
         public int NivelObligatoriedad { get; set; } // 0=N/A, 1=🔵 (Ppal), 2=🟡 (Comp)
 
-        [Column("activo")]
-        public bool Activo { get; set; } = true;
+        [Column("activado")]
+        public bool Activado { get; set; } = true;
 
         // Navegación
         [ForeignKey("IdTipoOperacion")]

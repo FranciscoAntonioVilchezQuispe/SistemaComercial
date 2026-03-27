@@ -14,5 +14,6 @@ namespace Inventario.API.Domain.Interfaces
         Task AgregarAsync(KardexMovimiento movimiento);
         Task ActualizarAsync(KardexMovimiento movimiento);
         Task BloquearFilaParaCalculoAsync(long almacenId, long productoId);
+        Task<(IEnumerable<KardexMovimiento> Datos, int Total)> ObtenerPaginadoAsync(long? idAlmacen, long? idProducto, int pagina, int elementosPorPagina);
     }
 }

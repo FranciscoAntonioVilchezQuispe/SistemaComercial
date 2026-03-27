@@ -48,5 +48,26 @@ namespace Inventario.API.Infrastructure.Repositorios
         {
             return await _context.Stocks.ToListAsync();
         }
+
+        public async Task<(IEnumerable<Stock> stocks, int total)> ObtenerPaginadoAsync(long? idAlmacen, long? idProducto, int pagina, int elementosPorPagina)
+        {
+            var query = _context.Stocks.AsQueryable();
+
+            if (idAlmacen.HasValue)
+                query = query.Where(s => s.IdAlmacen == idAlmacen.Value);
+
+            if (idProducto.HasValue)
+                query = query.Where(s => s.IdProducto == idProducto.Value);
+
+            int total = await query.CountAsync();
+
+            var stocks = await query
+                .OrderByDescending(s => s.FechaActualizacion ?? s.FechaCreacion)
+                .Skip((pagina - 1) * elementosPorPagina)
+                .Take(elementosPorPagina)
+                .ToListAsync();
+
+            return (stocks, total);
+        }
     }
 }

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Search, Package, AlertTriangle, Plus, History } from "lucide-react";
-import { useStock, useAlmacenes } from "../hooks/useInventario";
+import { useStock, useListaAlmacenes } from "../hooks/useInventario";
+import { usePagination } from "@/hooks/usePagination";
 import { toast } from "sonner";
 import { TablaStock } from "../componentes/stock/TablaStock";
 import { Button } from "@/components/ui/button";
@@ -19,10 +20,17 @@ import { ModuleTabBar } from "@/componentes/shared/ModuleTabBar";
 import { RUTAS_TITULOS } from "@/config/rutasTitulos";
 
 export function PaginaStock() {
+  const {
+    paginacion,
+    cambiarPagina,
+    cambiarPageSize,
+    cambiarBusqueda,
+  } = usePagination();
+
   const [filtros, setFiltros] = useState<InventarioFiltros>({});
 
-  const { data, isLoading } = useStock(filtros);
-  const { data: almacenes } = useAlmacenes();
+  const { data, isLoading } = useStock(paginacion, filtros);
+  const { data: almacenes } = useListaAlmacenes();
 
   const handleVerKardex = (_item: StockProducto) => {
     toast.info("Próximamente: ver Kardex");
@@ -117,21 +125,19 @@ export function PaginaStock() {
               <Input
                 placeholder="Buscar por nombre o código de producto..."
                 className="pl-8"
-                value={filtros.busqueda || ""}
-                onChange={(e) =>
-                  setFiltros({ ...filtros, busqueda: e.target.value })
-                }
+                onChange={(e) => cambiarBusqueda(e.target.value)}
               />
             </div>
             <Select
               onValueChange={(val) =>
-                setFiltros({ ...filtros, idAlmacen: Number(val) })
+                setFiltros({ ...filtros, idAlmacen: val === "all" ? undefined : Number(val) })
               }
             >
               <SelectTrigger>
                 <SelectValue placeholder="Todos los Almacenes" />
               </SelectTrigger>
               <SelectContent>
+                <SelectItem value="all">Todos los Almacenes</SelectItem>
                 {almacenes?.map((a: any) => (
                   <SelectItem key={a.id} value={a.id.toString()}>
                     {a.nombre}
@@ -158,6 +164,10 @@ export function PaginaStock() {
           <TablaStock
             stock={data?.datos || []}
             isLoading={isLoading}
+            pagination={data}
+            onPageChange={cambiarPagina}
+            onPageSizeChange={cambiarPageSize}
+            onSearchChange={cambiarBusqueda}
             onAjustar={handleAjustar}
             onVerKardex={handleVerKardex}
           />

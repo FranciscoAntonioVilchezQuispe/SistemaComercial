@@ -38,5 +38,31 @@ namespace Inventario.API.Infrastructure.Repositorios
         {
             return await _context.Almacenes.ToListAsync();
         }
+
+        public async Task<(IEnumerable<Almacen> Datos, int Total)> ObtenerPaginadoAsync(string? busqueda, bool? activo, int pagina, int elementosPorPagina)
+        {
+            var query = _context.Almacenes.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(busqueda))
+            {
+                var term = busqueda.Trim().ToLower();
+                query = query.Where(a => a.NombreAlmacen.ToLower().Contains(term) || (a.Direccion != null && a.Direccion.ToLower().Contains(term)));
+            }
+
+            if (activo.HasValue)
+            {
+                query = query.Where(a => a.Activado == activo.Value);
+            }
+
+            var total = await query.CountAsync();
+
+            var datos = await query
+                .OrderBy(a => a.NombreAlmacen)
+                .Skip((pagina - 1) * elementosPorPagina)
+                .Take(elementosPorPagina)
+                .ToListAsync();
+
+            return (datos, total);
+        }
     }
 }

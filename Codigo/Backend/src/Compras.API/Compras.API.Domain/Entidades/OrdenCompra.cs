@@ -56,6 +56,15 @@ namespace Compras.API.Domain.Entidades
         [ForeignKey("IdProveedor")]
         public virtual Proveedor Proveedor { get; set; } = null!;
 
+        [NotMapped]
+        public string? RazonSocialProveedor { get; set; }
+        [NotMapped]
+        public long IdTipoDocumentoProveedor { get; set; }
+        [NotMapped]
+        public string? NumeroDocumentoProveedor { get; set; }
+        [NotMapped]
+        public string? NombreAlmacen { get; set; }
+
         public virtual ICollection<DetalleOrdenCompra> Detalles { get; set; } = new List<DetalleOrdenCompra>();
     }
 }

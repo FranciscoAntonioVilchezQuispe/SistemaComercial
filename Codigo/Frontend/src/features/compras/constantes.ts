@@ -3,6 +3,7 @@ export enum EstadoOrdenCompra {
   Pendiente = 40,
   Aprobada = 41,
   Rechazada = 42,
+  Facturada = 100,
 }
 
 export const EstadoOrdenCompraEtiquetas: Record<EstadoOrdenCompra, string> = {
@@ -10,6 +11,7 @@ export const EstadoOrdenCompraEtiquetas: Record<EstadoOrdenCompra, string> = {
   [EstadoOrdenCompra.Pendiente]: "Pendiente",
   [EstadoOrdenCompra.Aprobada]: "Aprobada",
   [EstadoOrdenCompra.Rechazada]: "Rechazada",
+  [EstadoOrdenCompra.Facturada]: "Facturada",
 };
 
 export enum TablasGenerales {

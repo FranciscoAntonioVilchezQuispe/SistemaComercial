@@ -7,11 +7,14 @@ import {
 } from "@tanstack/react-query";
 import { Compra, CrearCompraPayload } from "../types/compra.types";
 import * as servicio from "../servicios/servicioCompras";
+import { PagedRequest, PagedResponse } from "@/types/pagination.types";
 
-export const useCompras = (): UseQueryResult<Compra[], Error> => {
+export const useCompras = (
+  paginacion?: PagedRequest,
+): UseQueryResult<PagedResponse<Compra>, Error> => {
   return useQuery({
-    queryKey: ["compras"],
-    queryFn: servicio.obtenerCompras,
+    queryKey: ["compras", paginacion],
+    queryFn: () => servicio.obtenerCompras(paginacion),
   });
 };
 

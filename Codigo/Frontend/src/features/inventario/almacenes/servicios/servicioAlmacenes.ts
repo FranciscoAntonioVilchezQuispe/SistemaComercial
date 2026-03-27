@@ -1,9 +1,13 @@
 import api from "@/lib/axios";
 import { Almacen, AlmacenFormData } from "../types/almacen.types";
+import { PagedRequest, PagedResponse } from "@/types/pagination.types";
 
-export const obtenerAlmacenes = async (): Promise<Almacen[]> => {
-  const respuesta: any = await api.get("/inventario/almacenes");
-  return respuesta.datos || respuesta;
+export const obtenerAlmacenes = async (
+  paginacion?: PagedRequest,
+): Promise<PagedResponse<Almacen>> => {
+  const params = paginacion || {};
+  const respuesta: any = await api.get("/inventario/almacenes", { params });
+  return respuesta;
 };
 
 export const obtenerAlmacen = async (id: number): Promise<Almacen> => {

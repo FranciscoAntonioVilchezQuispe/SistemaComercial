@@ -82,10 +82,14 @@ export function PaginaKardexReporte() {
   useEffect(() => {
     const cargarAlmacenes = async () => {
       try {
-        const data = await servicioInventario.obtenerAlmacenes();
-        setAlmacenes(data || []);
-        if (data && data.length > 0) {
-          setValue("almacenId", data[0].id);
+        const response = await servicioInventario.obtenerAlmacenes({
+          pageNumber: 1,
+          pageSize: 100,
+        });
+        const listaAlmacenes = response.datos || [];
+        setAlmacenes(listaAlmacenes);
+        if (listaAlmacenes.length > 0) {
+          setValue("almacenId", listaAlmacenes[0].id);
         }
       } catch (error) {
         console.error("Error al cargar almacenes", error);
@@ -94,7 +98,10 @@ export function PaginaKardexReporte() {
     cargarAlmacenes();
   }, [setValue]);
 
-  const buscarReporte = async (data: FormBusqueda) => {
+  const [pageNumber, setPageNumber] = useState(1);
+  const [pageSize, setPageSize] = useState(100);
+
+  const buscarReporte = async (data: FormBusqueda, page: number = 1, size: number = 100) => {
     if (!data.productoId || data.productoId === 0) {
       toast.warning("Debe seleccionar un producto");
       return;
@@ -107,8 +114,12 @@ export function PaginaKardexReporte() {
         Number(data.productoId),
         data.desde,
         data.hasta,
+        page,
+        size
       );
       setReporte(resultado);
+      setPageNumber(page);
+      setPageSize(size);
       toast.success("Kardex generado correctamente");
     } catch (error: any) {
       toast.error(
@@ -185,7 +196,7 @@ export function PaginaKardexReporte() {
           </CardHeader>
           <CardContent>
             <form
-              onSubmit={handleSubmit(buscarReporte)}
+              onSubmit={handleSubmit((data) => buscarReporte(data, 1, pageSize))}
               className="flex flex-wrap gap-4 items-end"
             >
               {/* Selector de Almacén */}
@@ -518,6 +529,56 @@ export function PaginaKardexReporte() {
                   )}
                 </tbody>
               </table>
+            </div>
+            
+            {/* Controles de Paginación SUNAT */}
+            <div className="bg-slate-50 border-t p-3 flex items-center justify-between text-sm">
+              <div className="text-slate-500">
+                Mostrando {((pageNumber - 1) * pageSize) + 1} a {Math.min(pageNumber * pageSize, reporte.totalItems)} de {reporte.totalItems} movimientos
+              </div>
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2">
+                  <span className="text-slate-500">Filas:</span>
+                  <Select 
+                    value={pageSize.toString()} 
+                    onValueChange={(val) => {
+                      const newSize = Number(val);
+                      setPageSize(newSize);
+                      buscarReporte(getValues(), 1, newSize);
+                    }}
+                  >
+                    <SelectTrigger className="h-8 w-16">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {[50, 100, 200, 500].map(size => (
+                        <SelectItem key={size} value={size.toString()}>{size}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="flex items-center gap-1">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="h-8 w-8 p-0" 
+                    disabled={pageNumber <= 1 || cargando}
+                    onClick={() => buscarReporte(getValues(), pageNumber - 1, pageSize)}
+                  >
+                    &lt;
+                  </Button>
+                  <span className="px-2 font-medium">Página {pageNumber} de {reporte.totalPages}</span>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="h-8 w-8 p-0" 
+                    disabled={pageNumber >= reporte.totalPages || cargando}
+                    onClick={() => buscarReporte(getValues(), pageNumber + 1, pageSize)}
+                  >
+                    &gt;
+                  </Button>
+                </div>
+              </div>
             </div>
           </Card>
         )}

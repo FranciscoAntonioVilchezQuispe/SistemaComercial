@@ -2,6 +2,7 @@ using Contabilidad.API.Domain.Entidades;
 using Contabilidad.API.Domain.Interfaces;
 using Contabilidad.API.Infrastructure.Datos;
 using Microsoft.EntityFrameworkCore;
+using Dapper;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -48,6 +49,38 @@ namespace Contabilidad.API.Infrastructure.Repositorios
                 .Where(c => c.Nivel == nivel)
                 .ToListAsync();
         }
+
+        public async Task<(IEnumerable<PlanCuenta> Datos, int Total)> ObtenerPaginadoAsync(string? busqueda, int? nivel, int pagina, int elementosPorPagina)
+        {
+            var connection = _context.Database.GetDbConnection();
+            var offset = (pagina - 1) * elementosPorPagina;
+            
+            var sqlBase = "FROM contabilidad.plan_cuentas WHERE 1=1";
+            var parameters = new DynamicParameters();
+
+            if (!string.IsNullOrEmpty(busqueda))
+            {
+                sqlBase += " AND (nombre ILIKE @busqueda OR codigo ILIKE @busqueda)";
+                parameters.Add("busqueda", $"%{busqueda}%");
+            }
+
+            if (nivel.HasValue)
+            {
+                sqlBase += " AND nivel = @nivel";
+                parameters.Add("nivel", nivel.Value);
+            }
+
+            var sqlCount = $"SELECT COUNT(*) {sqlBase}";
+            var sqlData = $"SELECT * {sqlBase} ORDER BY codigo OFFSET @offset LIMIT @limit";
+            
+            parameters.Add("offset", offset);
+            parameters.Add("limit", elementosPorPagina);
+
+            var total = await connection.ExecuteScalarAsync<int>(sqlCount, parameters);
+            var datos = await connection.QueryAsync<PlanCuenta>(sqlData, parameters);
+
+            return (datos, total);
+        }
     }
 
     public class CentroCostoRepositorio : ICentroCostoRepositorio
@@ -80,6 +113,32 @@ namespace Contabilidad.API.Infrastructure.Repositorios
         public async Task<IEnumerable<CentroCosto>> ObtenerTodosAsync()
         {
             return await _context.CentrosCosto.ToListAsync();
+        }
+
+        public async Task<(IEnumerable<CentroCosto> Datos, int Total)> ObtenerPaginadoAsync(string? busqueda, int pagina, int elementosPorPagina)
+        {
+            var connection = _context.Database.GetDbConnection();
+            var offset = (pagina - 1) * elementosPorPagina;
+            
+            var sqlBase = "FROM contabilidad.centros_costo WHERE 1=1";
+            var parameters = new DynamicParameters();
+
+            if (!string.IsNullOrEmpty(busqueda))
+            {
+                sqlBase += " AND (nombre ILIKE @busqueda OR codigo ILIKE @busqueda)";
+                parameters.Add("busqueda", $"%{busqueda}%");
+            }
+
+            var sqlCount = $"SELECT COUNT(*) {sqlBase}";
+            var sqlData = $"SELECT * {sqlBase} ORDER BY codigo OFFSET @offset LIMIT @limit";
+            
+            parameters.Add("offset", offset);
+            parameters.Add("limit", elementosPorPagina);
+
+            var total = await connection.ExecuteScalarAsync<int>(sqlCount, parameters);
+            var datos = await connection.QueryAsync<CentroCosto>(sqlData, parameters);
+
+            return (datos, total);
         }
     }
 }

@@ -19,11 +19,12 @@ namespace Ventas.API.Endpoints
         {
             var grupo = app.MapGroup("/api/ventas").WithTags("Ventas");
 
-            grupo.MapGet("/", async (IVentaRepositorio repo) =>
+            grupo.MapGet("/", async (IVentaRepositorio repo, [AsParameters] Nucleo.Comun.Application.Paginacion.PagedRequest request) =>
             {
-                var ventas = await repo.ObtenerTodasAsync();
-                var dtos = ventas.Select(v => MapVentaToDto(v)).ToList();
-                return Results.Ok(new ToReturnList<VentaDto>(dtos));
+                var (datos, total) = await repo.ObtenerPaginadoAsync(request.Search, request.PageNumber ?? 1, request.PageSize ?? 10);
+                var dtos = datos.Select(v => MapVentaToDto(v)).ToList();
+                var response = new Nucleo.Comun.Application.Paginacion.PagedResponse<VentaDto>(dtos, request.PageNumber ?? 1, request.PageSize ?? 10, total);
+                return Results.Ok(response);
             });
 
             // IMPORTANTE: rutas con segmentos fijos DEBEN ir ANTES de /{id}
@@ -134,11 +135,12 @@ namespace Ventas.API.Endpoints
         {
             var grupo = app.MapGroup("/api/cotizaciones").WithTags("Cotizaciones");
 
-            grupo.MapGet("/", async (ICotizacionRepositorio repo) =>
+            grupo.MapGet("/", async (ICotizacionRepositorio repo, [AsParameters] Nucleo.Comun.Application.Paginacion.PagedRequest request) =>
             {
-                var cotizaciones = await repo.ObtenerTodasAsync();
-                var dtos = cotizaciones.Select(c => MapCotizacionToDto(c)).ToList();
-                return Results.Ok(new ToReturnList<CotizacionDto>(dtos));
+                var (datos, total) = await repo.ObtenerPaginadoAsync(request.Search, request.PageNumber ?? 1, request.PageSize ?? 10);
+                var dtos = datos.Select(c => MapCotizacionToDto(c)).ToList();
+                var response = new Nucleo.Comun.Application.Paginacion.PagedResponse<CotizacionDto>(dtos, request.PageNumber ?? 1, request.PageSize ?? 10, total);
+                return Results.Ok(response);
             });
 
             grupo.MapGet("/{id}", async (long id, ICotizacionRepositorio repo) =>

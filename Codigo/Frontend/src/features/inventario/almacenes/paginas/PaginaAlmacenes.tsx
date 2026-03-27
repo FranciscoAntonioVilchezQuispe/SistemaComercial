@@ -24,6 +24,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { useAlmacenes, useEliminarAlmacen } from "../hooks/useAlmacenes";
+import { usePagination } from "@/hooks/usePagination";
 import { useSucursales } from "@/features/configuracion/hooks/useSucursales";
 import { Almacen } from "../types/almacen.types";
 import { AlmacenForm } from "../componentes/AlmacenForm";
@@ -34,10 +35,17 @@ export default function PaginaAlmacenes() {
   const [dialogoOpen, setDialogoOpen] = useState(false);
   const [almacenSeleccionado, setAlmacenSeleccionado] =
     useState<Almacen | null>(null);
-  const [filtro, setFiltro] = useState("");
   const [eliminarId, setEliminarId] = useState<number | null>(null);
+  
+  const {
+    paginacion,
+    cambiarPagina,
+    cambiarPageSize,
+    cambiarBusqueda,
+    cambiarFiltroActivo,
+  } = usePagination();
 
-  const { data: almacenes, isLoading, error } = useAlmacenes();
+  const { data, isLoading, error } = useAlmacenes(paginacion);
   const { data: sucursales } = useSucursales();
   const eliminarAlmacen = useEliminarAlmacen();
 
@@ -50,10 +58,7 @@ export default function PaginaAlmacenes() {
     { label: RUTAS_TITULOS["/inventario/almacenes"], to: "/inventario/almacenes" },
   ];
 
-  const almacenesFiltrados =
-    almacenes?.filter((a) =>
-      a.nombreAlmacen.toLowerCase().includes(filtro.toLowerCase()),
-    ) || [];
+  const almacenes = data?.datos || [];
 
 // ... columnas ...
   const columnas = [
@@ -157,10 +162,15 @@ export default function PaginaAlmacenes() {
       <Card className="shadow-none border-muted/20">
         <CardContent className="pt-6">
           <DataTable
-            data={almacenesFiltrados}
+            data={almacenes}
             columns={columnas}
-            onSearchChange={setFiltro}
+            pagination={data}
+            onPageChange={cambiarPagina}
+            onPageSizeChange={cambiarPageSize}
+            onSearchChange={cambiarBusqueda}
+            onActiveFilterChange={cambiarFiltroActivo}
             searchPlaceholder="Buscar por nombre..."
+            isLoading={isLoading}
           />
         </CardContent>
       </Card>

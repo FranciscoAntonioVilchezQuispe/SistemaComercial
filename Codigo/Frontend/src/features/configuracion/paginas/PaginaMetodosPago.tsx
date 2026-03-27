@@ -40,13 +40,17 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
+import { usePagination } from "@/hooks/usePagination";
+
 export function PaginaMetodosPago() {
+  const { paginacion, cambiarPagina, cambiarPageSize, cambiarBusqueda, cambiarFiltroActivo } = usePagination();
   const [dialogoOpen, setDialogoOpen] = useState(false);
   const [registroSeleccionado, setRegistroSeleccionado] =
     useState<MetodoPago | null>(null);
   const [eliminarId, setEliminarId] = useState<number | null>(null);
 
-  const { data: metodos, isLoading, error } = useMetodosPago();
+  const { data, isLoading, error } = useMetodosPago(paginacion);
+  const metodos = data?.datos || [];
 
   const crearMutation = useCrearMetodoPago();
   const actualizarMutation = useActualizarMetodoPago();
@@ -175,7 +179,16 @@ export function PaginaMetodosPago() {
           </Button>
         </CardHeader>
         <CardContent className="p-6">
-          <DataTable data={metodos || []} columns={columns} />
+          <DataTable 
+            data={metodos} 
+            columns={columns} 
+            pagination={data}
+            onPageChange={cambiarPagina}
+            onPageSizeChange={cambiarPageSize}
+            onSearchChange={cambiarBusqueda}
+            onActiveFilterChange={cambiarFiltroActivo}
+            isLoading={isLoading}
+          />
         </CardContent>
       </Card>
 

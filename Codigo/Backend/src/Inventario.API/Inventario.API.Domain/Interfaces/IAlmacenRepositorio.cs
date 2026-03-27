@@ -10,5 +10,6 @@ namespace Inventario.API.Domain.Interfaces
         Task<Almacen> AgregarAsync(Almacen almacen);
         Task ActualizarAsync(Almacen almacen);
         Task<IEnumerable<Almacen>> ObtenerTodosAsync();
+        Task<(IEnumerable<Almacen> Datos, int Total)> ObtenerPaginadoAsync(string? busqueda, bool? activo, int pagina, int elementosPorPagina);
     }
 }

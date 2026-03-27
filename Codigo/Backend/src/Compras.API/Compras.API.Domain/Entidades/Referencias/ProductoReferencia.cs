@@ -12,5 +12,8 @@ namespace Compras.API.Domain.Entidades.Referencias
 
         [Column("nombre_producto")]
         public string NombreProducto { get; set; } = null!;
+
+        [Column("id_unidad")]
+        public long IdUnidadMedida { get; set; }
     }
 }

@@ -1,4 +1,6 @@
 import { apiInventario } from "@/lib/axios";
+import { PagedRequest, PagedResponse } from "@/types/pagination.types";
+import { Traslado } from "../tipos/inventario.types";
 
 export interface TrasladoDetalleDTO {
   productoId: number;
@@ -41,8 +43,12 @@ export const servicioTraslado = {
     return response;
   },
 
-  obtenerTodos: async () => {
-    const response: any = await apiInventario.get("/inventario/traslados");
+  obtenerTodos: async (
+    paginacion?: PagedRequest,
+  ): Promise<PagedResponse<Traslado>> => {
+    const response: any = await apiInventario.get("/inventario/traslados", {
+      params: paginacion,
+    });
     return response;
   },
 };

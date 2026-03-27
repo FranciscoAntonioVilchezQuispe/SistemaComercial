@@ -1,14 +1,26 @@
 import { MoveDown, MoveUp, RefreshCw, ArrowLeftRight } from "lucide-react";
 import { MovimientoInventario } from "../../tipos/inventario.types";
-import { TablaPaginada } from "@/compartido/componentes/tablas/TablaPaginada";
+import { DataTable } from "@/componentes/ui/DataTable";
+import { PagedResponse } from "@/types/pagination.types";
 import { formatearFechaHora } from "@compartido/utilidades";
 
 interface Props {
   movimientos: MovimientoInventario[];
   isLoading: boolean;
+  pagination?: PagedResponse<MovimientoInventario>;
+  onPageChange?: (page: number) => void;
+  onPageSizeChange?: (pageSize: number) => void;
+  onSearchChange?: (search: string) => void;
 }
 
-export function TablaMovimientos({ movimientos, isLoading }: Props) {
+export function TablaMovimientos({
+  movimientos,
+  isLoading,
+  pagination,
+  onPageChange,
+  onPageSizeChange,
+  onSearchChange,
+}: Props) {
   const getIconoTipo = (idTipo: number) => {
     switch (idTipo) {
       case 1:
@@ -117,10 +129,18 @@ export function TablaMovimientos({ movimientos, isLoading }: Props) {
   ];
 
   return (
-    <TablaPaginada
-      datos={movimientos}
-      columnas={columnas}
-      cargando={isLoading}
+    <DataTable
+      data={movimientos}
+      columns={columnas.map((c) => ({
+        header: c.titulo,
+        accessorKey: c.clave as any,
+        cell: c.renderizar,
+      }))}
+      isLoading={isLoading}
+      pagination={pagination}
+      onPageChange={onPageChange}
+      onPageSizeChange={onPageSizeChange}
+      onSearchChange={onSearchChange}
     />
   );
 }

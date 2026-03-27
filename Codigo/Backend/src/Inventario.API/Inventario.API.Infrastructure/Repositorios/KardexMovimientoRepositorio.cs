@@ -69,5 +69,31 @@ namespace Inventario.API.Infrastructure.Repositorios
                 .ThenByDescending(x => x.Id)
                 .FirstOrDefaultAsync();
         }
+
+        public async Task<(IEnumerable<KardexMovimiento> Datos, int Total)> ObtenerPaginadoAsync(long? idAlmacen, long? idProducto, int pagina, int elementosPorPagina)
+        {
+            var query = _context.KardexMovimientos.AsQueryable();
+
+            if (idAlmacen.HasValue)
+            {
+                query = query.Where(x => x.AlmacenId == idAlmacen.Value);
+            }
+
+            if (idProducto.HasValue)
+            {
+                query = query.Where(x => x.ProductoId == idProducto.Value);
+            }
+
+            var total = await query.CountAsync();
+
+            var datos = await query
+                .OrderByDescending(x => x.FechaHoraCompuesta)
+                .ThenByDescending(x => x.Id)
+                .Skip((pagina - 1) * elementosPorPagina)
+                .Take(elementosPorPagina)
+                .ToListAsync();
+
+            return (datos, total);
+        }
     }
 }

@@ -8,10 +8,14 @@ import {
 import { servicioSucursal } from "../servicios/servicioSucursal";
 import { Sucursal, SucursalFormData } from "../tipos/sucursal.types";
 
-export const useSucursales = (): UseQueryResult<Sucursal[], Error> => {
-  return useQuery<Sucursal[], Error>({
-    queryKey: ["sucursales"],
-    queryFn: servicioSucursal.obtenerTodas,
+import { PagedRequest, PagedResponse } from "@/types/pagination.types";
+
+export const useSucursales = (
+  paginacion?: PagedRequest,
+): UseQueryResult<PagedResponse<Sucursal>, Error> => {
+  return useQuery<PagedResponse<Sucursal>, Error>({
+    queryKey: ["sucursales", paginacion],
+    queryFn: () => servicioSucursal.obtenerTodas(paginacion),
   });
 };
 

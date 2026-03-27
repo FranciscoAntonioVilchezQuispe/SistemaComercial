@@ -11,5 +11,6 @@ namespace Inventario.API.Domain.Interfaces
         Task<IEnumerable<Stock>> ObtenerPorAlmacenAsync(long idAlmacen);
         Task<IEnumerable<Stock>> ObtenerPorProductoAsync(long idProducto);
         Task<IEnumerable<Stock>> ObtenerTodoAsync();
+        Task<(IEnumerable<Stock> stocks, int total)> ObtenerPaginadoAsync(long? idAlmacen, long? idProducto, int pagina, int elementosPorPagina);
     }
 }

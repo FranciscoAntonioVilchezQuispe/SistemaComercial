@@ -67,16 +67,27 @@ namespace Inventario.API.Application.Manejadores.Kardex
                 });
             }
 
-            // 2. Traer todos los movimientos en el rango
-            var movimientos = await _context.KardexMovimientos
+            // 2. Traer movimientos paginados
+            var query = _context.KardexMovimientos
                 .Where(m => m.AlmacenId == request.IdAlmacen &&
                             m.ProductoId == request.IdProducto &&
                             m.FechaMovimiento >= request.FechaInicio.Date &&
                             m.FechaMovimiento <= request.FechaFin.Date &&
-                            !m.Anulado)
+                            !m.Anulado);
+
+            var totalItems = await query.CountAsync(cancellationToken);
+            
+            var movimientos = await query
                 .OrderBy(m => m.FechaHoraCompuesta)
                 .ThenBy(m => m.CorrelativoKardex)
+                .Skip((request.PageNumber - 1) * request.PageSize)
+                .Take(request.PageSize)
                 .ToListAsync(cancellationToken);
+
+            reporte.TotalItems = totalItems;
+            reporte.PageNumber = request.PageNumber;
+            reporte.PageSize = request.PageSize;
+            reporte.TotalPages = (int)Math.Ceiling(totalItems / (double)request.PageSize);
 
             // 3. Mapear al DTO
             foreach (var mov in movimientos)

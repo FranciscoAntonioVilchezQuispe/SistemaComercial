@@ -34,6 +34,7 @@ import { toast } from "sonner";
 import {
   useOrdenesCompra,
   useCambiarEstadoOrdenCompra,
+  useOrdenCompra,
 } from "../hooks/useOrdenesCompra";
 import { OrdenCompra } from "../types/ordenCompra.types";
 import { OrdenCompraForm } from "../componentes/OrdenCompraForm";
@@ -41,6 +42,7 @@ import {
   EstadoOrdenCompra,
   EstadoOrdenCompraEtiquetas,
 } from "../../constantes";
+import { usePagination } from "@/hooks/usePagination";
 import { ModuleTabBar } from "@/componentes/shared/ModuleTabBar";
 import { RUTAS_TITULOS } from "@/config/rutasTitulos";
 
@@ -50,11 +52,26 @@ export default function PaginaOrdenCompra() {
   const [ordenSeleccionada, setOrdenSeleccionada] =
     useState<OrdenCompra | null>(null);
   const [modoCreacion, setModoCreacion] = useState(false);
-  const [filtro, setFiltro] = useState("");
   const [eliminarId, setEliminarId] = useState<number | null>(null);
+  
+  const {
+    paginacion,
+    cambiarPagina,
+    cambiarPageSize,
+    cambiarBusqueda,
+    cambiarFiltroActivo,
+  } = usePagination();
 
-  const { data: ordenes, isLoading, error } = useOrdenesCompra();
+  const { data, isLoading, error } = useOrdenesCompra(paginacion);
   const cambiarEstado = useCambiarEstadoOrdenCompra();
+
+  const ordenes = data?.datos || [];
+
+  const { data: qDetalle, isLoading: isLoadingDetalle } = useOrdenCompra(
+    ordenSeleccionada?.id || 0,
+  );
+
+  const ordenCompleta = !modoCreacion && qDetalle ? qDetalle : ordenSeleccionada;
 
   const tabsCompras = [
     { label: RUTAS_TITULOS["/proveedores/ordenes"], to: "/proveedores/ordenes" },
@@ -84,13 +101,6 @@ export default function PaginaOrdenCompra() {
     );
   };
 
-  const ordenesFiltradas =
-    ordenes?.filter(
-      (o) =>
-        o.codigoOrden.toLowerCase().includes(filtro.toLowerCase()) ||
-        o.razonSocialProveedor?.toLowerCase().includes(filtro.toLowerCase()) ||
-        o.id.toString().includes(filtro),
-    ) || [];
 
 // ... columnas ...
   const columnas = [
@@ -232,10 +242,15 @@ export default function PaginaOrdenCompra() {
       <Card className="shadow-none border-muted/20">
         <CardContent className="pt-6">
           <DataTable
-            data={ordenesFiltradas}
+            data={ordenes}
             columns={columnas}
-            onSearchChange={setFiltro}
+            pagination={data}
+            onPageChange={cambiarPagina}
+            onPageSizeChange={cambiarPageSize}
+            onSearchChange={cambiarBusqueda}
+            onActiveFilterChange={cambiarFiltroActivo}
             searchPlaceholder="Buscar por código o proveedor..."
+            isLoading={isLoading}
           />
         </CardContent>
       </Card>
@@ -243,172 +258,41 @@ export default function PaginaOrdenCompra() {
       <Dialog open={dialogoOpen} onOpenChange={setDialogoOpen}>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="flex justify-between items-center pr-8">
-              <span>
-                {modoCreacion
-                  ? "Nueva Orden de Compra"
-                  : `Orden ${ordenSeleccionada?.codigoOrden}`}
-              </span>
-              {!modoCreacion && ordenSeleccionada && (
-                <Badge
-                  variant={
-                    ordenSeleccionada.idEstado === EstadoOrdenCompra.Aprobada
-                      ? "default"
-                      : "secondary"
-                  }
-                >
-                  {
-                    EstadoOrdenCompraEtiquetas[
-                      ordenSeleccionada.idEstado as EstadoOrdenCompra
-                    ]
-                  }
-                </Badge>
-              )}
+            <DialogTitle>
+              {modoCreacion ? "Nueva Orden de Compra" : "Detalle de Orden de Compra"}
             </DialogTitle>
           </DialogHeader>
 
-          {modoCreacion ? (
-            <OrdenCompraForm
-              onSuccess={() => {
-                toast.success("Orden de compra registrada exitosamente");
-                setDialogoOpen(false);
-              }}
-              onCancel={() => setDialogoOpen(false)}
-            />
-          ) : (
-            <div className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 p-4 bg-muted/20 rounded-lg">
-                <div className="space-y-1">
-                  <span className="text-xs text-muted-foreground uppercase font-bold tracking-wider">
-                    Proveedor
-                  </span>
-                  <p className="font-medium text-sm">
-                    {ordenSeleccionada?.razonSocialProveedor ||
-                      `ID: ${ordenSeleccionada?.idProveedor}`}
-                  </p>
-                </div>
-                <div className="space-y-1">
-                  <span className="text-xs text-muted-foreground uppercase font-bold tracking-wider">
-                    Almacén Destino
-                  </span>
-                  <p className="font-medium text-sm">
-                    {ordenSeleccionada?.nombreAlmacen ||
-                      `ID: ${ordenSeleccionada?.idAlmacenDestino}`}
-                  </p>
-                </div>
-                <div className="space-y-1">
-                  <span className="text-xs text-muted-foreground uppercase font-bold tracking-wider">
-                    Fecha Emisión
-                  </span>
-                  <p className="font-medium text-sm">
-                    {ordenSeleccionada?.fechaEmision &&
-                      formatFecha(
-                        new Date(ordenSeleccionada.fechaEmision),
-                        "PPPP",
-                      )}
-                  </p>
-                </div>
-                <div className="space-y-1">
-                  <span className="text-xs text-muted-foreground uppercase font-bold tracking-wider">
-                    Entrega Estimada
-                  </span>
-                  <p className="font-medium text-sm">
-                    {ordenSeleccionada?.fechaEntregaEstimada
-                      ? formatFecha(
-                          new Date(ordenSeleccionada.fechaEntregaEstimada),
-                          "PPPP",
-                        )
-                      : "No especificada"}
-                  </p>
-                </div>
-                <div className="space-y-1">
-                  <span className="text-xs text-muted-foreground uppercase font-bold tracking-wider">
-                    Total Importe
-                  </span>
-                  <p className="font-bold text-lg text-primary">
-                    S/ {ordenSeleccionada?.totalImporte.toFixed(2)}
-                  </p>
-                </div>
+        {modoCreacion ? (
+          <OrdenCompraForm
+            onSuccess={() => {
+              setDialogoOpen(false);
+            }}
+            onCancel={() => setDialogoOpen(false)}
+          />
+        ) : (
+          <div className="space-y-6">
+            {isLoadingDetalle ? (
+              <div className="py-20">
+                <Loading mensaje="Cargando detalles de la orden..." />
               </div>
+            ) : (
+              <>
+                <OrdenCompraForm
+                  data={ordenCompleta!}
+                  readOnly
+                  onSuccess={() => {}}
+                  onCancel={() => setDialogoOpen(false)}
+                />
 
-              {ordenSeleccionada?.observaciones && (
-                <div className="p-3 bg-blue-50 border border-blue-100 rounded text-sm text-blue-800">
-                  <strong className="block mb-1">Observaciones:</strong>
-                  {ordenSeleccionada.observaciones}
-                </div>
-              )}
-
-              <div className="space-y-3">
-                <h4 className="font-bold text-lg border-b pb-2 flex items-center gap-2">
-                  <Plus className="h-4 w-4" /> Detalles de la Orden
-                </h4>
-                <div className="border rounded-lg overflow-hidden">
-                  <table className="w-full text-sm">
-                    <thead className="bg-muted/50 text-muted-foreground">
-                      <tr className="text-left">
-                        <th className="p-3 font-semibold">Producto</th>
-                        <th className="p-3 font-semibold text-right">
-                          Cantidad
-                        </th>
-                        <th className="p-3 font-semibold text-right">
-                          Precio Unit.
-                        </th>
-                        <th className="p-3 font-semibold text-right text-primary">
-                          Subtotal
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y">
-                      {ordenSeleccionada?.detalles.map((d, i) => (
-                        <tr
-                          key={i}
-                          className="hover:bg-muted/30 transition-colors"
-                        >
-                          <td className="p-3">
-                            <div className="font-medium">
-                              {d.nombreProducto || `Prod. #${d.idProducto}`}
-                            </div>
-                          </td>
-                          <td className="p-3 text-right tabular-nums">
-                            {d.cantidadSolicitada.toFixed(3)}
-                          </td>
-                          <td className="p-3 text-right tabular-nums">
-                            {d.precioUnitarioPactado.toFixed(2)}
-                          </td>
-                          <td className="p-3 text-right font-bold tabular-nums">
-                            {(
-                              d.cantidadSolicitada * d.precioUnitarioPactado
-                            ).toFixed(2)}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                    <tfoot className="bg-muted/20 font-bold">
-                      <tr>
-                        <td
-                          colSpan={3}
-                          className="p-3 text-right uppercase tracking-wider text-xs text-muted-foreground"
-                        >
-                          Total Final
-                        </td>
-                        <td className="p-3 text-right text-base text-primary">
-                          S/ {ordenSeleccionada?.totalImporte.toFixed(2)}
-                        </td>
-                      </tr>
-                    </tfoot>
-                  </table>
-                </div>
-              </div>
-
-              {!modoCreacion &&
-                ordenSeleccionada?.idEstado === EstadoOrdenCompra.Pendiente && (
-                  <div className="flex justify-end gap-3 pt-4">
+                {ordenCompleta?.idEstado === EstadoOrdenCompra.Pendiente && (
+                  <div className="flex justify-end gap-3 pt-4 border-t">
                     <Button
                       variant="outline"
                       className="text-orange-600 border-orange-200 hover:bg-orange-50"
                       onClick={() =>
                         handleCambiarEstado(
-                          ordenSeleccionada.id,
+                          ordenCompleta.id,
                           EstadoOrdenCompra.Rechazada,
                           "Orden rechazada",
                         )
@@ -420,7 +304,7 @@ export default function PaginaOrdenCompra() {
                       className="bg-green-600 hover:bg-green-700"
                       onClick={() =>
                         handleCambiarEstado(
-                          ordenSeleccionada.id,
+                          ordenCompleta.id,
                           EstadoOrdenCompra.Aprobada,
                           "Orden aprobada exitosamente",
                         )
@@ -431,22 +315,24 @@ export default function PaginaOrdenCompra() {
                   </div>
                 )}
 
-              {ordenSeleccionada?.idEstado === EstadoOrdenCompra.Aprobada && (
-                <div className="flex justify-end pt-4">
-                  <Button
-                    className="bg-blue-600 hover:bg-blue-700"
-                    onClick={() =>
-                      navigate("/compras/lista", {
-                        state: { orden: ordenSeleccionada },
-                      })
-                    }
-                  >
-                    <ShoppingBag className="mr-2 h-4 w-4" /> Comprar
-                  </Button>
-                </div>
-              )}
-            </div>
-          )}
+                {ordenCompleta?.idEstado === EstadoOrdenCompra.Aprobada && (
+                  <div className="flex justify-end pt-4 border-t">
+                    <Button
+                      className="bg-blue-600 hover:bg-blue-700"
+                      onClick={() =>
+                        navigate("/compras/lista", {
+                          state: { orden: ordenCompleta },
+                        })
+                      }
+                    >
+                      <ShoppingBag className="mr-2 h-4 w-4" /> Comprar
+                    </Button>
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        )}
         </DialogContent>
       </Dialog>
       <AlertDialog

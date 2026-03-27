@@ -3,14 +3,14 @@ import {
   SerieComprobante,
   SerieComprobanteFormData,
 } from "../tipos/serieComprobante.types";
+import { PagedRequest, PagedResponse } from "@/types/pagination.types";
 
 const BASE_URL = "/series";
 
 export const servicioSerieComprobante = {
-  obtenerTodas: async (): Promise<SerieComprobante[]> => {
-    const response: any = await apiConfiguracion.get(BASE_URL);
-    const lista = response.datos || response.data || response;
-    return Array.isArray(lista) ? lista : [];
+  obtenerTodas: async (params?: PagedRequest): Promise<PagedResponse<SerieComprobante>> => {
+    const response: any = await apiConfiguracion.get(BASE_URL, { params });
+    return response.datos || response.data || response;
   },
 
   obtenerPorTipo: async (idTipo: number): Promise<SerieComprobante[]> => {

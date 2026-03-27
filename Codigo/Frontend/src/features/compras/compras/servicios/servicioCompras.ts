@@ -1,10 +1,13 @@
 import api from "@/lib/axios";
 import { Compra, CrearCompraPayload } from "../types/compra.types";
+import { PagedRequest, PagedResponse } from "@/types/pagination.types";
 
-export const obtenerCompras = async (): Promise<Compra[]> => {
-  const respuesta: any = await api.get("/compras");
-  const data = respuesta.datos || respuesta.data || [];
-  return data;
+export const obtenerCompras = async (
+  paginacion?: PagedRequest,
+): Promise<PagedResponse<Compra>> => {
+  const params = paginacion || {};
+  const respuesta: any = await api.get("/compras", { params });
+  return respuesta;
 };
 
 export const obtenerCompra = async (id: number): Promise<Compra> => {

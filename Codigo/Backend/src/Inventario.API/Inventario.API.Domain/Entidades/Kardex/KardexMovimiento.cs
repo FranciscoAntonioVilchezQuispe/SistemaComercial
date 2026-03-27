@@ -71,9 +71,9 @@ namespace Inventario.API.Domain.Entidades.Kardex
         public string TipoOperacion { get; set; } = null!; // 'E'=Entrada / 'S'=Salida
 
         [Required]
-        [MaxLength(2)]
+        [MaxLength(4)]
         [Column("motivo_traslado_sunat")]
-        public string MotivoTrasladoSunat { get; set; } = null!; // Tabla 12 SUNAT
+        public string MotivoTrasladoSunat { get; set; } = null!; // Tabla 12/Catálogo 51 SUNAT
 
         [Required]
         [MaxLength(255)]

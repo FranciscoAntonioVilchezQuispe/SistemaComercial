@@ -3,14 +3,14 @@ import {
   TipoComprobante,
   TipoComprobanteFormData,
 } from "../tipos/tipoComprobante.types";
+import { PagedRequest, PagedResponse } from "@/types/pagination.types";
 
 const BASE_URL = "/tipos-comprobante";
 
 export const servicioTipoComprobante = {
-  obtenerTodos: async (): Promise<TipoComprobante[]> => {
-    const response: any = await apiConfiguracion.get(BASE_URL);
-    const lista = response.datos || response.data || response;
-    return Array.isArray(lista) ? lista : [];
+  obtenerTodos: async (params?: PagedRequest & { modulo?: string }): Promise<PagedResponse<TipoComprobante>> => {
+    const response: any = await apiConfiguracion.get(BASE_URL, { params });
+    return response.datos || response.data || response;
   },
 
   crear: async (datos: TipoComprobanteFormData): Promise<TipoComprobante> => {

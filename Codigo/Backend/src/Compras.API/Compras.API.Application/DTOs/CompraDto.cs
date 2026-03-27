@@ -13,7 +13,7 @@ namespace Compras.API.Application.DTOs
         public decimal Cantidad { get; set; }
         public decimal PrecioUnitarioCompra { get; set; }
         public decimal Subtotal { get; set; }
-        public string AfectacionIgv { get; set; } = "G";
+        public string AfectacionIgv { get; set; } = "10";
     }
 
     public class CompraDto

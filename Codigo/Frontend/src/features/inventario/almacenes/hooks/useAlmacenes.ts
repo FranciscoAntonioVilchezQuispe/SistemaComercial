@@ -7,11 +7,14 @@ import {
 } from "@tanstack/react-query";
 import { Almacen, AlmacenFormData } from "../types/almacen.types";
 import * as servicio from "../servicios/servicioAlmacenes";
+import { PagedRequest, PagedResponse } from "@/types/pagination.types";
 
-export const useAlmacenes = (): UseQueryResult<Almacen[], Error> => {
+export const useAlmacenes = (
+  paginacion?: PagedRequest,
+): UseQueryResult<PagedResponse<Almacen>, Error> => {
   return useQuery({
-    queryKey: ["almacenes"],
-    queryFn: servicio.obtenerAlmacenes,
+    queryKey: ["almacenes", paginacion],
+    queryFn: () => servicio.obtenerAlmacenes(paginacion),
   });
 };
 

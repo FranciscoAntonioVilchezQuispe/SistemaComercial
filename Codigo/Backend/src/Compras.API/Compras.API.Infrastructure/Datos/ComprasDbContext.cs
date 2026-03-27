@@ -25,6 +25,7 @@ namespace Compras.API.Infrastructure.Datos
         public DbSet<Compras.API.Domain.Entidades.Referencias.TipoComprobanteReferencia> TiposComprobanteRef { get; set; } = null!;
         public DbSet<Compras.API.Domain.Entidades.Referencias.AlmacenReferencia> AlmacenesRef { get; set; } = null!;
         public DbSet<Compras.API.Domain.Entidades.Referencias.ProductoReferencia> ProductosRef { get; set; } = null!;
+        public DbSet<Compras.API.Domain.Entidades.Maestros.UnidadMedida> UnidadesMedidaRef { get; set; } = null!;
         public DbSet<Compras.API.Domain.Entidades.Referencias.SerieComprobanteReferencia> SeriesComprobantesRef { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -37,6 +38,7 @@ namespace Compras.API.Infrastructure.Datos
             modelBuilder.Entity<Compras.API.Domain.Entidades.Referencias.TipoComprobanteReferencia>().ToTable("tipo_comprobante", "configuracion", t => t.ExcludeFromMigrations());
             modelBuilder.Entity<Compras.API.Domain.Entidades.Referencias.AlmacenReferencia>().ToTable("almacenes", "inventario", t => t.ExcludeFromMigrations());
             modelBuilder.Entity<Compras.API.Domain.Entidades.Referencias.ProductoReferencia>().ToTable("productos", "catalogo", t => t.ExcludeFromMigrations());
+            modelBuilder.Entity<Compras.API.Domain.Entidades.Maestros.UnidadMedida>().ToTable("unidades_medida", "catalogo", t => t.ExcludeFromMigrations());
             modelBuilder.Entity<Compras.API.Domain.Entidades.Referencias.SerieComprobanteReferencia>().ToTable("series_comprobantes", "configuracion", t => t.ExcludeFromMigrations());
             modelBuilder.Entity<Compras.API.Domain.Entidades.Referencias.CatalogoReferencia>().ToTable("tablas_generales_detalle", "configuracion", t => t.ExcludeFromMigrations());
 

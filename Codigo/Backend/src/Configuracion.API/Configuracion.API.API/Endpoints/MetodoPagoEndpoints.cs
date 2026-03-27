@@ -14,10 +14,11 @@ namespace Configuracion.API.Endpoints
         {
             var grupo = app.MapGroup("/api/metodos-pago").WithTags("Metodos de Pago");
 
-            grupo.MapGet("/", async (IMetodoPagoRepositorio repo) =>
+            grupo.MapGet("/", async (IMetodoPagoRepositorio repo, [AsParameters] Nucleo.Comun.Application.Paginacion.PagedRequest request) =>
             {
-                var metodos = await repo.ObtenerTodosAsync();
-                return Results.Ok(new ToReturnList<MetodoPago>(metodos));
+                var (datos, total) = await repo.ObtenerPaginadoAsync(request.Search, request.Activo, request.PageNumber ?? 1, request.PageSize ?? 10);
+                var response = new Nucleo.Comun.Application.Paginacion.PagedResponse<MetodoPago>(datos, request.PageNumber ?? 1, request.PageSize ?? 10, total);
+                return Results.Ok(response);
             });
 
             grupo.MapGet("/{id}", async (long id, IMetodoPagoRepositorio repo) =>

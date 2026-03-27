@@ -6,6 +6,11 @@ using Compras.API.Endpoints;
 using Nucleo.Comun.Application.Extensions;
 using Nucleo.Comun.API.Extensions;
 using System.Text.Json.Serialization;
+using FluentValidation;
+using MediatR;
+using Nucleo.Comun.Application.Comportamientos;
+
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
 var builder = WebApplication.CreateBuilder(args);
 builder.AddCentralizedLogging();
@@ -25,8 +30,12 @@ builder.Services.AddScoped<IProveedorRepositorio, ProveedorRepositorio>();
 builder.Services.AddScoped<IOrdenCompraRepositorio, OrdenCompraRepositorio>();
 builder.Services.AddScoped<ICompraRepositorio, CompraRepositorio>();
 
-// MediatR
-builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Compras.API.Application.DTOs.CompraDto).Assembly));
+// MediatR y Validaciones
+builder.Services.AddValidatorsFromAssembly(typeof(Compras.API.Application.DTOs.CompraDto).Assembly);
+builder.Services.AddMediatR(cfg => {
+    cfg.RegisterServicesFromAssembly(typeof(Compras.API.Application.DTOs.CompraDto).Assembly);
+    cfg.AddOpenBehavior(typeof(ComportamientoValidacion<,>));
+});
 
 // Integración con Inventario (Servicios Externos)
 builder.Services.AddHttpClient<Compras.API.Application.Interfaces.IInventarioServicio, Compras.API.Application.Integracion.InventarioServicio>(client =>

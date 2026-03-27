@@ -113,14 +113,16 @@ docker-compose up -d
 
 ## 🏛 Arquitectura y Decisiones Técnicas
 
-- **Backend basado en Microservicios y Clean Architecture:** 
-  Cada módulo (Catálogo, Clientes, Ventas, etc.) se aloja en su propia solución segregada con sus capas en una Arquitectura Limpia/Hexagonal (`API`, `Application`, `Domain` e `Infrastructure`). Esto garantiza alto desacoplamiento.
+- **Arquitectura Híbrida EF Core + Dapper:** 
+  Uso de **EF Core** para la capa de persistencia de escritura (Migraciones, Insert, Update, Delete) y **Dapper** para la capa de lectura (Queries complejas, Reportes, Paginación). Esta separación garantiza el máximo rendimiento en consultas masivas sin perder la potencia de modelado del ORM.
+- **Microservicios y Clean Architecture:** 
+  Cada módulo (Ventas, Inventario, Contabilidad, etc.) se aloja en su propia solución segregada con capas `API`, `Application`, `Domain` e `Infrastructure`.
 - **Patrón CQRS y MediatR:**
-  Implementación en C# usando `MediatR` para dividir claramente las operaciones de lectura (Queries) y modificación de datos (Commands).
-- **Frontend modularizado mediante Lazy Loading:**
-  Reducción masiva en la carga inicial de React a través de carga perezosa de rutas usando `lazy()` y `<Suspense>` por funcionalidad (Kardex, Dashboards, Catálogo, POS).
-- **Agnóstico UI con Headless Components:**
-  Uso de Radix UI combinado con Tailwind CSS para generar componentes estables, escalables y con accesibilidad priorizada, sin depender de un framework monolítico visual.
+  División clara entre comandos (cambios de estado) y consultas (lecturas) mediante el uso de MediatR como mediador interno.
+- **Estandarización de Paginación Delegada:**
+  Todas las APIs de listado utilizan `PagedRequest` / `PagedResponse`, delegando la carga computacional (offset/limit) al motor PostgreSQL.
+- **Frontend Modular y React Query:**
+  Uso de TanStack Query para la sincronización del estado del servidor y Lazy Loading para optimizar el bundle inicial por feature.
 
 ## 🖥 Pantallas / Vistas Principales (Frontend)
 
@@ -156,12 +158,11 @@ Variables extraíbles y leídas desde los respectivos archivos de entorno (`apps
 El proyecto sigue una serie de estándares rigurosos para mantener la calidad y escalabilidad:
 
 ### Backend (.NET)
-1. **Arquitectura Limpia (Clean Architecture):** Separación estricta de responsabilidades en capas: *Domain*, *Application*, *Infrastructure* y *API*.
-2. **Patrón CQRS con MediatR:** Las operaciones de lectura y escritura están desacopladas. Los controladores solo despachan comandos o consultas.
-3. **Validación de Comandos:** Uso de **FluentValidation** en el backend para validar la integridad de los datos antes de que lleguen a la capa de dominio.
-4. **Respuestas Estandarizadas:** Todas las APIs devuelven un formato consistente usando wrappers como `ToReturn<T>` y `PagedResponse<T>`.
-5. **Logging Estructurado:** Implementación de **Serilog** para una trazabilidad detallada en archivos y consola.
-6. **Carga de Datos por ID:** Los formularios de edición siempre consultan el detalle fresco al backend mediante el ID, garantizando datos completos.
+1. **Arquitectura Híbrida:** EF Core para escrituras y Dapper para lecturas de alto nivel y reportes.
+2. **Paginación Global:** Uso mandatorio de `PagedRequest` en controladores y `PagedResponse<T>` en las respuestas.
+3. **Idempotencia SQL:** Todo script de datos maestros (`/scripts`) debe incluir cláusulas `ON CONFLICT DO NOTHING` para permitir re-ejecuciones seguras.
+4. **Validación de Comandos:** Uso de **FluentValidation** para asegurar la integridad de los datos antes de la persistencia.
+5. **Logging con Serilog:** Registro detallado de excepciones incluyendo `InnerException` para diagnóstico rápido.
 
 ### Frontend (React/TS)
 1. **Estructura Basada en Features:** Organización del código por funcionalidad (`src/features/...`) agrupando componentes, hooks, servicios y tipos.

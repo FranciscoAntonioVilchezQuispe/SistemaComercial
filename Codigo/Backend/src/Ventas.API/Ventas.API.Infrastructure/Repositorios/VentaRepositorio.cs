@@ -37,6 +37,32 @@ namespace Ventas.API.Infrastructure.Repositorios
                 .Include(v => v.Cliente)
                 .ToListAsync();
         }
+
+        public async Task<(IEnumerable<Venta> Datos, int Total)> ObtenerPaginadoAsync(string? search, int pageNumber, int pageSize)
+        {
+            var query = _context.Ventas
+                .Include(v => v.Cliente)
+                .AsQueryable();
+
+            if (!string.IsNullOrEmpty(search))
+            {
+                search = search.ToLower();
+                query = query.Where(v => 
+                    v.Serie.ToLower().Contains(search) || 
+                    v.Numero.ToLower().Contains(search) ||
+                    v.Cliente.RazonSocial.ToLower().Contains(search));
+            }
+
+            var total = await query.CountAsync();
+            var datos = await query
+                .OrderByDescending(v => v.FechaEmision)
+                .ThenByDescending(v => v.Id)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return (datos, total);
+        }
     }
 
     public class CotizacionRepositorio : ICotizacionRepositorio
@@ -68,6 +94,32 @@ namespace Ventas.API.Infrastructure.Repositorios
             return await _context.Cotizaciones
                 .Include(c => c.Cliente)
                 .ToListAsync();
+        }
+
+        public async Task<(IEnumerable<Cotizacion> Datos, int Total)> ObtenerPaginadoAsync(string? search, int pageNumber, int pageSize)
+        {
+            var query = _context.Cotizaciones
+                .Include(c => c.Cliente)
+                .AsQueryable();
+
+            if (!string.IsNullOrEmpty(search))
+            {
+                search = search.ToLower();
+                query = query.Where(c => 
+                    c.Serie.ToLower().Contains(search) || 
+                    c.Numero.ToLower().Contains(search) ||
+                    c.Cliente.RazonSocial.ToLower().Contains(search));
+            }
+
+            var total = await query.CountAsync();
+            var datos = await query
+                .OrderByDescending(c => c.FechaEmision)
+                .ThenByDescending(c => c.Id)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return (datos, total);
         }
     }
 }

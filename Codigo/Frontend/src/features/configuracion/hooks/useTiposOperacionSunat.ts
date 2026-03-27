@@ -9,7 +9,7 @@ export interface TipoOperacionSunat {
 }
 
 const obtenerTiposOperacion = async (): Promise<TipoOperacionSunat[]> => {
-  const response: any = await apiConfiguracion.get("/tiposoperacionsunat");
+  const response: any = await apiConfiguracion.get("/operaciones-sunat");
   const data = response.datos || response.data || response;
   return Array.isArray(data) ? data : [];
 };

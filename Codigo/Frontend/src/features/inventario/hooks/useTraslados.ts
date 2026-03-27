@@ -11,11 +11,15 @@ import {
   RecibirTrasladoComando,
 } from "../servicios/servicioTraslado";
 import { toast } from "sonner";
+import { PagedRequest, PagedResponse } from "@/types/pagination.types";
+import { Traslado } from "../tipos/inventario.types";
 
-export const useTraslados = (): UseQueryResult<any[], Error> => {
-  return useQuery<any[]>({
-    queryKey: ["traslados"],
-    queryFn: () => servicioTraslado.obtenerTodos(),
+export const useTraslados = (
+  paginacion?: PagedRequest,
+): UseQueryResult<PagedResponse<Traslado>, Error> => {
+  return useQuery<PagedResponse<Traslado>>({
+    queryKey: ["traslados", paginacion],
+    queryFn: () => servicioTraslado.obtenerTodos(paginacion),
   });
 };
 

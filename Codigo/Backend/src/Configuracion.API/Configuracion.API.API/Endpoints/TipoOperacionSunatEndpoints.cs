@@ -21,7 +21,7 @@ namespace Configuracion.API.Endpoints
     {
         public static void MapTipoOperacionSunatEndpoints(this IEndpointRouteBuilder app)
         {
-            var grupo = app.MapGroup("/api/tiposoperacionsunat").WithTags("Operaciones SUNAT");
+            var grupo = app.MapGroup("/api/operaciones-sunat").WithTags("Operaciones SUNAT");
 
             grupo.MapGet("/", async (ITipoOperacionSunatRepositorio repo) =>
             {
@@ -42,7 +42,7 @@ namespace Configuracion.API.Endpoints
                 {
                     Codigo = dto.Codigo,
                     Nombre = dto.Nombre,
-                    Activo = dto.Activo,
+                    Activado = dto.Activo,
                     UsuarioCreacion = "SISTEMA",
                     FechaCreacion = DateTime.UtcNow
                 };
@@ -57,7 +57,7 @@ namespace Configuracion.API.Endpoints
 
                 operacion.Codigo = dto.Codigo;
                 operacion.Nombre = dto.Nombre;
-                operacion.Activo = dto.Activo;
+                operacion.Activado = dto.Activo;
                 operacion.UsuarioActualizacion = "SISTEMA";
                 operacion.FechaActualizacion = DateTime.UtcNow;
 

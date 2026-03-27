@@ -1,13 +1,18 @@
 import { apiConfiguracion } from "@/lib/axios";
 import { MetodoPago, MetodoPagoFormData } from "../tipos/metodoPago.types";
+import { PagedRequest, PagedResponse } from "@/types/pagination.types";
 
 const BASE_URL = "/metodos-pago";
 
 export const servicioMetodoPago = {
-  obtenerTodos: async (): Promise<MetodoPago[]> => {
-    const response: any = await apiConfiguracion.get(BASE_URL);
-    const lista = response.datos || response.data || response;
-    return Array.isArray(lista) ? lista : [];
+  obtenerTodos: async (params?: PagedRequest): Promise<PagedResponse<MetodoPago>> => {
+    const response: any = await apiConfiguracion.get(BASE_URL, { params });
+    return response.datos || response.data || response;
+  },
+
+  obtenerPorId: async (id: number): Promise<MetodoPago> => {
+    const response: any = await apiConfiguracion.get(`${BASE_URL}/${id}`);
+    return response.datos || response.data;
   },
 
   crear: async (datos: MetodoPagoFormData): Promise<MetodoPago> => {
@@ -15,14 +20,8 @@ export const servicioMetodoPago = {
     return response.datos || response.data;
   },
 
-  actualizar: async (
-    id: number,
-    datos: MetodoPagoFormData,
-  ): Promise<MetodoPago> => {
-    const response: any = await apiConfiguracion.put(
-      `${BASE_URL}/${id}`,
-      datos,
-    );
+  actualizar: async (id: number, datos: MetodoPagoFormData): Promise<MetodoPago> => {
+    const response: any = await apiConfiguracion.put(`${BASE_URL}/${id}`, datos);
     return response.datos || response.data;
   },
 

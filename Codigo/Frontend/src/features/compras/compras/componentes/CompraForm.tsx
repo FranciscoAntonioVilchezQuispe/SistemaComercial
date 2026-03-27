@@ -99,6 +99,7 @@ const compraSchema = z.object({
   }).min(0.001, "El tipo de cambio debe ser mayor a 0"),
   tipoOperacion: z.string().min(1, "La operación SUNAT es requerida"),
   observaciones: z.string().optional(),
+  idOrdenCompraRef: z.number().optional().nullable(),
   detalles: z
     .array(
       z.object({
@@ -111,7 +112,7 @@ const compraSchema = z.object({
         precioUnitario: z.coerce.number({
           invalid_type_error: "El precio debe ser un número",
         }).min(0, "El precio no puede ser negativo"),
-        afectacionIgv: z.enum(["G", "E", "I"]).default("G"),
+        afectacionIgv: z.enum(["10", "20", "30"]).default("10"),
         unidadMedida: z.string().optional(),
       }),
     )
@@ -284,7 +285,7 @@ export function CompraForm({
     defaultValues: {
       idProveedor: 0,
       idAlmacen: 0,
-      idMoneda: 1, // Soles por defecto
+      idMoneda: 51, // Soles por defecto (ID 51 según backend)
 
       tipoComprobante: "",
       serieComprobante: "",
@@ -299,7 +300,7 @@ export function CompraForm({
           idProducto: 0,
           cantidad: 1,
           precioUnitario: 0,
-          afectacionIgv: "G",
+          afectacionIgv: "10",
           unidadMedida: "",
         },
       ],
@@ -405,6 +406,7 @@ export function CompraForm({
         // Llenar el formulario
         form.setValue("idProveedor", ordenEncontrada.idProveedor);
         form.setValue("idAlmacen", ordenEncontrada.idAlmacenDestino);
+        form.setValue("idOrdenCompraRef", ordenEncontrada.id);
         form.setValue(
           "observaciones",
           `Orden de Compra: ${ordenEncontrada.codigoOrden}`,
@@ -415,7 +417,7 @@ export function CompraForm({
           idProducto: d.idProducto,
           cantidad: d.cantidadSolicitada,
           precioUnitario: d.precioUnitarioPactado,
-          afectacionIgv: "G" as const,
+          afectacionIgv: "10" as const,
         }));
 
         replace(nuevosDetalles);
@@ -440,9 +442,9 @@ export function CompraForm({
     values.detalles.forEach((curr) => {
       const sub =
         (Number(curr.cantidad) || 0) * (Number(curr.precioUnitario) || 0);
-      if (curr.afectacionIgv === "G") baseGravada += sub;
-      else if (curr.afectacionIgv === "E") baseExonerada += sub;
-      else if (curr.afectacionIgv === "I") baseInafecta += sub;
+      if (curr.afectacionIgv === "10") baseGravada += sub;
+      else if (curr.afectacionIgv === "20") baseExonerada += sub;
+      else if (curr.afectacionIgv === "30") baseInafecta += sub;
     });
 
     const impuesto = baseGravada * 0.18; // Asumiendo 18% para gravados
@@ -452,7 +454,7 @@ export function CompraForm({
     const payload: CrearCompraPayload = {
       idProveedor: values.idProveedor,
       idAlmacen: values.idAlmacen,
-      idOrdenCompraRef: null, // O mapearlo si existe
+      idOrdenCompraRef: values.idOrdenCompraRef || null,
       idTipoComprobante: Number(values.tipoComprobante), // Convertir a number
       serieComprobante: values.serieComprobante,
       numeroComprobante: values.numeroComprobante,
@@ -476,10 +478,12 @@ export function CompraForm({
         descripcion: "", // Backend lo puede llenar o dejar vacío
         cantidad: d.cantidad,
         precioUnitarioCompra: d.precioUnitario, // Mapeo clave para que el backend lo reciba bien
-        afectacionIgv: d.afectacionIgv as "G" | "E" | "I",
+        afectacionIgv: d.afectacionIgv,
         subtotal: d.cantidad * d.precioUnitario,
       })),
     };
+
+    console.log("[DEBUG] [Frontend] Enviando Compra Payload:", payload);
 
     registrar.mutate(payload, {
       onSuccess: () => onSuccess(),
@@ -537,21 +541,21 @@ export function CompraForm({
   // Calcular totales en tiempo real
   const valoresDetalles = form.watch("detalles");
   const baseGravadaCalc = valoresDetalles
-    .filter((d) => d.afectacionIgv === "G")
+    .filter((d) => d.afectacionIgv === "10")
     .reduce(
       (acc, curr) =>
         acc + (Number(curr.cantidad) || 0) * (Number(curr.precioUnitario) || 0),
       0,
     );
   const baseExoneradaCalc = valoresDetalles
-    .filter((d) => d.afectacionIgv === "E")
+    .filter((d) => d.afectacionIgv === "20")
     .reduce(
       (acc, curr) =>
         acc + (Number(curr.cantidad) || 0) * (Number(curr.precioUnitario) || 0),
       0,
     );
   const baseInafectaCalc = valoresDetalles
-    .filter((d) => d.afectacionIgv === "I")
+    .filter((d) => d.afectacionIgv === "30")
     .reduce(
       (acc, curr) =>
         acc + (Number(curr.cantidad) || 0) * (Number(curr.precioUnitario) || 0),
@@ -564,7 +568,10 @@ export function CompraForm({
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        {/* Buscador de Orden de Compra - Ocular en modo lectura */}
+        {/* Campo oculto para asegurar el envío de la referencia de OC */}
+        <input type="hidden" {...form.register("idOrdenCompraRef")} />
+        
+        {/* Buscador de Orden de Compra - Ocultar en modo lectura */}
         {!readOnly && (
           <div className="bg-blue-50/50 p-4 rounded-lg border border-blue-100 flex items-center gap-4">
             <div className="flex-1 max-w-md relative">
@@ -948,9 +955,9 @@ export function CompraForm({
                             {...field}
                             disabled={readOnly}
                           >
-                            <option value="G">Gravado</option>
-                            <option value="E">Exonerado</option>
-                            <option value="I">Inafecto</option>
+                            <option value="10">Gravado</option>
+                            <option value="20">Exonerado</option>
+                            <option value="30">Inafecto</option>
                           </select>
                         </FormControl>
                         <FormMessage />
@@ -1084,7 +1091,7 @@ export function CompraForm({
                     idProducto: 0,
                     cantidad: 1,
                     precioUnitario: 0,
-                    afectacionIgv: "G",
+                    afectacionIgv: "10",
                   })
                 }
                 className="mt-2"

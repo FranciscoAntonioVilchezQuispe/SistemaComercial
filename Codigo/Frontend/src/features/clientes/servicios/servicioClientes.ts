@@ -1,12 +1,12 @@
 import api from "@/lib/axios";
 import { Cliente, ClienteFormData } from "../types/cliente.types";
+import { PagedRequest, PagedResponse } from "@/types/pagination.types";
 
 export const obtenerClientes = async (
-  busqueda?: string,
-): Promise<Cliente[]> => {
-  const params = busqueda ? { busqueda } : {};
+  params?: PagedRequest,
+): Promise<PagedResponse<Cliente>> => {
   const response: any = await api.get("/clientes", { params });
-  return response.datos || response.data || [];
+  return response.datos || response.data || response;
 };
 
 export const obtenerCliente = async (id: number): Promise<Cliente> => {

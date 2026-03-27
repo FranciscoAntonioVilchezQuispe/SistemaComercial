@@ -16,9 +16,14 @@ namespace Inventario.API.Endpoints
             var group = routes.MapGroup("/api/inventario/kardex").WithTags("Kardex");
 
             // 1. Reporte Formato 13.1 SUNAT
-            group.MapGet("/reporte", async ([FromQuery] long almacenId, [FromQuery] long productoId, [FromQuery] DateTime desde, [FromQuery] DateTime hasta, IMediator mediator) =>
+            group.MapGet("/reporte", async ([FromQuery] long almacenId, [FromQuery] long productoId, [FromQuery] DateTime desde, [FromQuery] DateTime hasta, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 100, IMediator mediator) =>
             {
-                var result = await mediator.Send(new GenerarReporteKardexConsulta(almacenId, productoId, desde, hasta));
+                var query = new GenerarReporteKardexConsulta(almacenId, productoId, desde, hasta)
+                {
+                    PageNumber = pageNumber,
+                    PageSize = pageSize
+                };
+                var result = await mediator.Send(query);
                 return Results.Ok(result);
             });
 

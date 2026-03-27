@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Inventario.API.Application.Interfaces;
 using Inventario.API.Application.DTOs;
 using Nucleo.Comun.Application.Wrappers;
+using Nucleo.Comun.Application.Paginacion;
 using System.Linq;
 
 namespace Inventario.API.Endpoints
@@ -33,7 +34,7 @@ namespace Inventario.API.Endpoints
 
             var grupo = app.MapGroup("/api/inventario/movimientos").WithTags("Movimientos");
             
-            grupo.MapGet("/", async (long? idProducto, long? idAlmacen, IInventarioDbContext context, int pagina = 1, int limite = 10) =>
+            grupo.MapGet("/", async ([AsParameters] PagedRequest request, long? idProducto, long? idAlmacen, IInventarioDbContext context) =>
             {
                 var query = context.MovimientosInventario.AsQueryable();
 
@@ -47,11 +48,17 @@ namespace Inventario.API.Endpoints
                     query = query.Where(m => m.Stock.IdAlmacen == idAlmacen.Value);
                 }
 
+                if (!string.IsNullOrWhiteSpace(request.Busqueda))
+                {
+                    var term = request.Busqueda.Trim().ToLower();
+                    query = query.Where(m => m.Observaciones != null && m.Observaciones.ToLower().Contains(term));
+                }
+
                 var total = await query.CountAsync();
                 var movimientos = await query
                     .OrderByDescending(m => m.Id)
-                    .Skip((pagina - 1) * limite)
-                    .Take(limite)
+                    .Skip((request.Pagina - 1) * request.ElementosPorPagina)
+                    .Take(request.ElementosPorPagina)
                     .Select(m => new MovimientoInventarioDto
                     {
                         Id = m.Id,
@@ -69,7 +76,8 @@ namespace Inventario.API.Endpoints
                     })
                     .ToListAsync();
 
-                return Results.Ok(new ToReturnList<MovimientoInventarioDto>(movimientos, total));
+                var response = new PagedResponse<MovimientoInventarioDto>(movimientos, total, request.Pagina, request.ElementosPorPagina);
+                return Results.Ok(response);
             });
 
             grupo.MapPost("/", async (CrearMovimientoInventarioComando comando, IMediator mediator) =>

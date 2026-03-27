@@ -200,10 +200,6 @@ namespace Compras.API.Infrastructure.Migrations
                         .HasColumnType("bigint")
                         .HasColumnName("id_compra");
 
-                    b.Property<long>("IdComprao")
-                        .HasColumnType("bigint")
-                        .HasColumnName("id_comprao");
-
                     b.Property<long>("IdProducto")
                         .HasColumnType("bigint")
                         .HasColumnName("id_producto");
@@ -242,8 +238,8 @@ namespace Compras.API.Infrastructure.Migrations
                     b.HasKey("Id")
                         .HasName("pk_detalle_compra");
 
-                    b.HasIndex("IdComprao")
-                        .HasDatabaseName("ix_detalle_compra_id_comprao");
+                    b.HasIndex("IdCompra")
+                        .HasDatabaseName("ix_detalle_compra_id_compra");
 
                     b.ToTable("detalle_compra", "compras");
                 });
@@ -376,6 +372,59 @@ namespace Compras.API.Infrastructure.Migrations
                         .HasDatabaseName("ix_detalle_orden_compra_id_orden_compra");
 
                     b.ToTable("detalle_orden_compra", "compras");
+                });
+
+            modelBuilder.Entity("Compras.API.Domain.Entidades.Maestros.UnidadMedida", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_unidad");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<bool>("Activado")
+                        .HasColumnType("boolean")
+                        .HasColumnName("activado");
+
+                    b.Property<DateTime?>("FechaActualizacion")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fecha_modificacion");
+
+                    b.Property<DateTime>("FechaCreacion")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fecha_creacion");
+
+                    b.Property<string>("NombreUnidad")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("nombre_unidad");
+
+                    b.Property<string>("Simbolo")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)")
+                        .HasColumnName("simbolo");
+
+                    b.Property<string>("UsuarioActualizacion")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("usuario_modificacion");
+
+                    b.Property<string>("UsuarioCreacion")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("usuario_creacion");
+
+                    b.HasKey("Id")
+                        .HasName("pk_unidades_medida");
+
+                    b.ToTable("unidades_medida", "catalogo", t =>
+                        {
+                            t.ExcludeFromMigrations();
+                        });
                 });
 
             modelBuilder.Entity("Compras.API.Domain.Entidades.Nota", b =>
@@ -717,6 +766,10 @@ namespace Compras.API.Infrastructure.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
+                    b.Property<long>("IdUnidadMedida")
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_unidad");
+
                     b.Property<string>("NombreProducto")
                         .IsRequired()
                         .HasColumnType("text")
@@ -853,10 +906,10 @@ namespace Compras.API.Infrastructure.Migrations
                 {
                     b.HasOne("Compras.API.Domain.Entidades.Compra", "Compra")
                         .WithMany("Detalles")
-                        .HasForeignKey("IdComprao")
+                        .HasForeignKey("IdCompra")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("fk_detalle_compra_compras_id_comprao");
+                        .HasConstraintName("fk_detalle_compra_compras_id_compra");
 
                     b.Navigation("Compra");
                 });

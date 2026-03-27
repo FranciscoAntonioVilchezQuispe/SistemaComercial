@@ -19,7 +19,7 @@ namespace Inventario.API.Domain.Entidades.Integracion
         [Column("nivel_obligatoriedad")]
         public int NivelObligatoriedad { get; set; }
 
-        [Column("activo")]
-        public bool Activo { get; set; }
+        [Column("activado")]
+        public bool Activado { get; set; }
     }
 }

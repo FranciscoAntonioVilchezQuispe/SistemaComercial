@@ -10,6 +10,7 @@ namespace Configuracion.API.Domain.Interfaces
         Task<Impuesto> AgregarAsync(Impuesto impuesto);
         Task ActualizarAsync(Impuesto impuesto);
         Task<IEnumerable<Impuesto>> ObtenerTodosAsync();
+        Task<(IEnumerable<Impuesto> Datos, int Total)> ObtenerPaginadoAsync(string? search, bool? activo, int pageNumber, int pageSize);
         Task EliminarAsync(long id);
     }
 
@@ -19,6 +20,7 @@ namespace Configuracion.API.Domain.Interfaces
         Task<MetodoPago> AgregarAsync(MetodoPago metodo);
         Task ActualizarAsync(MetodoPago metodo);
         Task<IEnumerable<MetodoPago>> ObtenerTodosAsync();
+        Task<(IEnumerable<MetodoPago> Datos, int Total)> ObtenerPaginadoAsync(string? search, bool? activo, int pageNumber, int pageSize);
         Task EliminarAsync(long id);
     }
 }

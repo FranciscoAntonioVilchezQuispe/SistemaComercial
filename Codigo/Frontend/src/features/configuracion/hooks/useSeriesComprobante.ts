@@ -11,13 +11,14 @@ import {
   SerieComprobanteFormData,
 } from "../tipos/serieComprobante.types";
 
-export const useSeriesComprobante = (): UseQueryResult<
-  SerieComprobante[],
-  Error
-> => {
-  return useQuery<SerieComprobante[], Error>({
-    queryKey: ["series"],
-    queryFn: servicioSerieComprobante.obtenerTodas,
+import { PagedRequest, PagedResponse } from "@/types/pagination.types";
+
+export const useSeriesComprobante = (
+  paginacion?: PagedRequest,
+): UseQueryResult<PagedResponse<SerieComprobante>, Error> => {
+  return useQuery<PagedResponse<SerieComprobante>, Error>({
+    queryKey: ["series", paginacion],
+    queryFn: () => servicioSerieComprobante.obtenerTodas(paginacion),
   });
 };
 

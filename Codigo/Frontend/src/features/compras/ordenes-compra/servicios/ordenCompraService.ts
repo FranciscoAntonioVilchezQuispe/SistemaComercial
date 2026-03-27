@@ -1,5 +1,6 @@
 import api from "@/lib/axios";
 import { OrdenCompra, OrdenCompraFormData } from "../types/ordenCompra.types";
+import { PagedRequest, PagedResponse } from "@/types/pagination.types";
 
 // BASE_URL unused, directly using paths
 // Checking existing service: servicioCompras.ts uses api.get("/compras") which implies axios base url has /api or similar or direct.
@@ -19,10 +20,12 @@ import { OrdenCompra, OrdenCompraFormData } from "../types/ordenCompra.types";
 // But `OrdenCompraEndpoints.cs` is explicit about `/api/ordenes-compra`.
 // If I use `/ordenes-compra`, and axios adds `/api`, it becomes `/api/ordenes-compra`. This is standard.
 
-export const obtenerOrdenesCompra = async (): Promise<OrdenCompra[]> => {
-  const respuesta: any = await api.get("/ordenes-compra");
-  const data = respuesta.datos || respuesta.data || [];
-  return data;
+export const obtenerOrdenesCompra = async (
+  paginacion?: PagedRequest,
+): Promise<PagedResponse<OrdenCompra>> => {
+  const params = paginacion || {};
+  const respuesta: any = await api.get("/ordenes-compra", { params });
+  return respuesta;
 };
 
 export const obtenerSiguienteNumero = async (): Promise<string> => {

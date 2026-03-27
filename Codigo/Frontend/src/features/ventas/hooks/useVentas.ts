@@ -1,30 +1,28 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient, UseQueryResult } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { servicioVentas } from "../servicios/servicioVentas";
-import { VentaFormData, VentaFiltros } from "../tipos/ventas.types";
+import { VentaFormData, Venta } from "../tipos/ventas.types";
 import { manejadorErrores } from "@/lib/axios/manejadorErrores";
+import { PagedRequest, PagedResponse } from "@/types/pagination.types";
 
 const QUERY_KEY = "ventas";
 
 /**
- * Hook para obtener lista de ventas con filtros
+ * Hook para obtener lista de ventas paginada
  */
 export function useVentas(
-  filtros?: VentaFiltros,
-  pagina: number = 1,
-  elementosPorPagina: number = 10,
-): any {
+  paginacion?: PagedRequest,
+): UseQueryResult<PagedResponse<Venta>, Error> {
   return useQuery({
-    queryKey: [QUERY_KEY, filtros, pagina, elementosPorPagina],
-    queryFn: () =>
-      servicioVentas.obtenerVentas(filtros, pagina, elementosPorPagina),
+    queryKey: [QUERY_KEY, paginacion],
+    queryFn: () => servicioVentas.obtenerVentas(paginacion),
   });
 }
 
 /**
  * Hook para obtener una venta por ID
  */
-export function useVenta(id: number): any {
+export function useVenta(id: number): UseQueryResult<Venta, Error> {
   return useQuery({
     queryKey: [QUERY_KEY, id],
     queryFn: () => servicioVentas.obtenerVentaPorId(id),
@@ -35,18 +33,18 @@ export function useVenta(id: number): any {
 /**
  * Hook para obtener ventas del día
  */
-export function useVentasDelDia(): any {
+export function useVentasDelDia(): UseQueryResult<Venta[], Error> {
   return useQuery({
     queryKey: [QUERY_KEY, "hoy"],
     queryFn: () => servicioVentas.obtenerVentasDelDia(),
-    refetchInterval: 30000, // Refetch cada 30 segundos
+    refetchInterval: 30000,
   });
 }
 
 /**
  * Hook para crear una venta
  */
-export function useCrearVenta(): any {
+export function useCrearVenta() {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -64,7 +62,7 @@ export function useCrearVenta(): any {
 /**
  * Hook para anular una venta
  */
-export function useAnularVenta(): any {
+export function useAnularVenta() {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -86,7 +84,7 @@ export function useAnularVenta(): any {
 export function useEstadisticasVentas(
   fechaInicio: string,
   fechaFin: string,
-): any {
+) {
   return useQuery({
     queryKey: [QUERY_KEY, "estadisticas", fechaInicio, fechaFin],
     queryFn: () => servicioVentas.obtenerEstadisticas(fechaInicio, fechaFin),
@@ -97,10 +95,22 @@ export function useEstadisticasVentas(
 /**
  * Hook para obtener series por tipo de comprobante y almacén
  */
-export function useSeries(idTipoComprobante: number, idAlmacen?: number): any {
+export function useSeries(idTipoComprobante: number, idAlmacen?: number) {
   return useQuery({
     queryKey: ["series", idTipoComprobante, idAlmacen],
     queryFn: () => servicioVentas.obtenerSeries(idTipoComprobante, idAlmacen),
     enabled: !!idTipoComprobante,
+  });
+}
+
+/**
+ * Hook para obtener lista de cotizaciones paginada
+ */
+export function useCotizaciones(
+  paginacion?: PagedRequest,
+): UseQueryResult<PagedResponse<any>, Error> {
+  return useQuery({
+    queryKey: ["cotizaciones", paginacion],
+    queryFn: () => servicioVentas.obtenerCotizaciones(paginacion),
   });
 }

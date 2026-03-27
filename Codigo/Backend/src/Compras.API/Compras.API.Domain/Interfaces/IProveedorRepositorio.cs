@@ -11,5 +11,6 @@ namespace Compras.API.Domain.Interfaces
         Task ActualizarAsync(Proveedor proveedor);
         Task EliminarAsync(long id);
         Task<IEnumerable<Proveedor>> ObtenerTodosAsync(string? busqueda = null);
+        Task<(IEnumerable<Proveedor> Datos, int Total)> ObtenerPaginadoAsync(string? busqueda, bool? activo, int pagina, int elementosPorPagina);
     }
 }

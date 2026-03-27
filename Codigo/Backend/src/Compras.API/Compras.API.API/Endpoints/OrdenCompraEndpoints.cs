@@ -17,10 +17,12 @@ namespace Compras.API.Endpoints
 
             grupo.MapGet("/ping", () => Results.Ok("pong"));
 
-            grupo.MapGet("/", async (IOrdenCompraRepositorio repo) =>
+            grupo.MapGet("/", async ([Microsoft.AspNetCore.Mvc.AsParameters] Nucleo.Comun.Application.Paginacion.PagedRequest request, IOrdenCompraRepositorio repo) =>
             {
-                var ordenes = await repo.ObtenerTodosAsync();
-                return Results.Ok(new ToReturnList<OrdenCompra>(ordenes));
+                var (ordenes, total) = await repo.ObtenerPaginadoAsync(request.Search, request.Activo, request.PageNumber ?? 1, request.PageSize ?? 10);
+                var dtos = ordenes.Select(o => MapToDto(o)).ToList();
+                var response = new Nucleo.Comun.Application.Paginacion.PagedResponse<OrdenCompraDto>(dtos, request.PageNumber ?? 1, request.PageSize ?? 10, total);
+                return Results.Ok(response);
             });
 
             grupo.MapGet("/siguiente-numero", async (IOrdenCompraRepositorio repo) =>
@@ -32,8 +34,8 @@ namespace Compras.API.Endpoints
             grupo.MapGet("/{id}", async (long id, IOrdenCompraRepositorio repo) =>
             {
                 var orden = await repo.ObtenerPorIdAsync(id);
-                if (orden == null) return Results.NotFound(new ToReturnError<OrdenCompra>("Orden de compra no encontrada", 404));
-                return Results.Ok(new ToReturn<OrdenCompra>(orden));
+                if (orden == null) return Results.NotFound(new ToReturnError<OrdenCompraDto>("Orden de compra no encontrada", 404));
+                return Results.Ok(new ToReturn<OrdenCompraDto>(MapToDto(orden)));
             });
 
             grupo.MapPost("/", async (OrdenCompraDto dto, IOrdenCompraRepositorio repo) =>
@@ -79,9 +81,47 @@ namespace Compras.API.Endpoints
             grupo.MapPatch("/{id}/estado", async (long id, long idEstado, IOrdenCompraRepositorio repo) =>
             {
                 var orden = await repo.ActualizarEstadoAsync(id, idEstado);
-                if (orden == null) return Results.NotFound(new ToReturnError<OrdenCompra>("Orden de compra no encontrada", 404));
-                return Results.Ok(new ToReturn<OrdenCompra>(orden));
+                if (orden == null) return Results.NotFound(new ToReturnError<OrdenCompraDto>("Orden de compra no encontrada", 404));
+                
+                // Recargar para obtener datos enriquecidos si el Repo no los devuelve al actualizar
+                var ordenEnriquecida = await repo.ObtenerPorIdAsync(id);
+                return Results.Ok(new ToReturn<OrdenCompraDto>(MapToDto(ordenEnriquecida!)));
             });
+        }
+
+        private static OrdenCompraDto MapToDto(OrdenCompra o)
+        {
+            return new OrdenCompraDto
+            {
+                Id = o.Id,
+                CodigoOrden = o.CodigoOrden,
+                IdProveedor = o.IdProveedor,
+                IdAlmacenDestino = o.IdAlmacenDestino,
+                FechaEmision = o.FechaEmision,
+                FechaEntregaEstimada = o.FechaEntregaEstimada,
+                IdEstado = o.IdEstado,
+                TotalImporte = o.TotalImporte,
+                Observaciones = o.Observaciones,
+                IdTipoComprobante = o.IdTipoComprobante,
+                Serie = o.Serie,
+                Numero = o.Numero,
+                RazonSocialProveedor = o.RazonSocialProveedor,
+                IdTipoDocumentoProveedor = o.IdTipoDocumentoProveedor,
+                NumeroDocumentoProveedor = o.NumeroDocumentoProveedor,
+                NombreAlmacen = o.NombreAlmacen,
+                Detalles = o.Detalles.Select(d => new DetalleOrdenCompraDto
+                {
+                    Id = d.Id,
+                    IdProducto = d.IdProducto,
+                    IdVariante = d.IdVariante,
+                    CantidadSolicitada = d.CantidadSolicitada,
+                    PrecioUnitarioPactado = d.PrecioUnitarioPactado,
+                    Subtotal = d.Subtotal,
+                    CantidadRecibida = d.CantidadRecibida,
+                    NombreProducto = d.NombreProducto,
+                    UnidadMedidaSimbolo = d.UnidadMedidaSimbolo
+                }).ToList()
+            };
         }
     }
 }

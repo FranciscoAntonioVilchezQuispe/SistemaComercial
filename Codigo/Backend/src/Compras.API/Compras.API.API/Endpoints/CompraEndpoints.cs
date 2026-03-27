@@ -8,6 +8,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Nucleo.Comun.Application.Wrappers;
 using System.Linq;
+using Microsoft.EntityFrameworkCore;
+using Compras.API.Infrastructure.Datos;
+using System.Threading.Tasks;
 
 namespace Compras.API.Endpoints
 {
@@ -17,11 +20,12 @@ namespace Compras.API.Endpoints
         {
             var grupo = app.MapGroup("/api/compras").WithTags("Compras");
 
-            grupo.MapGet("/", async (ICompraRepositorio repo) =>
+            grupo.MapGet("/", async ([Microsoft.AspNetCore.Mvc.AsParameters] Nucleo.Comun.Application.Paginacion.PagedRequest request, ICompraRepositorio repo) =>
             {
-                var compras = await repo.ObtenerTodosAsync();
+                var (compras, total) = await repo.ObtenerPaginadoAsync(request.Search, request.Activo, request.PageNumber ?? 1, request.PageSize ?? 10);
                 var dtos = compras.Select(c => MapToDto(c)).ToList();
-                return Results.Ok(new ToReturnList<CompraDto>(dtos));
+                var response = new Nucleo.Comun.Application.Paginacion.PagedResponse<CompraDto>(dtos, request.PageNumber ?? 1, request.PageSize ?? 10, total);
+                return Results.Ok(response);
             });
 
             grupo.MapGet("/{id}", async (long id, ICompraRepositorio repo) =>
@@ -42,6 +46,48 @@ namespace Compras.API.Endpoints
                 var exito = await mediator.Send(new EliminarCompraComando(id));
                 if (!exito) return Results.NotFound(new ToReturnError<bool>("Compra no encontrada", 404));
                 return Results.Ok(new ToReturn<bool>(true));
+            });
+
+            grupo.MapGet("/debug-fix-db", async (ComprasDbContext context) =>
+            {
+                string sql = @"
+DO $$
+BEGIN
+    IF EXISTS (SELECT 1 FROM information_schema.table_constraints WHERE constraint_name = 'fk_detalle_compra_compras_id_comprao' AND table_name = 'detalle_compra' AND table_schema = 'compras') THEN
+        ALTER TABLE compras.detalle_compra DROP CONSTRAINT fk_detalle_compra_compras_id_comprao;
+    END IF;
+    IF EXISTS (SELECT 1 FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace WHERE c.relname = 'ix_detalle_compra_id_comprao' AND n.nspname = 'compras') THEN
+        DROP INDEX compras.ix_detalle_compra_id_comprao;
+    END IF;
+    IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'detalle_compra' AND table_schema = 'compras' AND column_name = 'id_comprao') THEN
+        ALTER TABLE compras.detalle_compra DROP COLUMN id_comprao;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace WHERE c.relname = 'ix_detalle_compra_id_compra' AND n.nspname = 'compras') THEN
+        CREATE INDEX ix_detalle_compra_id_compra ON compras.detalle_compra (id_compra);
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.table_constraints WHERE constraint_name = 'fk_detalle_compra_compras_id_compra' AND table_name = 'detalle_compra' AND table_schema = 'compras') THEN
+        ALTER TABLE compras.detalle_compra ADD CONSTRAINT fk_detalle_compra_compras_id_compra FOREIGN KEY (id_compra) REFERENCES compras.compras (id_compra) ON DELETE CASCADE;
+    END IF;
+
+    CREATE TABLE IF NOT EXISTS compras.""__EFMigrationsHistory"" (
+        ""MigrationId"" character varying(150) NOT NULL,
+        ""ProductVersion"" character varying(32) NOT NULL,
+        CONSTRAINT pk_ef_migrations_history PRIMARY KEY (""MigrationId"")
+    );
+
+    INSERT INTO compras.""__EFMigrationsHistory"" (""MigrationId"", ""ProductVersion"") VALUES ('20260129231053_Inicial', '8.0.8') ON CONFLICT DO NOTHING;
+    INSERT INTO compras.""__EFMigrationsHistory"" (""MigrationId"", ""ProductVersion"") VALUES ('20260206190831_FixDetalleAudit', '8.0.8') ON CONFLICT DO NOTHING;
+    INSERT INTO compras.""__EFMigrationsHistory"" (""MigrationId"", ""ProductVersion"") VALUES ('20260213160911_AddCompraIdToOrdenCompra', '8.0.8') ON CONFLICT DO NOTHING;
+    INSERT INTO compras.""__EFMigrationsHistory"" (""MigrationId"", ""ProductVersion"") VALUES ('20260217183807_UpdateOrdenCompraSerieNumero', '8.0.8') ON CONFLICT DO NOTHING;
+    INSERT INTO compras.""__EFMigrationsHistory"" (""MigrationId"", ""ProductVersion"") VALUES ('20260217203920_AddSerieNumeroCorrelativoToOrdenCompra', '8.0.8') ON CONFLICT DO NOTHING;
+    INSERT INTO compras.""__EFMigrationsHistory"" (""MigrationId"", ""ProductVersion"") VALUES ('20260219175334_AddObservacionesToCompra', '8.0.8') ON CONFLICT DO NOTHING;
+    INSERT INTO compras.""__EFMigrationsHistory"" (""MigrationId"", ""ProductVersion"") VALUES ('20260221132104_AddCamposSunatPle81', '8.0.8') ON CONFLICT DO NOTHING;
+    INSERT INTO compras.""__EFMigrationsHistory"" (""MigrationId"", ""ProductVersion"") VALUES ('20260316050748_UpdateSunatFieldsCompras', '8.0.8') ON CONFLICT DO NOTHING;
+    INSERT INTO compras.""__EFMigrationsHistory"" (""MigrationId"", ""ProductVersion"") VALUES ('20260322232250_FixTypoIdCompra', '8.0.8') ON CONFLICT DO NOTHING;
+END
+$$;";
+                await context.Database.ExecuteSqlRawAsync(sql);
+                return Results.Ok("Esquema de Compras corregido y sincronizado con EF Core.");
             });
         }
 

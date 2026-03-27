@@ -8,10 +8,14 @@ import {
 import { servicioMetodoPago } from "../servicios/servicioMetodoPago";
 import { MetodoPago, MetodoPagoFormData } from "../tipos/metodoPago.types";
 
-export const useMetodosPago = (): UseQueryResult<MetodoPago[], Error> => {
-  return useQuery<MetodoPago[], Error>({
-    queryKey: ["metodos-pago"],
-    queryFn: servicioMetodoPago.obtenerTodos,
+import { PagedRequest, PagedResponse } from "@/types/pagination.types";
+
+export const useMetodosPago = (
+  paginacion?: PagedRequest,
+): UseQueryResult<PagedResponse<MetodoPago>, Error> => {
+  return useQuery<PagedResponse<MetodoPago>, Error>({
+    queryKey: ["metodos-pago", paginacion],
+    queryFn: () => servicioMetodoPago.obtenerTodos(paginacion),
   });
 };
 

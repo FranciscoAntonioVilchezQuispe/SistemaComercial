@@ -91,5 +91,50 @@ namespace Compras.API.Infrastructure.Repositorios
                 .Where(c => c.IdProveedor == idProveedor)
                 .ToListAsync();
         }
+
+        public async Task<(IEnumerable<Compra> Datos, int Total)> ObtenerPaginadoAsync(string? busqueda, bool? activo, int pagina, int elementosPorPagina)
+        {
+            var query = from c in _context.Compras
+                        join p in _context.Proveedores on c.IdProveedor equals p.Id
+                        join td in _context.TiposDocumentoRef on p.IdTipoDocumento equals td.Id
+                        join tc in _context.TiposComprobanteRef on c.IdTipoComprobante equals tc.Id
+                        join a in _context.AlmacenesRef on c.IdAlmacen equals a.Id
+                        select new { c, p, td, tc, a };
+
+            if (!string.IsNullOrWhiteSpace(busqueda))
+            {
+                var term = busqueda.Trim().ToLower();
+                query = query.Where(r => 
+                    r.c.SerieComprobante.ToLower().Contains(term) || 
+                    r.c.NumeroComprobante.ToLower().Contains(term) ||
+                    r.p.RazonSocial.ToLower().Contains(term));
+            }
+
+            if (activo.HasValue)
+            {
+                query = query.Where(r => r.c.Activado == activo.Value);
+            }
+
+            var total = await query.CountAsync();
+
+            var resultados = await query
+                .OrderByDescending(r => r.c.FechaCreacion)
+                .Skip((pagina - 1) * elementosPorPagina)
+                .Take(elementosPorPagina)
+                .ToListAsync();
+
+            var datos = resultados.Select(r =>
+            {
+                var c = r.c;
+                c.Proveedor = r.p;
+                c.NombreAlmacen = r.a.NombreAlmacen;
+                c.NombreTipoComprobante = r.tc.Nombre;
+                c.NombreTipoDocumentoProveedor = r.td.Nombre;
+                c.IdTipoDocumentoProveedor = r.p.IdTipoDocumento;
+                return c;
+            }).ToList();
+
+            return (datos, total);
+        }
     }
 }

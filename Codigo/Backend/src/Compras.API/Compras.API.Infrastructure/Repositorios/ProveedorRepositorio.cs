@@ -67,5 +67,33 @@ namespace Compras.API.Infrastructure.Repositorios
 
             return await query.ToListAsync();
         }
+
+        public async Task<(IEnumerable<Proveedor> Datos, int Total)> ObtenerPaginadoAsync(string? busqueda, bool? activo, int pagina, int elementosPorPagina)
+        {
+            var query = _context.Proveedores.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(busqueda))
+            {
+                var term = busqueda.Trim().ToLower();
+                query = query.Where(p =>
+                    p.RazonSocial.ToLower().Contains(term) ||
+                    p.NumeroDocumento.Contains(term));
+            }
+
+            if (activo.HasValue)
+            {
+                query = query.Where(p => p.Activado == activo.Value);
+            }
+
+            var total = await query.CountAsync();
+
+            var datos = await query
+                .OrderBy(p => p.RazonSocial)
+                .Skip((pagina - 1) * elementosPorPagina)
+                .Take(elementosPorPagina)
+                .ToListAsync();
+
+            return (datos, total);
+        }
     }
 }

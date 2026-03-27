@@ -8,13 +8,15 @@ import {
 import { Proveedor, ProveedorFormData } from "../types/proveedor.types";
 import * as servicio from "../servicios/servicioProveedores";
 
+import { PagedRequest, PagedResponse } from "@/types/pagination.types";
+
 export const useProveedores = (
-  busqueda?: string,
+  paginacion?: PagedRequest,
   enabled: boolean = true,
-): UseQueryResult<Proveedor[], Error> => {
+): UseQueryResult<PagedResponse<Proveedor>, Error> => {
   return useQuery({
-    queryKey: ["proveedores", busqueda],
-    queryFn: () => servicio.obtenerProveedores(busqueda),
+    queryKey: ["proveedores", paginacion],
+    queryFn: () => servicio.obtenerProveedores(paginacion),
     enabled: enabled,
   });
 };

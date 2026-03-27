@@ -60,6 +60,31 @@ namespace Configuracion.API.Infrastructure.Repositorios
             return await _context.Sucursales.ToListAsync();
         }
 
+        public async Task<(IEnumerable<Sucursal> Datos, int Total)> ObtenerPaginadoAsync(string? search, bool? activo, int pageNumber, int pageSize)
+        {
+            var query = _context.Sucursales.AsQueryable();
+
+            if (!string.IsNullOrEmpty(search))
+            {
+                search = search.ToLower();
+                query = query.Where(s => s.Nombre.ToLower().Contains(search) || s.Direccion.ToLower().Contains(search));
+            }
+
+            if (activo.HasValue)
+            {
+                query = query.Where(s => s.Activado == activo.Value);
+            }
+
+            var total = await query.CountAsync();
+            var datos = await query
+                .OrderBy(s => s.Nombre)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return (datos, total);
+        }
+
         public async Task EliminarAsync(long id)
         {
             var entity = await _context.Sucursales.FindAsync(id);

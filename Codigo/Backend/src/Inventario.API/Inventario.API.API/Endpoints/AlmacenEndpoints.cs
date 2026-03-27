@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Nucleo.Comun.Application.Wrappers;
+using Nucleo.Comun.Application.Paginacion;
 
 namespace Inventario.API.Endpoints
 {
@@ -14,12 +15,13 @@ namespace Inventario.API.Endpoints
         {
             var grupo = app.MapGroup("/api/inventario/almacenes").WithTags("Almacenes");
 
-            grupo.MapGet("/", async (IAlmacenRepositorio repo) =>
+            grupo.MapGet("/", async ([AsParameters] PagedRequest request, IAlmacenRepositorio repo) =>
             {
                 try
                 {
-                    var almacenes = await repo.ObtenerTodosAsync();
-                    return Results.Ok(new ToReturnList<Almacen>(almacenes));
+                    var (datos, total) = await repo.ObtenerPaginadoAsync(request.Search, request.Activo, request.PageNumber ?? 1, request.PageSize ?? 100);
+                    var response = new PagedResponse<Almacen>(datos, total, request.PageNumber ?? 1, request.PageSize ?? 100);
+                    return Results.Ok(response);
                 }
                 catch (Exception ex)
                 {

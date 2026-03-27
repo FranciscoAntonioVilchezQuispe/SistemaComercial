@@ -29,10 +29,16 @@ namespace Inventario.API.Endpoints
             });
 
             // 3. Obtener Traslados
-            group.MapGet("/", async (IMediator mediator) =>
+            group.MapGet("/", async ([Microsoft.AspNetCore.Mvc.AsParameters] Nucleo.Comun.Application.Paginacion.PagedRequest request, IMediator mediator) =>
             {
-                var traslados = await mediator.Send(new ObtenerTrasladosConsulta());
-                return Results.Ok(traslados);
+                var consulta = new ObtenerTrasladosConsulta 
+                { 
+                    PageNumber = request.PageNumber, 
+                    PageSize = request.PageSize, 
+                    Search = request.Search 
+                };
+                var resultado = await mediator.Send(consulta);
+                return Results.Ok(resultado);
             });
         }
     }

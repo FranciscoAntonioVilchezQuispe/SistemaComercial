@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus, Edit2, Trash2, MapPin, CheckCircle, XCircle } from "lucide-react";
+import { Plus, Edit2, Trash2, MapPin, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -41,13 +41,17 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
+import { usePagination } from "@/hooks/usePagination";
+
 export function PaginaSucursales() {
+  const { paginacion, cambiarPagina, cambiarPageSize, cambiarBusqueda, cambiarFiltroActivo } = usePagination();
   const [dialogoOpen, setDialogoOpen] = useState(false);
   const [registroSeleccionado, setRegistroSeleccionado] =
     useState<Sucursal | null>(null);
   const [eliminarId, setEliminarId] = useState<number | null>(null);
 
-  const { data: sucursales, isLoading, error } = useSucursales();
+  const { data, isLoading, error } = useSucursales(paginacion);
+  const sucursales = data?.datos || [];
   const { data: empresa } = useEmpresa(); // Needed to set default idEmpresa
 
   const crearMutation = useCrearSucursal();
@@ -186,7 +190,16 @@ export function PaginaSucursales() {
           </Button>
         </CardHeader>
         <CardContent className="p-6">
-          <DataTable data={sucursales || []} columns={columns} />
+          <DataTable 
+            data={sucursales} 
+            columns={columns} 
+            pagination={data}
+            onPageChange={cambiarPagina}
+            onPageSizeChange={cambiarPageSize}
+            onSearchChange={cambiarBusqueda}
+            onActiveFilterChange={cambiarFiltroActivo}
+            isLoading={isLoading}
+          />
         </CardContent>
       </Card>
 
