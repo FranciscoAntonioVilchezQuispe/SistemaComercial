@@ -18,7 +18,8 @@ builder.AddCentralizedLogging();
 // DbContext e Interfaz
 builder.Services.AddDbContext<ComprasDbContext>(options =>
 {
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"),
+        o => o.MigrationsHistoryTable("__ef_migrations_history", "compras"));
     options.UseSnakeCaseNamingConvention();
 });
 

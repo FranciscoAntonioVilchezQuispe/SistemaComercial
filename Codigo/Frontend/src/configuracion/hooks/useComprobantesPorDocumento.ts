@@ -1,5 +1,5 @@
 import { useQuery, UseQueryResult } from "@tanstack/react-query";
-import { reglasDocumentoService } from "../services/reglasDocumentoService";
+import { servicioReglaDocumento } from "@/features/configuracion/servicios/servicioReglaDocumento";
 import { TipoComprobante } from "@/features/configuracion/tipos/tipoComprobante.types";
 
 export const useComprobantesPorDocumento = (
@@ -9,7 +9,7 @@ export const useComprobantesPorDocumento = (
     queryKey: ["comprobantes-por-documento", codigoDocumento],
     queryFn: () =>
       codigoDocumento
-        ? reglasDocumentoService.listarComprobantesPorDocumento(codigoDocumento)
+        ? servicioReglaDocumento.listarComprobantesPorDocumento(codigoDocumento)
         : Promise.resolve([]),
     enabled: !!codigoDocumento,
     staleTime: 1000 * 60 * 60, // 1 hora de caché

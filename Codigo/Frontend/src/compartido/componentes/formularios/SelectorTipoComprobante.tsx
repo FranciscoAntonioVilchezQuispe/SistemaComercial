@@ -56,7 +56,7 @@ export const SelectorTipoComprobante: React.FC<
   const isError = errorTodos || (!!codigoDocumento && errorFiltrados);
 
   const tiposAMostrar = React.useMemo(() => {
-    if (!codigoDocumento) return todosLosTipos || [];
+    if (!codigoDocumento) return todosLosTipos?.datos || [];
     return tiposFiltradosQuery || [];
   }, [todosLosTipos, tiposFiltradosQuery, codigoDocumento]);
 

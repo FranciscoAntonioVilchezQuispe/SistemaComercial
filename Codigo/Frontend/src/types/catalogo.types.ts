@@ -1,5 +1,6 @@
 export interface ValorCatalogo {
   id: number;
+  idDetalle?: number; // Identificador proveniente del backend
   codigo: string;
   nombre: string;
   descripcion?: string;

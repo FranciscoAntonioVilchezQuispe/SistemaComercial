@@ -1,13 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
 import {
-  reglasDocumentoService,
+  servicioReglaDocumento,
   ReglasResponse,
-} from "../services/reglasDocumentoService";
+} from "@/features/configuracion/servicios/servicioReglaDocumento";
 
 export const useReglasDocumentos = () => {
   return useQuery<ReglasResponse>({
     queryKey: ["reglas-documentos"],
-    queryFn: reglasDocumentoService.obtenerConfiguracion,
+    queryFn: () => servicioReglaDocumento.obtenerConfiguracion(),
     staleTime: 1000 * 60 * 60, // 1 hora de caché (cambian muy poco)
   });
 };

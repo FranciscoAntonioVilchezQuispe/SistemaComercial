@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
-import { ReglaDocumento } from "@configuracion/services/reglasDocumentoService";
+import { ReglaDocumento } from "@/features/configuracion/servicios/servicioReglaDocumento";
 
 const formSchema = z.object({
   id: z.number().optional(),

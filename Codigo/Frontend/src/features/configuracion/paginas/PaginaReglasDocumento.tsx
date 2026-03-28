@@ -11,7 +11,7 @@ import { DataTable } from "@/components/ui/DataTable";
 import { Loading } from "@compartido/componentes/feedback/Loading";
 import { MensajeError } from "@compartido/componentes/feedback/MensajeError";
 import { toast } from "sonner";
-import { ReglaDocumento } from "@configuracion/services/reglasDocumentoService";
+import { ReglaDocumento } from "@/features/configuracion/servicios/servicioReglaDocumento";
 import {
   useReglasDocumentosCRUD,
   useGuardarRegla,
@@ -270,7 +270,7 @@ export function PaginaReglasDocumento() {
 
           <div className="space-y-4 py-4">
             <div className="grid grid-cols-1 gap-1 border border-muted/20 rounded-lg p-2 max-h-[300px] overflow-y-auto bg-muted/5">
-              {tiposComprobante?.map((tipo) => (
+              {tiposComprobante?.datos?.map((tipo) => (
                 <div
                   key={tipo.id}
                   className="flex items-center space-x-3 p-2 hover:bg-muted/20 rounded-md transition-colors cursor-pointer"

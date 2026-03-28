@@ -264,19 +264,21 @@ export function CompraForm({
   const [buscandoOrden, setBuscandoOrden] = React.useState(false);
 
   // Provider search state
-  const [busquedaProv, setBusquedaProv] = React.useState("");
+  const [busquedaProveedor, setBusquedaProveedor] = React.useState("");
 
-  const { data: proveedores = [], refetch: buscarProveedores } = useProveedores(
-    busquedaProv,
+  const { data: qProveedores, refetch: buscarProveedores } = useProveedores(
+    { search: busquedaProveedor, pageNumber: 1, pageSize: 100 },
     false,
   );
+  const proveedores = qProveedores?.datos || [];
 
   const handleSearchProveedor = (term: string) => {
-    setBusquedaProv(term);
+    setBusquedaProveedor(term);
     setTimeout(() => buscarProveedores(), 0);
   };
 
-  const { data: almacenes } = useAlmacenes();
+  const { data: qAlmacenes } = useAlmacenes();
+  const almacenes = qAlmacenes?.datos || [];
   const { data: tiposOperacion = [] } = useTiposOperacionSunat();
   // Se quitó la carga masiva inicial de productos
 
@@ -386,7 +388,7 @@ export function CompraForm({
       try {
         // Obtenemos todas las órdenes (idealmente habría un endpoint de búsqueda directa)
         const ordenes = await obtenerOrdenesCompra();
-        const ordenEncontrada = ordenes.find(
+        const ordenEncontrada = ordenes.datos.find(
           (o) =>
             o.codigoOrden.toLowerCase() === busquedaOrden.toLowerCase().trim(),
         );

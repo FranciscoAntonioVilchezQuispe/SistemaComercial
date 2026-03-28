@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus, Edit2, Trash2, Banknote, CreditCard, CheckCircle, XCircle } from "lucide-react";
+import { Plus, Edit2, Trash2, Banknote, CreditCard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,

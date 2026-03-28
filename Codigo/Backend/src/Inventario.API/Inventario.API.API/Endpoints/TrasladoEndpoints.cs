@@ -29,7 +29,7 @@ namespace Inventario.API.Endpoints
             });
 
             // 3. Obtener Traslados
-            group.MapGet("/", async ([Microsoft.AspNetCore.Mvc.AsParameters] Nucleo.Comun.Application.Paginacion.PagedRequest request, IMediator mediator) =>
+            group.MapGet("/", async ([AsParameters] Nucleo.Comun.Application.Paginacion.PagedRequest request, IMediator mediator) =>
             {
                 var consulta = new ObtenerTrasladosConsulta 
                 { 

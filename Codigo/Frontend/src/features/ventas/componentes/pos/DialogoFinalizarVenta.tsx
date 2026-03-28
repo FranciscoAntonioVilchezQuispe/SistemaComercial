@@ -70,10 +70,10 @@ export function DialogoFinalizarVenta({
     useComprobantesPorDocumento(cliente.idTipoDocumento?.toString());
 
   // Si no hay reglas (cliente nuevo o error), fallback al hook general
-  const { data: tiposComprobanteGen = [] } = useTipoComprobante("VENTA");
+  const { data: pagedTiposGen } = useTipoComprobante("VENTA");
 
   const tiposComprobante =
-    tiposComprobanteRules.length > 0 ? tiposComprobanteRules : tiposComprobanteGen;
+    tiposComprobanteRules.length > 0 ? tiposComprobanteRules : (pagedTiposGen?.datos || []);
 
   const { data: tiposOperacion = [] } =
     useTiposOperacionSunat();
@@ -319,8 +319,9 @@ export function DialogoFinalizarVenta({
             </div>
           </div>
         </div>
+      </div>
 
-        <DialogFooter className="gap-2">
+      <DialogFooter className="gap-2">
           <Button
             variant="outline"
             onClick={() => onOpenChange(false)}

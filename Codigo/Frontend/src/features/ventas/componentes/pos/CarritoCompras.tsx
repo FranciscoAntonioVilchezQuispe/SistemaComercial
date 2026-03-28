@@ -304,6 +304,9 @@ export function CarritoCompras() {
             telefono: "",
             direccion: "",
             activado: true,
+            esAgenteRetencion: false,
+            esBuenContribuyente: false,
+            esAgentePercepcion: false,
           }
         }
         metodoPago={metodoPagoSeleccionado}

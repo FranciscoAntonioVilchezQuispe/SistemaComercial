@@ -36,6 +36,11 @@ namespace Clientes.API.Infrastructure.Migrations
                         .HasColumnType("boolean")
                         .HasColumnName("activado");
 
+                    b.Property<string>("CondicionSunat")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("condicion_sunat");
+
                     b.Property<int?>("DiasCredito")
                         .HasColumnType("integer")
                         .HasColumnName("dias_credito");
@@ -50,6 +55,23 @@ namespace Clientes.API.Infrastructure.Migrations
                         .HasColumnType("character varying(100)")
                         .HasColumnName("email");
 
+                    b.Property<bool>("EsAgentePercepcion")
+                        .HasColumnType("boolean")
+                        .HasColumnName("es_agente_percepcion");
+
+                    b.Property<bool>("EsAgenteRetencion")
+                        .HasColumnType("boolean")
+                        .HasColumnName("es_agente_retencion");
+
+                    b.Property<bool>("EsBuenContribuyente")
+                        .HasColumnType("boolean")
+                        .HasColumnName("es_buen_contribuyente");
+
+                    b.Property<string>("EstadoSunat")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("estado_sunat");
+
                     b.Property<DateTime?>("FechaActualizacion")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("fecha_modificacion");
@@ -57,6 +79,10 @@ namespace Clientes.API.Infrastructure.Migrations
                     b.Property<DateTime>("FechaCreacion")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("fecha_creacion");
+
+                    b.Property<DateTime?>("FechaUltimaConsultaSunat")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fecha_ultima_consulta_sunat");
 
                     b.Property<long?>("IdListaPrecioAsignada")
                         .HasColumnType("bigint")
@@ -95,6 +121,11 @@ namespace Clientes.API.Infrastructure.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)")
                         .HasColumnName("telefono");
+
+                    b.Property<string>("Ubigeo")
+                        .HasMaxLength(6)
+                        .HasColumnType("character varying(6)")
+                        .HasColumnName("ubigeo");
 
                     b.Property<string>("UsuarioActualizacion")
                         .HasMaxLength(50)

@@ -46,7 +46,7 @@ namespace Configuracion.API.Infrastructure.Repositorios
             if (!string.IsNullOrEmpty(search))
             {
                 search = search.ToLower();
-                query = query.Where(i => i.Nombre.ToLower().Contains(search) || i.CodigoSunat.ToLower().Contains(search));
+                query = query.Where(i => i.Nombre.ToLower().Contains(search) || i.Codigo.ToLower().Contains(search));
             }
 
             if (activo.HasValue)
@@ -114,7 +114,7 @@ namespace Configuracion.API.Infrastructure.Repositorios
             if (!string.IsNullOrEmpty(search))
             {
                 search = search.ToLower();
-                query = query.Where(m => m.Nombre.ToLower().Contains(search) || m.CodigoSunat.ToLower().Contains(search));
+                query = query.Where(m => m.Nombre.ToLower().Contains(search) || m.Codigo.ToLower().Contains(search));
             }
 
             if (activo.HasValue)

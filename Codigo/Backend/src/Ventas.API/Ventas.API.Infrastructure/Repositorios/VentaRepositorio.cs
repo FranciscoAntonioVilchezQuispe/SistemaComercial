@@ -49,7 +49,7 @@ namespace Ventas.API.Infrastructure.Repositorios
                 search = search.ToLower();
                 query = query.Where(v => 
                     v.Serie.ToLower().Contains(search) || 
-                    v.Numero.ToLower().Contains(search) ||
+                    v.Numero.ToString().ToLower().Contains(search) ||
                     v.Cliente.RazonSocial.ToLower().Contains(search));
             }
 
@@ -107,7 +107,7 @@ namespace Ventas.API.Infrastructure.Repositorios
                 search = search.ToLower();
                 query = query.Where(c => 
                     c.Serie.ToLower().Contains(search) || 
-                    c.Numero.ToLower().Contains(search) ||
+                    c.Numero.ToString().ToLower().Contains(search) ||
                     c.Cliente.RazonSocial.ToLower().Contains(search));
             }
 

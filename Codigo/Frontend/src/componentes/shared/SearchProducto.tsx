@@ -46,7 +46,7 @@ export function SearchProducto({
         );
         // La instancia de axios devuelve directamente el wrapper ToReturn/ToReturnList
         // En este proyecto, ToReturnList tiene una propiedad 'data' que es el array
-        setResults(response.data || []);
+        setResults(response.datos || response.data || []);
       } catch (e) {
         if ((e as Error).name !== "AbortError") {
           console.error(e);

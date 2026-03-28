@@ -6,10 +6,10 @@ import {
   UseMutationResult,
 } from "@tanstack/react-query";
 import {
-  reglasDocumentoService,
+  servicioReglaDocumento,
   ReglaDocumento,
   ReglasResponse,
-} from "../services/reglasDocumentoService";
+} from "@/features/configuracion/servicios/servicioReglaDocumento";
 
 export const useReglasDocumentosCRUD = (): UseQueryResult<
   ReglaDocumento[],
@@ -17,7 +17,7 @@ export const useReglasDocumentosCRUD = (): UseQueryResult<
 > => {
   return useQuery({
     queryKey: ["reglas-documentos-full"],
-    queryFn: () => reglasDocumentoService.listarReglas(),
+    queryFn: () => servicioReglaDocumento.listarReglas(),
   });
 };
 
@@ -27,7 +27,7 @@ export const useConfiguracionReglas = (): UseQueryResult<
 > => {
   return useQuery({
     queryKey: ["reglas-documentos-config"],
-    queryFn: () => reglasDocumentoService.obtenerConfiguracion(),
+    queryFn: () => servicioReglaDocumento.obtenerConfiguracion(),
   });
 };
 
@@ -40,7 +40,7 @@ export const useGuardarRegla = (): UseMutationResult<
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (regla: ReglaDocumento) =>
-      reglasDocumentoService.guardarRegla(regla),
+      servicioReglaDocumento.guardarRegla(regla),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["reglas-documentos-full"] });
       queryClient.invalidateQueries({ queryKey: ["reglas-documentos-config"] });
@@ -56,7 +56,7 @@ export const useEliminarRegla = (): UseMutationResult<
 > => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (id: number) => reglasDocumentoService.eliminarRegla(id),
+    mutationFn: (id: number) => servicioReglaDocumento.eliminarRegla(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["reglas-documentos-full"] });
       queryClient.invalidateQueries({ queryKey: ["reglas-documentos-config"] });
@@ -79,7 +79,7 @@ export const useActualizarRelaciones = (): UseMutationResult<
       codigoDocumento: string;
       idsTiposComprobante: number[];
     }) =>
-      reglasDocumentoService.actualizarRelaciones(
+      servicioReglaDocumento.actualizarRelaciones(
         codigoDocumento,
         idsTiposComprobante,
       ),

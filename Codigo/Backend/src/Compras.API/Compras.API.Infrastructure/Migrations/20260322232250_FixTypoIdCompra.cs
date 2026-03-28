@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -10,36 +10,7 @@ namespace Compras.API.Infrastructure.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropForeignKey(
-                name: "fk_detalle_compra_compras_id_comprao",
-                schema: "compras",
-                table: "detalle_compra");
-
-            migrationBuilder.DropIndex(
-                name: "ix_detalle_compra_id_comprao",
-                schema: "compras",
-                table: "detalle_compra");
-
-            migrationBuilder.DropColumn(
-                name: "id_comprao",
-                schema: "compras",
-                table: "detalle_compra");
-
-            migrationBuilder.CreateIndex(
-                name: "ix_detalle_compra_id_compra",
-                schema: "compras",
-                table: "detalle_compra",
-                column: "id_compra");
-
-            migrationBuilder.AddForeignKey(
-                name: "fk_detalle_compra_compras_id_compra",
-                schema: "compras",
-                table: "detalle_compra",
-                column: "id_compra",
-                principalSchema: "compras",
-                principalTable: "compras",
-                principalColumn: "id_compra",
-                onDelete: ReferentialAction.Cascade);
+            // Migración baselined: los cambios ya existen en la base de datos.
         }
 
         /// <inheritdoc />

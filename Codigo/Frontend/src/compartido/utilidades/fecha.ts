@@ -7,11 +7,23 @@ export const APP_LOCALE = es;
  * Formatea una fecha usando un string de formato (por defecto PPP)
  */
 export const formatFecha = (
-  fecha: Date | number | string,
+  fecha: Date | number | string | null | undefined,
   formatStr: string = "dd/MM/yyyy",
 ): string => {
+  if (!fecha) return "";
   try {
-    const fechaObj = typeof fecha === "string" ? parseISO(fecha) : fecha;
+    let fechaObj: Date | number;
+    if (typeof fecha === "string") {
+      fechaObj = parseISO(fecha);
+    } else {
+      fechaObj = fecha;
+    }
+    
+    // Validar si la fecha es válida antes de formatear
+    if (fechaObj instanceof Date && isNaN(fechaObj.getTime())) {
+      return "";
+    }
+
     return format(fechaObj, formatStr, { locale: APP_LOCALE });
   } catch (error) {
     console.error("Error al formatear fecha:", error);

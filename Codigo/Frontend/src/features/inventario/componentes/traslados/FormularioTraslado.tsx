@@ -19,7 +19,8 @@ interface Props {
 }
 
 export function FormularioTraslado({ onSuccess, onCancel }: Props) {
-  const { data: almacenes } = useAlmacenes();
+  const { data: qAlmacenes } = useAlmacenes();
+  const almacenes = qAlmacenes?.datos || [];
   const crearTraslado = useCrearTraslado();
 
   const [origen, setOrigen] = useState<string>("");
@@ -29,7 +30,7 @@ export function FormularioTraslado({ onSuccess, onCancel }: Props) {
     { productoId: number; cantidad: number; nombre?: string }[]
   >([]);
 
-  const { data: stockOrigen } = useStock({ idAlmacen: Number(origen) });
+  const { data: stockOrigen } = useStock(undefined, { idAlmacen: Number(origen) });
 
   const agregarProducto = (producto: any) => {
     if (!producto) return;

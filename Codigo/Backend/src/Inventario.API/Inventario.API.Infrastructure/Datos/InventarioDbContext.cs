@@ -37,7 +37,8 @@ namespace Inventario.API.Infrastructure.Datos
             modelBuilder.Entity<Stock>(entity =>
             {
                 entity.ToTable("stock", "inventario", t => t.ExcludeFromMigrations());
-                entity.Ignore(s => s.Activado).Ignore(s => s.FechaCreacion).Ignore(s => s.UsuarioCreacion).Ignore(s => s.FechaActualizacion).Ignore(s => s.UsuarioActualizacion).Ignore(s => s.EventosDominio);
+                // No se ignora FechaActualizacion ni UsuarioActualizacion porque sí existen en la base de datos (fecha_modificacion/usuario_modificacion)
+                entity.Ignore(s => s.Activado).Ignore(s => s.FechaCreacion).Ignore(s => s.UsuarioCreacion).Ignore(s => s.EventosDominio);
             });
 
             modelBuilder.Entity<Almacen>(entity =>

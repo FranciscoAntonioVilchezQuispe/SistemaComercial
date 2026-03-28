@@ -23,7 +23,7 @@ export interface ReglasResponse {
   relaciones: RelacionDocComprobante[];
 }
 
-export const reglasDocumentoService = {
+export const servicioReglaDocumento = {
   obtenerConfiguracion: async (): Promise<ReglasResponse> => {
     const respuesta: any = await apiConfiguracion.get("/reglasdocumentos");
     return respuesta.datos || respuesta.data || respuesta;

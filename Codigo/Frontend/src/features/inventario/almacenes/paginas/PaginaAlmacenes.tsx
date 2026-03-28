@@ -82,7 +82,7 @@ export default function PaginaAlmacenes() {
       header: "Sucursal",
       accessorKey: "idSucursal" as keyof Almacen,
       cell: (row: Almacen) => {
-        const sucursal = sucursales?.find((s) => s.id === row.idSucursal);
+        const sucursal = sucursales?.datos?.find((s) => s.id === row.idSucursal);
         return (
           <span>{sucursal?.nombreSucursal || `ID: ${row.idSucursal}`}</span>
         );

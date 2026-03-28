@@ -33,6 +33,7 @@ namespace Configuracion.API.Endpoints
                 var sucursal = new Sucursal
                 {
                     IdEmpresa = dto.IdEmpresa,
+                    Codigo = dto.Codigo,
                     NombreSucursal = dto.NombreSucursal,
                     Direccion = dto.Direccion,
                     Telefono = dto.Telefono,
@@ -50,6 +51,7 @@ namespace Configuracion.API.Endpoints
                 if (sucursal == null) return Results.NotFound(new ToReturnError<object>("Sucursal no encontrada", 404));
 
                 sucursal.IdEmpresa = dto.IdEmpresa;
+                sucursal.Codigo = dto.Codigo;
                 sucursal.NombreSucursal = dto.NombreSucursal;
                 sucursal.Direccion = dto.Direccion;
                 sucursal.Telefono = dto.Telefono;

@@ -8,7 +8,7 @@ export interface ToReturn<T> {
 export interface ToReturnList<T> {
   success: boolean;
   message: string;
-  data: T[];
+  datos: T[];
   totalRecords: number;
   statusCode: number;
 }

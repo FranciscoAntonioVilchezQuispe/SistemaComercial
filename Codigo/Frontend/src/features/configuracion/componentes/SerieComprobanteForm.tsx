@@ -50,8 +50,10 @@ export function SerieComprobanteForm({
   alCancelar,
   cargando,
 }: SerieComprobanteFormProps) {
-  const { data: tipos } = useTiposComprobante();
-  const { data: almacenes } = useAlmacenes();
+  const { data: qTipos } = useTiposComprobante();
+  const tipos = qTipos?.datos || [];
+  const { data: qAlmacenes } = useAlmacenes();
+  const almacenes = qAlmacenes?.datos || [];
 
   const [inputCorrelativo, setInputCorrelativo] = useState("00000000");
 

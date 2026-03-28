@@ -17,7 +17,7 @@ namespace Compras.API.Endpoints
 
             grupo.MapGet("/ping", () => Results.Ok("pong"));
 
-            grupo.MapGet("/", async ([Microsoft.AspNetCore.Mvc.AsParameters] Nucleo.Comun.Application.Paginacion.PagedRequest request, IOrdenCompraRepositorio repo) =>
+            grupo.MapGet("/", async ([AsParameters] Nucleo.Comun.Application.Paginacion.PagedRequest request, IOrdenCompraRepositorio repo) =>
             {
                 var (ordenes, total) = await repo.ObtenerPaginadoAsync(request.Search, request.Activo, request.PageNumber ?? 1, request.PageSize ?? 10);
                 var dtos = ordenes.Select(o => MapToDto(o)).ToList();

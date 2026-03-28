@@ -43,7 +43,7 @@ export function SearchProveedor({
           `/proveedores?search=${query}&pageSize=10`,
           { signal: abortRef.current.signal }
         );
-        setResults(response.data || []);
+        setResults(response.datos || response.data || []);
       } catch (e) {
         if ((e as Error).name !== "AbortError") {
           console.error(e);

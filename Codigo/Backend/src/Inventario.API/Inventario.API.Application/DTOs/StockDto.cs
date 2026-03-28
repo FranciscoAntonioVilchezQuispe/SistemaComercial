@@ -11,6 +11,6 @@ namespace Inventario.API.Application.DTOs
         public decimal CantidadActual { get; set; }
         public decimal? CantidadReservada { get; set; }
         public string? UbicacionFisica { get; set; }
-        public DateTime FechaActualizacion { get; set; }
+        public DateTime? UltimaActualizacion { get; set; }
     }
 }

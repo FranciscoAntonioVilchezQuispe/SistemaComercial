@@ -41,6 +41,7 @@ export const RUTAS_TITULOS: Record<string, string> = {
   '/configuracion/operaciones-sunat': 'Operaciones SUNAT',
   '/configuracion/matriz-sunat':   'Matriz SUNAT',
   '/configuracion/tablas-generales': 'Tablas Generales',
+  '/configuracion/ubigeos': 'Ubigeos',
   '/configuracion/sunat':          'SUNAT',
   '/configuracion/permisos':       'Permisos',
   '/compras/lista':                'Compras',

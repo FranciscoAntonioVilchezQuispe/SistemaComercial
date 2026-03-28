@@ -14,6 +14,15 @@ namespace Clientes.API.Application.DTOs
         public int? DiasCredito { get; set; }
         public long? IdListaPrecioAsignada { get; set; }
         public bool? Activado { get; set; }
+
+        // --- Campos SUNAT UBL 2.1 ---
+        public string? Ubigeo { get; set; }
+        public string? CondicionSunat { get; set; }
+        public string? EstadoSunat { get; set; }
+        public bool EsAgenteRetencion { get; set; }
+        public bool EsBuenContribuyente { get; set; }
+        public bool EsAgentePercepcion { get; set; }
+        public DateTime? FechaUltimaConsultaSunat { get; set; }
     }
 
     public class ClienteDto : CrearClienteDto

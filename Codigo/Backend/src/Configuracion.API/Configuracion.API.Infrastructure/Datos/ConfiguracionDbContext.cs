@@ -24,6 +24,7 @@ namespace Configuracion.API.Infrastructure.Datos
         public DbSet<DocumentoComprobanteRelacion> DocumentoComprobanteRelaciones { get; set; }
         public DbSet<TipoOperacionSunat> TiposOperacionSunat { get; set; } = null!;
         public DbSet<MatrizReglaSunat> MatrizReglasSunat { get; set; } = null!;
+        public DbSet<Ubigeo> Ubigeos { get; set; } = null!;
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -41,13 +42,14 @@ namespace Configuracion.API.Infrastructure.Datos
             modelBuilder.Entity<Empresa>().ToTable("empresa", "configuracion");
             modelBuilder.Entity<SerieComprobante>().ToTable("series_comprobantes", "configuracion");
             modelBuilder.Entity<TipoComprobante>().ToTable("tipo_comprobante", "configuracion");
-            modelBuilder.Entity<Impuesto>().ToTable("impuesto", "configuracion");
-            modelBuilder.Entity<Sucursal>().ToTable("sucursal", "configuracion");
+            modelBuilder.Entity<Impuesto>().ToTable("impuestos", "configuracion");
+            modelBuilder.Entity<Sucursal>().ToTable("sucursales", "configuracion");
             modelBuilder.Entity<MetodoPago>().ToTable("metodo_pago", "configuracion");
             modelBuilder.Entity<DocumentoIdentidadRegla>().ToTable("tipo_documento", "configuracion");
             modelBuilder.Entity<DocumentoComprobanteRelacion>().ToTable("regla_documento_comprobante", "configuracion");
             modelBuilder.Entity<TipoOperacionSunat>().ToTable("tipo_operacion_sunat", "configuracion");
             modelBuilder.Entity<MatrizReglaSunat>().ToTable("matriz_regla_sunat", "configuracion");
+            modelBuilder.Entity<Ubigeo>().ToTable("ubigeos", "configuracion");
 
             // Configuración de Relaciones (Fluent API)
 
@@ -79,6 +81,16 @@ namespace Configuracion.API.Infrastructure.Datos
                 .WithMany()
                 .HasForeignKey(s => s.IdEmpresa)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            // 5. Ubigeo Recursive
+            modelBuilder.Entity<Ubigeo>(e =>
+            {
+                e.HasKey(x => x.Codigo);
+                e.HasOne(x => x.Parent)
+                    .WithMany(x => x.Hijos)
+                    .HasForeignKey(x => x.ParentId)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
         }
 
     }

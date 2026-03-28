@@ -6,7 +6,7 @@ export const obtenerClientes = async (
   params?: PagedRequest,
 ): Promise<PagedResponse<Cliente>> => {
   const response: any = await api.get("/clientes", { params });
-  return response.datos || response.data || response;
+  return response;
 };
 
 export const obtenerCliente = async (id: number): Promise<Cliente> => {

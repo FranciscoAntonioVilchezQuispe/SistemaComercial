@@ -1,0 +1,19 @@
+﻿  Determinando los proyectos que se van a restaurar...
+d:\Personal\Proyectos\SistemaComercial\Codigo\Backend\src\Inventario.API\Inventario.API.Application\Inventario.API.Application.csproj : warning NU1903: El paquete "AutoMapper" 13.0.1 tiene una vulnerabilidad de gravedad alta conocida, https://github.com/advisories/GHSA-rvv3-g6hj-g44x [d:\Personal\Proyectos\SistemaComercial\Codigo\Backend\src\Inventario.API\Inventario.API.API\Inventario.API.API.csproj]
+  Todos los proyectos est├ín actualizados para la restauraci├│n.
+d:\Personal\Proyectos\SistemaComercial\Codigo\Backend\src\Inventario.API\Inventario.API.Application\Inventario.API.Application.csproj : warning NU1903: El paquete "AutoMapper" 13.0.1 tiene una vulnerabilidad de gravedad alta conocida, https://github.com/advisories/GHSA-rvv3-g6hj-g44x
+  Nucleo -> d:\Personal\Proyectos\SistemaComercial\Codigo\Backend\src\Nucleo\bin\Debug\net8.0\Nucleo.dll
+  Inventario.API.Domain -> d:\Personal\Proyectos\SistemaComercial\Codigo\Backend\src\Inventario.API\Inventario.API.Domain\bin\Debug\net8.0\Inventario.API.Domain.dll
+d:\Personal\Proyectos\SistemaComercial\Codigo\Backend\src\Inventario.API\Inventario.API.Application\Manejadores\EliminarMovimientosPorReferenciaManejador.cs(43,21): error CS0266: No se puede convertir impl├¡citamente el tipo 'decimal?' en 'decimal'. Ya existe una conversi├│n expl├¡cita (compruebe si le falta una conversi├│n) [d:\Personal\Proyectos\SistemaComercial\Codigo\Backend\src\Inventario.API\Inventario.API.Application\Inventario.API.Application.csproj]
+d:\Personal\Proyectos\SistemaComercial\Codigo\Backend\src\Inventario.API\Inventario.API.Application\Manejadores\EliminarMovimientosPorReferenciaManejador.cs(43,21): warning CS8629: Un tipo que acepta valores NULL puede ser nulo. [d:\Personal\Proyectos\SistemaComercial\Codigo\Backend\src\Inventario.API\Inventario.API.Application\Inventario.API.Application.csproj]
+
+ERROR al compilar.
+
+d:\Personal\Proyectos\SistemaComercial\Codigo\Backend\src\Inventario.API\Inventario.API.Application\Inventario.API.Application.csproj : warning NU1903: El paquete "AutoMapper" 13.0.1 tiene una vulnerabilidad de gravedad alta conocida, https://github.com/advisories/GHSA-rvv3-g6hj-g44x [d:\Personal\Proyectos\SistemaComercial\Codigo\Backend\src\Inventario.API\Inventario.API.API\Inventario.API.API.csproj]
+d:\Personal\Proyectos\SistemaComercial\Codigo\Backend\src\Inventario.API\Inventario.API.Application\Inventario.API.Application.csproj : warning NU1903: El paquete "AutoMapper" 13.0.1 tiene una vulnerabilidad de gravedad alta conocida, https://github.com/advisories/GHSA-rvv3-g6hj-g44x
+d:\Personal\Proyectos\SistemaComercial\Codigo\Backend\src\Inventario.API\Inventario.API.Application\Manejadores\EliminarMovimientosPorReferenciaManejador.cs(43,21): warning CS8629: Un tipo que acepta valores NULL puede ser nulo. [d:\Personal\Proyectos\SistemaComercial\Codigo\Backend\src\Inventario.API\Inventario.API.Application\Inventario.API.Application.csproj]
+d:\Personal\Proyectos\SistemaComercial\Codigo\Backend\src\Inventario.API\Inventario.API.Application\Manejadores\EliminarMovimientosPorReferenciaManejador.cs(43,21): error CS0266: No se puede convertir impl├¡citamente el tipo 'decimal?' en 'decimal'. Ya existe una conversi├│n expl├¡cita (compruebe si le falta una conversi├│n) [d:\Personal\Proyectos\SistemaComercial\Codigo\Backend\src\Inventario.API\Inventario.API.Application\Inventario.API.Application.csproj]
+    3 Advertencia(s)
+    1 Errores
+
+Tiempo transcurrido 00:00:01.69

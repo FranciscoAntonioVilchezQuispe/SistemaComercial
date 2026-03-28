@@ -48,35 +48,46 @@ namespace Inventario.API.Endpoints
                     query = query.Where(m => m.Stock.IdAlmacen == idAlmacen.Value);
                 }
 
-                if (!string.IsNullOrWhiteSpace(request.Busqueda))
+                if (!string.IsNullOrWhiteSpace(request.Search))
                 {
-                    var term = request.Busqueda.Trim().ToLower();
+                    var term = request.Search.Trim().ToLower();
                     query = query.Where(m => m.Observaciones != null && m.Observaciones.ToLower().Contains(term));
                 }
 
                 var total = await query.CountAsync();
+                
                 var movimientos = await query
+                    .Include(m => m.Stock)
+                        .ThenInclude(s => s.Almacen)
                     .OrderByDescending(m => m.Id)
-                    .Skip((request.Pagina - 1) * request.ElementosPorPagina)
-                    .Take(request.ElementosPorPagina)
-                    .Select(m => new MovimientoInventarioDto
-                    {
-                        Id = m.Id,
-                        IdTipoMovimiento = m.IdTipoMovimiento,
-                        IdStock = m.IdStock,
-                        Cantidad = m.Cantidad,
-                        CantidadAnterior = m.CantidadAnterior,
-                        CantidadNueva = m.CantidadNueva,
-                        CostoUnitarioMovimiento = m.CostoUnitarioMovimiento,
-                        ReferenciaModulo = m.ReferenciaModulo,
-                        IdReferencia = m.IdReferencia,
-                        Observaciones = m.Observaciones,
-                        FechaCreacion = m.FechaCreacion,
-                        UsuarioCreacion = m.UsuarioCreacion
-                    })
+                    .Skip(((request.PageNumber ?? 1) - 1) * (request.PageSize ?? 10))
+                    .Take(request.PageSize ?? 10)
+                    .Join(context.TiposMovimiento, m => m.IdTipoMovimiento, t => t.Id, (m, t) => new { Mov = m, Tipo = t.Nombre })
                     .ToListAsync();
 
-                var response = new PagedResponse<MovimientoInventarioDto>(movimientos, total, request.Pagina, request.ElementosPorPagina);
+                var dtos = movimientos.Select(x => new MovimientoInventarioDto
+                {
+                    Id = x.Mov.Id,
+                    IdTipoMovimiento = x.Mov.IdTipoMovimiento,
+                    TipoMovimientoNombre = x.Tipo,
+                    IdStock = x.Mov.IdStock,
+                    IdProducto = x.Mov.Stock.IdProducto,
+                    AlmacenNombre = x.Mov.Stock.Almacen.NombreAlmacen,
+                    Cantidad = x.Mov.Cantidad,
+                    CantidadAnterior = x.Mov.CantidadAnterior,
+                    CantidadNueva = x.Mov.CantidadNueva,
+                    CostoUnitarioMovimiento = x.Mov.CostoUnitarioMovimiento,
+                    SaldoCantidad = x.Mov.SaldoCantidad,
+                    SaldoValorizado = x.Mov.SaldoValorizado,
+                    CostoPromedioActual = x.Mov.CostoPromedioActual,
+                    ReferenciaModulo = x.Mov.ReferenciaModulo,
+                    IdReferencia = x.Mov.IdReferencia,
+                    Observaciones = x.Mov.Observaciones,
+                    FechaCreacion = x.Mov.FechaCreacion,
+                    UsuarioCreacion = x.Mov.UsuarioCreacion
+                }).ToList();
+
+                var response = new PagedResponse<MovimientoInventarioDto>(dtos, request.PageNumber ?? 1, request.PageSize ?? 10, total);
                 return Results.Ok(response);
             });
 

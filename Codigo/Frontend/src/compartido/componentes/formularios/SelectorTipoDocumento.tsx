@@ -13,7 +13,7 @@ import {
   FormMessage,
 } from "@/componentes/ui/form";
 import { useTipoDocumento } from "@/features/configuracion/hooks/useTipoDocumento";
-import { TipoDocumento } from "@/features/configuracion/services/tipoDocumentoService";
+import { TipoDocumento } from "@/features/configuracion/servicios/servicioTipoDocumento";
 import { Loader2 } from "lucide-react";
 
 interface SelectorTipoDocumentoProps {

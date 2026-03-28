@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -10,12 +10,7 @@ namespace Compras.API.Infrastructure.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<long>(
-                name: "compra_id",
-                schema: "compras",
-                table: "ordenes_compra",
-                type: "bigint",
-                nullable: true);
+            // Migración baselined: los cambios ya existen en la base de datos.
         }
 
         /// <inheritdoc />

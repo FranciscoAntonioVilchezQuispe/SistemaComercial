@@ -12,6 +12,13 @@ export interface Cliente {
   diasCredito?: number;
   idListaPrecioAsignada?: number;
   activado: boolean;
+  ubigeo?: string;
+  condicionSunat?: string;
+  estadoSunat?: string;
+  esAgenteRetencion: boolean;
+  esBuenContribuyente: boolean;
+  esAgentePercepcion: boolean;
+  fechaUltimaConsultaSunat?: string;
   contactos?: ContactoCliente[];
 }
 
@@ -39,4 +46,11 @@ export interface ClienteFormData {
   diasCredito?: number;
   idListaPrecioAsignada?: number;
   activado: boolean;
+  ubigeo?: string;
+  condicionSunat?: string;
+  estadoSunat?: string;
+  esAgenteRetencion: boolean;
+  esBuenContribuyente: boolean;
+  esAgentePercepcion: boolean;
+  fechaUltimaConsultaSunat?: string;
 }

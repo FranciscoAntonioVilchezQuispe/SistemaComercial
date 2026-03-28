@@ -14,7 +14,7 @@ namespace Compras.API.Endpoints
         {
             var grupo = app.MapGroup("/api/proveedores").WithTags("Proveedores");
 
-            grupo.MapGet("/", async ([Microsoft.AspNetCore.Mvc.AsParameters] Nucleo.Comun.Application.Paginacion.PagedRequest request, IProveedorRepositorio repo) =>
+            grupo.MapGet("/", async ([AsParameters] Nucleo.Comun.Application.Paginacion.PagedRequest request, IProveedorRepositorio repo) =>
             {
                 var (proveedores, total) = await repo.ObtenerPaginadoAsync(request.Search, request.Activo, request.PageNumber ?? 1, request.PageSize ?? 10);
                 var response = new Nucleo.Comun.Application.Paginacion.PagedResponse<Proveedor>(proveedores, request.PageNumber ?? 1, request.PageSize ?? 10, total);
@@ -41,6 +41,13 @@ namespace Compras.API.Endpoints
                     Email = dto.Email,
                     PaginaWeb = dto.PaginaWeb,
                     Activado = dto.Activado ?? true,
+                    Ubigeo = dto.Ubigeo,
+                    CondicionSunat = dto.CondicionSunat,
+                    EstadoSunat = dto.EstadoSunat,
+                    EsAgenteRetencion = dto.EsAgenteRetencion,
+                    EsBuenContribuyente = dto.EsBuenContribuyente,
+                    EsAgentePercepcion = dto.EsAgentePercepcion,
+                    FechaUltimaConsultaSunat = dto.FechaUltimaConsultaSunat,
                     UsuarioCreacion = "SISTEMA"
                 };
                 var creado = await repo.AgregarAsync(proveedor);
@@ -60,6 +67,14 @@ namespace Compras.API.Endpoints
                 existente.Telefono = dto.Telefono;
                 existente.Email = dto.Email;
                 existente.PaginaWeb = dto.PaginaWeb;
+                existente.Ubigeo = dto.Ubigeo;
+                existente.CondicionSunat = dto.CondicionSunat;
+                existente.EstadoSunat = dto.EstadoSunat;
+                existente.EsAgenteRetencion = dto.EsAgenteRetencion;
+                existente.EsBuenContribuyente = dto.EsBuenContribuyente;
+                existente.EsAgentePercepcion = dto.EsAgentePercepcion;
+                existente.FechaUltimaConsultaSunat = dto.FechaUltimaConsultaSunat;
+                
                 if (dto.Activado.HasValue) existente.Activado = dto.Activado.Value;
                 existente.UsuarioActualizacion = "SISTEMA";
                 existente.FechaActualizacion = DateTime.UtcNow;

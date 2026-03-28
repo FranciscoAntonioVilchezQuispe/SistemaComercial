@@ -67,7 +67,7 @@ namespace Configuracion.API.Infrastructure.Repositorios
             if (!string.IsNullOrEmpty(search))
             {
                 search = search.ToLower();
-                query = query.Where(s => s.Nombre.ToLower().Contains(search) || s.Direccion.ToLower().Contains(search));
+                query = query.Where(s => s.NombreSucursal.ToLower().Contains(search) || s.Direccion.ToLower().Contains(search));
             }
 
             if (activo.HasValue)
@@ -77,7 +77,7 @@ namespace Configuracion.API.Infrastructure.Repositorios
 
             var total = await query.CountAsync();
             var datos = await query
-                .OrderBy(s => s.Nombre)
+                .OrderBy(s => s.NombreSucursal)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();

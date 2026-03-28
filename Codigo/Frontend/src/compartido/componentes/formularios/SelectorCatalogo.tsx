@@ -26,6 +26,8 @@ interface SelectorCatalogoProps {
   disabled?: boolean;
   hideLabel?: boolean;
   soloCodigo?: boolean;
+  hideMessage?: boolean;
+  className?: string;
 }
 
 export const SelectorCatalogo: React.FC<SelectorCatalogoProps> = ({
@@ -37,16 +39,18 @@ export const SelectorCatalogo: React.FC<SelectorCatalogoProps> = ({
   disabled = false,
   hideLabel = false,
   soloCodigo = false,
+  hideMessage = false,
+  className,
 }) => {
   const { data: valores, isLoading, isError } = useCatalogo(codigo);
 
   return (
-    <FormItem>
-      {!hideLabel && <FormLabel>{label}</FormLabel>}
+    <FormItem className={className}>
+      {label && !hideLabel && <FormLabel className="text-[10px] uppercase font-black opacity-60 ml-1">{label}</FormLabel>}
 
       <Select
         onValueChange={onChange}
-        value={value?.toString()}
+        value={value != null ? value.toString() : undefined}
         disabled={disabled || isLoading}
       >
         <FormControl>
@@ -83,7 +87,7 @@ export const SelectorCatalogo: React.FC<SelectorCatalogoProps> = ({
           ))}
         </SelectContent>
       </Select>
-      <FormMessage />
+      {!hideMessage && <FormMessage />}
     </FormItem>
   );
 };

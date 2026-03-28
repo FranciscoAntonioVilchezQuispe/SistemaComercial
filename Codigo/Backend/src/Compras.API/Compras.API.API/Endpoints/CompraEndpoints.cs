@@ -20,7 +20,7 @@ namespace Compras.API.Endpoints
         {
             var grupo = app.MapGroup("/api/compras").WithTags("Compras");
 
-            grupo.MapGet("/", async ([Microsoft.AspNetCore.Mvc.AsParameters] Nucleo.Comun.Application.Paginacion.PagedRequest request, ICompraRepositorio repo) =>
+            grupo.MapGet("/", async ([AsParameters] Nucleo.Comun.Application.Paginacion.PagedRequest request, ICompraRepositorio repo) =>
             {
                 var (compras, total) = await repo.ObtenerPaginadoAsync(request.Search, request.Activo, request.PageNumber ?? 1, request.PageSize ?? 10);
                 var dtos = compras.Select(c => MapToDto(c)).ToList();

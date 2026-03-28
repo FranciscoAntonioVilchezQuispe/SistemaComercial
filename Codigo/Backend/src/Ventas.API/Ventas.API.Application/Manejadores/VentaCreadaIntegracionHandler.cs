@@ -18,14 +18,18 @@ namespace Ventas.API.Application.Manejadores
 
         public async Task Handle(VentaCreadaEvento notification, CancellationToken cancellationToken)
         {
-            _logger.LogInformation("Procesando actualización de inventario para la Venta {VentaId}", notification.VentaId);
+            _logger.LogInformation("Procesando actualización de inventario para la Venta {VentaId} - Serie: {Serie}-{Numero}", 
+                notification.VentaId, notification.Serie, notification.Numero);
 
             foreach (var item in notification.Items)
             {
+                _logger.LogDebug("Solicitando salida de stock: Producto {ProductoId}, Almacén {AlmacenId}, Cantidad {Cantidad}", 
+                    item.IdProducto, notification.IdAlmacen, item.Cantidad);
+
                 var success = await _inventarioServicio.RegistrarSalidaVentaAsync(
-                    item.IdProducto, 
-                    notification.IdAlmacen, 
-                    item.Cantidad, 
+                    item.IdProducto,
+                    notification.IdAlmacen,
+                    item.Cantidad,
                     notification.VentaId,
                     notification.IdTipoComprobante,
                     notification.Serie,
@@ -33,8 +37,12 @@ namespace Ventas.API.Application.Manejadores
 
                 if (!success)
                 {
-                    _logger.LogWarning("No se pudo actualizar el stock para el Producto {ProductoId} de la Venta {VentaId}", 
+                    _logger.LogWarning("No se pudo actualizar el stock para el Producto {ProductoId} de la Venta {VentaId}",
                         item.IdProducto, notification.VentaId);
+                }
+                else 
+                {
+                    _logger.LogInformation("Stock actualizado correctamente para Producto {ProductoId}", item.IdProducto);
                 }
             }
         }

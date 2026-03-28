@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Configuracion.API.Domain.Entidades
 {
-    [Table("impuesto", Schema = "configuracion")]
+    [Table("impuestos", Schema = "configuracion")]
     public class Impuesto : EntidadBase
     {
         [Column("id_impuesto")]
@@ -12,7 +12,7 @@ namespace Configuracion.API.Domain.Entidades
 
         [Required]
         [MaxLength(10)]
-        [Column("codigo")]
+        [Column("codigo_sunat")]
         public string Codigo { get; set; } = null!;
 
         [Required]
@@ -23,7 +23,7 @@ namespace Configuracion.API.Domain.Entidades
         [Column("porcentaje", TypeName = "decimal(5,2)")]
         public decimal Porcentaje { get; set; }
 
-        [Column("es_igv")]
-        public bool EsIgv { get; set; }
+        [Column("es_porcentaje")]
+        public bool EsPorcentaje { get; set; }
     }
 }

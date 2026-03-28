@@ -117,7 +117,7 @@ function FormularioMatriz({
             <SelectValue placeholder="Seleccionar comprobante..." />
           </SelectTrigger>
           <SelectContent>
-            {(comprobantes || []).map((comp) => (
+            {(comprobantes?.datos || []).map((comp) => (
               <SelectItem key={comp.id} value={String(comp.id)}>
                 <span className="font-mono font-bold mr-2 text-[11px]">{comp.codigo}</span>
                 {comp.nombre}

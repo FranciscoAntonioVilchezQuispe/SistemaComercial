@@ -44,6 +44,13 @@ namespace Clientes.API.Endpoints
                     DiasCredito = dto.DiasCredito,
                     IdListaPrecioAsignada = dto.IdListaPrecioAsignada,
                     Activado = dto.Activado ?? true,
+                    Ubigeo = dto.Ubigeo,
+                    CondicionSunat = dto.CondicionSunat,
+                    EstadoSunat = dto.EstadoSunat,
+                    EsAgenteRetencion = dto.EsAgenteRetencion,
+                    EsBuenContribuyente = dto.EsBuenContribuyente,
+                    EsAgentePercepcion = dto.EsAgentePercepcion,
+                    FechaUltimaConsultaSunat = dto.FechaUltimaConsultaSunat,
                     UsuarioCreacion = "SISTEMA"
                 };
                 var creado = await repo.AgregarAsync(cliente);
@@ -66,6 +73,14 @@ namespace Clientes.API.Endpoints
                 existente.LimiteCredito = dto.LimiteCredito;
                 existente.DiasCredito = dto.DiasCredito;
                 existente.IdListaPrecioAsignada = dto.IdListaPrecioAsignada;
+                existente.Ubigeo = dto.Ubigeo;
+                existente.CondicionSunat = dto.CondicionSunat;
+                existente.EstadoSunat = dto.EstadoSunat;
+                existente.EsAgenteRetencion = dto.EsAgenteRetencion;
+                existente.EsBuenContribuyente = dto.EsBuenContribuyente;
+                existente.EsAgentePercepcion = dto.EsAgentePercepcion;
+                existente.FechaUltimaConsultaSunat = dto.FechaUltimaConsultaSunat;
+
                 if (dto.Activado.HasValue) existente.Activado = dto.Activado.Value;
                 existente.UsuarioActualizacion = "SISTEMA";
                 existente.FechaActualizacion = DateTime.UtcNow;

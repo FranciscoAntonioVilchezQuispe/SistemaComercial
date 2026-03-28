@@ -112,6 +112,9 @@ export const SelectorProveedorV2: React.FC<SelectorProveedorProps> = ({
         email: "proveedor@ejemplo.com",
         telefono: "",
         activado: true,
+        esAgenteRetencion: false,
+        esBuenContribuyente: false,
+        esAgentePercepcion: false,
       });
 
       if (nuevo) {

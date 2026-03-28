@@ -49,23 +49,23 @@ namespace Compras.API.Infrastructure.Migrations
                         .HasColumnName("base_inafecta");
 
                     b.Property<DateTime?>("FechaActualizacion")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("timestamp without time zone")
                         .HasColumnName("fecha_modificacion");
 
                     b.Property<DateTime>("FechaContable")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("timestamp without time zone")
                         .HasColumnName("fecha_contable");
 
                     b.Property<DateTime>("FechaCreacion")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("timestamp without time zone")
                         .HasColumnName("fecha_creacion");
 
                     b.Property<DateTime>("FechaEmision")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("timestamp without time zone")
                         .HasColumnName("fecha_emision");
 
                     b.Property<DateTime?>("FechaVencimiento")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("timestamp without time zone")
                         .HasColumnName("fecha_vencimiento");
 
                     b.Property<long>("IdAlmacen")
@@ -189,11 +189,11 @@ namespace Compras.API.Infrastructure.Migrations
                         .HasColumnName("descuento_item");
 
                     b.Property<DateTime?>("FechaActualizacion")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("timestamp without time zone")
                         .HasColumnName("fecha_modificacion");
 
                     b.Property<DateTime>("FechaCreacion")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("timestamp without time zone")
                         .HasColumnName("fecha_creacion");
 
                     b.Property<long>("IdCompra")
@@ -262,11 +262,11 @@ namespace Compras.API.Infrastructure.Migrations
                         .HasColumnName("cantidad");
 
                     b.Property<DateTime?>("FechaActualizacion")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("timestamp without time zone")
                         .HasColumnName("fecha_modificacion");
 
                     b.Property<DateTime>("FechaCreacion")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("timestamp without time zone")
                         .HasColumnName("fecha_creacion");
 
                     b.Property<long>("IdNota")
@@ -327,11 +327,11 @@ namespace Compras.API.Infrastructure.Migrations
                         .HasColumnName("cantidad_solicitada");
 
                     b.Property<DateTime?>("FechaActualizacion")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("timestamp without time zone")
                         .HasColumnName("fecha_modificacion");
 
                     b.Property<DateTime>("FechaCreacion")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("timestamp without time zone")
                         .HasColumnName("fecha_creacion");
 
                     b.Property<long>("IdOrdenCompra")
@@ -388,11 +388,11 @@ namespace Compras.API.Infrastructure.Migrations
                         .HasColumnName("activado");
 
                     b.Property<DateTime?>("FechaActualizacion")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("timestamp without time zone")
                         .HasColumnName("fecha_modificacion");
 
                     b.Property<DateTime>("FechaCreacion")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("timestamp without time zone")
                         .HasColumnName("fecha_creacion");
 
                     b.Property<string>("NombreUnidad")
@@ -456,15 +456,15 @@ namespace Compras.API.Infrastructure.Migrations
                         .HasColumnName("descripcion_motivo");
 
                     b.Property<DateTime?>("FechaActualizacion")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("timestamp without time zone")
                         .HasColumnName("fecha_modificacion");
 
                     b.Property<DateTime>("FechaCreacion")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("timestamp without time zone")
                         .HasColumnName("fecha_creacion");
 
                     b.Property<DateTime>("FechaEmision")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("timestamp without time zone")
                         .HasColumnName("fecha_emision");
 
                     b.Property<long>("IdCompraReferencia")
@@ -558,19 +558,19 @@ namespace Compras.API.Infrastructure.Migrations
                         .HasColumnName("compra_id");
 
                     b.Property<DateTime?>("FechaActualizacion")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("timestamp without time zone")
                         .HasColumnName("fecha_modificacion");
 
                     b.Property<DateTime>("FechaCreacion")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("timestamp without time zone")
                         .HasColumnName("fecha_creacion");
 
                     b.Property<DateTime>("FechaEmision")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("timestamp without time zone")
                         .HasColumnName("fecha_emision");
 
                     b.Property<DateTime?>("FechaEntregaEstimada")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("timestamp without time zone")
                         .HasColumnName("fecha_entrega_estimada");
 
                     b.Property<long>("IdAlmacenDestino")
@@ -640,6 +640,11 @@ namespace Compras.API.Infrastructure.Migrations
                         .HasColumnType("boolean")
                         .HasColumnName("activado");
 
+                    b.Property<string>("CondicionSunat")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("condicion_sunat");
+
                     b.Property<string>("Direccion")
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)")
@@ -650,13 +655,34 @@ namespace Compras.API.Infrastructure.Migrations
                         .HasColumnType("character varying(100)")
                         .HasColumnName("email");
 
+                    b.Property<bool>("EsAgentePercepcion")
+                        .HasColumnType("boolean")
+                        .HasColumnName("es_agente_percepcion");
+
+                    b.Property<bool>("EsAgenteRetencion")
+                        .HasColumnType("boolean")
+                        .HasColumnName("es_agente_retencion");
+
+                    b.Property<bool>("EsBuenContribuyente")
+                        .HasColumnType("boolean")
+                        .HasColumnName("es_buen_contribuyente");
+
+                    b.Property<string>("EstadoSunat")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("estado_sunat");
+
                     b.Property<DateTime?>("FechaActualizacion")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("timestamp without time zone")
                         .HasColumnName("fecha_modificacion");
 
                     b.Property<DateTime>("FechaCreacion")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("timestamp without time zone")
                         .HasColumnName("fecha_creacion");
+
+                    b.Property<DateTime?>("FechaUltimaConsultaSunat")
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("fecha_ultima_consulta_sunat");
 
                     b.Property<long>("IdTipoDocumento")
                         .HasColumnType("bigint")
@@ -688,6 +714,11 @@ namespace Compras.API.Infrastructure.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)")
                         .HasColumnName("telefono");
+
+                    b.Property<string>("Ubigeo")
+                        .HasMaxLength(6)
+                        .HasColumnType("character varying(6)")
+                        .HasColumnName("ubigeo");
 
                     b.Property<string>("UsuarioActualizacion")
                         .HasMaxLength(50)
@@ -798,7 +829,7 @@ namespace Compras.API.Infrastructure.Migrations
                         .HasColumnName("correlativo_actual");
 
                     b.Property<DateTime>("FechaCreacion")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("timestamp without time zone")
                         .HasColumnName("fecha_creacion");
 
                     b.Property<long>("IdTipoComprobante")

@@ -10,9 +10,9 @@ export interface TipoDocumento {
   activado: boolean;
 }
 
-export const tipoDocumentoService = {
+export const servicioTipoDocumento = {
   /** Obtiene los tipos de documento desde la tabla configuracion.tipo_documento */
-  getAll: async (): Promise<TipoDocumento[]> => {
+  obtenerTodos: async (): Promise<TipoDocumento[]> => {
     const response: any = await apiConfiguracion.get("/tipos-documento");
     return response.datos || response.data || [];
   },

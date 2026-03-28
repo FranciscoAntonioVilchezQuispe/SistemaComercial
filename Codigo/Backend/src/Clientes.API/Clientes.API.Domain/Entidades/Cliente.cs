@@ -53,5 +53,31 @@ namespace Clientes.API.Domain.Entidades
         public long? IdListaPrecioAsignada { get; set; }
 
         public virtual ICollection<ContactoCliente> Contactos { get; set; } = new List<ContactoCliente>();
+
+        // --- Campos SUNAT UBL 2.1 ---
+        
+        [MaxLength(6)]
+        [Column("ubigeo")]
+        public string? Ubigeo { get; set; }
+
+        [Column("condicion_sunat")]
+        [MaxLength(20)]
+        public string? CondicionSunat { get; set; }
+
+        [Column("estado_sunat")]
+        [MaxLength(20)]
+        public string? EstadoSunat { get; set; }
+
+        [Column("es_agente_retencion")]
+        public bool EsAgenteRetencion { get; set; }
+
+        [Column("es_buen_contribuyente")]
+        public bool EsBuenContribuyente { get; set; }
+
+        [Column("es_agente_percepcion")]
+        public bool EsAgentePercepcion { get; set; }
+
+        [Column("fecha_ultima_consulta_sunat")]
+        public DateTime? FechaUltimaConsultaSunat { get; set; }
     }
 }

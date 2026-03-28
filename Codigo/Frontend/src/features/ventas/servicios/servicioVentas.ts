@@ -2,7 +2,6 @@ import { apiVentas } from "@/lib/axios";
 import {
   Venta,
   VentaFormData,
-  VentaFiltros,
 } from "../tipos/ventas.types";
 import { PagedRequest, PagedResponse } from "@/types/pagination.types";
 

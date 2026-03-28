@@ -12,7 +12,8 @@ builder.AddCentralizedLogging();
 // Add services to the container.
 builder.Services.AddDbContext<ClientesDbContext>(options =>
 {
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"),
+        o => o.MigrationsHistoryTable("__ef_migrations_history", "clientes"));
     options.UseSnakeCaseNamingConvention();
 });
 

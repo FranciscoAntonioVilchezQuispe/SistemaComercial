@@ -18,6 +18,7 @@ namespace Configuracion.API.Application.DTOs
     {
         public long Id { get; set; }
         public long IdEmpresa { get; set; }
+        public string Codigo { get; set; } = null!;
         public string NombreSucursal { get; set; } = null!;
         public string? Direccion { get; set; }
         public string? Telefono { get; set; }
@@ -31,7 +32,7 @@ namespace Configuracion.API.Application.DTOs
         public string Codigo { get; set; } = null!;
         public string Nombre { get; set; } = null!;
         public decimal Porcentaje { get; set; }
-        public bool EsIgv { get; set; }
+        public bool EsPorcentaje { get; set; }
     }
 
     public class MetodoPagoDto

@@ -130,7 +130,7 @@ export function AlmacenForm({
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  {sucursales?.map((s) => (
+                  {sucursales?.datos?.map((s) => (
                     <SelectItem key={s.id} value={s.id.toString()}>
                       {s.nombreSucursal}
                     </SelectItem>

@@ -19,6 +19,7 @@
 
 -- 5. MANTENIMIENTO Y FIXES (Correcciones de estado)
 \i 07_actualizar_estados_oc.sql
+\i 08_normalizacion_sunat.sql
 \i fix_kardex_tables.sql
 
 -- ==============================================================================

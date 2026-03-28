@@ -100,6 +100,14 @@ namespace Configuracion.API.Infrastructure.Migrations
                         .HasColumnType("character varying(10)")
                         .HasColumnName("codigo");
 
+                    b.Property<bool>("EsDocumentoIdentidad")
+                        .HasColumnType("boolean")
+                        .HasColumnName("es_documento_identidad");
+
+                    b.Property<bool>("EsDocumentoRelacionado")
+                        .HasColumnType("boolean")
+                        .HasColumnName("es_documento_relacionado");
+
                     b.Property<bool>("EsEmpresa")
                         .HasColumnType("boolean")
                         .HasColumnName("es_empresa");
@@ -262,11 +270,11 @@ namespace Configuracion.API.Infrastructure.Migrations
                         .IsRequired()
                         .HasMaxLength(10)
                         .HasColumnType("character varying(10)")
-                        .HasColumnName("codigo");
+                        .HasColumnName("codigo_sunat");
 
-                    b.Property<bool>("EsIgv")
+                    b.Property<bool>("EsPorcentaje")
                         .HasColumnType("boolean")
-                        .HasColumnName("es_igv");
+                        .HasColumnName("es_porcentaje");
 
                     b.Property<DateTime?>("FechaActualizacion")
                         .HasColumnType("timestamp with time zone")
@@ -298,9 +306,9 @@ namespace Configuracion.API.Infrastructure.Migrations
                         .HasColumnName("usuario_creacion");
 
                     b.HasKey("Id")
-                        .HasName("pk_impuesto");
+                        .HasName("pk_impuestos");
 
-                    b.ToTable("impuesto", "configuracion");
+                    b.ToTable("impuestos", "configuracion");
                 });
 
             modelBuilder.Entity("Configuracion.API.Domain.Entidades.MatrizReglaSunat", b =>
@@ -315,10 +323,6 @@ namespace Configuracion.API.Infrastructure.Migrations
                     b.Property<bool>("Activado")
                         .HasColumnType("boolean")
                         .HasColumnName("activado");
-
-                    b.Property<bool>("Activo")
-                        .HasColumnType("boolean")
-                        .HasColumnName("activo");
 
                     b.Property<DateTime?>("FechaActualizacion")
                         .HasColumnType("timestamp with time zone")
@@ -552,6 +556,12 @@ namespace Configuracion.API.Infrastructure.Migrations
                         .HasColumnType("boolean")
                         .HasColumnName("activado");
 
+                    b.Property<string>("Codigo")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("codigo");
+
                     b.Property<string>("Direccion")
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)")
@@ -577,7 +587,7 @@ namespace Configuracion.API.Infrastructure.Migrations
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)")
-                        .HasColumnName("nombre_sucursal");
+                        .HasColumnName("nombre");
 
                     b.Property<string>("Telefono")
                         .HasMaxLength(50)
@@ -596,12 +606,12 @@ namespace Configuracion.API.Infrastructure.Migrations
                         .HasColumnName("usuario_creacion");
 
                     b.HasKey("Id")
-                        .HasName("pk_sucursal");
+                        .HasName("pk_sucursales");
 
                     b.HasIndex("IdEmpresa")
-                        .HasDatabaseName("ix_sucursal_id_empresa");
+                        .HasDatabaseName("ix_sucursales_id_empresa");
 
-                    b.ToTable("sucursal", "configuracion");
+                    b.ToTable("sucursales", "configuracion");
                 });
 
             modelBuilder.Entity("Configuracion.API.Domain.Entidades.TablaGeneral", b =>
@@ -833,10 +843,6 @@ namespace Configuracion.API.Infrastructure.Migrations
                         .HasColumnType("boolean")
                         .HasColumnName("activado");
 
-                    b.Property<bool>("Activo")
-                        .HasColumnType("boolean")
-                        .HasColumnName("activo");
-
                     b.Property<string>("Codigo")
                         .IsRequired()
                         .HasMaxLength(4)
@@ -872,6 +878,64 @@ namespace Configuracion.API.Infrastructure.Migrations
                         .HasName("pk_tipo_operacion_sunat");
 
                     b.ToTable("tipo_operacion_sunat", "configuracion");
+                });
+
+            modelBuilder.Entity("Configuracion.API.Domain.Entidades.Ubigeo", b =>
+                {
+                    b.Property<string>("Codigo")
+                        .HasMaxLength(6)
+                        .HasColumnType("character varying(6)")
+                        .HasColumnName("codigo");
+
+                    b.Property<bool>("Activado")
+                        .HasColumnType("boolean")
+                        .HasColumnName("activado");
+
+                    b.Property<DateTime?>("FechaActualizacion")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fecha_modificacion");
+
+                    b.Property<DateTime>("FechaCreacion")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fecha_creacion");
+
+                    b.Property<long>("Id")
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    b.Property<short>("Nivel")
+                        .HasColumnType("smallint")
+                        .HasColumnName("nivel");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("nombre");
+
+                    b.Property<string>("ParentId")
+                        .HasMaxLength(6)
+                        .HasColumnType("character varying(6)")
+                        .HasColumnName("parent_id");
+
+                    b.Property<string>("UsuarioActualizacion")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("usuario_modificacion");
+
+                    b.Property<string>("UsuarioCreacion")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("usuario_creacion");
+
+                    b.HasKey("Codigo")
+                        .HasName("pk_ubigeos");
+
+                    b.HasIndex("ParentId")
+                        .HasDatabaseName("ix_ubigeos_parent_id");
+
+                    b.ToTable("ubigeos", "configuracion");
                 });
 
             modelBuilder.Entity("Configuracion.API.Domain.Entidades.DocumentoComprobanteRelacion", b =>
@@ -936,7 +1000,7 @@ namespace Configuracion.API.Infrastructure.Migrations
                         .HasForeignKey("IdEmpresa")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
-                        .HasConstraintName("fk_sucursal_empresa_id_empresa");
+                        .HasConstraintName("fk_sucursales_empresa_id_empresa");
 
                     b.Navigation("Empresa");
                 });
@@ -953,9 +1017,25 @@ namespace Configuracion.API.Infrastructure.Migrations
                     b.Navigation("TablaGeneral");
                 });
 
+            modelBuilder.Entity("Configuracion.API.Domain.Entidades.Ubigeo", b =>
+                {
+                    b.HasOne("Configuracion.API.Domain.Entidades.Ubigeo", "Parent")
+                        .WithMany("Hijos")
+                        .HasForeignKey("ParentId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_ubigeos_ubigeos_parent_id");
+
+                    b.Navigation("Parent");
+                });
+
             modelBuilder.Entity("Configuracion.API.Domain.Entidades.TablaGeneral", b =>
                 {
                     b.Navigation("Detalles");
+                });
+
+            modelBuilder.Entity("Configuracion.API.Domain.Entidades.Ubigeo", b =>
+                {
+                    b.Navigation("Hijos");
                 });
 #pragma warning restore 612, 618
         }

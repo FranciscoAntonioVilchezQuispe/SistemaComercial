@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus, Package, Truck, CheckCircle, Clock } from "lucide-react";
+import { Plus, Truck, CheckCircle, Clock } from "lucide-react";
 import { useTraslados } from "../hooks/useTraslados";
 import { usePagination } from "@/hooks/usePagination";
 import { Button } from "@/components/ui/button";

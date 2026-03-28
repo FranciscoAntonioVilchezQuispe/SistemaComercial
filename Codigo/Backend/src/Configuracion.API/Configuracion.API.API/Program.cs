@@ -57,6 +57,7 @@ builder.Services.AddCors(options =>
 
 // Configuración de Autorización
 builder.Services.AddAuthorization();
+builder.Services.AddMemoryCache();
 
 // Registro de Repositorios
 builder.Services.AddScoped<ITablaGeneralRepositorio, TablaGeneralRepositorio>();
@@ -68,6 +69,7 @@ builder.Services.AddScoped<ISerieComprobanteRepositorio, SerieComprobanteReposit
 builder.Services.AddScoped<ITipoComprobanteRepositorio, TipoComprobanteRepositorio>();
 builder.Services.AddScoped<ITipoOperacionSunatRepositorio, TipoOperacionSunatRepositorio>();
 builder.Services.AddScoped<IMatrizReglaSunatRepositorio, MatrizReglaSunatRepositorio>();
+builder.Services.AddScoped<IUbigeoRepository, UbigeoRepository>();
 
 builder.Services.AddScoped<IReglasDocumentoServicio, ReglasDocumentoServicio>();
 
@@ -106,6 +108,7 @@ app.MapMatrizSunatEndpoints();
 app.MapTipoOperacionSunatEndpoints();
 
 app.MapTablaGeneralEndpoints();
+app.MapUbigeoEndpoints();
 
 app.MapGet("/", () => "Configuracion API Running - v1.0");
 

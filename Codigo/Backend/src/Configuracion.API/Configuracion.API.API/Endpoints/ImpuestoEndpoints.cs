@@ -35,7 +35,7 @@ namespace Configuracion.API.Endpoints
                     Codigo = dto.Codigo,
                     Nombre = dto.Nombre,
                     Porcentaje = dto.Porcentaje,
-                    EsIgv = dto.EsIgv,
+                    EsPorcentaje = dto.EsPorcentaje,
                     UsuarioCreacion = "SISTEMA",
                     Activado = true
                 };
@@ -51,7 +51,7 @@ namespace Configuracion.API.Endpoints
                 impuesto.Codigo = dto.Codigo;
                 impuesto.Nombre = dto.Nombre;
                 impuesto.Porcentaje = dto.Porcentaje;
-                impuesto.EsIgv = dto.EsIgv;
+                impuesto.EsPorcentaje = dto.EsPorcentaje;
                 impuesto.UsuarioActualizacion = "SISTEMA";
                 impuesto.FechaActualizacion = DateTime.UtcNow;
 

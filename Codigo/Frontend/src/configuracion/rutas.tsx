@@ -67,11 +67,8 @@ const PaginaOperacionesSunat = lazy(() =>
     }),
   ),
 );
-const PaginaMatrizReglas = lazy(() =>
-  import("@/features/configuracion/paginas/PaginaMatrizReglas").then((m) => ({
-    default: m.PaginaMatrizReglas,
-  })),
-);
+const PaginaMatrizReglas = lazy(() => import("@/features/configuracion/paginas/PaginaMatrizReglas").then((m) => ({ default: m.PaginaMatrizReglas })));
+const PaginaUbigeos = lazy(() => import("@/features/configuracion/paginas/PaginaUbigeos").then((m) => ({ default: m.PaginaUbigeos })));
 
 const PaginaPOS = lazy(() => import("@/features/ventas/paginas/PaginaPOS"));
 const PaginaClientes = lazy(() =>
@@ -290,6 +287,14 @@ export const ruteador = createBrowserRouter(
           element: (
             <Suspense fallback={<CargandoPagina />}>
               <PaginaMatrizReglas />
+            </Suspense>
+          ),
+        },
+        {
+          path: "configuracion/ubigeos",
+          element: (
+            <Suspense fallback={<CargandoPagina />}>
+              <PaginaUbigeos />
             </Suspense>
           ),
         },

@@ -1,5 +1,5 @@
 import { useQuery, UseQueryResult } from "@tanstack/react-query";
-import { reglasDocumentoService } from "../../configuracion/servicios/reglasDocumentoService";
+import { servicioReglaDocumento } from "@/features/configuracion/servicios/servicioReglaDocumento";
 import { TipoComprobante } from "../tipos/tipoComprobante.types";
 
 /**
@@ -11,7 +11,7 @@ export const useComprobantesPorDocumento = (
 ): UseQueryResult<TipoComprobante[], Error> => {
   return useQuery({
     queryKey: ["tipos-comprobante-filtrados", codigoDocumento],
-    queryFn: () => reglasDocumentoService.listarComprobantesPorDocumento(codigoDocumento!),
+    queryFn: () => servicioReglaDocumento.listarComprobantesPorDocumento(codigoDocumento!),
     enabled: !!codigoDocumento,
     staleTime: 1000 * 60 * 30, // 30 minutos de caché
   });

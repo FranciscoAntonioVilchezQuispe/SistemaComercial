@@ -91,12 +91,14 @@ export function OrdenCompraForm({
   const [busquedaProveedor, setBusquedaProveedor] = React.useState("");
 
   // Only fetch when search term is present or initial load if needed
-  const { data: proveedores = [], refetch: buscarProveedores } = useProveedores(
-    busquedaProveedor,
+  const { data: qProveedores, refetch: buscarProveedores } = useProveedores(
+    { search: busquedaProveedor, pageNumber: 1, pageSize: 100 },
     false,
   );
+  const proveedores = qProveedores?.datos || [];
 
-  const { data: almacenes } = useAlmacenes();
+  const { data: qAlmacenes } = useAlmacenes();
+  const almacenes = qAlmacenes?.datos || [];
   const { data: productosData } = useProductos(
     {
       pageNumber: 1,

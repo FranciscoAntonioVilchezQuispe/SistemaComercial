@@ -45,6 +45,9 @@ export function SelectorCliente({
     telefono: "",
     direccion: "",
     activado: true,
+    esAgenteRetencion: false,
+    esBuenContribuyente: false,
+    esAgentePercepcion: false,
   };
 
   const buscarClientes = async (termino: string) => {
@@ -56,10 +59,13 @@ export function SelectorCliente({
 
     setCargando(true);
     try {
-      const res = await obtenerClientes(termino);
+      const res = await obtenerClientes({
+        search: termino,
+        pageNumber: 1,
+        pageSize: 20,
+      });
       // Siempre incluimos Público General si el término es vacío o si no hay resultados específicos
-      // Pero si hay búsqueda, mostramos lo que devuelva el API y opcionalmente el por defecto arriba
-      setResultados(res || []);
+      setResultados(res.datos || []);
       setIsOpen(true);
       setSelectedIndex(-1);
     } catch (error) {

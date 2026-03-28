@@ -54,9 +54,11 @@ namespace Inventario.API.Infrastructure.Repositorios
             return await _context.KardexMovimientos.FirstOrDefaultAsync(x => x.Id == id);
         }
 
-        public async Task<KardexMovimiento?> ObtenerPorReferenciaAsync(long referenciaId, string referenciaTipo)
+        public async Task<List<KardexMovimiento>> ObtenerPorReferenciaAsync(long referenciaId, string referenciaTipo)
         {
-            return await _context.KardexMovimientos.FirstOrDefaultAsync(x => x.ReferenciaId == referenciaId && x.ReferenciaTipo == referenciaTipo);
+            return await _context.KardexMovimientos
+                .Where(x => x.ReferenciaId == referenciaId && x.ReferenciaTipo == referenciaTipo)
+                .ToListAsync();
         }
 
         public async Task<KardexMovimiento?> ObtenerUltimoMovimientoAsync(long almacenId, long productoId, DateTime hastaFecha, TimeSpan hastaHora)

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, Variants } from 'framer-motion';
 import { ArrowLeft, Grip } from 'lucide-react';
 import { ItemMenu, menuItems } from '@/config/menu';
 import { ContenedorPagina } from '@/compartido/componentes/ContenedorPagina';
@@ -19,7 +19,7 @@ const MODULE_COLORS: Record<string, string> = {
 };
 
 // Variantes para animar la cuadrícula
-const containerVariants = {
+const containerVariants: Variants = {
   hidden: { opacity: 0 },
   show: {
     opacity: 1,
@@ -34,7 +34,7 @@ const containerVariants = {
   }
 };
 
-const itemVariants = {
+const itemVariants: Variants = {
   hidden: { opacity: 0, scale: 0.9, y: 20 },
   show: { 
     opacity: 1, 
@@ -100,7 +100,7 @@ export default function PaginaDashboard() {
               exit="exit"
               className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
             >
-              {modulosDisponibles.map((modulo, idx) => {
+              {modulosDisponibles.map((modulo) => {
                 const gradient = MODULE_COLORS[modulo.titulo] || "from-gray-500 to-gray-700";
                 return (
                   <motion.div
@@ -145,7 +145,7 @@ export default function PaginaDashboard() {
               exit="exit"
               className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
             >
-              {moduloSeleccionado.subItems?.map((subItem, idx) => (
+              {moduloSeleccionado.subItems?.map((subItem) => (
                 <motion.div
                   key={subItem.titulo}
                   variants={itemVariants}

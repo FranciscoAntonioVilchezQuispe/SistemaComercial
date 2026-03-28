@@ -29,6 +29,7 @@ import {
   FileJson,
   ShieldCheck,
   Table,
+  MapPin,
 } from "lucide-react";
 import { RUTAS_TITULOS } from "@/config/rutasTitulos";
 
@@ -107,6 +108,7 @@ export const menuItems: ItemMenu[] = [
       { titulo: RUTAS_TITULOS["/configuracion/operaciones-sunat"] || "Op. SUNAT", icono: <FileText className="h-6 w-6" />, ruta: "/configuracion/operaciones-sunat" },
       { titulo: RUTAS_TITULOS["/configuracion/matriz-sunat"] || "Matriz SUNAT", icono: <Table className="h-6 w-6" />, ruta: "/configuracion/matriz-sunat" },
       { titulo: RUTAS_TITULOS["/configuracion/tablas-generales"] || "Tablas Generales", icono: <List className="h-6 w-6" />, ruta: "/configuracion/tablas-generales" },
+      { titulo: RUTAS_TITULOS["/configuracion/ubigeos"] || "Ubigeos", icono: <MapPin className="h-6 w-6" />, ruta: "/configuracion/ubigeos" },
     ],
   },
 ];

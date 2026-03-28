@@ -9,6 +9,13 @@ export interface Proveedor {
   email?: string;
   paginaWeb?: string;
   activado: boolean;
+  ubigeo?: string;
+  condicionSunat?: string;
+  estadoSunat?: string;
+  esAgenteRetencion: boolean;
+  esBuenContribuyente: boolean;
+  esAgentePercepcion: boolean;
+  fechaUltimaConsultaSunat?: string;
   fechaCreacion: string;
 }
 
@@ -23,4 +30,11 @@ export interface ProveedorFormData {
   email?: string;
   paginaWeb?: string;
   activado?: boolean;
+  ubigeo?: string;
+  condicionSunat?: string;
+  estadoSunat?: string;
+  esAgenteRetencion: boolean;
+  esBuenContribuyente: boolean;
+  esAgentePercepcion: boolean;
+  fechaUltimaConsultaSunat?: string;
 }

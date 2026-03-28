@@ -20,7 +20,7 @@ namespace Inventario.API.Endpoints
                 try
                 {
                     var (datos, total) = await repo.ObtenerPaginadoAsync(request.Search, request.Activo, request.PageNumber ?? 1, request.PageSize ?? 100);
-                    var response = new PagedResponse<Almacen>(datos, total, request.PageNumber ?? 1, request.PageSize ?? 100);
+                    var response = new PagedResponse<Almacen>(datos, request.PageNumber ?? 1, request.PageSize ?? 100, total);
                     return Results.Ok(response);
                 }
                 catch (Exception ex)
