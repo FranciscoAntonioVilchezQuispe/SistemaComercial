@@ -11,6 +11,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.0" />
+    <PackageReference Include="Dapper" Version="2.1.72" />
     <PackageReference Include="EFCore.NamingConventions" Version="8.0.3" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.0">
       <PrivateAssets>all</PrivateAssets>
@@ -21,5 +22,6 @@
   <ItemGroup>
     <ProjectReference Include="..\Inventario.API.Application\Inventario.API.Application.csproj" />
     <ProjectReference Include="..\Inventario.API.Domain\Inventario.API.Domain.csproj" />
+    <ProjectReference Include="..\..\Nucleo\Nucleo.csproj" />
   </ItemGroup>
 </Project>

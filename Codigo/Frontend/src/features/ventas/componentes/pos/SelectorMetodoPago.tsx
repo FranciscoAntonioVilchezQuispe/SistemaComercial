@@ -5,6 +5,7 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Card } from "@/components/ui/card";
 import { formatearMoneda } from "@compartido/utilidades/moneda";
+import { limpiarDecimal } from "@compartido/utilidades/string";
 
 export interface MetodoPago {
   id: number;
@@ -48,23 +49,25 @@ export function SelectorMetodoPago({
   const [metodoId, setMetodoId] = useState<string>(
     metodoSeleccionado?.id.toString() || "1",
   );
-  const [montoPagado, setMontoPagado] = useState<number>(total);
+  const [montoPagado, setMontoPagado] = useState<string>(total.toString());
 
+  const montoNumerico = parseFloat(montoPagado) || 0;
   const metodoActual = metodosPago.find((m) => m.id.toString() === metodoId);
-  const vuelto = metodoActual?.codigo === "EFECTIVO" ? montoPagado - total : 0;
+  const vuelto = metodoActual?.codigo === "EFECTIVO" ? Math.round((montoNumerico - total) * 100) / 100 : 0;
 
   const handleSeleccionar = (id: string) => {
     setMetodoId(id);
     const metodo = metodosPago.find((m) => m.id.toString() === id);
     if (metodo) {
-      onSeleccionar(metodo, metodo.codigo === "EFECTIVO" ? montoPagado : total);
+      onSeleccionar(metodo, metodo.codigo === "EFECTIVO" ? montoNumerico : total);
     }
   };
 
-  const handleMontoPagadoChange = (valor: number) => {
-    setMontoPagado(valor);
+  const handleMontoPagadoChange = (stringValor: string) => {
+    const limpio = limpiarDecimal(stringValor);
+    setMontoPagado(limpio);
     if (metodoActual) {
-      onSeleccionar(metodoActual, valor);
+      onSeleccionar(metodoActual, parseFloat(limpio) || 0);
     }
   };
 
@@ -102,13 +105,12 @@ export function SelectorMetodoPago({
             <Label htmlFor="monto-pagado">Monto Recibido</Label>
             <Input
               id="monto-pagado"
-              type="number"
-              step="0.01"
+              type="text"
+              inputMode="decimal"
               value={montoPagado}
-              onChange={(e) =>
-                handleMontoPagadoChange(parseFloat(e.target.value) || 0)
-              }
+              onChange={(e) => handleMontoPagadoChange(e.target.value)}
               className="text-lg font-semibold"
+              placeholder="0.00"
             />
           </div>
 
@@ -123,7 +125,7 @@ export function SelectorMetodoPago({
             </span>
           </div>
 
-          {vuelto < 0 && (
+          {Math.round(montoNumerico * 100) < Math.round(total * 100) && (
             <p className="text-xs text-destructive">
               El monto recibido es insuficiente
             </p>

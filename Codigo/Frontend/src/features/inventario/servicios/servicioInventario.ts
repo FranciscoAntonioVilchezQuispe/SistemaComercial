@@ -5,9 +5,11 @@ import {
   InventarioFiltros,
   MovimientoFiltros,
   Traslado,
+  MovimientoResumen,
+  MovimientoDetalle,
+  StockProducto,
 } from "../tipos/inventario.types";
 import { PagedRequest, PagedResponse } from "@/types/pagination.types";
-import { MovimientoInventario, StockProducto } from "../tipos/inventario.types";
 import { Almacen } from "../almacenes/types/almacen.types";
 
 const API_URL = "/inventario";
@@ -43,12 +45,20 @@ export const servicioInventario = {
   obtenerMovimientos: async (
     paginacion?: PagedRequest,
     filtros: MovimientoFiltros = {},
-  ): Promise<PagedResponse<MovimientoInventario>> => {
+  ): Promise<PagedResponse<MovimientoResumen>> => {
     const params = { ...filtros, ...paginacion };
     const response: any = await apiInventario.get(`${API_URL}/movimientos`, {
       params,
     });
     return response;
+  },
+
+  /**
+   * Obtiene el detalle completo de un movimiento por su ID
+   */
+  obtenerMovimientoPorId: async (id: number): Promise<MovimientoDetalle> => {
+    const response: any = await apiInventario.get(`${API_URL}/movimientos/${id}`);
+    return response.datos || response.data || response;
   },
 
   /**

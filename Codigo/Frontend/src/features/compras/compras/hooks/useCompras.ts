@@ -5,29 +5,31 @@ import {
   UseQueryResult,
   UseMutationResult,
 } from "@tanstack/react-query";
-import { Compra, CrearCompraPayload } from "../types/compra.types";
+import { CompraResumen, CompraDetalle, CrearCompraPayload } from "../types/compra.types";
 import * as servicio from "../servicios/servicioCompras";
 import { PagedRequest, PagedResponse } from "@/types/pagination.types";
 
+const QUERY_KEY = ["compras"];
+
 export const useCompras = (
   paginacion?: PagedRequest,
-): UseQueryResult<PagedResponse<Compra>, Error> => {
+): UseQueryResult<PagedResponse<CompraResumen>, Error> => {
   return useQuery({
-    queryKey: ["compras", paginacion],
+    queryKey: [...QUERY_KEY, "lista", paginacion],
     queryFn: () => servicio.obtenerCompras(paginacion),
   });
 };
 
-export const useCompra = (id: number): UseQueryResult<Compra, Error> => {
+export const useCompra = (id: number): UseQueryResult<CompraDetalle, Error> => {
   return useQuery({
-    queryKey: ["compras", id],
+    queryKey: [...QUERY_KEY, "detalle", id],
     queryFn: () => servicio.obtenerCompra(id),
     enabled: !!id,
   });
 };
 
 export const useRegistrarCompra = (): UseMutationResult<
-  Compra,
+  CompraDetalle,
   Error,
   CrearCompraPayload
 > => {
@@ -35,7 +37,7 @@ export const useRegistrarCompra = (): UseMutationResult<
   return useMutation({
     mutationFn: servicio.registrarCompra,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["compras"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEY });
       // También podríamos invalidar el stock si el backend lo actualiza inmediatamente
       queryClient.invalidateQueries({ queryKey: ["productos"] });
     },
@@ -50,8 +52,9 @@ export const useConfirmarCompra = (): UseMutationResult<
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: servicio.confirmarCompra,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["compras"] });
+    onSuccess: (_, id) => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: [...QUERY_KEY, "detalle", id] });
     },
   });
 };
@@ -61,7 +64,7 @@ export const useEliminarCompra = (): UseMutationResult<void, Error, number> => {
   return useMutation({
     mutationFn: servicio.eliminarCompra,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["compras"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEY });
       queryClient.invalidateQueries({ queryKey: ["productos"] });
     },
   });

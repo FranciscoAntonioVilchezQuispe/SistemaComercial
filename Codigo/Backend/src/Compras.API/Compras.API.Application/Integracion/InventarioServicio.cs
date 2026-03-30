@@ -59,19 +59,68 @@ namespace Compras.API.Application.Integracion
             try
             {
                 var response = await _httpClient.DeleteAsync($"inventario/movimientos/referencia/COMPRAS/{idCompra}");
-
-                if (response.IsSuccessStatusCode)
-                {
-                    return true;
-                }
-
-                var errorMsg = await response.Content.ReadAsStringAsync();
-                _logger.LogError("Error al eliminar movimientos en inventario: {Error}", errorMsg);
-                return false;
+                return response.IsSuccessStatusCode;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error de conexión con Inventario.API para eliminar movimientos");
+                _logger.LogError(ex, "Error al eliminar movimientos en inventario para Compra {CompraId}", idCompra);
+                return false;
+            }
+        }
+
+        public async Task<bool> RegistrarSalidaNotaCreditoAsync(long idProducto, long idAlmacen, decimal cantidad, long idNota, string serie, string numero)
+        {
+            try
+            {
+                var comando = new
+                {
+                    IdProducto = idProducto,
+                    IdAlmacen = idAlmacen,
+                    IdTipoMovimiento = 21, // SAL_DEV (Salida por Devolución a Proveedor)
+                    Cantidad = Math.Abs(cantidad),
+                    ReferenciaModulo = "NC_COMPRA",
+                    IdReferencia = idNota,
+                    Observaciones = $"Salida por Devolución - Nota de Crédito #" + idNota,
+                    IdTipoDocumento = "07",
+                    SerieDocumento = serie,
+                    NumeroDocumento = numero
+                };
+
+                var response = await _httpClient.PostAsJsonAsync("inventario/movimientos", comando);
+                return response.IsSuccessStatusCode;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al registrar salida por Nota de Crédito Compra {NotaId}", idNota);
+                return false;
+            }
+        }
+
+        public async Task<bool> RegistrarEntradaNotaDebitoAsync(long idProducto, long idAlmacen, decimal cantidad, decimal costoUnitario, long idNota, string serie, string numero)
+        {
+            try
+            {
+                var comando = new
+                {
+                    IdProducto = idProducto,
+                    IdAlmacen = idAlmacen,
+                    IdTipoMovimiento = 19, // ING_COM (Ingreso por Compra)
+                    Cantidad = cantidad,
+                    CostoUnitario = costoUnitario,
+                    ReferenciaModulo = "ND_COMPRA",
+                    IdReferencia = idNota,
+                    Observaciones = $"Ingreso adicional por Nota de Débito #" + idNota,
+                    IdTipoDocumento = "08",
+                    SerieDocumento = serie,
+                    NumeroDocumento = numero
+                };
+
+                var response = await _httpClient.PostAsJsonAsync("inventario/movimientos", comando);
+                return response.IsSuccessStatusCode;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al registrar entrada por Nota de Débito Compra {NotaId}", idNota);
                 return false;
             }
         }

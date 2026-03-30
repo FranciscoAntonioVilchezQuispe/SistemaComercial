@@ -1,5 +1,6 @@
 using Contabilidad.API.Domain.Entidades;
 using Contabilidad.API.Domain.Interfaces;
+using Contabilidad.API.Domain.DTOs;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
@@ -17,7 +18,7 @@ namespace Contabilidad.API.Endpoints
             grupo.MapGet("/", async ([AsParameters] PagedRequest request, int? nivel, IPlanCuentaRepositorio repo) =>
             {
                 var (datos, total) = await repo.ObtenerPaginadoAsync(request.Search, nivel, request.PageNumber ?? 1, request.PageSize ?? 100);
-                var response = new PagedResponse<PlanCuenta>(datos, total, request.PageNumber ?? 1, request.PageSize ?? 100);
+                var response = new PagedResponse<PlanCuenta>(datos, request.PageNumber ?? 1, request.PageSize ?? 100, total);
                 return Results.Ok(response);
             });
 
@@ -45,7 +46,7 @@ namespace Contabilidad.API.Endpoints
             grupo.MapGet("/", async ([AsParameters] PagedRequest request, ICentroCostoRepositorio repo) =>
             {
                 var (datos, total) = await repo.ObtenerPaginadoAsync(request.Search, request.PageNumber ?? 1, request.PageSize ?? 100);
-                var response = new PagedResponse<CentroCosto>(datos, total, request.PageNumber ?? 1, request.PageSize ?? 100);
+                var response = new PagedResponse<CentroCosto>(datos, request.PageNumber ?? 1, request.PageSize ?? 100, total);
                 return Results.Ok(response);
             });
 
@@ -54,6 +55,28 @@ namespace Contabilidad.API.Endpoints
                 var centro = await repo.ObtenerPorIdAsync(id);
                 if (centro == null) return Results.NotFound(new ToReturnError<CentroCosto>("Centro de costo no encontrado", 404));
                 return Results.Ok(new ToReturn<CentroCosto>(centro));
+            });
+        }
+    }
+
+    public static class AsientoEndpoints
+    {
+        public static void MapAsientoEndpoints(this IEndpointRouteBuilder app)
+        {
+            var grupo = app.MapGroup("/api/asientos").WithTags("Asientos Contables");
+
+            grupo.MapGet("/", async ([AsParameters] PagedRequest request, string? periodo, IAsientoRepositorio repo) =>
+            {
+                var (datos, total) = await repo.ObtenerPaginadoAsync(request.Search, periodo, request.PageNumber ?? 1, request.PageSize ?? 10);
+                var response = new PagedResponse<AsientoListDto>(datos, request.PageNumber ?? 1, request.PageSize ?? 10, total);
+                return Results.Ok(response);
+            });
+
+            grupo.MapGet("/{id}", async (long id, IAsientoRepositorio repo) =>
+            {
+                var asiento = await repo.ObtenerDetallePorIdAsync(id);
+                if (asiento == null) return Results.NotFound(new ToReturnError<AsientoDetalleDto>("Asiento contable no encontrado", 404));
+                return Results.Ok(new ToReturn<AsientoDetalleDto>(asiento));
             });
         }
     }

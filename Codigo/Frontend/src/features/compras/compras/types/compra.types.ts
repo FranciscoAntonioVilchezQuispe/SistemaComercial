@@ -9,20 +9,40 @@ export interface DetalleCompra {
   subtotal: number;
 }
 
-export interface Compra {
+/** Interface ligera para el listado de compras (Grids) */
+export interface CompraResumen {
   id: number;
-  idProveedor: number;
-  idAlmacen: number;
-  idMoneda: number;
-  idTipoComprobante: number;
-  tipoComprobante: string; // 'FACTURA', 'BOLETA', etc.
+  tipoComprobanteNombre: string;
   serieComprobante: string;
   numeroComprobante: string;
-  fechaEmision: string; // ISO Date
-  fechaContable: string; // ISO Date
-  moneda: string; // 'PEN', 'USD'
+  fechaEmision: string;
+  proveedorRazonSocial: string;
+  proveedorNumeroDocumento: string;
+  moneda: string;
+  total: number;
+  estadoNombre: string;
+  estadoPagoNombre: string;
+}
+
+/** Interface completa para el detalle de la compra */
+export interface CompraDetalle {
+  id: number;
+  idProveedor: number;
+  proveedorRazonSocial?: string;
+  proveedorNumeroDocumento?: string;
+  idAlmacen: number;
+  nombreAlmacen?: string;
+  idMoneda: number;
+  moneda: string;
+  idTipoComprobante: number;
+  tipoComprobanteNombre: string;
+  serieComprobante: string;
+  numeroComprobante: string;
+  fechaEmision: string;
+  fechaContable: string;
   tipoCambio: number;
-  estado: string; // 'BORRADOR', 'CONFIRMADO', 'ANULADO'
+  estado: string;
+  estadoNombre: string;
   tipoOperacion?: string;
   observaciones?: string;
 
@@ -32,17 +52,13 @@ export interface Compra {
   total: number;
   saldoPendiente?: number;
   idEstadoPago: number;
+  estadoPagoNombre?: string;
 
   detalles: DetalleCompra[];
-
-  // Datos expandidos (opcional, depende del backend)
-  razonSocialProveedor?: string;
-  nombreAlmacen?: string;
-  nombreTipoComprobante?: string;
-  numeroDocumentoProveedor?: string;
-  nombreTipoDocumentoProveedor?: string;
-  idTipoDocumentoProveedor?: number;
 }
+
+/** @deprecated Usar CompraResumen o CompraDetalle */
+export type Compra = CompraResumen | CompraDetalle;
 
 export interface CompraFormData {
   idProveedor: number;

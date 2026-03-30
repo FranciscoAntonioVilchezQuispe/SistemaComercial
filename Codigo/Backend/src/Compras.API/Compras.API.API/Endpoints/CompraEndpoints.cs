@@ -1,5 +1,6 @@
 using Compras.API.Domain.Entidades;
 using Compras.API.Domain.Interfaces;
+using Compras.API.Domain.DTOs;
 using Compras.API.Application.DTOs;
 using Compras.API.Application.Comandos;
 using MediatR;
@@ -22,17 +23,16 @@ namespace Compras.API.Endpoints
 
             grupo.MapGet("/", async ([AsParameters] Nucleo.Comun.Application.Paginacion.PagedRequest request, ICompraRepositorio repo) =>
             {
-                var (compras, total) = await repo.ObtenerPaginadoAsync(request.Search, request.Activo, request.PageNumber ?? 1, request.PageSize ?? 10);
-                var dtos = compras.Select(c => MapToDto(c)).ToList();
-                var response = new Nucleo.Comun.Application.Paginacion.PagedResponse<CompraDto>(dtos, request.PageNumber ?? 1, request.PageSize ?? 10, total);
+                var (datos, total) = await repo.ObtenerPaginadoAsync(request.Search, request.PageNumber ?? 1, request.PageSize ?? 10);
+                var response = new Nucleo.Comun.Application.Paginacion.PagedResponse<CompraListDto>(datos, request.PageNumber ?? 1, request.PageSize ?? 10, total);
                 return Results.Ok(response);
             });
 
             grupo.MapGet("/{id}", async (long id, ICompraRepositorio repo) =>
             {
-                var compra = await repo.ObtenerPorIdAsync(id);
-                if (compra == null) return Results.NotFound(new ToReturnError<CompraDto>("Compra no encontrada", 404));
-                return Results.Ok(new ToReturn<CompraDto>(MapToDto(compra)));
+                var compra = await repo.ObtenerDetallePorIdAsync(id);
+                if (compra == null) return Results.NotFound(new ToReturnError<CompraDetalleDto>("Compra no encontrada", 404));
+                return Results.Ok(new ToReturn<CompraDetalleDto>(compra));
             });
 
             grupo.MapPost("/", async (CompraDto dto, IMediator mediator) =>

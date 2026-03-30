@@ -19,8 +19,6 @@ namespace Ventas.API.Application.Integracion
         {
             try
             {
-                // El endpoint en Inventario.API es POST /inventario/movimientos
-                // Basado en CrearMovimientoInventarioComando.cs
                 var comando = new
                 {
                     IdProducto = idProducto,
@@ -49,6 +47,76 @@ namespace Ventas.API.Application.Integracion
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error de conexión con Inventario.API");
+                return false;
+            }
+        }
+
+        public async Task<bool> AnularMovimientosVentaAsync(long idVenta)
+        {
+            try
+            {
+                var response = await _httpClient.DeleteAsync($"inventario/movimientos/referencia/VENTAS/{idVenta}");
+                return response.IsSuccessStatusCode;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al anular movimientos en inventario para Venta {VentaId}", idVenta);
+                return false;
+            }
+        }
+
+        public async Task<bool> RegistrarEntradaNotaCreditoAsync(long idProducto, long idAlmacen, decimal cantidad, long idNota, string serie, string numero)
+        {
+            try
+            {
+                var comando = new
+                {
+                    IdProducto = idProducto,
+                    IdAlmacen = idAlmacen,
+                    IdTipoMovimiento = 10, // ENT_DEV (Entrada por Devolución)
+                    Cantidad = cantidad,
+                    ReferenciaModulo = "NC_VENTA",
+                    IdReferencia = idNota,
+                    Observaciones = $"Reingreso por Nota de Crédito #" + idNota,
+                    IdTipoDocumento = "07",
+                    SerieDocumento = serie,
+                    NumeroDocumento = numero
+                };
+
+                var response = await _httpClient.PostAsJsonAsync("inventario/movimientos", comando);
+                return response.IsSuccessStatusCode;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al registrar entrada por Nota de Crédito {NotaId}", idNota);
+                return false;
+            }
+        }
+
+        public async Task<bool> RegistrarSalidaNotaDebitoAsync(long idProducto, long idAlmacen, decimal cantidad, long idNota, string serie, string numero)
+        {
+            try
+            {
+                var comando = new
+                {
+                    IdProducto = idProducto,
+                    IdAlmacen = idAlmacen,
+                    IdTipoMovimiento = 20, // SAL_VEN
+                    Cantidad = cantidad,
+                    ReferenciaModulo = "ND_VENTA",
+                    IdReferencia = idNota,
+                    Observaciones = $"Salida por Nota de Débito #" + idNota,
+                    IdTipoDocumento = "08",
+                    SerieDocumento = serie,
+                    NumeroDocumento = numero
+                };
+
+                var response = await _httpClient.PostAsJsonAsync("inventario/movimientos", comando);
+                return response.IsSuccessStatusCode;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al registrar salida por Nota de Débito {NotaId}", idNota);
                 return false;
             }
         }

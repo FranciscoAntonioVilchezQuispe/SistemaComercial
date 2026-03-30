@@ -1,0 +1,120 @@
+using Nucleo.Comun.Domain;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace Ventas.API.Domain.Entidades
+{
+    [Table("nota_debito", Schema = "ventas")]
+    public class NotaDebito : EntidadBase
+    {
+        [Key]
+        [Column("id_nota")]
+        public override long Id { get; set; }
+
+        [Required]
+        [MaxLength(4)]
+        [Column("serie")]
+        public string Serie { get; set; } = null!;
+
+        [Column("numero")]
+        public long Numero { get; set; }
+
+        [Required]
+        [MaxLength(2)]
+        [Column("tipo_comprobante")]
+        public string TipoComprobante { get; set; } = "08";
+
+        [Column("id_venta_referencia")]
+        public long IdVentaReferencia { get; set; }
+
+        [Required]
+        [MaxLength(4)]
+        [Column("serie_referencia")]
+        public string SerieReferencia { get; set; } = null!;
+
+        [Column("numero_referencia")]
+        public long NumeroReferencia { get; set; }
+
+        [Required]
+        [MaxLength(2)]
+        [Column("tipo_doc_referencia")]
+        public string TipoDocReferencia { get; set; } = null!;
+
+        [Column("id_tipo_nota")]
+        public long IdTipoNota { get; set; }
+
+        [Required]
+        [Column("motivo_sustento", TypeName = "text")]
+        public string MotivoSustento { get; set; } = null!;
+
+        [Required]
+        [MaxLength(2)]
+        [Column("cliente_tipo_doc")]
+        public string ClienteTipoDoc { get; set; } = null!;
+
+        [Required]
+        [MaxLength(15)]
+        [Column("cliente_nro_doc")]
+        public string ClienteNroDoc { get; set; } = null!;
+
+        [Required]
+        [MaxLength(250)]
+        [Column("cliente_razon_social")]
+        public string ClienteRazonSocial { get; set; } = null!;
+
+        [Column("subtotal", TypeName = "decimal(12,2)")]
+        public decimal Subtotal { get; set; }
+
+        [Column("igv", TypeName = "decimal(12,2)")]
+        public decimal Igv { get; set; }
+
+        [Column("total", TypeName = "decimal(12,2)")]
+        public decimal Total { get; set; }
+
+        [Column("porcentaje_igv", TypeName = "decimal(5,2)")]
+        public decimal PorcentajeIgv { get; set; } = 18.00m;
+
+        [Required]
+        [MaxLength(3)]
+        [Column("moneda")]
+        public string Moneda { get; set; } = "PEN";
+
+        [Column("tipo_cambio", TypeName = "decimal(10,4)")]
+        public decimal? TipoCambio { get; set; }
+
+        [Column("afecta_stock")]
+        public bool AfectaStock { get; set; } = false;
+
+        [Column("fecha_emision", TypeName = "date")]
+        public DateTime FechaEmision { get; set; }
+
+        [Required]
+        [MaxLength(20)]
+        [Column("estado")]
+        public string Estado { get; set; } = "PENDIENTE";
+
+        [Column("fecha_envio_sunat")]
+        public DateTime? FechaEnvioSunat { get; set; }
+
+        [MaxLength(10)]
+        [Column("respuesta_sunat_codigo")]
+        public string? RespuestaSunatCodigo { get; set; }
+
+        [Column("respuesta_sunat_desc", TypeName = "text")]
+        public string? RespuestaSunatDesc { get; set; }
+
+        [Column("hash_cdr", TypeName = "text")]
+        public string? HashCdr { get; set; }
+
+        [Column("xml_generado", TypeName = "text")]
+        public string? XmlGenerado { get; set; }
+
+        // Navegación
+        [ForeignKey("IdVentaReferencia")]
+        public virtual Venta Venta { get; set; } = null!;
+
+        public virtual ICollection<NotaDebitoDetalle> Detalles { get; set; } = new List<NotaDebitoDetalle>();
+    }
+}

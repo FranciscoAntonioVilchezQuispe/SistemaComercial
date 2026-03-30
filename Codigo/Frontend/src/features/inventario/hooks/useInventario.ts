@@ -12,7 +12,8 @@ import {
   RegistroMovimientoDTO,
   AjusteStockDTO,
   StockProducto,
-  MovimientoInventario,
+  MovimientoResumen,
+  MovimientoDetalle,
   KardexProducto,
   Traslado,
 } from "../tipos/inventario.types";
@@ -43,15 +44,26 @@ export const useStockProducto = (
 export const useMovimientos = (
   paginacion?: PagedRequest,
   filtros: MovimientoFiltros = {},
-): UseQueryResult<PagedResponse<MovimientoInventario>, Error> => {
+): UseQueryResult<PagedResponse<MovimientoResumen>, Error> => {
   return useQuery({
     queryKey: ["inventario", "movimientos", paginacion, filtros],
     queryFn: () => servicioInventario.obtenerMovimientos(paginacion, filtros),
   });
 };
 
+/**
+ * Hook para obtener el detalle de un movimiento por ID
+ */
+export const useMovimiento = (id: number): UseQueryResult<MovimientoDetalle, Error> => {
+  return useQuery({
+    queryKey: ["inventario", "movimientos", id],
+    queryFn: () => servicioInventario.obtenerMovimientoPorId(id),
+    enabled: !!id,
+  });
+};
+
 export const useRegistrarMovimiento = (): UseMutationResult<
-  MovimientoInventario,
+  MovimientoDetalle,
   Error,
   RegistroMovimientoDTO
 > => {

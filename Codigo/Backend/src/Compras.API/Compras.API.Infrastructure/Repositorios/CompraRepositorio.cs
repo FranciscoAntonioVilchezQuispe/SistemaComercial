@@ -5,9 +5,9 @@ using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Configuracion.API.Infrastructure.Datos;
-using Inventario.API.Infrastructure.Datos;
-using Catalogo.Infrastructure.Datos;
+using Dapper;
+using Compras.API.Domain.DTOs;
+using System.Data;
 
 namespace Compras.API.Infrastructure.Repositorios
 {
@@ -20,39 +20,53 @@ namespace Compras.API.Infrastructure.Repositorios
             _context = context;
         }
 
-        public async Task<Compra?> ObtenerPorIdAsync(long id)
+        public async Task<CompraDetalleDto?> ObtenerDetallePorIdAsync(long id)
         {
-            var query = from c in _context.Compras
-                        join p in _context.Proveedores on c.IdProveedor equals p.Id
-                        join td in _context.TiposDocumentoRef on p.IdTipoDocumento equals td.Id
-                        join tc in _context.TiposComprobanteRef on c.IdTipoComprobante equals tc.Id
-                        join a in _context.AlmacenesRef on c.IdAlmacen equals a.Id
-                        where c.Id == id
-                        select new { c, p, td, tc, a };
+            var connection = _context.GetDbConnection();
+            if (connection.State != ConnectionState.Open) await connection.OpenAsync();
 
-            var resultado = await query.FirstOrDefaultAsync();
-            if (resultado == null) return null;
+            var sql = @"
+                -- Cabecera
+                SELECT c.id_compra as Id, c.id_proveedor, p.razon_social as RazonSocialProveedor, 
+                       p.numero_documento as NumeroDocumentoProveedor, td.nombre as NombreTipoDocumentoProveedor,
+                       p.id_tipo_documento as IdTipoDocumentoProveedor,
+                       c.id_almacen, alm.nombre_almacen as NombreAlmacen, c.id_orden_compra_ref,
+                       c.id_tipo_comprobante, tc.nombre as NombreTipoComprobante,
+                       c.serie_comprobante, c.numero_comprobante, c.fecha_emision, c.fecha_contable,
+                       c.fecha_vencimiento, c.moneda, c.tipo_cambio, c.subtotal, c.base_gravada,
+                       c.base_exonerada, c.base_inafecta, c.impuesto, c.total, c.saldo_pendiente,
+                       c.id_estado_pago, c.observaciones
+                FROM compras.compras c
+                INNER JOIN clientes.proveedores p ON p.id_proveedor = c.id_proveedor
+                INNER JOIN configuracion.tipo_documento td ON td.id_tipo_documento = p.id_tipo_documento
+                INNER JOIN inventario.almacenes alm ON alm.id_almacen = c.id_almacen
+                INNER JOIN configuracion.tipo_comprobante tc ON tc.id_tipo_comprobante = c.id_tipo_comprobante
+                WHERE c.id_compra = @id;
 
-            var compra = resultado.c;
-            compra.Proveedor = resultado.p;
-            compra.NombreAlmacen = resultado.a.NombreAlmacen;
-            compra.NombreTipoComprobante = resultado.tc.Nombre;
-            compra.NombreTipoDocumentoProveedor = resultado.td.Nombre;
-            compra.IdTipoDocumentoProveedor = resultado.p.IdTipoDocumento;
+                -- Detalles
+                SELECT dc.id_detalle_compra as Id, dc.id_producto, prod.nombre_producto as NombreProducto,
+                       dc.id_variante, dc.descripcion, dc.cantidad, dc.precio_unitario_compra,
+                       dc.subtotal, dc.afectacion_igv
+                FROM compras.detalle_compra dc
+                INNER JOIN catalogo.productos prod ON prod.id_producto = dc.id_producto
+                WHERE dc.id_compra = @id;";
 
-            var detallesQuery = from dc in _context.DetallesCompra
-                                join prod in _context.ProductosRef on dc.IdProducto equals prod.Id
-                                where dc.IdCompra == id
-                                select new { dc, prod };
-
-            var detalles = await detallesQuery.ToListAsync();
-            compra.Detalles = detalles.Select(x =>
+            using var multi = await connection.QueryMultipleAsync(sql, new { id });
+            var compra = await multi.ReadFirstOrDefaultAsync<CompraDetalleDto>();
+            if (compra != null)
             {
-                x.dc.Descripcion = x.prod.NombreProducto;
-                return x.dc;
-            }).ToList();
+                compra.Detalles = (await multi.ReadAsync<DetalleCompraDto>()).ToList();
+            }
 
             return compra;
+        }
+
+        public async Task<Compra?> ObtenerPorIdAsync(long id)
+        {
+            return await _context.Compras
+                .Include(c => c.Detalles)
+                .Include(c => c.Proveedor)
+                .FirstOrDefaultAsync(c => c.Id == id);
         }
 
         public async Task<Compra> AgregarAsync(Compra compra)
@@ -64,25 +78,9 @@ namespace Compras.API.Infrastructure.Repositorios
 
         public async Task<IEnumerable<Compra>> ObtenerTodosAsync()
         {
-            var query = from c in _context.Compras
-                        join p in _context.Proveedores on c.IdProveedor equals p.Id
-                        join td in _context.TiposDocumentoRef on p.IdTipoDocumento equals td.Id
-                        join tc in _context.TiposComprobanteRef on c.IdTipoComprobante equals tc.Id
-                        join a in _context.AlmacenesRef on c.IdAlmacen equals a.Id
-                        select new { c, p, td, tc, a };
-
-            var resultados = await query.ToListAsync();
-
-            return resultados.Select(r =>
-            {
-                var c = r.c;
-                c.Proveedor = r.p;
-                c.NombreAlmacen = r.a.NombreAlmacen;
-                c.NombreTipoComprobante = r.tc.Nombre;
-                c.NombreTipoDocumentoProveedor = r.td.Nombre;
-                c.IdTipoDocumentoProveedor = r.p.IdTipoDocumento;
-                return c;
-            }).ToList();
+            return await _context.Compras
+                .Include(c => c.Proveedor)
+                .ToListAsync();
         }
 
         public async Task<IEnumerable<Compra>> ObtenerPorProveedorAsync(long idProveedor)
@@ -92,49 +90,35 @@ namespace Compras.API.Infrastructure.Repositorios
                 .ToListAsync();
         }
 
-        public async Task<(IEnumerable<Compra> Datos, int Total)> ObtenerPaginadoAsync(string? busqueda, bool? activo, int pagina, int elementosPorPagina)
+        public async Task<(IEnumerable<CompraListDto> Datos, int Total)> ObtenerPaginadoAsync(string? busqueda, int pagina, int elementosPorPagina)
         {
-            var query = from c in _context.Compras
-                        join p in _context.Proveedores on c.IdProveedor equals p.Id
-                        join td in _context.TiposDocumentoRef on p.IdTipoDocumento equals td.Id
-                        join tc in _context.TiposComprobanteRef on c.IdTipoComprobante equals tc.Id
-                        join a in _context.AlmacenesRef on c.IdAlmacen equals a.Id
-                        select new { c, p, td, tc, a };
+            var connection = _context.GetDbConnection();
+            if (connection.State != ConnectionState.Open) await connection.OpenAsync();
 
-            if (!string.IsNullOrWhiteSpace(busqueda))
-            {
-                var term = busqueda.Trim().ToLower();
-                query = query.Where(r => 
-                    r.c.SerieComprobante.ToLower().Contains(term) || 
-                    r.c.NumeroComprobante.ToLower().Contains(term) ||
-                    r.p.RazonSocial.ToLower().Contains(term));
-            }
+            var offset = (pagina - 1) * elementosPorPagina;
+            var sql = @"
+                SELECT c.id_compra as Id, c.serie_comprobante, c.numero_comprobante, c.fecha_emision,
+                       p.razon_social as RazonSocialProveedor, p.numero_documento as NumeroDocumentoProveedor,
+                       tc.nombre as NombreTipoComprobante, c.moneda, c.total, c.saldo_pendiente,
+                       alm.nombre_almacen as NombreAlmacen,
+                       COUNT(*) OVER() AS TotalRegistros
+                FROM compras.compras c
+                INNER JOIN clientes.proveedores p ON p.id_proveedor = c.id_proveedor
+                INNER JOIN configuracion.tipo_comprobante tc ON tc.id_tipo_comprobante = c.id_tipo_comprobante
+                INNER JOIN inventario.almacenes alm ON alm.id_almacen = c.id_almacen
+                WHERE (@busqueda IS NULL OR 
+                       c.serie_comprobante ILIKE '%' || @busqueda || '%' OR 
+                       c.numero_comprobante ILIKE '%' || @busqueda || '%' OR
+                       p.razon_social ILIKE '%' || @busqueda || '%' OR
+                       p.numero_documento ILIKE '%' || @busqueda || '%')
+                ORDER BY c.fecha_emision DESC, c.id_compra DESC
+                LIMIT @elementosPorPagina OFFSET @offset;";
 
-            if (activo.HasValue)
-            {
-                query = query.Where(r => r.c.Activado == activo.Value);
-            }
-
-            var total = await query.CountAsync();
-
-            var resultados = await query
-                .OrderByDescending(r => r.c.FechaCreacion)
-                .Skip((pagina - 1) * elementosPorPagina)
-                .Take(elementosPorPagina)
-                .ToListAsync();
-
-            var datos = resultados.Select(r =>
-            {
-                var c = r.c;
-                c.Proveedor = r.p;
-                c.NombreAlmacen = r.a.NombreAlmacen;
-                c.NombreTipoComprobante = r.tc.Nombre;
-                c.NombreTipoDocumentoProveedor = r.td.Nombre;
-                c.IdTipoDocumentoProveedor = r.p.IdTipoDocumento;
-                return c;
-            }).ToList();
-
-            return (datos, total);
+            var parameters = new { busqueda, elementosPorPagina, offset };
+            var rows = await connection.QueryAsync<CompraListDto>(sql, parameters);
+            
+            var total = rows.FirstOrDefault()?.TotalRegistros ?? 0;
+            return (rows, total);
         }
     }
 }

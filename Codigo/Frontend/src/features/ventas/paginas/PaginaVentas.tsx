@@ -1,15 +1,16 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { useVentas } from "../hooks/useVentas";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Venta } from "../tipos/ventas.types";
+import { VentaResumen } from "../tipos/ventas.types";
 import { ModuleTabBar } from "@/componentes/shared/ModuleTabBar";
 import { RUTAS_TITULOS } from "@/config/rutasTitulos";
-import { Plus, Eye, FileText, MoreHorizontal } from "lucide-react";
+import { Plus, Eye, FileText, MoreHorizontal, ReceiptText } from "lucide-react";
 
 import { usePagination } from "@/hooks/usePagination";
-import { DataTable } from "@/componentes/ui/DataTable";
+import { DataTable, DataTableColumn } from "@/componentes/ui/DataTable";
 import { formatearMoneda, formatearFechaHora } from "@compartido/utilidades";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -20,16 +21,45 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { ModalVistaPreviaVenta } from "../componentes/ModalVistaPreviaVenta";
+import { ModalAnularVenta } from "../componentes/ModalAnularVenta";
+import { ModalCrearNotaSunat } from "../componentes/ModalCrearNotaSunat";
+import { EstadoVenta, EstadoPago } from "@compartido/enums";
+
+const ESTADO_VENTA_COLORES: Record<number, string> = {
+  [EstadoVenta.Completada]: "bg-green-100 text-green-700 border-green-200 hover:bg-green-100",
+  [EstadoVenta.PendientePago]: "bg-amber-100 text-amber-700 border-amber-200 hover:bg-amber-100",
+  [EstadoVenta.Anulada]: "bg-red-100 text-red-700 border-red-200 hover:bg-red-100",
+};
+
+const ESTADO_PAGO_COLORES: Record<number, string> = {
+  [EstadoPago.Pagado]: "bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-50",
+  [EstadoPago.Pendiente]: "bg-orange-50 text-orange-700 border-orange-200 hover:bg-orange-50",
+  [EstadoPago.Parcial]: "bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-50",
+  [EstadoPago.Credito]: "bg-purple-50 text-purple-700 border-purple-200 hover:bg-purple-50",
+  [EstadoPago.Anulado]: "bg-red-50 text-red-700 border-red-200 hover:bg-red-50",
+};
 
 export function PaginaVentas() {
   const navigate = useNavigate();
   const { paginacion, cambiarPagina, cambiarPageSize, cambiarBusqueda } = usePagination();
+  
+  // Estado para el modal de vista previa
+  const [ventaSeleccionadaId, setVentaSeleccionadaId] = useState<number | null>(null);
+  const [mostrarVistaPrevia, setMostrarVistaPrevia] = useState(false);
 
-  const { data, isLoading } = useVentas(paginacion);
+  const { data, isLoading, refetch } = useVentas(paginacion);
   const ventas = data?.datos || [];
 
-  const handleVerDetalle = (_venta: Venta) => {
-    toast.info("Próximamente: ver detalle de venta");
+  // Estados para anulación y notas
+  const [ventaAAnular, setVentaAAnular] = useState<VentaResumen | null>(null);
+  const [mostrarAnular, setMostrarAnular] = useState(false);
+  const [ventaParaNota, setVentaParaNota] = useState<VentaResumen | null>(null);
+  const [mostrarCrearNota, setMostrarCrearNota] = useState(false);
+
+  const handleVerDetalle = (venta: VentaResumen) => {
+    setVentaSeleccionadaId(venta.id);
+    setMostrarVistaPrevia(true);
   };
 
   const handleNuevoPOS = () => {
@@ -43,73 +73,77 @@ export function PaginaVentas() {
     { label: RUTAS_TITULOS["/clientes"], to: "/clientes" },
   ];
 
-  const columns = [
+  const columns: DataTableColumn<VentaResumen>[] = [
     {
       header: "Comprobante",
-      accessorKey: "numeroComprobante" as keyof Venta,
-      cell: (venta: Venta) => (
+      cell: (venta: VentaResumen) => (
         <div className="flex flex-col">
-          <span className="font-medium">{venta.numeroComprobante}</span>
-          <span className="text-xs text-muted-foreground">
-            {venta.tipoComprobante || 'Venta'}
+          <span className="font-medium text-primary">
+            {venta.serie}-{venta.numero.toString().padStart(8, '0')}
+          </span>
+          <span className="text-[10px] uppercase font-bold text-muted-foreground">
+            {venta.tipoComprobanteNombre}
           </span>
         </div>
       ),
     },
     {
       header: "Fecha",
-      cell: (venta: Venta) => formatearFechaHora(venta.fecha),
+      cell: (venta: VentaResumen) => (
+        <span className="text-sm">
+          {formatearFechaHora(venta.fechaEmision)}
+        </span>
+      ),
     },
     {
       header: "Cliente",
-      cell: (venta: Venta) =>
-        venta.cliente?.razonSocial || "Cliente General",
+      cell: (venta: VentaResumen) => (
+        <div className="max-w-[200px] truncate" title={venta.clienteRazonSocial || "Consumidor Final"}>
+          {venta.clienteRazonSocial || "Consumidor Final"}
+        </div>
+      ),
     },
     {
       header: "Total",
-      cell: (venta: Venta) => (
-        <span className="font-bold">{formatearMoneda(venta.total)}</span>
+      cell: (venta: VentaResumen) => (
+        <span className="font-bold text-base">
+          {formatearMoneda(venta.totalVenta)}
+        </span>
       ),
     },
     {
       header: "Estado",
-      cell: (venta: Venta) => (
+      cell: (venta: VentaResumen) => (
         <Badge
-          variant={
-            venta.idEstado === 1 // Completada
-              ? "default"
-              : venta.idEstado === 2 // Pendiente
-                ? "secondary"
-                : "destructive" // Anulada
-          }
+          variant="outline"
+          className={ESTADO_VENTA_COLORES[venta.idEstado] || "bg-gray-100 text-gray-700"}
         >
-          {venta.estado || "Completada"}
+          {venta.estadoNombre}
         </Badge>
       ),
     },
     {
       header: "Pago",
-      cell: (venta: Venta) => (
+      cell: (venta: VentaResumen) => (
         <Badge
-          variant={venta.idEstadoPago === 1 ? "outline" : "secondary"}
-          className={
-            venta.idEstadoPago === 1 ? "border-green-500 text-green-500" : ""
-          }
+          variant="outline"
+          className={ESTADO_PAGO_COLORES[venta.idEstadoPago] || "bg-gray-100 text-gray-700"}
         >
-          {venta.estadoPago || "Pagado"}
+          {venta.estadoPagoNombre}
         </Badge>
       ),
     },
     {
       header: "Acciones",
       className: "text-right",
-      cell: (venta: Venta) => (
+      cell: (venta: VentaResumen) => (
         <div className="flex items-center justify-end gap-2">
           <Button
             variant="ghost"
             size="icon"
             onClick={() => handleVerDetalle(venta)}
             title="Ver Detalle"
+            className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
           >
             <Eye className="h-4 w-4" />
           </Button>
@@ -121,17 +155,34 @@ export function PaginaVentas() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Comprobantes</DropdownMenuLabel>
-              <DropdownMenuItem onClick={() => toast.info("Próximamente: generar ticket")}>
-                <FileText className="mr-2 h-4 w-4" />
-                Ticket
+              <DropdownMenuLabel>Acciones de Venta</DropdownMenuLabel>
+              <DropdownMenuItem onClick={() => handleVerDetalle(venta)}>
+                <ReceiptText className="mr-2 h-4 w-4" />
+                Vista Previa
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => toast.info("Próximamente: generar factura")}>
+              <DropdownMenuItem onClick={() => toast.info("Generando Ticket...")}>
                 <FileText className="mr-2 h-4 w-4" />
-                Factura / Boleta
+                Imprimir Ticket
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="text-destructive">
+              <DropdownMenuItem 
+                onClick={() => {
+                  setVentaParaNota(venta);
+                  setMostrarCrearNota(true);
+                }}
+                disabled={venta.idEstado === EstadoVenta.Anulada}
+              >
+                <Plus className="mr-2 h-4 w-4" />
+                Emitir Nota (NC/ND)
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                className="text-destructive" 
+                onClick={() => {
+                  setVentaAAnular(venta);
+                  setMostrarAnular(true);
+                }}
+                disabled={venta.idEstado === EstadoVenta.Anulada}
+              >
                 Anular Venta
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -166,6 +217,29 @@ export function PaginaVentas() {
           />
         </CardContent>
       </Card>
+
+      {/* Modal de Vista Previa */}
+      <ModalVistaPreviaVenta 
+        idVenta={ventaSeleccionadaId}
+        open={mostrarVistaPrevia}
+        onOpenChange={setMostrarVistaPrevia}
+      />
+
+      {/* Modal de Anulación */}
+      <ModalAnularVenta 
+        venta={ventaAAnular}
+        open={mostrarAnular}
+        onOpenChange={setMostrarAnular}
+        onSuccess={() => refetch()}
+      />
+
+      {/* Modal de Notas SUNAT */}
+      <ModalCrearNotaSunat
+        idVenta={ventaParaNota?.id || null}
+        open={mostrarCrearNota}
+        onOpenChange={setMostrarCrearNota}
+        onSuccess={() => refetch()}
+      />
     </div>
   );
 }

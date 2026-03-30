@@ -1,5 +1,6 @@
 using Ventas.API.Domain.Entidades;
 using Ventas.API.Domain.Interfaces;
+using Ventas.API.Domain.DTOs;
 using Ventas.API.Application.DTOs;
 using Ventas.API.Application.Comandos;
 using Ventas.API.Infrastructure.Datos;
@@ -9,6 +10,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using Nucleo.Comun.Application.Wrappers;
+using Microsoft.AspNetCore.Mvc;
 using System.Linq;
 
 namespace Ventas.API.Endpoints
@@ -22,8 +24,7 @@ namespace Ventas.API.Endpoints
             grupo.MapGet("/", async (IVentaRepositorio repo, [AsParameters] Nucleo.Comun.Application.Paginacion.PagedRequest request) =>
             {
                 var (datos, total) = await repo.ObtenerPaginadoAsync(request.Search, request.PageNumber ?? 1, request.PageSize ?? 10);
-                var dtos = datos.Select(v => MapVentaToDto(v)).ToList();
-                var response = new Nucleo.Comun.Application.Paginacion.PagedResponse<VentaDto>(dtos, request.PageNumber ?? 1, request.PageSize ?? 10, total);
+                var response = new Nucleo.Comun.Application.Paginacion.PagedResponse<VentaListDto>(datos, request.PageNumber ?? 1, request.PageSize ?? 10, total);
                 return Results.Ok(response);
             });
 
@@ -43,9 +44,10 @@ namespace Ventas.API.Endpoints
             {
                 var ventas = await repo.ObtenerTodasAsync();
                 var hoy = DateTime.UtcNow.Date;
+                // Para efectos de simplicidad en este endpoint temporal, devolvemos una lista simplificada
                 var ventasHoy = ventas.Where(v => v.FechaEmision.Date == hoy)
-                                      .Select(v => MapVentaToDto(v)).ToList();
-                return Results.Ok(new ToReturnList<VentaDto>(ventasHoy));
+                                      .Select(v => new { v.Id, v.Serie, v.Numero, v.TotalVenta }).ToList();
+                return Results.Ok(new ToReturnList<object>(ventasHoy));
             });
 
             grupo.MapGet("/estadisticas", async (string? fechaInicio, string? fechaFin, IVentaRepositorio repo) =>
@@ -62,71 +64,37 @@ namespace Ventas.API.Endpoints
 
             grupo.MapGet("/{id}", async (long id, IVentaRepositorio repo) =>
             {
-                var venta = await repo.ObtenerPorIdAsync(id);
-                if (venta == null) return Results.NotFound(new ToReturnError<VentaDto>("Venta no encontrada", 404));
-                return Results.Ok(new ToReturn<VentaDto>(MapVentaToDto(venta)));
+                var venta = await repo.ObtenerDetallePorIdAsync(id);
+                if (venta == null) return Results.NotFound(new ToReturnError<VentaDetalleDto>("Venta no encontrada", 404));
+                return Results.Ok(new ToReturn<VentaDetalleDto>(venta));
             });
 
-            grupo.MapPatch("/{id}/anular", async (long id, IVentaRepositorio repo) =>
+            grupo.MapPatch("/{id}/anular", async (long id, [FromBody] AnularVentaRequest request, IMediator mediator) =>
             {
-                // Implementación básica de anulación (cambia estado)
-                return Results.Ok(new ToReturn<string>("Venta anulada"));
+                try
+                {
+                    var exito = await mediator.Send(new AnularVentaComando(id, string.IsNullOrWhiteSpace(request?.Motivo) ? "Anulación solicitada por el usuario" : request.Motivo));
+                    return exito ? Results.Ok(new ToReturn<bool>(true)) : Results.BadRequest(new ToReturnError<bool>("No se pudo anular la venta", 400));
+                }
+                catch (Exception ex)
+                {
+                    return Results.BadRequest(new ToReturnError<bool>(ex.Message, 400));
+                }
             });
 
             grupo.MapPost("/", async (VentaDto dto, IMediator mediator) =>
             {
                 try
                 {
-                    var id = await mediator.Send(new CrearVentaComando(dto));
-                    return Results.Created($"/api/ventas/{id}", new ToReturn<long>(id));
+                    var resultDto = await mediator.Send(new CrearVentaComando(dto));
+                    return Results.Created($"/api/ventas/{resultDto.Id}", new ToReturn<VentaDto>(resultDto));
                 }
                 catch (Exception ex)
                 {
-                    return Results.BadRequest(new ToReturnError<long>(ex.Message, 400));
+                    return Results.BadRequest(new ToReturnError<VentaDto>(ex.Message, 400));
                 }
             });
         }
-
-        private static VentaDto MapVentaToDto(Venta v) => new VentaDto
-        {
-            Id = v.Id,
-            IdEmpresa = v.IdEmpresa,
-            IdAlmacen = v.IdAlmacen,
-            IdCaja = v.IdCaja,
-            IdCliente = v.IdCliente,
-            IdUsuarioVendedor = v.IdUsuarioVendedor,
-            IdCotizacionOrigen = v.IdCotizacionOrigen,
-            IdTipoComprobante = v.IdTipoComprobante,
-            Serie = v.Serie,
-            Numero = v.Numero,
-            FechaEmision = v.FechaEmision,
-            FechaVencimientoPago = v.FechaVencimientoPago,
-            IdEstado = v.IdEstado,
-            Moneda = v.Moneda,
-            TipoCambio = v.TipoCambio,
-            SubtotalGravado = v.SubtotalGravado,
-            SubtotalExonerado = v.SubtotalExonerado,
-            SubtotalInafecto = v.SubtotalInafecto,
-            TotalImpuesto = v.TotalImpuesto,
-            TotalDescuentoGlobal = v.TotalDescuentoGlobal,
-            TotalVenta = v.TotalVenta,
-            SaldoPendiente = v.SaldoPendiente,
-            IdEstadoPago = v.IdEstadoPago,
-            Observaciones = v.Observaciones,
-            Detalles = v.Detalles?.Select(d => new DetalleVentaDto
-            {
-                Id = d.Id,
-                IdProducto = d.IdProducto,
-                IdVariante = d.IdVariante,
-                DescripcionProducto = d.DescripcionProducto,
-                Cantidad = d.Cantidad,
-                PrecioUnitario = d.PrecioUnitario,
-                PrecioListaOriginal = d.PrecioListaOriginal,
-                PorcentajeImpuesto = d.PorcentajeImpuesto,
-                ImpuestoItem = d.ImpuestoItem,
-                TotalItem = d.TotalItem
-            }).ToList() ?? new()
-        };
     }
 
     public static class CotizacionEndpoints
@@ -138,44 +106,16 @@ namespace Ventas.API.Endpoints
             grupo.MapGet("/", async (ICotizacionRepositorio repo, [AsParameters] Nucleo.Comun.Application.Paginacion.PagedRequest request) =>
             {
                 var (datos, total) = await repo.ObtenerPaginadoAsync(request.Search, request.PageNumber ?? 1, request.PageSize ?? 10);
-                var dtos = datos.Select(c => MapCotizacionToDto(c)).ToList();
-                var response = new Nucleo.Comun.Application.Paginacion.PagedResponse<CotizacionDto>(dtos, request.PageNumber ?? 1, request.PageSize ?? 10, total);
+                var response = new Nucleo.Comun.Application.Paginacion.PagedResponse<CotizacionListDto>(datos, request.PageNumber ?? 1, request.PageSize ?? 10, total);
                 return Results.Ok(response);
             });
 
             grupo.MapGet("/{id}", async (long id, ICotizacionRepositorio repo) =>
             {
-                var cotizacion = await repo.ObtenerPorIdAsync(id);
-                if (cotizacion == null) return Results.NotFound(new ToReturnError<CotizacionDto>("Cotización no encontrada", 404));
-                return Results.Ok(new ToReturn<CotizacionDto>(MapCotizacionToDto(cotizacion)));
+                var cotizacion = await repo.ObtenerDetallePorIdAsync(id);
+                if (cotizacion == null) return Results.NotFound(new ToReturnError<CotizacionDetalleDto>("Cotización no encontrada", 404));
+                return Results.Ok(new ToReturn<CotizacionDetalleDto>(cotizacion));
             });
         }
-
-        private static CotizacionDto MapCotizacionToDto(Cotizacion c) => new CotizacionDto
-        {
-            Id = c.Id,
-            Serie = c.Serie,
-            Numero = c.Numero,
-            IdCliente = c.IdCliente,
-            IdUsuarioVendedor = c.IdUsuarioVendedor,
-            FechaEmision = c.FechaEmision,
-            FechaVencimiento = c.FechaVencimiento,
-            IdEstado = c.IdEstado,
-            Moneda = c.Moneda,
-            TipoCambio = c.TipoCambio,
-            Subtotal = c.Subtotal,
-            Impuesto = c.Impuesto,
-            Total = c.Total,
-            Observaciones = c.Observaciones,
-            Detalles = c.Detalles?.Select(d => new DetalleCotizacionDto
-            {
-                Id = d.Id,
-                IdProducto = d.IdProducto,
-                IdVariante = d.IdVariante,
-                Cantidad = d.Cantidad,
-                PrecioUnitario = d.PrecioUnitario,
-                Subtotal = d.Subtotal
-            }).ToList() ?? new()
-        };
     }
 }

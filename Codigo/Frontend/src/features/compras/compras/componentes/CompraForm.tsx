@@ -99,7 +99,7 @@ const compraSchema = z.object({
   }).min(0.001, "El tipo de cambio debe ser mayor a 0"),
   tipoOperacion: z.string().min(1, "La operación SUNAT es requerida"),
   observaciones: z.string().optional(),
-  idOrdenCompraRef: z.number().optional().nullable(),
+  idOrdenCompraRef: z.coerce.number().optional().nullable(),
   detalles: z
     .array(
       z.object({
@@ -295,7 +295,7 @@ export function CompraForm({
       fechaEmision: new Date(),
       fechaVencimiento: null,
       tipoCambio: 1.0,
-      tipoOperacion: "0101", // Venta/Compra Interna
+      tipoOperacion: "0201", // Compra Interna (estándar para Ingresos)
       observaciones: "",
       detalles: [
         {
@@ -436,6 +436,7 @@ export function CompraForm({
   };
 
   const onSubmit = (values: CompraFormValues) => {
+    console.log("[DEBUG] [Frontend] onSubmit disparado con valores:", values);
     // Calcular totales
     let baseGravada = 0;
     let baseExonerada = 0;
@@ -490,6 +491,11 @@ export function CompraForm({
     registrar.mutate(payload, {
       onSuccess: () => onSuccess(),
     });
+  };
+
+  const onError = (errors: any) => {
+    console.log("[DEBUG] [Frontend] Errores de validación detectados:", errors);
+    toast.error("El formulario tiene errores de validación. Revise los campos rojos.");
   };
 
   // Reglas de Negocio SUNAT y Bloqueos
@@ -569,7 +575,7 @@ export function CompraForm({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      <form onSubmit={form.handleSubmit(onSubmit, onError)} className="space-y-6">
         {/* Campo oculto para asegurar el envío de la referencia de OC */}
         <input type="hidden" {...form.register("idOrdenCompraRef")} />
         

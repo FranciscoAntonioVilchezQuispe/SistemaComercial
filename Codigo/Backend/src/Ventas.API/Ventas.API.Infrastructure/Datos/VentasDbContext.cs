@@ -3,6 +3,7 @@ using Ventas.API.Application.Interfaces;
 using System.Reflection;
 using Ventas.API.Domain.Entidades;
 using Ventas.API.Domain.Entidades.Referencias;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Ventas.API.Infrastructure.Datos
 {
@@ -25,6 +26,11 @@ namespace Ventas.API.Infrastructure.Datos
         public DbSet<SeriesComprobante> SeriesComprobantes { get; set; } = null!;
         public DbSet<Nota> Notas { get; set; } = null!;
         public DbSet<DetalleNota> DetallesNota { get; set; } = null!;
+        public DbSet<NotaCredito> NotasCredito { get; set; } = null!;
+        public DbSet<NotaCreditoDetalle> NotasCreditoDetalles { get; set; } = null!;
+        public DbSet<NotaDebito> NotasDebito { get; set; } = null!;
+        public DbSet<NotaDebitoDetalle> NotasDebitoDetalles { get; set; } = null!;
+        public DbSet<Ventas.API.Domain.Entidades.Referencias.TipoComprobanteReferencia> TiposComprobanteRef { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -34,26 +40,63 @@ namespace Ventas.API.Infrastructure.Datos
             // Re-mapear clientes si es necesario ya que están en otro esquema
             modelBuilder.Entity<Cliente>().ToTable("clientes", "clientes");
             modelBuilder.Entity<ContactoCliente>().ToTable("contactos_cliente", "clientes");
+            modelBuilder.Entity<Ventas.API.Domain.Entidades.Referencias.TipoComprobanteReferencia>().ToTable("tipo_comprobante", "configuracion", t => t.ExcludeFromMigrations());
+        }
+
+        protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+        {
+            // Convierte todos los DateTime a UTC al guardar en la base de datos
+            configurationBuilder
+                .Properties<DateTime>()
+                .HaveConversion(typeof(DateTimeToUtcConverter));
+
+            configurationBuilder
+                .Properties<DateTime?>()
+                .HaveConversion(typeof(NullableDateTimeToUtcConverter));
         }
 
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
-            foreach (var entry in ChangeTracker.Entries<Nucleo.Comun.Domain.EntidadBase>())
+            var entries = ChangeTracker.Entries()
+                .Where(e => e.State == EntityState.Added || e.State == EntityState.Modified);
+
+            foreach (var entry in entries)
             {
-                switch (entry.State)
+                // 1. Normalización de auditoría para EntidadBase
+                if (entry.Entity is Nucleo.Comun.Domain.EntidadBase baseEntity)
                 {
-                    case EntityState.Added:
-                        entry.Entity.FechaCreacion = DateTime.UtcNow;
-                        entry.Entity.UsuarioCreacion = "API_USER";
-                        entry.Entity.Activado = true;
-                        break;
-                    case EntityState.Modified:
-                        entry.Entity.FechaActualizacion = DateTime.UtcNow;
-                        entry.Entity.UsuarioActualizacion = "API_USER";
-                        break;
+                    if (entry.State == EntityState.Added)
+                    {
+                        baseEntity.FechaCreacion = DateTime.UtcNow;
+                        baseEntity.UsuarioCreacion = string.IsNullOrEmpty(baseEntity.UsuarioCreacion) ? "SISTEMA" : baseEntity.UsuarioCreacion;
+                        baseEntity.Activado = true;
+                    }
+                    else
+                    {
+                        baseEntity.FechaActualizacion = DateTime.UtcNow;
+                        baseEntity.UsuarioActualizacion = "SISTEMA";
+                    }
                 }
             }
+
             return base.SaveChangesAsync(cancellationToken);
+        }
+    }
+
+    // Convertidores para asegurar DateTimeKind.Utc
+    public class DateTimeToUtcConverter : ValueConverter<DateTime, DateTime>
+    {
+        public DateTimeToUtcConverter()
+            : base(v => v.Kind == DateTimeKind.Utc ? v : DateTime.SpecifyKind(v, DateTimeKind.Utc), v => v)
+        {
+        }
+    }
+
+    public class NullableDateTimeToUtcConverter : ValueConverter<DateTime?, DateTime?>
+    {
+        public NullableDateTimeToUtcConverter()
+            : base(v => !v.HasValue ? v : (v.Value.Kind == DateTimeKind.Utc ? v : DateTime.SpecifyKind(v.Value, DateTimeKind.Utc)), v => v)
+        {
         }
     }
 }

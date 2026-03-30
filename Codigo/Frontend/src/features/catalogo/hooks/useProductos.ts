@@ -8,31 +8,31 @@ import {
 import { PagedRequest, PagedResponse } from "@/types/pagination.types";
 import { toast } from "sonner";
 import { servicioProductos } from "../servicios/servicioProductos";
-import { Producto, ProductoFormData } from "../tipos/catalogo.types";
+import { ProductoResumen, ProductoDetalle, ProductoFormData } from "../tipos/catalogo.types";
 import { manejadorErrores } from "@/lib/axios/manejadorErrores";
 
-const QUERY_KEY = "productos";
+const QUERY_KEY = ["productos"];
 
 /**
- * Hook para obtener lista de productos paginada
+ * Hook para obtener lista de productos paginada (Ligero)
  */
 export function useProductos(
   req?: PagedRequest,
   options?: { enabled?: boolean },
-): UseQueryResult<PagedResponse<Producto>, Error> {
+): UseQueryResult<PagedResponse<ProductoResumen>, Error> {
   return useQuery({
-    queryKey: [QUERY_KEY, req],
+    queryKey: [...QUERY_KEY, "lista", req],
     queryFn: () => servicioProductos.obtenerProductos(req),
     enabled: options?.enabled ?? true,
   });
 }
 
 /**
- * Hook para obtener un producto por ID
+ * Hook para obtener un producto por ID (Detalle completo)
  */
-export function useProducto(id: number) {
+export function useProducto(id: number): UseQueryResult<ProductoDetalle, Error> {
   return useQuery({
-    queryKey: [QUERY_KEY, id],
+    queryKey: [...QUERY_KEY, "detalle", id],
     queryFn: () => servicioProductos.obtenerProductoPorId(id),
     enabled: !!id,
   });
@@ -42,7 +42,7 @@ export function useProducto(id: number) {
  * Hook para crear un producto
  */
 export function useCrearProducto(): UseMutationResult<
-  Producto,
+  ProductoDetalle,
   Error,
   ProductoFormData
 > {
@@ -52,7 +52,7 @@ export function useCrearProducto(): UseMutationResult<
     mutationFn: (datos: ProductoFormData) =>
       servicioProductos.crearProducto(datos),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [QUERY_KEY] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEY });
       toast.success("Producto creado exitosamente");
     },
     onError: (error) => {
@@ -65,7 +65,7 @@ export function useCrearProducto(): UseMutationResult<
  * Hook para actualizar un producto
  */
 export function useActualizarProducto(): UseMutationResult<
-  Producto,
+  ProductoDetalle,
   Error,
   { id: number; datos: ProductoFormData }
 > {
@@ -74,8 +74,9 @@ export function useActualizarProducto(): UseMutationResult<
   return useMutation({
     mutationFn: ({ id, datos }: { id: number; datos: ProductoFormData }) =>
       servicioProductos.actualizarProducto(id, datos),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [QUERY_KEY] });
+    onSuccess: (_, { id }) => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: [...QUERY_KEY, "detalle", id] });
       toast.success("Producto actualizado exitosamente");
     },
     onError: (error) => {
@@ -93,7 +94,7 @@ export function useEliminarProducto(): UseMutationResult<void, Error, number> {
   return useMutation({
     mutationFn: (id: number) => servicioProductos.eliminarProducto(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [QUERY_KEY] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEY });
       toast.success("Producto eliminado exitosamente");
     },
     onError: (error) => {
@@ -103,11 +104,11 @@ export function useEliminarProducto(): UseMutationResult<void, Error, number> {
 }
 
 /**
- * Hook para buscar producto por código de barras
+ * Hook para buscar producto por código de barras (Detalle completo)
  */
 export function useBuscarPorCodigoBarras(codigoBarras: string) {
   return useQuery({
-    queryKey: [QUERY_KEY, "codigo-barras", codigoBarras],
+    queryKey: [...QUERY_KEY, "codigo-barras", codigoBarras],
     queryFn: () => servicioProductos.buscarPorCodigoBarras(codigoBarras),
     enabled: !!codigoBarras && codigoBarras.length > 0,
   });

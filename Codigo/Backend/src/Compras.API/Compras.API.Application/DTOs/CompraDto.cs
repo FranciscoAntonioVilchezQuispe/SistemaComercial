@@ -1,21 +1,7 @@
-using System;
-using System.Collections.Generic;
+using Compras.API.Domain.DTOs;
 
 namespace Compras.API.Application.DTOs
 {
-    public class DetalleCompraDto
-    {
-        public long Id { get; set; }
-        public long IdProducto { get; set; }
-        public string? NombreProducto { get; set; }
-        public long? IdVariante { get; set; }
-        public string? Descripcion { get; set; }
-        public decimal Cantidad { get; set; }
-        public decimal PrecioUnitarioCompra { get; set; }
-        public decimal Subtotal { get; set; }
-        public string AfectacionIgv { get; set; } = "10";
-    }
-
     public class CompraDto
     {
         public long Id { get; set; }

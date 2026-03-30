@@ -3,6 +3,7 @@ import { Search, ArrowUpDown } from "lucide-react";
 import { useMovimientos, useTiposMovimiento } from "../hooks/useInventario";
 import { usePagination } from "@/hooks/usePagination";
 import { TablaMovimientos } from "../componentes/movimientos/TablaMovimientos";
+import { ModalDetalleMovimiento } from "../componentes/movimientos/ModalDetalleMovimiento";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
@@ -28,8 +29,17 @@ export function PaginaMovimientos() {
   
   const [filtros, setFiltros] = useState<MovimientoFiltros>({});
 
+  // Estados para el detalle diferido (Two-Call Pattern)
+  const [modalDetalleOpen, setModalDetalleOpen] = useState(false);
+  const [selectedMovimientoId, setSelectedMovimientoId] = useState<number | null>(null);
+
   const { data, isLoading } = useMovimientos(paginacion, filtros);
   const { data: tipos } = useTiposMovimiento();
+
+  const handleVerDetalle = (id: number) => {
+    setSelectedMovimientoId(id);
+    setModalDetalleOpen(true);
+  };
 
   const tabsInventario = [
     { label: RUTAS_TITULOS["/inventario/stock"], to: "/inventario/stock" },
@@ -45,7 +55,7 @@ export function PaginaMovimientos() {
       <ModuleTabBar tabs={tabsInventario} />
 
       <div className="flex justify-end gap-2 mb-2">
-        <Button variant="outline" size="sm">
+        <Button variant="outline" size="sm" onClick={() => {}}>
           <ArrowUpDown className="mr-2 h-4 w-4" />
           Reporte Kardex
         </Button>
@@ -105,9 +115,16 @@ export function PaginaMovimientos() {
             onPageChange={cambiarPagina}
             onPageSizeChange={cambiarPageSize}
             onSearchChange={cambiarBusqueda}
+            onVerDetalle={handleVerDetalle}
           />
         </CardContent>
       </Card>
+
+      <ModalDetalleMovimiento 
+        id={selectedMovimientoId}
+        isOpen={modalDetalleOpen}
+        onClose={() => setModalDetalleOpen(false)}
+      />
     </div>
   );
 }

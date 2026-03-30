@@ -63,7 +63,7 @@ export function CarritoCompras() {
       return;
     }
 
-    if (metodoPagoSeleccionado.codigo === "EFECTIVO" && montoPagado < total) {
+    if (metodoPagoSeleccionado.codigo === "EFECTIVO" && Math.round(montoPagado * 100) < Math.round(total * 100)) {
       toast.error("El monto recibido es insuficiente");
       return;
     }
@@ -84,6 +84,8 @@ export function CarritoCompras() {
         cantidad: item.cantidad,
         precioUnitario: item.precioUnitario,
         descuento: item.descuento,
+        codigoAfectacionIgv: item.producto.gravadoImpuesto ? "10" : "20", // 10=Gravado, 20=Exonerado
+        descripcionProducto: item.producto.nombre
       }));
 
       // Preparar datos de venta
@@ -100,6 +102,13 @@ export function CarritoCompras() {
         totalVenta: total,
         observaciones: `Método de pago: ${metodoPagoSeleccionado.nombre}`,
         detalles,
+        pagos: [
+          {
+            idMetodoPago: metodoPagoSeleccionado.id,
+            montoPago: montoPagado,
+            fechaPago: new Date().toISOString()
+          }
+        ]
       };
 
       // Registrar venta

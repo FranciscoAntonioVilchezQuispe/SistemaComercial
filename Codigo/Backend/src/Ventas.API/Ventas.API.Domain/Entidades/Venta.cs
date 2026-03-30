@@ -52,7 +52,23 @@ namespace Ventas.API.Domain.Entidades
         [Column("id_estado")]
         public long IdEstado { get; set; }
 
-        [MaxLength(3)]
+        [Required]
+        [Column("id_estado_pago")]
+        public long IdEstadoPago { get; set; }
+
+        [Column("estado_sunat")]
+        public string EstadoSunat { get; set; } = "PENDIENTE";
+
+        [Column("fecha_anulacion")]
+        public DateTime? FechaAnulacion { get; set; }
+
+        [Column("motivo_anulacion")]
+        public string? MotivoAnulacion { get; set; }
+
+        [Column("numero_resumen_baja")]
+        public string? NumeroResumenBaja { get; set; }
+
+        [MaxLength(255)]
         [Column("moneda")]
         public string Moneda { get; set; } = "PEN";
 
@@ -79,9 +95,6 @@ namespace Ventas.API.Domain.Entidades
 
         [Column("saldo_pendiente", TypeName = "decimal(12,2)")]
         public decimal SaldoPendiente { get; set; } = 0;
-
-        [Column("id_estado_pago")]
-        public long IdEstadoPago { get; set; }
 
         [Column("observaciones", TypeName = "text")]
         public string? Observaciones { get; set; }

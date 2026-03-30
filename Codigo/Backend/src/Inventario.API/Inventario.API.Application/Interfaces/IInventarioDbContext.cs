@@ -23,6 +23,7 @@ namespace Inventario.API.Application.Interfaces
         DbSet<Inventario.API.Domain.Entidades.Traslado> Traslados { get; set; }
         DbSet<Inventario.API.Domain.Entidades.TrasladoDetalle> TrasladosDetalle { get; set; }
         DbSet<Inventario.API.Domain.Entidades.Almacen> Almacenes { get; set; }
+        System.Data.IDbConnection GetDbConnection();
         Task<int> SaveChangesAsync(CancellationToken cancellationToken);
     }
 }

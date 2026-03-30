@@ -10,6 +10,13 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { formatearMoneda, formatearFechaHora } from "@compartido/utilidades";
+import { EstadoVenta } from "@compartido/enums";
+
+const ESTADO_VENTA_COLORES: Record<number, string> = {
+  [EstadoVenta.Completada]: "bg-green-100 text-green-700 border-green-200 hover:bg-green-100",
+  [EstadoVenta.PendientePago]: "bg-amber-100 text-amber-700 border-amber-200 hover:bg-amber-100",
+  [EstadoVenta.Anulada]: "bg-red-100 text-red-700 border-red-200 hover:bg-red-100",
+};
 
 interface Props {
   venta: Venta;
@@ -23,19 +30,26 @@ export function DetalleVentaModal({ venta }: Props) {
           <p className="text-sm font-medium text-muted-foreground">
             Comprobante
           </p>
-          <p className="text-base font-bold">{venta.numeroComprobante}</p>
+          <p className="text-base font-bold text-primary">
+            {venta.serie}-{venta.numeroFormateado}
+          </p>
         </div>
         <div>
           <p className="text-sm font-medium text-muted-foreground">Tipo</p>
-          <p className="text-base">{venta.tipoComprobante}</p>
+          <p className="text-base uppercase font-medium">{venta.tipoComprobante || 'NOTA DE VENTA'}</p>
         </div>
         <div>
           <p className="text-sm font-medium text-muted-foreground">Fecha</p>
-          <p className="text-base">{formatearFechaHora(venta.fecha)}</p>
+          <p className="text-base">{formatearFechaHora(venta.fechaEmision)}</p>
         </div>
         <div>
           <p className="text-sm font-medium text-muted-foreground">Estado</p>
-          <Badge>{venta.estado || "Completada"}</Badge>
+          <Badge 
+            variant="outline"
+            className={ESTADO_VENTA_COLORES[venta.idEstado] || "bg-gray-100 text-gray-700"}
+          >
+            {venta.estado || "Completada"}
+          </Badge>
         </div>
       </div>
 
@@ -48,18 +62,16 @@ export function DetalleVentaModal({ venta }: Props) {
             <p className="text-sm font-medium text-muted-foreground">
               Nombre / Razón Social
             </p>
-            <p className="text-base">
-              {venta.cliente?.razonSocial ||
-                venta.cliente?.razonSocial ||
-                "Cliente General"}
+            <p className="text-base font-medium">
+              {venta.nombreCliente || "Cliente General"}
             </p>
           </div>
           <div>
             <p className="text-sm font-medium text-muted-foreground">
-              Número Documento
+              Moneda
             </p>
-            <p className="text-base">
-              {venta.cliente?.numeroDocumento || "N/A"}
+            <p className="text-base uppercase">
+              {venta.moneda} {venta.moneda === 'USD' ? `(TC: ${venta.tipoCambio})` : ''}
             </p>
           </div>
         </div>
@@ -69,9 +81,9 @@ export function DetalleVentaModal({ venta }: Props) {
 
       <div className="space-y-2">
         <h3 className="text-lg font-bold">Detalle de Productos</h3>
-        <div className="rounded-md border">
+        <div className="rounded-md border overflow-hidden">
           <Table>
-            <TableHeader>
+            <TableHeader className="bg-muted/50">
               <TableRow>
                 <TableHead>Producto</TableHead>
                 <TableHead className="text-right">Cant.</TableHead>
@@ -81,11 +93,12 @@ export function DetalleVentaModal({ venta }: Props) {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {venta.detalles.map((detalle, index) => (
+              {venta.detalles?.map((detalle, index) => (
                 <TableRow key={index}>
                   <TableCell>
-                    {detalle.producto?.nombre ||
-                      `Producto #${detalle.idProducto}`}
+                    <span className="font-medium">
+                      {detalle.producto?.nombre || `Producto #${detalle.idProducto}`}
+                    </span>
                   </TableCell>
                   <TableCell className="text-right">
                     {detalle.cantidad}
@@ -93,10 +106,10 @@ export function DetalleVentaModal({ venta }: Props) {
                   <TableCell className="text-right">
                     {formatearMoneda(detalle.precioUnitario)}
                   </TableCell>
-                  <TableCell className="text-right">
-                    {formatearMoneda(detalle.descuento)}
+                  <TableCell className="text-right text-destructive">
+                    {detalle.descuento > 0 ? `-${formatearMoneda(detalle.descuento)}` : '-'}
                   </TableCell>
-                  <TableCell className="text-right font-medium">
+                  <TableCell className="text-right font-bold">
                     {formatearMoneda(detalle.subtotal)}
                   </TableCell>
                 </TableRow>
@@ -107,31 +120,33 @@ export function DetalleVentaModal({ venta }: Props) {
       </div>
 
       <div className="flex justify-end">
-        <div className="w-full md:w-1/3 space-y-2">
+        <div className="w-full md:w-1/3 space-y-2 bg-slate-50 p-4 rounded-lg border">
           <div className="flex justify-between text-sm">
-            <span>Subtotal:</span>
-            <span>{formatearMoneda(venta.subtotal)}</span>
+            <span className="text-muted-foreground uppercase font-bold text-[10px]">Subtotal Gravado:</span>
+            <span className="font-medium">{formatearMoneda(venta.subtotalGravado)}</span>
           </div>
-          <div className="flex justify-between text-sm text-destructive">
-            <span>Descuento:</span>
-            <span>-{formatearMoneda(venta.descuento)}</span>
-          </div>
+          {venta.totalDescuentoGlobal > 0 && (
+            <div className="flex justify-between text-sm text-destructive">
+              <span className="uppercase font-bold text-[10px]">Desc. Global:</span>
+              <span className="font-medium">-{formatearMoneda(venta.totalDescuentoGlobal)}</span>
+            </div>
+          )}
           <div className="flex justify-between text-sm">
-            <span>IGV (18%):</span>
-            <span>{formatearMoneda(venta.igv)}</span>
+            <span className="text-muted-foreground uppercase font-bold text-[10px]">I.G.V. (18%):</span>
+            <span className="font-medium">{formatearMoneda(venta.totalImpuesto)}</span>
           </div>
-          <Separator />
-          <div className="flex justify-between text-lg font-bold">
-            <span>Total:</span>
-            <span>{formatearMoneda(venta.total)}</span>
+          <Separator className="my-2" />
+          <div className="flex justify-between text-xl font-black">
+            <span>TOTAL:</span>
+            <span className="text-primary">{formatearMoneda(venta.totalVenta)}</span>
           </div>
         </div>
       </div>
 
       {venta.observaciones && (
-        <div className="mt-4 p-4 bg-muted rounded-md text-sm">
-          <p className="font-medium mb-1">Observaciones:</p>
-          <p>{venta.observaciones}</p>
+        <div className="mt-4 p-4 bg-muted/30 rounded-md text-sm border-l-4 border-primary">
+          <p className="font-bold mb-1 uppercase text-[10px] text-muted-foreground">Observaciones:</p>
+          <p className="italic">"{venta.observaciones}"</p>
         </div>
       )}
     </div>

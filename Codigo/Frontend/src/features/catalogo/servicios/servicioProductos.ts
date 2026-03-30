@@ -1,6 +1,5 @@
 import { apiCatalogo } from "@/lib/axios";
-import { Producto, ProductoFormData } from "../tipos/catalogo.types";
-
+import { ProductoResumen, ProductoDetalle, ProductoFormData } from "../tipos/catalogo.types";
 import { PagedRequest, PagedResponse } from "@/types/pagination.types";
 
 const BASE_URL = "/productos";
@@ -8,7 +7,7 @@ const BASE_URL = "/productos";
 export const servicioProductos = {
   obtenerProductos: async (
     req?: PagedRequest,
-  ): Promise<PagedResponse<Producto>> => {
+  ): Promise<PagedResponse<ProductoResumen>> => {
     const params = new URLSearchParams();
     params.append("pageNumber", (req?.pageNumber || 1).toString());
     params.append("pageSize", (req?.pageSize || 10).toString());
@@ -23,41 +22,41 @@ export const servicioProductos = {
     return response;
   },
 
-  obtenerProductoPorId: async (id: number): Promise<Producto> => {
+  obtenerProductoPorId: async (id: number): Promise<ProductoDetalle> => {
     const response: any = await apiCatalogo.get(`${BASE_URL}/${id}`);
     return response.data;
   },
 
-  crearProducto: async (datos: ProductoFormData): Promise<Producto> => {
+  crearProducto: async (datos: ProductoFormData): Promise<ProductoDetalle> => {
     const response: any = await apiCatalogo.post(BASE_URL, datos);
-    return response.data;
+    return response.data.data; // ToReturn<T>
   },
 
   actualizarProducto: async (
     id: number,
     datos: ProductoFormData,
-  ): Promise<Producto> => {
+  ): Promise<ProductoDetalle> => {
     const response: any = await apiCatalogo.put(`${BASE_URL}/${id}`, datos);
-    return response.data;
+    return response.data.data; // ToReturn<T>
   },
 
   eliminarProducto: async (id: number): Promise<void> => {
     await apiCatalogo.delete(`${BASE_URL}/${id}`);
   },
 
-  actualizarStock: async (id: number, cantidad: number): Promise<Producto> => {
+  actualizarStock: async (id: number, cantidad: number): Promise<ProductoDetalle> => {
     const response: any = await apiCatalogo.patch(`${BASE_URL}/${id}/stock`, {
       cantidad,
     });
-    return response.data;
+    return response.data.data;
   },
 
   buscarPorCodigoBarras: async (
     codigoBarras: string,
-  ): Promise<Producto | null> => {
+  ): Promise<ProductoDetalle | null> => {
     const response: any = await apiCatalogo.get(
       `${BASE_URL}/codigo-barras/${codigoBarras}`,
     );
-    return response.data;
+    return response.data.data;
   },
 };

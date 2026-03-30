@@ -39,16 +39,22 @@ export const formatearFecha = formatFecha;
 /**
  * Formatea una fecha con hora en formato dd/MM/yyyy HH:mm
  */
-export const formatearFechaHora = (fecha: string | Date): string => {
+export const formatearFechaHora = (fecha: string | Date | null | undefined): string => {
   return formatFecha(fecha, "dd/MM/yyyy HH:mm");
 };
 
 /**
  * Formatea una fecha en formato relativo (hace 2 horas, hace 3 días, etc.)
  */
-export const formatearFechaRelativa = (fecha: string | Date): string => {
+export const formatearFechaRelativa = (fecha: string | Date | null | undefined): string => {
+  if (!fecha) return "";
   try {
     const fechaObj = typeof fecha === "string" ? parseISO(fecha) : fecha;
+    
+    if (fechaObj instanceof Date && isNaN(fechaObj.getTime())) {
+      return "";
+    }
+
     return formatDistanceToNow(fechaObj, {
       addSuffix: true,
       locale: APP_LOCALE,
@@ -62,6 +68,6 @@ export const formatearFechaRelativa = (fecha: string | Date): string => {
 /**
  * Formatea una fecha en formato largo (1 de enero de 2024)
  */
-export const formatearFechaLarga = (fecha: string | Date): string => {
+export const formatearFechaLarga = (fecha: string | Date | null | undefined): string => {
   return formatFecha(fecha, "d 'de' MMMM 'de' yyyy");
 };

@@ -25,11 +25,8 @@ import { ModuleTabBar } from "@/componentes/shared/ModuleTabBar";
 import { RUTAS_TITULOS } from "@/config/rutasTitulos";
 
 import { useClientes, useCliente, useEliminarCliente } from "../hooks/useClientes";
-import { Cliente } from "../types/cliente.types";
+import { ClienteResumen, ClienteDetalle } from "../types/cliente.types";
 import { ClienteForm } from "../componentes/ClienteForm";
-import { useCatalogo } from "@/features/configuracion/hooks/useCatalogo";
-import { useTipoDocumento } from "@/features/configuracion/hooks/useTipoDocumento";
-
 import { usePagination } from "@/hooks/usePagination";
 
 export function PaginaClientes() {
@@ -40,13 +37,9 @@ export function PaginaClientes() {
 
   const { data, isLoading, error } = useClientes(paginacion);
   const clientes = data?.datos || [];
-  const { data: clienteDetalle, isLoading: cargandoDetalle } = useCliente(idClienteAEditar || 0);
+  const { data: respDetalle, isLoading: cargandoDetalle } = useCliente(idClienteAEditar || 0);
+  const clienteDetalle = respDetalle as ClienteDetalle;
   const eliminarCliente = useEliminarCliente();
-
-  // Cargamos tipos de documento desde configuracion.tipo_documento y
-  // tipo cliente desde el catálogo de detalle
-  const { data: tiposDocumento } = useTipoDocumento();
-  const { data: tiposCliente } = useCatalogo("TIPO_CLIENTE");
 
   const tabsVentas = [
     { label: RUTAS_TITULOS["/ventas/pos"], to: "/ventas/pos" },
@@ -54,7 +47,6 @@ export function PaginaClientes() {
     { label: RUTAS_TITULOS["/ventas/cotizaciones"], to: "/ventas/cotizaciones" },
     { label: RUTAS_TITULOS["/clientes"], to: "/clientes" },
   ];
-
   const handleEliminar = (id: number) => {
     eliminarCliente.mutate(id, {
       onSuccess: () => {
@@ -71,56 +63,51 @@ export function PaginaClientes() {
   const columnas = [
     {
       header: "Doc.",
-      accessorKey: "idTipoDocumento" as keyof Cliente,
-      cell: (row: Cliente) => {
-        const tipo = tiposDocumento?.find(
-          (t: any) => t.id === row.idTipoDocumento,
-        );
-        return (
-          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase bg-muted text-muted-foreground border border-muted-foreground/10">
-            {tipo?.nombre || tipo?.codigo || row.idTipoDocumento}
-          </span>
-        );
-      },
+      accessorKey: "tipoDocumentoNombre" as keyof ClienteResumen,
+      cell: (row: ClienteResumen) => (
+        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase bg-muted text-muted-foreground border border-muted-foreground/10">
+          {row.tipoDocumentoNombre}
+        </span>
+      ),
     },
     {
       header: "Número",
-      accessorKey: "numeroDocumento" as keyof Cliente,
+      accessorKey: "numeroDocumento" as keyof ClienteResumen,
       className: "font-mono font-medium",
     },
     {
       header: "Razón Social / Nombres",
-      accessorKey: "razonSocial" as keyof Cliente,
+      accessorKey: "razonSocial" as keyof ClienteResumen,
       className: "font-semibold min-w-[200px] text-primary",
     },
     {
-      header: "Tipo Cliente",
-      accessorKey: "idTipoCliente" as keyof Cliente,
-      cell: (row: Cliente) => {
-        const tipo = tiposCliente?.find((t: any) => t.id === row.idTipoCliente);
-        return tipo ? (
-          <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-medium bg-secondary/50 text-secondary-foreground border border-secondary">
-            {tipo.nombre}
-          </span>
-        ) : (
-          "-"
-        );
-      },
+      header: "Condición SUNAT",
+      accessorKey: "condicionSunat" as keyof ClienteResumen,
+      cell: (row: ClienteResumen) => (
+        <span className="text-[11px] font-medium text-muted-foreground">
+          {row.condicionSunat || "-"}
+        </span>
+      ),
     },
     {
-      header: "Email",
-      accessorKey: "email" as keyof Cliente,
-      className: "text-sm text-muted-foreground",
-    },
-    {
-      header: "Teléfono",
-      accessorKey: "telefono" as keyof Cliente,
-      className: "text-sm text-muted-foreground",
+      header: "Estado",
+      accessorKey: "activado" as keyof ClienteResumen,
+      cell: (row: ClienteResumen) => (
+        <span
+          className={`px-2 py-1 rounded text-xs font-medium ${
+            row.activado
+              ? "bg-green-100 text-green-800"
+              : "bg-red-100 text-red-800"
+          }`}
+        >
+          {row.activado ? "Activo" : "Inactivo"}
+        </span>
+      ),
     },
     {
       header: "Acciones",
       className: "text-right",
-      cell: (row: Cliente) => (
+      cell: (row: ClienteResumen) => (
         <div className="flex justify-end gap-1">
           <Button
             variant="ghost"

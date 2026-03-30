@@ -19,6 +19,7 @@ builder.Services.AddDbContext<ContabilidadDbContext>(options =>
 // Registros de Infraestructura
 builder.Services.AddScoped<IPlanCuentaRepositorio, PlanCuentaRepositorio>();
 builder.Services.AddScoped<ICentroCostoRepositorio, CentroCostoRepositorio>();
+builder.Services.AddScoped<IAsientoRepositorio, AsientoRepositorio>();
 
 // CORS
 // CORS
@@ -54,5 +55,6 @@ app.UseHttpsRedirection();
 // Map Endpoints
 app.MapPlanCuentaEndpoints();
 app.MapCentroCostoEndpoints();
+app.MapAsientoEndpoints();
 
 app.Run();

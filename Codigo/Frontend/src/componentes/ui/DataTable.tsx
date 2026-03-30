@@ -24,7 +24,7 @@ import {
 } from "lucide-react";
 import { PagedResponse } from "../../types/pagination.types";
 
-interface DataTableColumn<T> {
+export interface DataTableColumn<T> {
   header: string;
   accessorKey?: keyof T;
   cell?: (item: T) => React.ReactNode;

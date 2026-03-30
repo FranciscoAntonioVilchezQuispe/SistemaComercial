@@ -1,16 +1,16 @@
 import { TablaPaginada } from "@compartido/componentes/tablas/TablaPaginada";
 import { ColumnaAcciones } from "@compartido/componentes/tablas/ColumnaAcciones";
 import { Badge } from "@/components/ui/badge";
-import { Producto } from "../../tipos/catalogo.types";
+import { ProductoResumen } from "../../tipos/catalogo.types";
 import { formatearMoneda } from "@compartido/utilidades/moneda";
 
 interface PropiedadesTablaProductos {
-  productos: Producto[];
+  productos: ProductoResumen[];
   cargando?: boolean;
   error?: string;
-  alEditar: (producto: Producto) => void;
-  alEliminar: (producto: Producto) => void;
-  alVer: (producto: Producto) => void;
+  alEditar: (producto: ProductoResumen) => void;
+  alEliminar: (producto: ProductoResumen) => void;
+  alVer: (producto: ProductoResumen) => void;
 }
 
 export function TablaProductos({
@@ -30,14 +30,9 @@ export function TablaProductos({
     {
       clave: "nombre",
       titulo: "Nombre",
-      renderizar: (producto: Producto) => (
+      renderizar: (producto: ProductoResumen) => (
         <div>
           <p className="font-medium">{producto.nombre}</p>
-          {producto.descripcion && (
-            <p className="text-sm text-muted-foreground line-clamp-1">
-              {producto.descripcion}
-            </p>
-          )}
         </div>
       ),
     },
@@ -45,39 +40,36 @@ export function TablaProductos({
       clave: "categoria",
       titulo: "Categoría",
       ancho: "150px",
-      renderizar: (producto: Producto) => producto.categoria?.nombre || "-",
+      renderizar: (producto: ProductoResumen) => producto.categoriaNombre || "-",
     },
     {
       clave: "marca",
       titulo: "Marca",
       ancho: "120px",
-      renderizar: (producto: Producto) => producto.marca?.nombre || "-",
+      renderizar: (producto: ProductoResumen) => producto.marcaNombre || "-",
     },
     {
       clave: "precio",
       titulo: "Precio",
       ancho: "120px",
-      renderizar: (producto: Producto) =>
+      renderizar: (producto: ProductoResumen) =>
         formatearMoneda(producto.precioVentaPublico),
     },
     {
       clave: "stock",
       titulo: "Stock",
       ancho: "100px",
-      renderizar: (producto: Producto) => {
-        const stockBajo = producto.stock <= producto.stockMinimo;
-        return (
-          <span className={stockBajo ? "text-destructive font-semibold" : ""}>
-            {producto.stock} {producto.unidadMedida?.nombre}
-          </span>
-        );
-      },
+      renderizar: (producto: ProductoResumen) => (
+        <span>
+          {producto.stock} {producto.unidadMedidaNombre}
+        </span>
+      ),
     },
     {
       clave: "activo",
       titulo: "Estado",
       ancho: "100px",
-      renderizar: (producto: Producto) => (
+      renderizar: (producto: ProductoResumen) => (
         <Badge variant={producto.activo ? "default" : "secondary"}>
           {producto.activo ? "Activo" : "Inactivo"}
         </Badge>
@@ -87,7 +79,7 @@ export function TablaProductos({
       clave: "acciones",
       titulo: "Acciones",
       ancho: "120px",
-      renderizar: (producto: Producto) => (
+      renderizar: (producto: ProductoResumen) => (
         <ColumnaAcciones
           compacto
           acciones={[

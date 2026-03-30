@@ -1,0 +1,27 @@
+/**
+ * Enums de sistema y otros módulos sincronizados con el Backend
+ */
+
+export enum TipoMovimientoInventario {
+  IngresoCompra = 19,
+  SalidaVenta = 20,
+  AjustePositivo = 21,
+  AjusteNegativo = 22,
+  TransferenciaAlmacen = 23,
+}
+
+export enum TablasGenerales {
+  TIPO_DOCUMENTO = "TIPO_DOCUMENTO",
+  TIPO_CLIENTE = "TIPO_CLIENTE",
+  TIPO_MOVIMIENTO_CAJA = "TIPO_MOVIMIENTO_CAJA",
+  TIPO_PRODUCTO = "TIPO_PRODUCTO",
+  TIPO_MOVIMIENTO_INVENTARIO = "TIPO_MOVIMIENTO_INVENTARIO",
+  TIPO_CUENTA_CONTABLE = "TIPO_CUENTA_CONTABLE",
+  ESTADO_VENTA = "ESTADO_VENTA",
+  ESTADO_COTIZACION = "ESTADO_COTIZACION",
+  ESTADO_CAJA = "ESTADO_CAJA",
+  ESTADO_ORDEN_COMPRA = "ESTADO_ORDEN_COMPRA",
+  ESTADO_ASIENTO = "ESTADO_ASIENTO",
+  ESTADO_PAGO = "ESTADO_PAGO",
+  TIPO_MONEDA = "TIPO_MONEDA",
+}

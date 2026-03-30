@@ -12,30 +12,32 @@ import {
   actualizarCliente,
   eliminarCliente,
 } from "../servicios/servicioClientes";
-import { Cliente, ClienteFormData } from "../types/cliente.types";
+import { ClienteResumen, ClienteDetalle, ClienteFormData } from "../types/cliente.types";
 import { PagedRequest, PagedResponse } from "@/types/pagination.types";
+
+const QUERY_KEY = ["clientes"];
 
 export const useClientes = (
   paginacion?: PagedRequest,
   enabled: boolean = true,
-): UseQueryResult<PagedResponse<Cliente>, Error> => {
+): UseQueryResult<PagedResponse<ClienteResumen>, Error> => {
   return useQuery({
-    queryKey: ["clientes", paginacion],
+    queryKey: [...QUERY_KEY, "lista", paginacion],
     queryFn: () => obtenerClientes(paginacion),
     enabled: enabled,
   });
 };
 
-export const useCliente = (id: number): UseQueryResult<Cliente, Error> => {
+export const useCliente = (id: number): UseQueryResult<ClienteDetalle, Error> => {
   return useQuery({
-    queryKey: ["clientes", id],
+    queryKey: [...QUERY_KEY, "detalle", id],
     queryFn: () => obtenerCliente(id),
     enabled: !!id,
   });
 };
 
 export const useCrearCliente = (): UseMutationResult<
-  Cliente,
+  ClienteDetalle,
   Error,
   ClienteFormData
 > => {
@@ -43,13 +45,13 @@ export const useCrearCliente = (): UseMutationResult<
   return useMutation({
     mutationFn: crearCliente,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["clientes"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEY });
     },
   });
 };
 
 export const useActualizarCliente = (): UseMutationResult<
-  Cliente,
+  ClienteDetalle,
   Error,
   { id: number; data: ClienteFormData }
 > => {
@@ -57,8 +59,9 @@ export const useActualizarCliente = (): UseMutationResult<
   return useMutation({
     mutationFn: ({ id, data }: { id: number; data: ClienteFormData }) =>
       actualizarCliente(id, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["clientes"] });
+    onSuccess: (_, { id }) => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: [...QUERY_KEY, "detalle", id] });
     },
   });
 };
@@ -72,7 +75,7 @@ export const useEliminarCliente = (): UseMutationResult<
   return useMutation({
     mutationFn: eliminarCliente,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["clientes"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEY });
     },
   });
 };

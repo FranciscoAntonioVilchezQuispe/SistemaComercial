@@ -121,6 +121,186 @@
 - **Nunca mezclar** ambos dentro del mismo método o transacción.
 - Las migraciones deben ser **reversibles** — toda migración destructiva requiere script de rollback previo.
 
+### 🔍 Reglas de Consultas con Dapper (Lecturas / Paginación)
+
+#### Gestión de la Conexión
+- **Nunca usar `using var connection = _context.Database.GetDbConnection()`** — disponerla rompe la conexión que EF administra internamente.
+- Obtener la conexión del contexto EF y **abrirla solo si está cerrada**; nunca disponerla manualmente:
+```csharp
+var connection = _context.Database.GetDbConnection();
+if (connection.State != ConnectionState.Open)
+    await connection.OpenAsync();
+```
+
+#### Paginación Eficiente
+- **Nunca hacer dos queries separadas** (una para datos, otra para el total) — usar `COUNT(*) OVER()` como columna adicional para obtener ambos en un solo round-trip a la base de datos:
+```sql
+SELECT
+    v.id_venta,
+    v.serie,
+    -- ... resto de columnas
+    COUNT(*) OVER() AS total   -- total sin paginación en la misma query
+FROM ventas.ventas v
+ORDER BY v.fecha_emision DESC
+LIMIT @pageSize OFFSET @offset;
+```
+- Calcular el offset siempre como: `var offset = (pageNumber - 1) * pageSize;`
+- Extraer el total del primer resultado: `var total = rows.FirstOrDefault()?.Total ?? 0;`
+
+#### Mapeo Tipado (sin `dynamic`)
+- **Prohibido usar `QueryAsync<dynamic>`** para mapear resultados — es frágil porque PostgreSQL devuelve aliases en minúsculas y rompe silenciosamente en refactors.
+- **Siempre usar un DTO tipado plano** para que Dapper haga el mapeo automático:
+```csharp
+// ✅ Correcto
+var rows = await connection.QueryAsync<VentaPaginadaDto>(sql, parameters);
+
+// ❌ Prohibido
+var rows = await connection.QueryAsync<dynamic>(sql, parameters);
+var datos = rows.Select(row => new Venta { Campo = row.campo ... }); // mapeo manual frágil
+```
+- Habilitar la convención snake_case → PascalCase **una sola vez en Program.cs** para que Dapper mapee automáticamente `total_venta` → `TotalVenta`:
+```csharp
+DefaultTypeMap.MatchNamesWithUnderscores = true;
+```
+
+#### Separación de Responsabilidades
+- El **repositorio** solo devuelve DTOs planos (`VentaPaginadaDto`) — no construir entidades de dominio ni objetos anidados dentro del repositorio con Dapper.
+- La conversión del DTO al objeto de dominio o al DTO de respuesta de la API ocurre en la **capa de aplicación** (Service o Handler), no en el repositorio.
+- El DTO de Dapper incluye todos los campos necesarios en forma plana, incluyendo campos de joins (`ClienteRazonSocial`, `TipoComprobanteNombre`, etc.).
+
+#### Firma Estándar de Métodos Paginados
+```csharp
+// Repositorio devuelve DTO plano + total
+public async Task<(IEnumerable<VentaPaginadaDto> Datos, int Total)> ObtenerPaginadoAsync(
+    string? search, int pageNumber, int pageSize)
+
+// El DTO plano incluye la columna de total
+public class VentaPaginadaDto
+{
+    public int IdVenta { get; set; }
+    // ... campos de la entidad principal
+    public string TipoComprobanteNombre { get; set; } = default!;  // del JOIN
+    public string ClienteRazonSocial { get; set; } = default!;     // del JOIN
+    public string EstadoNombre { get; set; } = default!;           // del JOIN
+    public int Total { get; set; }  // COUNT(*) OVER() — no mapear en la respuesta de la API
+}
+```
+
+#### Lo que el Agente NUNCA debe hacer con Dapper
+- Usar `QueryAsync<dynamic>` y mapear manualmente campo por campo.
+- Ejecutar dos queries (datos + count) cuando `COUNT(*) OVER()` resuelve ambas en una.
+- Disponer (`using`) la conexión obtenida de `_context.Database.GetDbConnection()`.
+- Construir entidades de dominio con objetos anidados (`new Cliente { ... }`) dentro del repositorio Dapper.
+- Omitir `DefaultTypeMap.MatchNamesWithUnderscores = true` y luego acceder a propiedades en minúsculas para compensar.
+
+---
+---
+
+## ✅ Validaciones — Backend .NET / C#
+
+> Esta sección aplica **únicamente a proyectos C# que ya tengan instalado FluentValidation**
+> (`FluentValidation` o `FluentValidation.AspNetCore` referenciado en el `.csproj`).
+> El agente debe verificar esta condición antes de generar código de validación.
+
+### Regla de Detección Automática
+
+Antes de generar cualquier validación en un proyecto C#, buscar en el `.csproj` activo:
+```xml
+<PackageReference Include="FluentValidation" ... />
+<PackageReference Include="FluentValidation.AspNetCore" ... />
+```
+Si existe alguna de estas referencias → aplicar **TODAS** las reglas siguientes sin excepción.
+
+---
+
+### Reglas Obligatorias
+
+1. **NUNCA usar Data Annotations** (`[Required]`, `[MaxLength]`, `[Range]`, `[RegularExpression]`, etc.)
+   para validar lógica de negocio en DTOs, Commands o Requests si FluentValidation ya está presente.
+   Data Annotations solo se permiten para documentación Swagger (`[FromBody]`, `[FromQuery]`).
+
+2. **SIEMPRE crear un `AbstractValidator<T>`** por cada DTO, Command o Request que reciba datos
+   del usuario, de un formulario o de una API externa.
+
+3. **Estructura obligatoria** de cada validador:
+```csharp
+   public class NombreRequestValidator : AbstractValidator<NombreRequest>
+   {
+       public NombreRequestValidator()
+       {
+           RuleFor(x => x.Campo)
+               .NotEmpty().WithMessage("El campo Campo es obligatorio.")
+               .MaximumLength(100).WithMessage("Campo no debe superar 100 caracteres.");
+           // ... más reglas
+       }
+   }
+```
+
+4. **Ubicación del archivo:** el validador va en la misma carpeta que su DTO/Command,
+   o en una subcarpeta `Validators/` dentro del módulo. Ejemplo:
+```
+   Features/
+   └── Ventas/
+       ├── CrearVentaRequest.cs
+       ├── CrearVentaRequestValidator.cs   ← aquí
+       └── VentasService.cs
+```
+
+5. **Registro en DI:** si el proyecto ya usa registro automático (`AddValidatorsFromAssemblyContaining<T>()`),
+   no registrar manualmente. Si no existe registro automático, agregarlo en `Program.cs`:
+```csharp
+   builder.Services.AddValidatorsFromAssemblyContaining<Program>();
+```
+
+6. **En Controllers/Endpoints:** confiar en el pipeline automático de validación.
+   No validar con `ModelState.IsValid` manualmente si el filtro global ya está configurado.
+   Si no está configurado, agregarlo:
+```csharp
+   builder.Services.AddFluentValidationAutoValidation();
+```
+
+7. **No duplicar validaciones:** el validador cubre formato y presencia; el dominio/servicio
+   cubre reglas de negocio complejas. No mezclar ambas en el mismo lugar.
+
+---
+
+### Reglas para Dominio Peruano (SUNAT)
+
+Para campos con lógica peruana, usar `.Must()` o `.MustAsync()`:
+```csharp
+// RUC
+RuleFor(x => x.Ruc)
+    .NotEmpty().WithMessage("El RUC es obligatorio.")
+    .Length(11).WithMessage("El RUC debe tener exactamente 11 dígitos.")
+    .Must(ValidarDigitoVerificadorRuc).WithMessage("El RUC no es válido.");
+
+// DNI
+RuleFor(x => x.Dni)
+    .NotEmpty().WithMessage("El DNI es obligatorio.")
+    .Length(8).WithMessage("El DNI debe tener exactamente 8 dígitos.")
+    .Matches("^[0-9]+$").WithMessage("El DNI solo debe contener dígitos.");
+
+// Serie de comprobante (F001, B001, FC01, etc.)
+RuleFor(x => x.Serie)
+    .NotEmpty().WithMessage("La serie es obligatoria.")
+    .Matches(@"^[FBCET][A-Z0-9]{3}$").WithMessage("La serie no tiene el formato válido (ej: F001, B001).");
+
+// IGV — nunca validar un valor fijo; verificar que venga de configuración
+RuleFor(x => x.PorcentajeIgv)
+    .GreaterThan(0).WithMessage("El porcentaje de IGV debe ser mayor a 0.")
+    .LessThanOrEqualTo(100).WithMessage("El porcentaje de IGV no puede superar 100.");
+```
+
+---
+
+### Lo que el Agente NUNCA debe hacer en C# con FluentValidation presente
+
+- Agregar `[Required]` o cualquier Data Annotation de validación a un DTO nuevo.
+- Validar formato de RUC/DNI con una condición `if` dentro del Service o Controller.
+- Crear un endpoint que reciba datos sin su correspondiente `AbstractValidator<T>`.
+- Dejar un validador vacío (`RuleFor` sin ninguna regla definida).
+- Duplicar la misma regla de validación en el validador y en el dominio.
+
 ---
 
 ## 🐘 Reglas de Base de Datos (PostgreSQL)
@@ -231,7 +411,99 @@
 - Siempre manejar el cierre graceful del servidor (`SIGTERM`, `SIGINT`) para no cortar conexiones a Oracle.
 
 ---
+## 🌐 Diseño de Endpoints REST — Lista vs Detalle
 
+> Esta regla aplica a **todos los backends del stack** (.NET, NestJS) para cualquier recurso
+> que se muestre en un grid/tabla en el frontend.
+
+### Principio: Dos Llamadas, Dos Propósitos
+
+| Llamada | Cuándo | Qué devuelve |
+|---------|--------|-------------|
+| **GET /recurso** (paginado) | Al cargar el grid | Solo las columnas visibles en la tabla + `id` |
+| **GET /recurso/{id}** | Al abrir vista previa o editar | Todos los campos necesarios para esa acción |
+
+**Prohibido devolver campos innecesarios en el endpoint de lista** — si una columna no se muestra
+en el grid, no debe viajar en la respuesta paginada.
+
+---
+
+### Reglas del Endpoint de Lista (Grid)
+
+- El DTO de respuesta de lista (`XxxListDto` / `XxxResumenDto`) **solo contiene las columnas
+  que el frontend efectivamente renderiza** en el grid, más el `id` del recurso.
+- Nunca incluir campos de texto largo (`observaciones`, `descripcion`, `xml`, `pdf_base64`, etc.)
+  en el DTO de lista — esos van únicamente en el detalle.
+- Si el grid muestra un campo de una entidad relacionada (ej: nombre del cliente),
+  incluirlo como campo plano en el DTO (`ClienteNombre`), no como objeto anidado.
+- El backend no debe asumir qué campos "puede que necesite el frontend en el futuro" —
+  solo los que el contrato con el frontend confirme que usa hoy.
+```csharp
+// ✅ DTO de lista — solo lo que el grid muestra
+public class VentaListDto
+{
+    public int Id { get; set; }
+    public string Serie { get; set; } = default!;
+    public int Numero { get; set; }
+    public DateTime FechaEmision { get; set; }
+    public string ClienteNombre { get; set; } = default!;   // del JOIN, plano
+    public string TipoComprobante { get; set; } = default!;
+    public decimal TotalVenta { get; set; }
+    public string EstadoNombre { get; set; } = default!;
+    public string EstadoPagoNombre { get; set; } = default!;
+}
+
+// ❌ Prohibido en el DTO de lista
+public class VentaListDto
+{
+    // ...
+    public string Observaciones { get; set; }   // no está en el grid
+    public string XmlSunat { get; set; }        // nunca en lista
+    public Cliente ClienteCompleto { get; set; } // objeto anidado innecesario
+}
+```
+
+---
+
+### Reglas del Endpoint de Detalle (Vista Previa / Edición)
+
+- Al hacer clic en "ver" o "editar", el frontend **siempre hace una segunda llamada**
+  `GET /recurso/{id}` — nunca reutiliza los datos parciales del grid.
+- El DTO de detalle (`XxxDetalleDto` / `XxxFormDto`) incluye **todos los campos**
+  necesarios para renderizar el formulario o la vista previa completa.
+- Si la vista previa y el formulario de edición necesitan datos distintos,
+  crear DTOs separados: `XxxVistaDto` y `XxxEditDto`.
+- El detalle puede incluir colecciones (`Lineas`, `Pagos`, `Archivos`)
+  que nunca deben ir en la respuesta de lista.
+```csharp
+// ✅ DTO de detalle — todo lo necesario para la acción
+public class VentaDetalleDto
+{
+    public int Id { get; set; }
+    public string Serie { get; set; } = default!;
+    public int Numero { get; set; }
+    public DateTime FechaEmision { get; set; }
+    public DateTime? FechaVencimientoPago { get; set; }
+    public string Moneda { get; set; } = default!;
+    public decimal TipoCambio { get; set; }
+    public string Observaciones { get; set; } = default!;   // aquí sí
+    public ClienteDetalleDto Cliente { get; set; } = default!;
+    public List<VentaLineaDto> Lineas { get; set; } = [];   // aquí sí
+    public List<PagoDto> Pagos { get; set; } = [];
+}
+```
+
+---
+
+### Lo que el Agente NUNCA debe hacer
+
+- Devolver todos los campos de la entidad en el endpoint de lista "por si acaso".
+- Reutilizar en el frontend los datos del grid para prellenar un formulario de edición.
+- Incluir colecciones o relaciones anidadas (`List<Linea>`, `Cliente` completo) en el DTO de lista.
+- Crear un único DTO gigante que sirva tanto para la lista como para el detalle.
+- Omitir el campo `id` en el DTO de lista — siempre es necesario para la segunda llamada.
+- Incluir en la query paginada columnas que no se muestran en el grid — ver sección "🌐 Diseño de Endpoints REST — Lista vs Detalle".
+---
 ## 📁 Estructura de Archivos de Tareas
 
 ```

@@ -17,6 +17,11 @@ namespace Ventas.API.Application.Interfaces
         DbSet<Ventas.API.Domain.Entidades.Referencias.SeriesComprobante> SeriesComprobantes { get; set; }
         DbSet<Ventas.API.Domain.Entidades.Nota> Notas { get; set; }
         DbSet<Ventas.API.Domain.Entidades.DetalleNota> DetallesNota { get; set; }
+        DbSet<Ventas.API.Domain.Entidades.NotaCredito> NotasCredito { get; set; }
+        DbSet<Ventas.API.Domain.Entidades.NotaCreditoDetalle> NotasCreditoDetalles { get; set; }
+        DbSet<Ventas.API.Domain.Entidades.NotaDebito> NotasDebito { get; set; }
+        DbSet<Ventas.API.Domain.Entidades.NotaDebitoDetalle> NotasDebitoDetalles { get; set; }
+        DbSet<Ventas.API.Domain.Entidades.Referencias.TipoComprobanteReferencia> TiposComprobanteRef { get; set; }
 
         Task<int> SaveChangesAsync(CancellationToken cancellationToken);
     }

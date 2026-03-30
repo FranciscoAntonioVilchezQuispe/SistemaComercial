@@ -1,6 +1,7 @@
 using Catalogo.Domain.Entidades;
 using Catalogo.Domain.Interfaces;
 using Catalogo.Application.DTOs;
+using Catalogo.Domain.DTOs;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;

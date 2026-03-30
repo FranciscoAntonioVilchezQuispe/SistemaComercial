@@ -1,5 +1,6 @@
 using Catalogo.Domain.Entidades;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using System.Reflection;
 
 namespace Catalogo.Infrastructure.Datos
@@ -30,6 +31,18 @@ namespace Catalogo.Infrastructure.Datos
             modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
         }
 
+        protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+        {
+            // Convierte todos los DateTime a UTC al guardar en la base de datos
+            configurationBuilder
+                .Properties<DateTime>()
+                .HaveConversion(typeof(DateTimeToUtcConverter));
+
+            configurationBuilder
+                .Properties<DateTime?>()
+                .HaveConversion(typeof(NullableDateTimeToUtcConverter));
+        }
+
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
             foreach (var entry in ChangeTracker.Entries<Nucleo.Comun.Domain.EntidadBase>())
@@ -58,6 +71,25 @@ namespace Catalogo.Infrastructure.Datos
             }
 
             return base.SaveChangesAsync(cancellationToken);
+        }
+
+        public System.Data.Common.DbConnection GetDbConnection() => Database.GetDbConnection();
+    }
+
+    // Convertidores para asegurar DateTimeKind.Utc
+    public class DateTimeToUtcConverter : ValueConverter<DateTime, DateTime>
+    {
+        public DateTimeToUtcConverter()
+            : base(v => v.Kind == DateTimeKind.Utc ? v : DateTime.SpecifyKind(v, DateTimeKind.Utc), v => v)
+        {
+        }
+    }
+
+    public class NullableDateTimeToUtcConverter : ValueConverter<DateTime?, DateTime?>
+    {
+        public NullableDateTimeToUtcConverter()
+            : base(v => !v.HasValue ? v : (v.Value.Kind == DateTimeKind.Utc ? v : DateTime.SpecifyKind(v.Value, DateTimeKind.Utc)), v => v)
+        {
         }
     }
 }

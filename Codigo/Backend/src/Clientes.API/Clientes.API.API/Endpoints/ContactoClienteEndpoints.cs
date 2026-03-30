@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Nucleo.Comun.Application.Wrappers;
+using Clientes.API.Domain.DTOs;
 
 namespace Clientes.API.Endpoints
 {

@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { useClickOutside } from "@/hooks/useClickOutside";
 import { apiVentas } from "@/lib/axios";
 import { Venta } from "@/features/ventas/tipos/ventas.types";
+import { formatearMoneda, formatearFechaHora } from "@compartido/utilidades";
 
 interface SearchComprobanteProps {
   onSelect: (venta: Venta) => void;
@@ -96,15 +97,15 @@ export function SearchComprobante({
                   className="w-full flex flex-col items-start px-3 py-2 text-sm hover:bg-secondary transition-colors text-left"
                 >
                   <div className="flex justify-between w-full">
-                    <span className="font-medium">{v.numeroComprobante}</span>
+                    <span className="font-medium">{v.serie}-{v.numeroFormateado}</span>
                     <span className="text-xs font-semibold text-primary">
-                      S/ {v.total.toFixed(2)}
+                      {formatearMoneda(v.totalVenta)}
                     </span>
                   </div>
                   <div className="flex gap-2 text-xs text-muted-foreground">
-                    <span>{v.cliente?.razonSocial || "Sin cliente"}</span>
+                    <span className="truncate max-w-[150px]">{v.nombreCliente || "Cliente General"}</span>
                     <span>•</span>
-                    <span>{new Date(v.fecha).toLocaleDateString()}</span>
+                    <span>{formatearFechaHora(v.fechaEmision)}</span>
                   </div>
                 </button>
               ))

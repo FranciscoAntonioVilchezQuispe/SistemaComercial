@@ -1,6 +1,21 @@
-export interface Cliente {
+/** Interface ligera para el listado de clientes (Grids) */
+export interface ClienteResumen {
   id: number;
   idTipoDocumento: number;
+  tipoDocumentoNombre: string;
+  numeroDocumento: string;
+  razonSocial: string;
+  nombreComercial?: string;
+  condicionSunat?: string;
+  estadoSunat?: string;
+  activado: boolean;
+}
+
+/** Interface completa para la ficha del cliente */
+export interface ClienteDetalle {
+  id: number;
+  idTipoDocumento: number;
+  tipoDocumentoNombre: string;
   numeroDocumento: string;
   razonSocial: string;
   nombreComercial?: string;
@@ -8,6 +23,7 @@ export interface Cliente {
   telefono?: string;
   email?: string;
   idTipoCliente?: number;
+  tipoClienteNombre?: string;
   limiteCredito?: number;
   diasCredito?: number;
   idListaPrecioAsignada?: number;
@@ -21,6 +37,9 @@ export interface Cliente {
   fechaUltimaConsultaSunat?: string;
   contactos?: ContactoCliente[];
 }
+
+/** @deprecated Usar ClienteResumen o ClienteDetalle */
+export type Cliente = ClienteResumen | ClienteDetalle;
 
 export interface ContactoCliente {
   id: number;

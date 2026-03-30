@@ -12,6 +12,22 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { formatearMoneda, formatearFechaHora } from "@compartido/utilidades";
+import { EstadoVenta, EstadoPago } from "@compartido/enums";
+import { toast } from "sonner";
+
+const ESTADO_VENTA_COLORES: Record<number, string> = {
+  [EstadoVenta.Completada]: "bg-green-100 text-green-700 border-green-200 hover:bg-green-100",
+  [EstadoVenta.PendientePago]: "bg-amber-100 text-amber-700 border-amber-200 hover:bg-amber-100",
+  [EstadoVenta.Anulada]: "bg-red-100 text-red-700 border-red-200 hover:bg-red-100",
+};
+
+const ESTADO_PAGO_COLORES: Record<number, string> = {
+  [EstadoPago.Pagado]: "bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-50",
+  [EstadoPago.Pendiente]: "bg-orange-50 text-orange-700 border-orange-200 hover:bg-orange-50",
+  [EstadoPago.Parcial]: "bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-50",
+  [EstadoPago.Credito]: "bg-purple-50 text-purple-700 border-purple-200 hover:bg-purple-50",
+  [EstadoPago.Anulado]: "bg-red-50 text-red-700 border-red-200 hover:bg-red-50",
+};
 
 interface Props {
   ventas: Venta[];
@@ -34,9 +50,11 @@ export function TablaVentas({
       titulo: "Comprobante",
       renderizar: (venta: Venta) => (
         <div className="flex flex-col">
-          <span className="font-medium">{venta.numeroComprobante}</span>
-          <span className="text-xs text-muted-foreground">
-            {venta.tipoComprobante}
+          <span className="font-medium text-primary">
+            {venta.serie}-{venta.numeroFormateado}
+          </span>
+          <span className="text-xs text-muted-foreground uppercase font-bold">
+            {venta.tipoComprobante || "NOTA DE VENTA"}
           </span>
         </div>
       ),
@@ -44,19 +62,28 @@ export function TablaVentas({
     {
       clave: "fecha",
       titulo: "Fecha",
-      renderizar: (venta: Venta) => formatearFechaHora(venta.fecha),
+      renderizar: (venta: Venta) => (
+        <span className="text-sm">
+          {formatearFechaHora(venta.fechaEmision)}
+        </span>
+      ),
     },
     {
       clave: "cliente",
       titulo: "Cliente",
-      renderizar: (venta: Venta) =>
-        venta.cliente?.razonSocial || "Cliente General",
+      renderizar: (venta: Venta) => (
+        <div className="max-w-[200px] truncate" title={venta.nombreCliente || "Cliente General"}>
+          {venta.nombreCliente || "Cliente General"}
+        </div>
+      ),
     },
     {
       clave: "total",
       titulo: "Total",
       renderizar: (venta: Venta) => (
-        <span className="font-bold">{formatearMoneda(venta.total)}</span>
+        <span className="font-bold text-base">
+          {formatearMoneda(venta.totalVenta)}
+        </span>
       ),
     },
     {
@@ -64,13 +91,8 @@ export function TablaVentas({
       titulo: "Estado",
       renderizar: (venta: Venta) => (
         <Badge
-          variant={
-            venta.idEstado === 1 // Completada
-              ? "default"
-              : venta.idEstado === 2 // Pendiente
-                ? "secondary"
-                : "destructive" // Anulada
-          }
+          variant="outline"
+          className={ESTADO_VENTA_COLORES[venta.idEstado] || "bg-gray-100 text-gray-700"}
         >
           {venta.estado || "Completada"}
         </Badge>
@@ -81,10 +103,8 @@ export function TablaVentas({
       titulo: "Pago",
       renderizar: (venta: Venta) => (
         <Badge
-          variant={venta.idEstadoPago === 1 ? "outline" : "secondary"}
-          className={
-            venta.idEstadoPago === 1 ? "border-green-500 text-green-500" : ""
-          }
+          variant="outline"
+          className={ESTADO_PAGO_COLORES[venta.idEstadoPago] || "bg-gray-100 text-gray-700"}
         >
           {venta.estadoPago || "Pagado"}
         </Badge>
@@ -100,6 +120,7 @@ export function TablaVentas({
             size="icon"
             onClick={() => onVerDetalle(venta)}
             title="Ver Detalle"
+            className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
           >
             <Eye className="h-4 w-4" />
           </Button>
@@ -121,7 +142,7 @@ export function TablaVentas({
                 Factura / Boleta
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="text-destructive">
+              <DropdownMenuItem className="text-destructive" onClick={() => toast.warning("Funcionalidad de anulación en desarrollo")}>
                 Anular Venta
               </DropdownMenuItem>
             </DropdownMenuContent>

@@ -2,7 +2,7 @@
  * Formatea un número como moneda en soles peruanos
  */
 export const formatMoneda = (
-  valor: number,
+  valor: number | null | undefined,
   opciones?: {
     mostrarSimbolo?: boolean;
     decimales?: number;
@@ -10,10 +10,17 @@ export const formatMoneda = (
 ): string => {
   const { mostrarSimbolo = true, decimales = 2 } = opciones || {};
 
+  // Manejar valores nulos o indefinidos para evitar NaN
+  if (valor === null || valor === undefined || isNaN(Number(valor))) {
+    return mostrarSimbolo ? `S/ 0.00` : "0.00";
+  }
+
+  const valorNum = Number(valor);
+
   const valorFormateado = new Intl.NumberFormat("es-PE", {
     minimumFractionDigits: decimales,
     maximumFractionDigits: decimales,
-  }).format(valor);
+  }).format(valorNum);
 
   return mostrarSimbolo ? `S/ ${valorFormateado}` : valorFormateado;
 };
@@ -26,18 +33,22 @@ export const formatearMoneda = formatMoneda;
 /**
  * Formatea un número con separadores de miles y decimales fijos
  */
-export const formatDecimal = (valor: number, decimales: number = 2): string => {
+export const formatDecimal = (valor: number | null | undefined, decimales: number = 2): string => {
+  if (valor === null || valor === undefined || isNaN(Number(valor))) {
+    return "0.00";
+  }
+  
   return new Intl.NumberFormat("es-PE", {
     minimumFractionDigits: decimales,
     maximumFractionDigits: decimales,
-  }).format(valor);
+  }).format(Number(valor));
 };
 
 /**
  * Formatea un número con separadores de miles
  */
 export const formatearNumero = (
-  valor: number,
+  valor: number | null | undefined,
   decimales: number = 0,
 ): string => {
   return formatDecimal(valor, decimales);
@@ -47,7 +58,7 @@ export const formatearNumero = (
  * Formatea un número como porcentaje
  */
 export const formatearPorcentaje = (
-  valor: number,
+  valor: number | null | undefined,
   decimales: number = 2,
 ): string => {
   return `${formatDecimal(valor, decimales)}%`;

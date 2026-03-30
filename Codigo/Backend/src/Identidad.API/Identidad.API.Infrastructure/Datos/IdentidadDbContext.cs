@@ -1,5 +1,6 @@
 using Identidad.API.Domain.Entidades;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Identidad.API.Infrastructure.Datos
 {
@@ -48,6 +49,35 @@ namespace Identidad.API.Infrastructure.Datos
             modelBuilder.Entity<RolMenu>()
                 .HasIndex(rm => new { rm.IdRol, rm.IdMenu })
                 .IsUnique();
+        }
+
+        protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+        {
+            // Convierte todos los DateTime a UTC al guardar en la base de datos
+            configurationBuilder
+                .Properties<DateTime>()
+                .HaveConversion(typeof(DateTimeToUtcConverter));
+
+            configurationBuilder
+                .Properties<DateTime?>()
+                .HaveConversion(typeof(NullableDateTimeToUtcConverter));
+        }
+    }
+
+    // Convertidores para asegurar DateTimeKind.Utc
+    public class DateTimeToUtcConverter : ValueConverter<DateTime, DateTime>
+    {
+        public DateTimeToUtcConverter()
+            : base(v => v.Kind == DateTimeKind.Utc ? v : DateTime.SpecifyKind(v, DateTimeKind.Utc), v => v)
+        {
+        }
+    }
+
+    public class NullableDateTimeToUtcConverter : ValueConverter<DateTime?, DateTime?>
+    {
+        public NullableDateTimeToUtcConverter()
+            : base(v => !v.HasValue ? v : (v.Value.Kind == DateTimeKind.Utc ? v : DateTime.SpecifyKind(v.Value, DateTimeKind.Utc)), v => v)
+        {
         }
     }
 }

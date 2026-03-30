@@ -1,0 +1,52 @@
+using System;
+using System.Collections.Generic;
+
+namespace Compras.API.Application.DTOs
+{
+    public class NotaCreditoCompraDto
+    {
+        public long Id { get; set; }
+        public string Serie { get; set; } = null!;
+        public string Numero { get; set; } = null!;
+        public string TipoComprobante { get; set; } = "07";
+
+        public long IdCompraReferencia { get; set; }
+        public string SerieReferencia { get; set; } = null!;
+        public string NumeroReferencia { get; set; } = null!;
+        public string TipoDocReferencia { get; set; } = null!;
+
+        public long IdTipoNota { get; set; }
+        public string MotivoSustento { get; set; } = null!;
+
+        public long IdProveedor { get; set; }
+        public string ProveedorTipoDoc { get; set; } = null!;
+        public string ProveedorNroDoc { get; set; } = null!;
+        public string ProveedorRazonSocial { get; set; } = null!;
+
+        public decimal Subtotal { get; set; }
+        public decimal Igv { get; set; }
+        public decimal Total { get; set; }
+        public string Moneda { get; set; } = "PEN";
+        public decimal? TipoCambio { get; set; }
+
+        public bool AfectaStock { get; set; }
+        public DateTime FechaEmision { get; set; }
+        public string Estado { get; set; } = "PENDIENTE";
+
+        public List<NotaCreditoDetalleCompraDto> Detalles { get; set; } = new();
+    }
+
+    public class NotaCreditoDetalleCompraDto
+    {
+        public long Id { get; set; }
+        public long? IdCompraDetalle { get; set; }
+        public long IdProducto { get; set; }
+        public string Descripcion { get; set; } = null!;
+        public string UnidadMedida { get; set; } = "NIU";
+        public decimal Cantidad { get; set; }
+        public decimal PrecioUnitario { get; set; }
+        public decimal Subtotal { get; set; }
+        public decimal Igv { get; set; }
+        public decimal Total { get; set; }
+    }
+}

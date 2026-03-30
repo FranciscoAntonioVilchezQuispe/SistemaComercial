@@ -1,7 +1,7 @@
-using Inventario.API.Application.DTOs;
+using Inventario.API.Domain.DTOs;
 using MediatR;
 
 namespace Inventario.API.Application.Consultas
 {
-    public record ObtenerMovimientoInventarioPorIdConsulta(long Id) : IRequest<MovimientoInventarioDto?>;
+    public record ObtenerMovimientoInventarioPorIdConsulta(long Id) : IRequest<MovimientoDetalleDto?>;
 }

@@ -3,6 +3,7 @@ using Inventario.API.Domain.Entidades;
 using Inventario.API.Domain.Entidades.Kardex;
 using Inventario.API.Domain.Entidades.Referencias;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Inventario.API.Infrastructure.Datos
 {
@@ -27,6 +28,8 @@ namespace Inventario.API.Infrastructure.Datos
         public DbSet<KardexRecalculoLog> KardexRecalculoLogs { get; set; } = null!;
         public DbSet<Traslado> Traslados { get; set; } = null!;
         public DbSet<TrasladoDetalle> TrasladosDetalle { get; set; } = null!;
+
+        public System.Data.IDbConnection GetDbConnection() => Database.GetDbConnection();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -149,6 +152,35 @@ namespace Inventario.API.Infrastructure.Datos
                     .HasForeignKey(d => d.TrasladoId)
                     .OnDelete(DeleteBehavior.Cascade);
             });
+        }
+
+        protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+        {
+            // Convierte todos los DateTime a UTC al guardar en la base de datos
+            configurationBuilder
+                .Properties<DateTime>()
+                .HaveConversion(typeof(DateTimeToUtcConverter));
+
+            configurationBuilder
+                .Properties<DateTime?>()
+                .HaveConversion(typeof(NullableDateTimeToUtcConverter));
+        }
+    }
+
+    // Convertidores para asegurar DateTimeKind.Utc
+    public class DateTimeToUtcConverter : ValueConverter<DateTime, DateTime>
+    {
+        public DateTimeToUtcConverter()
+            : base(v => v.Kind == DateTimeKind.Utc ? v : DateTime.SpecifyKind(v, DateTimeKind.Utc), v => v)
+        {
+        }
+    }
+
+    public class NullableDateTimeToUtcConverter : ValueConverter<DateTime?, DateTime?>
+    {
+        public NullableDateTimeToUtcConverter()
+            : base(v => !v.HasValue ? v : (v.Value.Kind == DateTimeKind.Utc ? v : DateTime.SpecifyKind(v.Value, DateTimeKind.Utc)), v => v)
+        {
         }
     }
 }

@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 import { toast } from "sonner";
 import { useCotizaciones } from "../hooks/useVentas";
 import { Button } from "@/components/ui/button";
@@ -11,6 +12,7 @@ import { usePagination } from "@/hooks/usePagination";
 import { DataTable } from "@/componentes/ui/DataTable";
 import { formatearMoneda, formatearFechaHora } from "@compartido/utilidades";
 import { Badge } from "@/components/ui/badge";
+import { ModalDetalleCotizacion } from "../componentes/cotizaciones/ModalDetalleCotizacion";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -24,11 +26,16 @@ export function PaginaCotizaciones() {
   const navigate = useNavigate();
   const { paginacion, cambiarPagina, cambiarPageSize, cambiarBusqueda } = usePagination();
 
+  // Estados para el detalle diferido (Two-Call Pattern)
+  const [modalDetalleOpen, setModalDetalleOpen] = useState(false);
+  const [selectedCotizacionId, setSelectedCotizacionId] = useState<number | null>(null);
+
   const { data, isLoading } = useCotizaciones(paginacion);
   const cotizaciones = data?.datos || [];
 
-  const handleVerDetalle = (_cotizacion: any) => {
-    toast.info("Próximamente: ver detalle de cotización");
+  const handleVerDetalle = (id: number) => {
+    setSelectedCotizacionId(id);
+    setModalDetalleOpen(true);
   };
 
   const tabsVentas = [
@@ -61,13 +68,12 @@ export function PaginaCotizaciones() {
     },
     {
       header: "Cliente",
-      cell: (cot: any) =>
-        cot.cliente?.razonSocial || "Cliente General",
+      cell: (cot: any) => cot.clienteNombre || "Cliente General",
     },
     {
       header: "Total",
       cell: (cot: any) => (
-        <span className="font-bold">{formatearMoneda(cot.total)}</span>
+        <span className="font-bold">{formatearMoneda(cot.totalCotizacion)}</span>
       ),
     },
     {
@@ -82,7 +88,7 @@ export function PaginaCotizaciones() {
                 : "destructive" // Rechazada/Expirada
           }
         >
-          {cot.idEstado === 1 ? "Aprobada" : cot.idEstado === 0 ? "Borrador" : "Pendiente"}
+          {cot.estadoNombre}
         </Badge>
       ),
     },
@@ -94,7 +100,7 @@ export function PaginaCotizaciones() {
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => handleVerDetalle(cot)}
+            onClick={() => handleVerDetalle(cot.id)}
             title="Ver Detalle"
           >
             <Eye className="h-4 w-4" />
@@ -152,6 +158,13 @@ export function PaginaCotizaciones() {
           />
         </CardContent>
       </Card>
+
+      <ModalDetalleCotizacion 
+        id={selectedCotizacionId}
+        isOpen={modalDetalleOpen}
+        onClose={() => setModalDetalleOpen(false)}
+        onConvertir={(id) => navigate(`/ventas/pos?cotizacion=${id}`)}
+      />
     </div>
   );
 }

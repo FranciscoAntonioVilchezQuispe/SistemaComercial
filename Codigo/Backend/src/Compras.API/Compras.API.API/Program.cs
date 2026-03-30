@@ -85,5 +85,6 @@ app.UseHttpsRedirection();
 app.MapProveedorEndpoints();
 app.MapOrdenCompraEndpoints();
 app.MapCompraEndpoints();
+app.MapNotaSunatCompraEndpoints();
 
 app.Run();

@@ -11,4 +11,8 @@
     <ProjectReference Include="..\Ventas.API.Application\Ventas.API.Application.csproj" />
     <ProjectReference Include="..\Ventas.API.Infrastructure\Ventas.API.Infrastructure.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Ventas.API.Domain\Ventas.API.Domain.csproj" />
+  </ItemGroup>
 </Project>

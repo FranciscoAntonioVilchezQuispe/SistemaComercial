@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Inventario.API.Application.Comandos;
 using Inventario.API.Application.Interfaces;
 using System.Linq;
+using Nucleo.Comun.Domain.Enums;
 
 namespace Inventario.API.Application.Manejadores
 {
@@ -63,7 +64,7 @@ namespace Inventario.API.Application.Manejadores
                         bool existe = await _context.MovimientosInventario
                             .AnyAsync(m => m.IdReferencia == compra.IdCompra
                                         && m.ReferenciaModulo == "COMPRAS"
-                                        && m.IdTipoMovimiento == 19 // ING_COM
+                                        && m.IdTipoMovimiento == (long)TipoMovimientoInventario.IngresoCompra
                                         && m.Stock.IdProducto == detalle.IdProducto, cancellationToken);
 
                         if (existe)
@@ -75,7 +76,7 @@ namespace Inventario.API.Application.Manejadores
                         var comandoInventario = new CrearMovimientoInventarioComando(
                             IdProducto: detalle.IdProducto,
                             IdAlmacen: compra.IdAlmacen,
-                            IdTipoMovimiento: 19, // ING_COM
+                            IdTipoMovimiento: (long)TipoMovimientoInventario.IngresoCompra,
                             Cantidad: detalle.Cantidad,
                             CostoUnitario: detalle.PrecioUnitarioCompra,
                             ReferenciaModulo: "COMPRAS",
@@ -105,7 +106,7 @@ namespace Inventario.API.Application.Manejadores
                         bool existe = await _context.MovimientosInventario
                             .AnyAsync(m => m.IdReferencia == venta.IdVenta
                                         && m.ReferenciaModulo == "VENTAS"
-                                        && m.IdTipoMovimiento == 20 // SAL_VEN
+                                        && m.IdTipoMovimiento == (long)TipoMovimientoInventario.SalidaVenta
                                         && m.Stock.IdProducto == detalle.IdProducto, cancellationToken);
 
                         if (existe)
@@ -117,7 +118,7 @@ namespace Inventario.API.Application.Manejadores
                         var comandoInventario = new CrearMovimientoInventarioComando(
                             IdProducto: detalle.IdProducto,
                             IdAlmacen: venta.IdAlmacen,
-                            IdTipoMovimiento: 20, // SAL_VEN
+                            IdTipoMovimiento: (long)TipoMovimientoInventario.SalidaVenta,
                             Cantidad: detalle.Cantidad,
                             CostoUnitario: detalle.PrecioUnitario,
                             ReferenciaModulo: "VENTAS",

@@ -5,6 +5,9 @@ using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Dapper;
+using Clientes.API.Domain.DTOs;
+using System.Data;
 
 namespace Clientes.API.Infrastructure.Repositorios
 {
@@ -15,6 +18,38 @@ namespace Clientes.API.Infrastructure.Repositorios
         public ClienteRepositorio(ClientesDbContext context)
         {
             _context = context;
+        }
+
+        public async Task<ClienteDetalleDto?> ObtenerDetallePorIdAsync(long id)
+        {
+            var connection = _context.GetDbConnection();
+            if (connection.State != ConnectionState.Open) await connection.OpenAsync();
+
+            var sql = @"
+                -- Cabecera de Cliente
+                SELECT c.id_cliente as Id, c.id_tipo_documento, td.nombre as TipoDocumentoNombre,
+                       c.numero_documento, c.razon_social, c.nombre_comercial, c.direccion,
+                       c.telefono, c.email, c.id_tipo_cliente, c.limite_credito, c.dias_credito,
+                       c.id_lista_precio_asignada, c.ubigeo, c.condicion_sunat, c.estado_sunat,
+                       c.es_agente_retencion, c.es_buen_contribuyente, c.es_agente_percepcion,
+                       c.fecha_ultima_consulta_sunat, c.activado
+                FROM clientes.clientes c
+                LEFT JOIN configuracion.tipo_documento td ON td.id_tipo_documento = c.id_tipo_documento
+                WHERE c.id_cliente = @id;
+
+                -- Contactos
+                SELECT id_contacto as Id, nombre, cargo, telefono, email
+                FROM clientes.contactos_cliente
+                WHERE id_cliente = @id;";
+
+            using var multi = await connection.QueryMultipleAsync(sql, new { id });
+            var cliente = await multi.ReadFirstOrDefaultAsync<ClienteDetalleDto>();
+            if (cliente != null)
+            {
+                cliente.Contactos = (await multi.ReadAsync<ContactoClienteDto>()).ToList();
+            }
+
+            return cliente;
         }
 
         public async Task<Cliente?> ObtenerPorIdAsync(long id)
@@ -49,45 +84,37 @@ namespace Clientes.API.Infrastructure.Repositorios
 
         public async Task<IEnumerable<Cliente>> ObtenerTodosAsync(string? busqueda = null)
         {
-            var query = _context.Clientes.AsQueryable();
-
-            if (!string.IsNullOrWhiteSpace(busqueda))
-            {
-                var term = busqueda.Trim().ToLower();
-                query = query.Where(c =>
-                    c.RazonSocial.ToLower().Contains(term) ||
-                    c.NumeroDocumento.Contains(term));
-            }
-
-            return await query.Take(100).ToListAsync();
+            return await _context.Clientes
+                .Where(c => string.IsNullOrEmpty(busqueda) || 
+                            c.RazonSocial.ToLower().Contains(busqueda.ToLower()) || 
+                            c.NumeroDocumento.Contains(busqueda))
+                .Take(100)
+                .ToListAsync();
         }
 
-        public async Task<(IEnumerable<Cliente> Datos, int Total)> ObtenerPaginadoAsync(string? search, bool? activo, int pageNumber, int pageSize)
+        public async Task<(IEnumerable<ClienteListDto> Datos, int Total)> ObtenerPaginadoAsync(string? search, int pageNumber, int pageSize)
         {
-            var query = _context.Clientes.AsQueryable();
+            var connection = _context.GetDbConnection();
+            if (connection.State != ConnectionState.Open) await connection.OpenAsync();
 
-            if (!string.IsNullOrEmpty(search))
-            {
-                search = search.ToLower();
-                query = query.Where(c => 
-                    c.RazonSocial.ToLower().Contains(search) || 
-                    c.NumeroDocumento.Contains(search) ||
-                    (c.NombreComercial != null && c.NombreComercial.ToLower().Contains(search)));
-            }
+            var offset = (pageNumber - 1) * pageSize;
+            var sql = @"
+                SELECT c.id_cliente as Id, c.id_tipo_documento, td.nombre as TipoDocumentoNombre,
+                       c.numero_documento, c.razon_social, c.email, c.telefono, c.activado,
+                       COUNT(*) OVER() AS TotalRegistros
+                FROM clientes.clientes c
+                LEFT JOIN configuracion.tipo_documento td ON td.id_tipo_documento = c.id_tipo_documento
+                WHERE (@search IS NULL OR 
+                       c.razon_social ILIKE '%' || @search || '%' OR 
+                       c.numero_documento ILIKE '%' || @search || '%')
+                ORDER BY c.razon_social ASC
+                LIMIT @pageSize OFFSET @offset;";
 
-            if (activo.HasValue)
-            {
-                query = query.Where(c => c.Activado == activo.Value);
-            }
-
-            var total = await query.CountAsync();
-            var datos = await query
-                .OrderBy(c => c.RazonSocial)
-                .Skip((pageNumber - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync();
-
-            return (datos, total);
+            var parameters = new { search, pageSize, offset };
+            var rows = await connection.QueryAsync<ClienteListDto>(sql, parameters);
+            
+            var total = rows.FirstOrDefault()?.TotalRegistros ?? 0;
+            return (rows, total);
         }
     }
 }

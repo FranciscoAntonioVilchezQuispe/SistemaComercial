@@ -1,7 +1,13 @@
 import { useQuery, useMutation, useQueryClient, UseQueryResult } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { servicioVentas } from "../servicios/servicioVentas";
-import { VentaFormData, Venta } from "../tipos/ventas.types";
+import {
+  VentaFormData,
+  VentaResumen,
+  VentaDetalle,
+  CotizacionResumen,
+  CotizacionDetalle,
+} from "../tipos/ventas.types";
 import { manejadorErrores } from "@/lib/axios/manejadorErrores";
 import { PagedRequest, PagedResponse } from "@/types/pagination.types";
 
@@ -12,7 +18,7 @@ const QUERY_KEY = "ventas";
  */
 export function useVentas(
   paginacion?: PagedRequest,
-): UseQueryResult<PagedResponse<Venta>, Error> {
+): UseQueryResult<PagedResponse<VentaResumen>, Error> {
   return useQuery({
     queryKey: [QUERY_KEY, paginacion],
     queryFn: () => servicioVentas.obtenerVentas(paginacion),
@@ -22,7 +28,7 @@ export function useVentas(
 /**
  * Hook para obtener una venta por ID
  */
-export function useVenta(id: number): UseQueryResult<Venta, Error> {
+export function useVenta(id: number): UseQueryResult<VentaDetalle, Error> {
   return useQuery({
     queryKey: [QUERY_KEY, id],
     queryFn: () => servicioVentas.obtenerVentaPorId(id),
@@ -33,7 +39,7 @@ export function useVenta(id: number): UseQueryResult<Venta, Error> {
 /**
  * Hook para obtener ventas del día
  */
-export function useVentasDelDia(): UseQueryResult<Venta[], Error> {
+export function useVentasDelDia(): UseQueryResult<any[], Error> {
   return useQuery({
     queryKey: [QUERY_KEY, "hoy"],
     queryFn: () => servicioVentas.obtenerVentasDelDia(),
@@ -51,6 +57,7 @@ export function useCrearVenta() {
     mutationFn: (datos: VentaFormData) => servicioVentas.crearVenta(datos),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [QUERY_KEY] });
+      queryClient.invalidateQueries({ queryKey: ["productos"] }); // Refrescar stock en POS
       toast.success("Venta registrada exitosamente");
     },
     onError: (error) => {
@@ -108,9 +115,20 @@ export function useSeries(idTipoComprobante: number, idAlmacen?: number) {
  */
 export function useCotizaciones(
   paginacion?: PagedRequest,
-): UseQueryResult<PagedResponse<any>, Error> {
+): UseQueryResult<PagedResponse<CotizacionResumen>, Error> {
   return useQuery({
     queryKey: ["cotizaciones", paginacion],
     queryFn: () => servicioVentas.obtenerCotizaciones(paginacion),
+  });
+}
+
+/**
+ * Hook para obtener una cotización por ID (Detalle completo)
+ */
+export function useCotizacion(id: number): UseQueryResult<CotizacionDetalle, Error> {
+  return useQuery({
+    queryKey: ["cotizaciones", id],
+    queryFn: () => servicioVentas.obtenerCotizacionPorId(id),
+    enabled: !!id,
   });
 }

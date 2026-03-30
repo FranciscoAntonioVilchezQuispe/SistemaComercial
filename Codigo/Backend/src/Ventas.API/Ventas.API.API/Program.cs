@@ -5,6 +5,9 @@ using Microsoft.EntityFrameworkCore;
 using Ventas.API.Endpoints;
 using Nucleo.Comun.Application.Extensions;
 using Nucleo.Comun.API.Extensions;
+using Dapper;
+
+DefaultTypeMap.MatchNamesWithUnderscores = true;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.AddCentralizedLogging();
@@ -67,5 +70,6 @@ app.UseHttpsRedirection();
 app.MapCajaEndpoints();
 app.MapVentaEndpoints();
 app.MapCotizacionEndpoints();
+app.MapNotaSunatEndpoints();
 
 app.Run();

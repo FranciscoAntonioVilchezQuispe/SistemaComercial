@@ -1,32 +1,32 @@
 import api from "@/lib/axios";
-import { Cliente, ClienteFormData } from "../types/cliente.types";
+import { ClienteResumen, ClienteDetalle, ClienteFormData } from "../types/cliente.types";
 import { PagedRequest, PagedResponse } from "@/types/pagination.types";
 
 export const obtenerClientes = async (
   params?: PagedRequest,
-): Promise<PagedResponse<Cliente>> => {
+): Promise<PagedResponse<ClienteResumen>> => {
   const response: any = await api.get("/clientes", { params });
   return response;
 };
 
-export const obtenerCliente = async (id: number): Promise<Cliente> => {
+export const obtenerCliente = async (id: number): Promise<ClienteDetalle> => {
   const response: any = await api.get(`/clientes/${id}`);
-  return response.datos || response.data;
+  return response.data || response.datos;
 };
 
 export const crearCliente = async (
   cliente: ClienteFormData,
-): Promise<Cliente> => {
+): Promise<ClienteDetalle> => {
   const response: any = await api.post("/clientes", cliente);
-  return response.datos || response.data;
+  return response.data || response.datos;
 };
 
 export const actualizarCliente = async (
   id: number,
   cliente: ClienteFormData,
-): Promise<Cliente> => {
+): Promise<ClienteDetalle> => {
   const response: any = await api.put(`/clientes/${id}`, cliente);
-  return response.datos || response.data;
+  return response.data || response.datos;
 };
 
 export const eliminarCliente = async (id: number): Promise<void> => {

@@ -6,6 +6,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Dapper;
+using Inventario.API.Domain.DTOs;
+using System.Data;
 
 namespace Inventario.API.Infrastructure.Repositorios
 {
@@ -16,6 +19,27 @@ namespace Inventario.API.Infrastructure.Repositorios
         public KardexMovimientoRepositorio(IInventarioDbContext context)
         {
             _context = context;
+        }
+
+        public async Task<MovimientoDetalleDto?> ObtenerDetallePorIdAsync(long id)
+        {
+            var connection = _context.GetDbConnection();
+            if (connection.State != ConnectionState.Open) {
+                if (connection is System.Data.Common.DbConnection dbConn) await dbConn.OpenAsync();
+                else connection.Open();
+            }
+
+            var sql = @"
+                SELECT km.id_kardex_movimiento as Id, km.id_tipo_movimiento, km.id_stock, km.id_producto,
+                       km.id_almacen, km.cantidad, km.cantidad_anterior, km.cantidad_nueva,
+                       km.costo_unitario_movimiento, km.saldo_cantidad, km.saldo_valorizado,
+                       km.costo_promedio_actual, km.referencia_modulo, km.referencia_id,
+                       km.observaciones, km.fecha_movimiento as FechaHoraMovimiento,
+                       km.fecha_creacion as FechaCreacion, km.usuario_creacion
+                FROM inventario.inv_kardex_movimiento km
+                WHERE km.id_kardex_movimiento = @id;";
+
+            return await connection.QueryFirstOrDefaultAsync<MovimientoDetalleDto>(sql, new { id });
         }
 
         public async Task ActualizarAsync(KardexMovimiento movimiento)
@@ -32,10 +56,7 @@ namespace Inventario.API.Infrastructure.Repositorios
 
         public async Task BloquearFilaParaCalculoAsync(long almacenId, long productoId)
         {
-            // Bloqueo pesimista en PostgreSQL para evitar Race Conditions durante operaciones concurrentes en la misma combinación Almacén-Producto
-            var sql = $"SELECT 1 FROM inventario.inv_kardex_movimiento WHERE almacen_id = {almacenId} AND producto_id = {productoId} FOR UPDATE";
-            
-            // Usando ExecuteSqlRawAsync para que adquiera el candado SQL directamente en el bloque de la transacción activa
+            var sql = $"SELECT 1 FROM inventario.inv_kardex_movimiento WHERE id_almacen = {almacenId} AND id_producto = {productoId} FOR UPDATE";
             await ((DbContext)_context).Database.ExecuteSqlRawAsync(sql);
         }
 
@@ -72,30 +93,30 @@ namespace Inventario.API.Infrastructure.Repositorios
                 .FirstOrDefaultAsync();
         }
 
-        public async Task<(IEnumerable<KardexMovimiento> Datos, int Total)> ObtenerPaginadoAsync(long? idAlmacen, long? idProducto, int pagina, int elementosPorPagina)
+        public async Task<(IEnumerable<MovimientoListDto> Datos, int Total)> ObtenerPaginadoAsync(long? idAlmacen, long? idProducto, int pagina, int elementosPorPagina)
         {
-            var query = _context.KardexMovimientos.AsQueryable();
-
-            if (idAlmacen.HasValue)
-            {
-                query = query.Where(x => x.AlmacenId == idAlmacen.Value);
+            var connection = _context.GetDbConnection();
+            if (connection.State != ConnectionState.Open) {
+                if (connection is System.Data.Common.DbConnection dbConn) await dbConn.OpenAsync();
+                else connection.Open();
             }
 
-            if (idProducto.HasValue)
-            {
-                query = query.Where(x => x.ProductoId == idProducto.Value);
-            }
+            var offset = (pagina - 1) * elementosPorPagina;
+            var sql = @"
+                SELECT km.id_kardex_movimiento as Id, km.cantidad, km.cantidad_nueva,
+                       km.fecha_movimiento as FechaCreacion, km.usuario_creacion,
+                       COUNT(*) OVER() AS TotalRegistros
+                FROM inventario.inv_kardex_movimiento km
+                WHERE (@idAlmacen IS NULL OR km.id_almacen = @idAlmacen)
+                  AND (@idProducto IS NULL OR km.id_producto = @idProducto)
+                ORDER BY km.fecha_movimiento DESC, km.id_kardex_movimiento DESC
+                LIMIT @elementosPorPagina OFFSET @offset;";
 
-            var total = await query.CountAsync();
-
-            var datos = await query
-                .OrderByDescending(x => x.FechaHoraCompuesta)
-                .ThenByDescending(x => x.Id)
-                .Skip((pagina - 1) * elementosPorPagina)
-                .Take(elementosPorPagina)
-                .ToListAsync();
-
-            return (datos, total);
+            var parameters = new { idAlmacen, idProducto, elementosPorPagina, offset };
+            var rows = await connection.QueryAsync<MovimientoListDto>(sql, parameters);
+            
+            var total = rows.FirstOrDefault()?.TotalRegistros ?? 0;
+            return (rows, total);
         }
     }
 }

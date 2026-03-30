@@ -24,6 +24,12 @@ import { motion } from "framer-motion";
 import { Search, ShieldCheck } from "lucide-react";
 import { Badge } from "@/componentes/ui/badge";
 import { UbigeoSelector } from "@/componentes/shared/UbigeoSelector";
+import {
+  useCrearProveedor,
+  useProveedores,
+} from "@/features/compras/proveedores/hooks/useProveedores";
+import { ProveedorFormData } from "@/features/compras/proveedores/types/proveedor.types";
+import { toast } from "sonner";
 
 const formSchema = z.object({
   idTipoDocumento: z.coerce
@@ -48,6 +54,7 @@ const formSchema = z.object({
   esAgenteRetencion: z.boolean().default(false),
   esBuenContribuyente: z.boolean().default(false),
   esAgentePercepcion: z.boolean().default(false),
+  agregarAProveedor: z.boolean().default(true),
 });
 
 interface ClienteFormProps {
@@ -94,6 +101,7 @@ export function ClienteForm({
       esAgenteRetencion: false,
       esBuenContribuyente: false,
       esAgentePercepcion: false,
+      agregarAProveedor: true,
     },
   });
 
@@ -144,20 +152,52 @@ export function ClienteForm({
         { id: cliente.id, data },
         {
           onSuccess: () => {
+            toast.success("Cliente actualizado exitosamente");
             onSuccess();
           },
         },
       );
     } else {
       crear.mutate(data, {
-        onSuccess: () => {
+        onSuccess: async () => {
+          if (values.agregarAProveedor) {
+            // Verificar si ya existe como proveedor (usando el hook de consulta si fuera necesario, 
+            // pero por simplicidad seguiremos el patrón de ProveedorForm)
+            const proveedorData: ProveedorFormData = {
+              idTipoDocumento: values.idTipoDocumento,
+              numeroDocumento: values.numeroDocumento,
+              razonSocial: values.razonSocial,
+              nombreComercial: values.nombreComercial || undefined,
+              direccion: values.direccion || undefined,
+              telefono: values.telefono || undefined,
+              email: values.email || undefined,
+              ubigeo: values.ubigeo,
+              condicionSunat: values.condicionSunat,
+              estadoSunat: values.estadoSunat,
+              esAgenteRetencion: values.esAgenteRetencion,
+              esAgentePercepcion: values.esAgentePercepcion,
+              esBuenContribuyente: values.esBuenContribuyente,
+            };
+
+            try {
+              await crearProveedor.mutateAsync(proveedorData);
+              toast.success("Cliente registrado y también agregado como proveedor");
+            } catch (error) {
+              console.error("Error al crear proveedor:", error);
+              toast.error("Cliente registrado, pero hubo un error al crear el proveedor");
+            }
+          } else {
+            toast.success("Cliente registrado exitosamente");
+          }
           onSuccess();
         },
       });
     }
   };
 
-  const isPending = crear.isPending || actualizar.isPending;
+  useProveedores(undefined, !cliente);
+  const crearProveedor = useCrearProveedor();
+  const isPending = crear.isPending || actualizar.isPending || crearProveedor.isPending;
 
   return (
     <Form {...form}>
@@ -459,6 +499,26 @@ export function ClienteForm({
               </FormItem>
             )}
           />
+
+          {!cliente && (
+            <div className="md:col-span-4">
+              <FormField
+                control={form.control}
+                name="agregarAProveedor"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-2 shadow-sm bg-blue-50/10 mb-2">
+                    <div className="flex flex-col">
+                      <FormLabel className="text-blue-700 text-xs font-bold">Agregar a proveedor</FormLabel>
+                      <FormDescription className="text-[10px] -mt-1">Crea un registro automático en proveedores.</FormDescription>
+                    </div>
+                    <FormControl>
+                      <Switch checked={field.value} onCheckedChange={field.onChange} className="scale-90" />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+            </div>
+          )}
         </div>
 
         <div className="flex justify-end gap-2 pt-4">

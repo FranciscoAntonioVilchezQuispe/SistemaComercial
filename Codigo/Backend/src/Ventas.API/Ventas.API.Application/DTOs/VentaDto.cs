@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Ventas.API.Domain.DTOs;
 
 namespace Ventas.API.Application.DTOs
 {
@@ -16,6 +17,7 @@ namespace Ventas.API.Application.DTOs
         public long IdTipoComprobante { get; set; } // Catalog
         public string Serie { get; set; } = null!;
         public long Numero { get; set; }
+        public string NumeroFormateado => Numero.ToString().PadLeft(8, '0');
         public DateTime FechaEmision { get; set; }
         public DateTime? FechaVencimientoPago { get; set; }
         public long IdEstado { get; set; } // Catalog
@@ -29,6 +31,9 @@ namespace Ventas.API.Application.DTOs
         public decimal TotalVenta { get; set; }
         public decimal SaldoPendiente { get; set; }
         public long IdEstadoPago { get; set; } // Catalog
+        public string EstadoPago { get; set; } = string.Empty;
+        public string Estado { get; set; } = string.Empty;
+        public string TipoComprobante { get; set; } = string.Empty;
         public string? Observaciones { get; set; }
 
         public List<DetalleVentaDto> Detalles { get; set; } = new();

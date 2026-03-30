@@ -75,6 +75,15 @@ namespace Compras.API.Domain.Entidades
         [Column("id_estado_pago")]
         public long IdEstadoPago { get; set; }
 
+        [Column("estado_sunat")]
+        public string EstadoSunat { get; set; } = "EMITIDO";
+
+        [Column("fecha_anulacion")]
+        public DateTime? FechaAnulacion { get; set; }
+
+        [Column("motivo_anulacion")]
+        public string? MotivoAnulacion { get; set; }
+
         [MaxLength(500)]
         [Column("observaciones")]
         public string? Observaciones { get; set; }

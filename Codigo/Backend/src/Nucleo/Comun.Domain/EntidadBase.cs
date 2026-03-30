@@ -16,14 +16,14 @@ namespace Nucleo.Comun.Domain
         [Column("fecha_creacion")]
         public DateTime FechaCreacion { get; set; } = DateTime.UtcNow;
 
-        [MaxLength(50)]
+        [MaxLength(100)]
         [Column("usuario_creacion")]
         public string UsuarioCreacion { get; set; } = string.Empty;
 
         [Column("fecha_modificacion")]
         public DateTime? FechaActualizacion { get; set; }
 
-        [MaxLength(50)]
+        [MaxLength(100)]
         [Column("usuario_modificacion")]
         public string? UsuarioActualizacion { get; set; }
 

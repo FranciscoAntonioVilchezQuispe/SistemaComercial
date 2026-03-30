@@ -35,12 +35,40 @@ namespace Inventario.API.Application.Manejadores
 
             foreach (var mov in movimientos)
             {
+                // 3.1 Obtener el tipo de movimiento para saber si fue ENTRADA o SALIDA
+                var tipoMov = await _context.TiposMovimiento.FirstOrDefaultAsync(t => t.Id == mov.IdTipoMovimiento, cancellationToken);
+                if (tipoMov == null) continue;
+
+                // 3.2 Determinar Factor de Reversión
+                // Si el original fue SUMA (ING_COM, etc.), la reversión es RESTA (-1)
+                // Si el original fue RESTA (SAL_VEN, etc.), la reversión es SUMA (1)
+                decimal factorReversion = 0;
+                switch (tipoMov.Codigo)
+                {
+                    case "ING_COM":
+                    case "AJU_POS":
+                    case "INV_INI":
+                    case "ING_TRA":
+                        factorReversion = -1; // Revertir ingreso = Restar
+                        break;
+                    case "SAL_VEN":
+                    case "AJU_NEG":
+                    case "TRA_ALM":
+                        factorReversion = 1; // Revertir salida = Sumar
+                        break;
+                }
+
                 var stock = await _context.Stocks.FirstOrDefaultAsync(s => s.Id == mov.IdStock, cancellationToken);
                 if (stock != null)
                 {
-                    // Revertir el stock: Restamos cantidad y valor
-                    stock.CantidadActual -= mov.Cantidad;
-                    stock.ValorTotal -= (mov.Cantidad * (mov.CostoUnitarioMovimiento ?? 0));
+                    decimal cantidadARevertir = mov.Cantidad * factorReversion;
+                    
+                    // Revertir el stock: Aplicamos el factor de reversión
+                    stock.CantidadActual += cantidadARevertir;
+                    
+                    // Revertir Valorizado (Aproximado por CPP del movimiento)
+                    decimal costoUnitario = mov.CostoUnitarioMovimiento ?? stock.CostoPromedio;
+                    stock.ValorTotal += (cantidadARevertir * costoUnitario);
                     
                     if (stock.CantidadActual > 0)
                         stock.CostoPromedio = Math.Round(stock.ValorTotal / stock.CantidadActual, 4);

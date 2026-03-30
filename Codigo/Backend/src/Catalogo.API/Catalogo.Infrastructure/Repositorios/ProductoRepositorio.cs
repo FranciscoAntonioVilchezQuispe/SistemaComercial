@@ -3,6 +3,11 @@ using Catalogo.Domain.Interfaces;
 using Catalogo.Infrastructure.Datos;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
+using Dapper;
+using Catalogo.Domain.DTOs;
+using System.Collections.Generic;
+using System.Linq;
+using System.Data;
 
 namespace Catalogo.Infrastructure.Repositorios
 {
@@ -13,6 +18,49 @@ namespace Catalogo.Infrastructure.Repositorios
         public ProductoRepositorio(CatalogoDbContext context)
         {
             _context = context;
+        }
+
+        public async Task<ProductoDetalleDto?> ObtenerDetallePorIdAsync(long id)
+        {
+            var connection = _context.GetDbConnection();
+            if (connection.State != ConnectionState.Open) await connection.OpenAsync();
+
+            var sql = @"
+                -- Cabecera de Producto
+                SELECT p.id_producto as Id, p.codigo_producto as Codigo, p.nombre_producto as Nombre, p.descripcion,
+                       p.id_categoria, c.nombre as CategoriaNombre,
+                       p.id_marca, m.nombre as MarcaNombre,
+                       p.id_unidad_medida, um.nombre as UnidadMedidaNombre, um.sigla as UnidadMedidaSigla,
+                       p.id_tipo_producto, p.codigo_barras, p.sku,
+                       p.precio_compra, p.precio_venta_publico, p.precio_venta_mayorista, p.precio_venta_distribuidor,
+                       p.stock_minimo, p.stock_maximo, p.tiene_variantes, p.permite_inventario_negativo,
+                       p.metodo_valuacion, p.gravado_impuesto, p.porcentaje_impuesto, p.imagen_principal_url,
+                       p.activado as Activo, p.fecha_creacion, p.fecha_actualizacion as FechaModificacion
+                FROM catalogo.productos p
+                INNER JOIN catalogo.categorias c ON c.id_categoria = p.id_categoria
+                INNER JOIN catalogo.marcas m ON m.id_marca = p.id_marca
+                INNER JOIN catalogo.unidades_medida um ON um.id_unidad_medida = p.id_unidad_medida
+                WHERE p.id_producto = @id;
+
+                -- Imágenes
+                SELECT id_imagen as Id, url_imagen as Url, es_principal
+                FROM catalogo.imagenes_producto
+                WHERE id_producto = @id;
+
+                -- Variantes
+                SELECT id_variante as Id, codigo_variante as Codigo, nombre_variante as Nombre, stock_actual, precio_vendedor
+                FROM catalogo.variantes_producto
+                WHERE id_producto = @id;";
+
+            using var multi = await connection.QueryMultipleAsync(sql, new { id });
+            var producto = await multi.ReadFirstOrDefaultAsync<ProductoDetalleDto>();
+            if (producto != null)
+            {
+                producto.Imagenes = (await multi.ReadAsync<ImagenProductoDto>()).ToList();
+                producto.Variantes = (await multi.ReadAsync<VarianteProductoDto>()).ToList();
+            }
+
+            return producto;
         }
 
         public async Task<Producto?> ObtenerPorIdAsync(long id)
@@ -46,46 +94,33 @@ namespace Catalogo.Infrastructure.Repositorios
                 .ToListAsync();
         }
 
-        public async Task EliminarAsync(long id)
+        public async Task<(IEnumerable<ProductoListDto> Datos, int Total)> ObtenerPaginadoAsync(string? busqueda, int pagina, int elementosPorPagina)
         {
-            var producto = await _context.Productos.FindAsync(id);
-            if (producto != null)
-            {
-                producto.Activado = !producto.Activado;
-                producto.UsuarioActualizacion = "SISTEMA";
-                producto.FechaActualizacion = DateTime.UtcNow;
-                await _context.SaveChangesAsync();
-            }
-        }
+            var connection = _context.GetDbConnection();
+            if (connection.State != ConnectionState.Open) await connection.OpenAsync();
 
-        public async Task<(IEnumerable<Producto> Datos, int Total)> ObtenerPaginadoAsync(string? busqueda, bool? activo, int pagina, int elementosPorPagina)
-        {
-            var query = _context.Productos
-                .Include(p => p.Categoria)
-                .Include(p => p.Marca)
-                .Include(p => p.UnidadMedida)
-                .AsQueryable();
+            var offset = (pagina - 1) * elementosPorPagina;
+            var sql = @"
+                SELECT p.id_producto as Id, p.codigo_producto as Codigo, p.nombre_producto as Nombre,
+                       c.nombre as CategoriaNombre, m.nombre as MarcaNombre, um.sigla as UnidadMedidaSigla,
+                       p.precio_venta_publico as PrecioVenta, p.imagen_principal_url, p.activado as Activo,
+                       COUNT(*) OVER() AS TotalRegistros
+                FROM catalogo.productos p
+                INNER JOIN catalogo.categorias c ON c.id_categoria = p.id_categoria
+                INNER JOIN catalogo.marcas m ON m.id_marca = p.id_marca
+                INNER JOIN catalogo.unidades_medida um ON um.id_unidad_medida = p.id_unidad_medida
+                WHERE (@busqueda IS NULL OR 
+                       p.nombre_producto ILIKE '%' || @busqueda || '%' OR 
+                       p.codigo_producto ILIKE '%' || @busqueda || '%' OR
+                       p.codigo_barras ILIKE '%' || @busqueda || '%')
+                ORDER BY p.nombre_producto ASC
+                LIMIT @elementosPorPagina OFFSET @offset;";
 
-            if (!string.IsNullOrWhiteSpace(busqueda))
-            {
-                var termino = busqueda.ToLower();
-                query = query.Where(x => x.NombreProducto.ToLower().Contains(termino) || x.CodigoProducto.ToLower().Contains(termino));
-            }
-
-            if (activo.HasValue)
-            {
-                query = query.Where(x => x.Activado == activo.Value);
-            }
-
-            var total = await query.CountAsync();
-
-            var datos = await query
-                .OrderByDescending(x => x.Id)
-                .Skip((pagina - 1) * elementosPorPagina)
-                .Take(elementosPorPagina)
-                .ToListAsync();
-
-            return (datos, total);
+            var parameters = new { busqueda, elementosPorPagina, offset };
+            var rows = await connection.QueryAsync<ProductoListDto>(sql, parameters);
+            
+            var total = rows.FirstOrDefault()?.TotalRegistros ?? 0;
+            return (rows, total);
         }
     }
 }

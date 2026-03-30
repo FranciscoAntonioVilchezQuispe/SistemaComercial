@@ -1,7 +1,10 @@
 import { apiVentas } from "@/lib/axios";
 import {
-  Venta,
+  VentaResumen,
+  VentaDetalle,
   VentaFormData,
+  CotizacionResumen,
+  CotizacionDetalle,
 } from "../tipos/ventas.types";
 import { PagedRequest, PagedResponse } from "@/types/pagination.types";
 
@@ -10,30 +13,30 @@ const BASE_URL = "/ventas";
 export const servicioVentas = {
   obtenerVentas: async (
     params?: PagedRequest,
-  ): Promise<PagedResponse<Venta>> => {
+  ): Promise<PagedResponse<VentaResumen>> => {
     const response: any = await apiVentas.get(BASE_URL, { params });
     // Handle both cases: response.datos or the response itself being the PagedResponse
     return response.datos ? response : (response.data || response);
   },
 
-  obtenerVentaPorId: async (id: number): Promise<Venta> => {
+  obtenerVentaPorId: async (id: number): Promise<VentaDetalle> => {
     const response: any = await apiVentas.get(`${BASE_URL}/${id}`);
     return response.datos || response.data;
   },
 
-  crearVenta: async (datos: VentaFormData): Promise<Venta> => {
+  crearVenta: async (datos: VentaFormData): Promise<VentaDetalle> => {
     const response: any = await apiVentas.post(BASE_URL, datos);
     return response.datos || response.data;
   },
 
-  anularVenta: async (id: number, motivo: string): Promise<Venta> => {
+  anularVenta: async (id: number, motivo: string): Promise<any> => {
     const response: any = await apiVentas.patch(`${BASE_URL}/${id}/anular`, {
       motivo,
     });
     return response.datos || response.data;
   },
 
-  obtenerVentasDelDia: async (): Promise<Venta[]> => {
+  obtenerVentasDelDia: async (): Promise<any[]> => {
     const response: any = await apiVentas.get(`${BASE_URL}/hoy`);
     return response.datos || response.data;
   },
@@ -57,8 +60,23 @@ export const servicioVentas = {
 
   obtenerCotizaciones: async (
     params?: PagedRequest,
-  ): Promise<PagedResponse<any>> => {
+  ): Promise<PagedResponse<CotizacionResumen>> => {
     const response: any = await apiVentas.get("/cotizaciones", { params });
     return response.datos ? response : (response.data || response);
+  },
+
+  obtenerCotizacionPorId: async (id: number): Promise<CotizacionDetalle> => {
+    const response: any = await apiVentas.get(`/cotizaciones/${id}`);
+    return response.datos || response.data;
+  },
+
+  crearNotaCredito: async (datos: any): Promise<any> => {
+    const response: any = await apiVentas.post("/notas/credito", datos);
+    return response.datos || response.data;
+  },
+
+  crearNotaDebito: async (datos: any): Promise<any> => {
+    const response: any = await apiVentas.post("/notas/debito", datos);
+    return response.datos || response.data;
   },
 };

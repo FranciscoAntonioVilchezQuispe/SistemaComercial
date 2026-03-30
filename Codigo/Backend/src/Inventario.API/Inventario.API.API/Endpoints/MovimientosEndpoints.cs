@@ -6,10 +6,13 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Inventario.API.Application.Interfaces;
+using Inventario.API.Domain.Interfaces;
 using Inventario.API.Application.DTOs;
+using Inventario.API.Domain.DTOs;
 using Nucleo.Comun.Application.Wrappers;
 using Nucleo.Comun.Application.Paginacion;
-using System.Linq;
+using Dapper;
+using System.Data;
 
 namespace Inventario.API.Endpoints
 {
@@ -34,60 +37,10 @@ namespace Inventario.API.Endpoints
 
             var grupo = app.MapGroup("/api/inventario/movimientos").WithTags("Movimientos");
             
-            grupo.MapGet("/", async ([AsParameters] PagedRequest request, long? idProducto, long? idAlmacen, IInventarioDbContext context) =>
+            grupo.MapGet("/", async ([AsParameters] PagedRequest request, long? idProducto, long? idAlmacen, IKardexMovimientoRepositorio repo) =>
             {
-                var query = context.MovimientosInventario.AsQueryable();
-
-                if (idProducto.HasValue)
-                {
-                    query = query.Where(m => m.Stock.IdProducto == idProducto.Value);
-                }
-
-                if (idAlmacen.HasValue)
-                {
-                    query = query.Where(m => m.Stock.IdAlmacen == idAlmacen.Value);
-                }
-
-                if (!string.IsNullOrWhiteSpace(request.Search))
-                {
-                    var term = request.Search.Trim().ToLower();
-                    query = query.Where(m => m.Observaciones != null && m.Observaciones.ToLower().Contains(term));
-                }
-
-                var total = await query.CountAsync();
-                
-                var movimientos = await query
-                    .Include(m => m.Stock)
-                        .ThenInclude(s => s.Almacen)
-                    .OrderByDescending(m => m.Id)
-                    .Skip(((request.PageNumber ?? 1) - 1) * (request.PageSize ?? 10))
-                    .Take(request.PageSize ?? 10)
-                    .Join(context.TiposMovimiento, m => m.IdTipoMovimiento, t => t.Id, (m, t) => new { Mov = m, Tipo = t.Nombre })
-                    .ToListAsync();
-
-                var dtos = movimientos.Select(x => new MovimientoInventarioDto
-                {
-                    Id = x.Mov.Id,
-                    IdTipoMovimiento = x.Mov.IdTipoMovimiento,
-                    TipoMovimientoNombre = x.Tipo,
-                    IdStock = x.Mov.IdStock,
-                    IdProducto = x.Mov.Stock.IdProducto,
-                    AlmacenNombre = x.Mov.Stock.Almacen.NombreAlmacen,
-                    Cantidad = x.Mov.Cantidad,
-                    CantidadAnterior = x.Mov.CantidadAnterior,
-                    CantidadNueva = x.Mov.CantidadNueva,
-                    CostoUnitarioMovimiento = x.Mov.CostoUnitarioMovimiento,
-                    SaldoCantidad = x.Mov.SaldoCantidad,
-                    SaldoValorizado = x.Mov.SaldoValorizado,
-                    CostoPromedioActual = x.Mov.CostoPromedioActual,
-                    ReferenciaModulo = x.Mov.ReferenciaModulo,
-                    IdReferencia = x.Mov.IdReferencia,
-                    Observaciones = x.Mov.Observaciones,
-                    FechaCreacion = x.Mov.FechaCreacion,
-                    UsuarioCreacion = x.Mov.UsuarioCreacion
-                }).ToList();
-
-                var response = new PagedResponse<MovimientoInventarioDto>(dtos, request.PageNumber ?? 1, request.PageSize ?? 10, total);
+                var (datos, total) = await repo.ObtenerPaginadoAsync(idAlmacen, idProducto, request.PageNumber ?? 1, request.PageSize ?? 10);
+                var response = new PagedResponse<MovimientoListDto>(datos, request.PageNumber ?? 1, request.PageSize ?? 10, total);
                 return Results.Ok(response);
             });
 
@@ -97,17 +50,11 @@ namespace Inventario.API.Endpoints
                 return Results.Created($"/api/movimientos/{id}", id);
             });
 
-            grupo.MapGet("/{id}", async (long id, IMediator mediator) =>
+            grupo.MapGet("/{id}", async (long id, IKardexMovimientoRepositorio repo) =>
             {
-                var consulta = new Inventario.API.Application.Consultas.ObtenerMovimientoInventarioPorIdConsulta(id);
-                var resultado = await mediator.Send(consulta);
-
-                if (resultado == null)
-                {
-                    return Results.NotFound(new { Message = $"Movimiento con ID {id} no encontrado" });
-                }
-
-                return Results.Ok(resultado);
+                var resultado = await repo.ObtenerDetallePorIdAsync(id);
+                if (resultado == null) return Results.NotFound(new ToReturnError<MovimientoDetalleDto>($"Movimiento con ID {id} no encontrado", 404));
+                return Results.Ok(new ToReturn<MovimientoDetalleDto>(resultado));
             });
 
             grupo.MapDelete("/referencia/{modulo}/{idReferencia}", async (string modulo, long idReferencia, IMediator mediator) =>

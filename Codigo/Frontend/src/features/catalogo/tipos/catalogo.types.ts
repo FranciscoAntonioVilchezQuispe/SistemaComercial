@@ -6,13 +6,28 @@
 // PRODUCTO
 // ============================================
 
-export interface Producto {
+/** Interface ligera para el listado de productos (Grids) */
+export interface ProductoResumen {
+  id: number;
+  codigo: string;
+  nombre: string;
+  categoriaNombre?: string;
+  marcaNombre?: string;
+  unidadMedidaNombre?: string;
+  precioVentaPublico: number;
+  stock: number;
+  activo: boolean;
+  imagenPrincipalUrl?: string;
+}
+
+/** Interface completa para la ficha técnica del producto */
+export interface ProductoDetalle {
   id: number;
   codigo: string;
   nombre: string;
   descripcion?: string;
 
-  // Relaciones
+  // Relaciones completas
   idCategoria: number;
   categoria?: Categoria;
   idMarca: number;
@@ -25,18 +40,18 @@ export interface Producto {
   codigoBarras?: string;
   sku?: string;
 
-  // Precios
+  // Precios y Costos
   precioCompra: number;
   precioVentaPublico: number;
   precioVentaMayorista: number;
   precioVentaDistribuidor: number;
 
-  // Stock
+  // Stock y Almacén
   stock: number;
   stockMinimo: number;
   stockMaximo?: number;
 
-  // Configuración de inventario
+  // Configuración técnica
   tieneVariantes: boolean;
   permiteInventarioNegativo: boolean;
   metodoValuacion: string;
@@ -45,7 +60,7 @@ export interface Producto {
   gravadoImpuesto: boolean;
   porcentajeImpuesto: number;
 
-  // Imagen
+  // Media
   imagenPrincipalUrl?: string;
 
   // Auditoría
@@ -53,6 +68,9 @@ export interface Producto {
   fechaCreacion: string;
   fechaModificacion?: string;
 }
+
+/** @deprecated Usar ProductoResumen o ProductoDetalle */
+export type Producto = ProductoResumen | ProductoDetalle;
 
 export interface ProductoFormData {
   codigo: string;

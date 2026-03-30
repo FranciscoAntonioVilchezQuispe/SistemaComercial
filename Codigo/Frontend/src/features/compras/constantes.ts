@@ -1,10 +1,6 @@
-export enum EstadoOrdenCompra {
-  Borrador = 39,
-  Pendiente = 40,
-  Aprobada = 41,
-  Rechazada = 42,
-  Facturada = 100,
-}
+import { EstadoOrdenCompra, TablasGenerales } from "@compartido/enums";
+
+export { EstadoOrdenCompra, TablasGenerales };
 
 export const EstadoOrdenCompraEtiquetas: Record<EstadoOrdenCompra, string> = {
   [EstadoOrdenCompra.Borrador]: "Borrador",
@@ -13,22 +9,6 @@ export const EstadoOrdenCompraEtiquetas: Record<EstadoOrdenCompra, string> = {
   [EstadoOrdenCompra.Rechazada]: "Rechazada",
   [EstadoOrdenCompra.Facturada]: "Facturada",
 };
-
-export enum TablasGenerales {
-  TIPO_DOCUMENTO = "TIPO_DOCUMENTO",
-  TIPO_CLIENTE = "TIPO_CLIENTE",
-  TIPO_MOVIMIENTO_CAJA = "TIPO_MOVIMIENTO_CAJA",
-  TIPO_PRODUCTO = "TIPO_PRODUCTO",
-  TIPO_MOVIMIENTO_INVENTARIO = "TIPO_MOVIMIENTO_INVENTARIO",
-  TIPO_CUENTA_CONTABLE = "TIPO_CUENTA_CONTABLE",
-  ESTADO_VENTA = "ESTADO_VENTA",
-  ESTADO_COTIZACION = "ESTADO_COTIZACION",
-  ESTADO_CAJA = "ESTADO_CAJA",
-  ESTADO_ORDEN_COMPRA = "ESTADO_ORDEN_COMPRA",
-  ESTADO_ASIENTO = "ESTADO_ASIENTO",
-  ESTADO_PAGO = "ESTADO_PAGO",
-  TIPO_MONEDA = "TIPO_MONEDA",
-}
 
 /**
  * Clase contenedora de Enums para el módulo de Compras

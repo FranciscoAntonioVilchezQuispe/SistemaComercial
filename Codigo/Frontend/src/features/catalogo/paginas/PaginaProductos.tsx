@@ -11,15 +11,9 @@ import { ModuleTabBar } from "@/componentes/shared/ModuleTabBar";
 import { RUTAS_TITULOS } from "@/config/rutasTitulos";
 import { DataTable } from "@/components/ui/DataTable";
 import { ProductoForm } from "../componentes/productos/ProductoForm";
-import {
-  useProductos,
-  useProducto,
-  useCrearProducto,
-  useActualizarProducto,
-  useEliminarProducto,
-} from "../hooks/useProductos";
+import { useProductos, useProducto, useCrearProducto, useActualizarProducto, useEliminarProducto } from "../hooks/useProductos";
 import { usePagination } from "@/hooks/usePagination";
-import { Producto } from "../tipos/catalogo.types";
+import { ProductoResumen, ProductoDetalle } from "../tipos/catalogo.types";
 import { toast } from "sonner";
 import { Loading } from "@compartido/componentes/feedback/Loading";
 import { MensajeError } from "@compartido/componentes/feedback/MensajeError";
@@ -41,7 +35,7 @@ export function PaginaProductos() {
   const crearProducto = useCrearProducto();
   const actualizarProducto = useActualizarProducto();
   const eliminarProducto = useEliminarProducto();
-  const productoDetalle = respDetalle as any; // Usamos el objeto directamente ya que el servicio hace response.data
+  const productoDetalle = respDetalle as ProductoDetalle;
 
   const productos = data?.datos || [];
 
@@ -83,7 +77,6 @@ export function PaginaProductos() {
 
   const manejarCambiarEstado = async (id: number, estadoActual: boolean) => {
     try {
-      // Usamos el hook de eliminar que ahora hace borrado lógico (toggle activo)
       await eliminarProducto.mutateAsync(id);
       toast.success(
         `Producto ${estadoActual ? "desactivado" : "activado"} correctamente`,
@@ -96,51 +89,45 @@ export function PaginaProductos() {
   const columns = [
     {
       header: "Código",
-      accessorKey: "codigo" as keyof Producto,
+      accessorKey: "codigo" as keyof ProductoResumen,
       className: "w-[100px]",
     },
     {
       header: "Nombre",
-      accessorKey: "nombre" as keyof Producto,
+      accessorKey: "nombre" as keyof ProductoResumen,
       className: "font-medium",
     },
     {
       header: "Categoría",
-      accessorKey: "categoria.nombre" as any,
-      cell: (producto: Producto) => producto.categoria?.nombre || "-",
+      accessorKey: "categoriaNombre" as keyof ProductoResumen,
+      cell: (producto: ProductoResumen) => producto.categoriaNombre || "-",
     },
     {
       header: "Marca",
-      accessorKey: "marca.nombre" as any,
-      cell: (producto: Producto) => producto.marca?.nombre || "-",
+      accessorKey: "marcaNombre" as keyof ProductoResumen,
+      cell: (producto: ProductoResumen) => producto.marcaNombre || "-",
     },
     {
       header: "Precio",
-      accessorKey: "precio" as keyof Producto,
-      cell: (producto: Producto) =>
+      accessorKey: "precioVentaPublico" as keyof ProductoResumen,
+      cell: (producto: ProductoResumen) =>
         producto.precioVentaPublico != null
           ? `S/ ${producto.precioVentaPublico.toFixed(2)}`
           : "-",
     },
     {
       header: "Stock",
-      accessorKey: "stock" as keyof Producto,
-      cell: (producto: Producto) => (
-        <span
-          className={
-            producto.stock <= producto.stockMinimo
-              ? "text-red-500 font-bold"
-              : ""
-          }
-        >
+      accessorKey: "stock" as keyof ProductoResumen,
+      cell: (producto: ProductoResumen) => (
+        <span>
           {producto.stock}
         </span>
       ),
     },
     {
       header: "Estado",
-      accessorKey: "activo" as keyof Producto,
-      cell: (producto: Producto) => (
+      accessorKey: "activo" as keyof ProductoResumen,
+      cell: (producto: ProductoResumen) => (
         <span
           className={`px-2 py-1 rounded text-xs font-medium ${
             producto.activo
@@ -155,7 +142,7 @@ export function PaginaProductos() {
     {
       header: "Acciones",
       className: "text-right",
-      cell: (producto: Producto) => (
+      cell: (producto: ProductoResumen) => (
         <div className="flex justify-end space-x-2">
           <Button
             variant="ghost"

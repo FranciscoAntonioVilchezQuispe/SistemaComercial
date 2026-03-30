@@ -1,3 +1,4 @@
+using Compras.API.Domain.DTOs;
 using Compras.API.Domain.Entidades;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -6,10 +7,11 @@ namespace Compras.API.Domain.Interfaces
 {
     public interface ICompraRepositorio
     {
-        Task<Compra?> ObtenerPorIdAsync(long id);
+        Task<CompraDetalleDto?> ObtenerDetallePorIdAsync(long id);
+        Task<Compra?> ObtenerPorIdAsync(long id); // Auditoría y escrituras internas
         Task<Compra> AgregarAsync(Compra compra);
         Task<IEnumerable<Compra>> ObtenerTodosAsync();
         Task<IEnumerable<Compra>> ObtenerPorProveedorAsync(long idProveedor);
-        Task<(IEnumerable<Compra> Datos, int Total)> ObtenerPaginadoAsync(string? busqueda, bool? activo, int pagina, int elementosPorPagina);
+        Task<(IEnumerable<CompraListDto> Datos, int Total)> ObtenerPaginadoAsync(string? busqueda, int pagina, int elementosPorPagina);
     }
 }

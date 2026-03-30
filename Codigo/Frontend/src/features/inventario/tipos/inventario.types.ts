@@ -17,25 +17,43 @@ export interface StockProducto {
   ultimaActualizacion: string;
 }
 
-export interface MovimientoInventario {
+/** Interface ligera para el listado de movimientos (Grids) */
+export interface MovimientoResumen {
   id: number;
-  idProducto: number;
-  producto?: Producto;
-  idAlmacen: number;
-  almacen?: string;
-  idTipoMovimiento: number;
-  tipoMovimiento?: string; // Entrada, Salida, Ajuste, Traslado
+  tipoMovimientoNombre: string;
+  productoNombre: string;
+  almacenNombre: string;
   cantidad: number;
-  precioCosto?: number;
+  costoUnitarioMovimiento: number;
+  referenciaModulo?: string;
+  idReferencia?: number;
+  fechaCreacion: string;
+}
+
+/** Interface completa para el detalle de un movimiento */
+export interface MovimientoDetalle {
+  id: number;
+  idTipoMovimiento: number;
+  tipoMovimientoNombre: string;
+  idProducto: number;
+  productoNombre: string;
+  almacenNombre: string;
+  cantidad: number;
+  cantidadAnterior: number;
+  cantidadNueva: number;
+  costoUnitarioMovimiento: number;
   saldoCantidad: number;
   saldoValorizado: number;
   costoPromedioActual: number;
-  fecha: string;
-  idUsuario: number;
-  usuario?: string;
-  referencia?: string; // N° Factura, N° Venta, etc.
+  referenciaModulo?: string;
+  idReferencia?: number;
   observaciones?: string;
+  fechaCreacion: string;
+  usuarioCreacion?: string;
 }
+
+/** @deprecated Usar MovimientoResumen o MovimientoDetalle */
+export type MovimientoInventario = MovimientoResumen | MovimientoDetalle;
 
 export interface DetalleKardex {
   fecha: string;
