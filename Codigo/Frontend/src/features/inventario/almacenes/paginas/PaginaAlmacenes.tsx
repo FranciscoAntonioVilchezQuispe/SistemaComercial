@@ -31,7 +31,7 @@ import { AlmacenForm } from "../componentes/AlmacenForm";
 import { ModuleTabBar } from "@/componentes/shared/ModuleTabBar";
 import { RUTAS_TITULOS } from "@/config/rutasTitulos";
 
-export default function PaginaAlmacenes() {
+export function PaginaAlmacenes() {
   const [dialogoOpen, setDialogoOpen] = useState(false);
   const [almacenSeleccionado, setAlmacenSeleccionado] =
     useState<Almacen | null>(null);

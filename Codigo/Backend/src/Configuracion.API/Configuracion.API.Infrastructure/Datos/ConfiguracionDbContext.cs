@@ -10,8 +10,6 @@ namespace Configuracion.API.Infrastructure.Datos
         {
         }
 
-
-
         public DbSet<TablaGeneral> TablasGenerales { get; set; }
         public DbSet<TablaGeneralDetalle> TablasGeneralesDetalles { get; set; }
         public DbSet<ParametroConfiguracion> Configuraciones { get; set; }
@@ -27,11 +25,9 @@ namespace Configuracion.API.Infrastructure.Datos
         public DbSet<MatrizReglaSunat> MatrizReglasSunat { get; set; } = null!;
         public DbSet<Ubigeo> Ubigeos { get; set; } = null!;
 
-
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-
 
             // Esquema por defecto para Configuración
             modelBuilder.HasDefaultSchema("configuracion");
@@ -45,7 +41,7 @@ namespace Configuracion.API.Infrastructure.Datos
             modelBuilder.Entity<TipoComprobante>().ToTable("tipo_comprobante", "configuracion");
             modelBuilder.Entity<Impuesto>().ToTable("impuestos", "configuracion");
             modelBuilder.Entity<Sucursal>().ToTable("sucursales", "configuracion");
-            modelBuilder.Entity<MetodoPago>().ToTable("metodo_pago", "configuracion");
+            modelBuilder.Entity<MetodoPago>().ToTable("metodos_pago", "configuracion");
             modelBuilder.Entity<DocumentoIdentidadRegla>().ToTable("tipo_documento", "configuracion");
             modelBuilder.Entity<DocumentoComprobanteRelacion>().ToTable("regla_documento_comprobante", "configuracion");
             modelBuilder.Entity<TipoOperacionSunat>().ToTable("tipo_operacion_sunat", "configuracion");

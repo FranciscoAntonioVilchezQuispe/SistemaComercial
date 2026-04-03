@@ -74,7 +74,7 @@ namespace Ventas.API.Domain.Entidades
         public decimal Total { get; set; }
 
         [Column("porcentaje_igv", TypeName = "decimal(5,2)")]
-        public decimal PorcentajeIgv { get; set; } = 18.00m;
+        public decimal PorcentajeIgv { get; set; }
 
         [Required]
         [MaxLength(3)]
@@ -110,6 +110,32 @@ namespace Ventas.API.Domain.Entidades
 
         [Column("xml_generado", TypeName = "text")]
         public string? XmlGenerado { get; set; }
+
+        [Column("id_tipo_operacion")]
+        public long? IdTipoOperacion { get; set; }
+
+        [Column("hash_cpe")]
+        public string? HashCpe { get; set; }
+
+        [Column("subtotal_gravado", TypeName = "decimal(12,2)")]
+        public decimal SubtotalGravado { get; set; }
+
+        [Column("subtotal_exonerado", TypeName = "decimal(12,2)")]
+        public decimal SubtotalExonerado { get; set; }
+
+        [Column("subtotal_inafecto", TypeName = "decimal(12,2)")]
+        public decimal SubtotalInafecto { get; set; }
+
+        [Column("id_empresa")]
+        public long? IdEmpresa { get; set; }
+
+        [Column("numero_ticket_sunat")]
+        [MaxLength(100)]
+        public string? NumeroTicketSunat { get; set; }
+
+        [Column("id_estado_cpe")]
+        [MaxLength(20)]
+        public string? IdEstadoCpe { get; set; }
 
         // Navegación
         [ForeignKey("IdVentaReferencia")]

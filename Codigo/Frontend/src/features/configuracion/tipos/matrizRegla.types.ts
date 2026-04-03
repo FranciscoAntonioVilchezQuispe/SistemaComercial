@@ -6,7 +6,7 @@ export interface MatrizReglaSunat {
   idTipoOperacion: number;
   idTipoComprobante: number;
   nivelObligatoriedad: number; // 0=N/A, 1=Principal, 2=Complementario
-  activo: boolean;
+  activado: boolean;
   // Navegación
   tipoOperacion?: TipoOperacionSunat;
   tipoComprobante?: TipoComprobante;

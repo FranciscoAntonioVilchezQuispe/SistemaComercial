@@ -59,7 +59,7 @@ function FormularioOperacion({
   const [form, setForm] = useState<TipoOperacionSunatFormData>({
     codigo: datosIniciales?.codigo ?? "",
     nombre: datosIniciales?.nombre ?? "",
-    activo: datosIniciales?.activo ?? true,
+    activado: datosIniciales?.activado ?? true,
   });
 
   return (
@@ -91,11 +91,11 @@ function FormularioOperacion({
       </div>
       <div className="flex items-center gap-3 py-2">
         <Switch
-          id="activo"
-          checked={form.activo}
-          onCheckedChange={(v) => setForm((p) => ({ ...p, activo: v }))}
+          id="activado"
+          checked={form.activado}
+          onCheckedChange={(v) => setForm((p) => ({ ...p, activado: v }))}
         />
-        <Label htmlFor="activo" className="text-sm font-medium cursor-pointer">Activo</Label>
+        <Label htmlFor="activado" className="text-sm font-medium cursor-pointer">Activo</Label>
       </div>
       <div className="flex justify-end gap-2 pt-4 border-t">
         <Button variant="outline" size="sm" onClick={alCancelar} className="px-4 h-9">
@@ -173,9 +173,9 @@ export function PaginaOperacionesSunat() {
     },
     {
       header: "Estado",
-      accessorKey: "activo" as keyof TipoOperacionSunat,
+      accessorKey: "activado" as keyof TipoOperacionSunat,
       cell: (row: TipoOperacionSunat) =>
-        row.activo ? (
+        row.activado ? (
           <Badge variant="default" className="gap-1 bg-green-500/10 text-green-600 border-green-200 hover:bg-green-500/20 shadow-none text-[11px] h-5">
             <CheckCircle className="h-3 w-3" /> Activo
           </Badge>

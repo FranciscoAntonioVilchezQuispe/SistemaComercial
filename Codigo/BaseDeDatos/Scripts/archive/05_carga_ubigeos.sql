@@ -1,0 +1,112 @@
+/*
+==============================================================================
+09_UBIGEO_SEED.SQL
+Descripción: Carga inicial de Ubigeos (INEI) para Perú.
+Incluye Departamentos, Provincias y Distritos principales.
+==============================================================================
+*/
+
+INSERT INTO configuracion.ubigeos (codigo, nombre, nivel, parent_id, activado, fecha_creacion, usuario_creacion) VALUES
+-- Departamentos (nivel 1)
+('01','AMAZONAS',1,NULL, true, NOW(), 'SISTEMA'),
+('02','ANCASH',1,NULL, true, NOW(), 'SISTEMA'),
+('03','APURIMAC',1,NULL, true, NOW(), 'SISTEMA'),
+('04','AREQUIPA',1,NULL, true, NOW(), 'SISTEMA'),
+('05','AYACUCHO',1,NULL, true, NOW(), 'SISTEMA'),
+('06','CAJAMARCA',1,NULL, true, NOW(), 'SISTEMA'),
+('07','CALLAO',1,NULL, true, NOW(), 'SISTEMA'),
+('08','CUSCO',1,NULL, true, NOW(), 'SISTEMA'),
+('09','HUANCAVELICA',1,NULL, true, NOW(), 'SISTEMA'),
+('10','HUANUCO',1,NULL, true, NOW(), 'SISTEMA'),
+('11','ICA',1,NULL, true, NOW(), 'SISTEMA'),
+('12','JUNIN',1,NULL, true, NOW(), 'SISTEMA'),
+('13','LA LIBERTAD',1,NULL, true, NOW(), 'SISTEMA'),
+('14','LAMBAYEQUE',1,NULL, true, NOW(), 'SISTEMA'),
+('15','LIMA',1,NULL, true, NOW(), 'SISTEMA'),
+('16','LORETO',1,NULL, true, NOW(), 'SISTEMA'),
+('17','MADRE DE DIOS',1,NULL, true, NOW(), 'SISTEMA'),
+('18','MOQUEGUA',1,NULL, true, NOW(), 'SISTEMA'),
+('19','PASCO',1,NULL, true, NOW(), 'SISTEMA'),
+('20','PIURA',1,NULL, true, NOW(), 'SISTEMA'),
+('21','PUNO',1,NULL, true, NOW(), 'SISTEMA'),
+('22','SAN MARTIN',1,NULL, true, NOW(), 'SISTEMA'),
+('23','TACNA',1,NULL, true, NOW(), 'SISTEMA'),
+('24','TUMBES',1,NULL, true, NOW(), 'SISTEMA'),
+('25','UCAYALI',1,NULL, true, NOW(), 'SISTEMA'),
+
+-- Provincias (nivel 2) - Ejemplo La Libertad
+('1301','TRUJILLO',2,'13', true, NOW(), 'SISTEMA'),
+('1302','ASCOPE',2,'13', true, NOW(), 'SISTEMA'),
+('1303','BOLIVAR',2,'13', true, NOW(), 'SISTEMA'),
+('1304','CHEPEN',2,'13', true, NOW(), 'SISTEMA'),
+('1305','JULCAN',2,'13', true, NOW(), 'SISTEMA'),
+('1306','OTUZCO',2,'13', true, NOW(), 'SISTEMA'),
+('1307','PACASMAYO',2,'13', true, NOW(), 'SISTEMA'),
+('1308','PATAZ',2,'13', true, NOW(), 'SISTEMA'),
+('1309','SANCHEZ CARRION',2,'13', true, NOW(), 'SISTEMA'),
+('1310','SANTIAGO DE CHUCO',2,'13', true, NOW(), 'SISTEMA'),
+('1311','GRAN CHIMU',2,'13', true, NOW(), 'SISTEMA'),
+('1312','VIRU',2,'13', true, NOW(), 'SISTEMA'),
+
+-- Provincias (nivel 2) - Ejemplo Lima
+('1501','LIMA',2,'15', true, NOW(), 'SISTEMA'),
+
+-- Distritos (nivel 3) - Ejemplo Trujillo
+('130101','TRUJILLO',3,'1301', true, NOW(), 'SISTEMA'),
+('130102','EL PORVENIR',3,'1301', true, NOW(), 'SISTEMA'),
+('130103','FLORENCIA DE MORA',3,'1301', true, NOW(), 'SISTEMA'),
+('130104','HUANCHACO',3,'1301', true, NOW(), 'SISTEMA'),
+('130105','LA ESPERANZA',3,'1301', true, NOW(), 'SISTEMA'),
+('130106','LAREDO',3,'1301', true, NOW(), 'SISTEMA'),
+('130107','MOCHE',3,'1301', true, NOW(), 'SISTEMA'),
+('130108','POROTO',3,'1301', true, NOW(), 'SISTEMA'),
+('130109','SALAVERRY',3,'1301', true, NOW(), 'SISTEMA'),
+('130110','SIMBAL',3,'1301', true, NOW(), 'SISTEMA'),
+('130111','VICTOR LARCO HERRERA',3,'1301', true, NOW(), 'SISTEMA'),
+
+-- Distritos (nivel 3) - Ejemplo Lima Cercado
+('150101','LIMA',3,'1501', true, NOW(), 'SISTEMA'),
+('150102','ANCON',3,'1501', true, NOW(), 'SISTEMA'),
+('150103','ATE',3,'1501', true, NOW(), 'SISTEMA'),
+('150104','BARRANCO',3,'1501', true, NOW(), 'SISTEMA'),
+('150105','BREÑA',3,'1501', true, NOW(), 'SISTEMA'),
+('150106','CARABAYLLO',3,'1501', true, NOW(), 'SISTEMA'),
+('150107','CHACLACAYO',3,'1501', true, NOW(), 'SISTEMA'),
+('150108','CHORRILLOS',3,'1501', true, NOW(), 'SISTEMA'),
+('150109','CIENEGUILLA',3,'1501', true, NOW(), 'SISTEMA'),
+('150110','COMAS',3,'1501', true, NOW(), 'SISTEMA'),
+('150111','EL AGUSTINO',3,'1501', true, NOW(), 'SISTEMA'),
+('150112','INDEPENDENCIA',3,'1501', true, NOW(), 'SISTEMA'),
+('150113','JESUS MARIA',3,'1501', true, NOW(), 'SISTEMA'),
+('150114','LA MOLINA',3,'1501', true, NOW(), 'SISTEMA'),
+('150115','LA VICTORIA',3,'1501', true, NOW(), 'SISTEMA'),
+('150116','LINCE',3,'1501', true, NOW(), 'SISTEMA'),
+('150117','LOS OLIVOS',3,'1501', true, NOW(), 'SISTEMA'),
+('150118','LURIGANCHO',3,'1501', true, NOW(), 'SISTEMA'),
+('150119','LURIN',3,'1501', true, NOW(), 'SISTEMA'),
+('150120','MAGDALENA DEL MAR',3,'1501', true, NOW(), 'SISTEMA'),
+('150121','PUEBLO LIBRE',3,'1501', true, NOW(), 'SISTEMA'),
+('150122','MIRAFLORES',3,'1501', true, NOW(), 'SISTEMA'),
+('150123','PACHACAMAC',3,'1501', true, NOW(), 'SISTEMA'),
+('150124','PUCUSANA',3,'1501', true, NOW(), 'SISTEMA'),
+('150125','PUENTE PIEDRA',3,'1501', true, NOW(), 'SISTEMA'),
+('150126','PUNTA HERMOSA',3,'1501', true, NOW(), 'SISTEMA'),
+('150127','PUNTA NEGRA',3,'1501', true, NOW(), 'SISTEMA'),
+('150128','RIMAC',3,'1501', true, NOW(), 'SISTEMA'),
+('150129','SAN BARTOLO',3,'1501', true, NOW(), 'SISTEMA'),
+('150130','SAN BORJA',3,'1501', true, NOW(), 'SISTEMA'),
+('150131','SAN ISIDRO',3,'1501', true, NOW(), 'SISTEMA'),
+('150132','SAN JUAN DE LURIGANCHO',3,'1501', true, NOW(), 'SISTEMA'),
+('150133','SAN JUAN DE MIRAFLORES',3,'1501', true, NOW(), 'SISTEMA'),
+('150134','SAN LUIS',3,'1501', true, NOW(), 'SISTEMA'),
+('150135','SAN MARTIN DE PORRES',3,'1501', true, NOW(), 'SISTEMA'),
+('150136','SAN MIGUEL',3,'1501', true, NOW(), 'SISTEMA'),
+('150137','SANTA ANITA',3,'1501', true, NOW(), 'SISTEMA'),
+('150138','SANTA MARIA DEL MAR',3,'1501', true, NOW(), 'SISTEMA'),
+('150139','SANTA ROSA',3,'1501', true, NOW(), 'SISTEMA'),
+('150140','SANTIAGO DE SURCO',3,'1501', true, NOW(), 'SISTEMA'),
+('150141','SURQUILLO',3,'1501', true, NOW(), 'SISTEMA'),
+('150142','VILLA EL SALVADOR',3,'1501', true, NOW(), 'SISTEMA'),
+('150143','VILLA MARIA DEL TRIUNFO',3,'1501', true, NOW(), 'SISTEMA')
+
+ON CONFLICT (codigo) DO NOTHING;

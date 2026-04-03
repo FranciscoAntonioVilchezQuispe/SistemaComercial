@@ -55,19 +55,37 @@ namespace Nucleo.Comun.API.Middleware
                 _ => "Error interno del servidor"
             };
             
-            // Logging estandar según GEMINI.md
-            Console.Error.WriteLine($"[ERROR] [GlobalMiddleware] [{context.Request.Method} {context.Request.Path}] → {exception.Message}");
+            // Logging estructurado con Serilog — escribe automáticamente a consola y archivo
+            var endpoint = $"{context.Request.Method} {context.Request.Path}";
+            
             if (exception is AppException ae)
             {
-                Console.Error.WriteLine($"Detalle: Contexto={ae.Contexto} | Datos={ae.Detalle}");
+                _logger.LogError(exception,
+                    "[GlobalMiddleware] [{Endpoint}] {Mensaje} | Contexto={Contexto} | Datos={Detalle}",
+                    endpoint, exception.Message, ae.Contexto, ae.Detalle);
             }
-            Console.Error.WriteLine($"Stack: {exception.StackTrace}");
+            else if (exception is ValidationException vex)
+            {
+                // Validaciones no son errores del sistema, se loguean como Warning
+                var errores = string.Join("; ", vex.Errors.Select(e => $"{e.PropertyName}: {e.ErrorMessage}"));
+                _logger.LogWarning(
+                    "[GlobalMiddleware] [{Endpoint}] Validación fallida: {Errores}",
+                    endpoint, errores);
+            }
+            else
+            {
+                _logger.LogError(exception,
+                    "[GlobalMiddleware] [{Endpoint}] {Mensaje}",
+                    endpoint, exception.Message);
+            }
 
             var response = new 
             {
                 statusCode = status,
                 message = mensaje,
-                errors = exception is ValidationException vex ? vex.Errors.Select(e => new { property = e.PropertyName, error = e.ErrorMessage }) : null,
+                errors = exception is ValidationException ve 
+                    ? ve.Errors.Select(e => new { property = e.PropertyName, error = e.ErrorMessage }) 
+                    : null,
                 timestamp = DateTime.UtcNow
             };
             

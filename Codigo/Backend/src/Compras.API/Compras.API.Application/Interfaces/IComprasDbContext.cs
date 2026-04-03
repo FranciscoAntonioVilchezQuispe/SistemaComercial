@@ -10,8 +10,6 @@ namespace Compras.API.Application.Interfaces
         DbSet<Compras.API.Domain.Entidades.DetalleOrdenCompra> DetallesOrdenCompra { get; set; }
         DbSet<Compras.API.Domain.Entidades.Proveedor> Proveedores { get; set; }
         DbSet<Compras.API.Domain.Entidades.Referencias.CatalogoReferencia> Catalogos { get; set; }
-        DbSet<Compras.API.Domain.Entidades.Nota> Notas { get; set; }
-        DbSet<Compras.API.Domain.Entidades.DetalleNota> DetallesNota { get; set; }
         DbSet<Compras.API.Domain.Entidades.NotaCreditoCompra> NotasCredito { get; set; }
         DbSet<Compras.API.Domain.Entidades.NotaCreditoDetalleCompra> NotasCreditoDetalles { get; set; }
         DbSet<Compras.API.Domain.Entidades.NotaDebitoCompra> NotasDebito { get; set; }

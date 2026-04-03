@@ -43,7 +43,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { MoreHorizontal, FileMinus, RefreshCcw } from "lucide-react";
 
-export default function PaginaCompras() {
+export function PaginaCompras() {
   const location = useLocation();
   const [dialogoOpen, setDialogoOpen] = useState(false);
   const [compraSeleccionada, setCompraSeleccionada] = useState<CompraDetalle | null>(
@@ -132,9 +132,9 @@ export default function PaginaCompras() {
     },
     {
       header: "Proveedor",
-      accessorKey: "proveedorRazonSocial" as keyof CompraResumen,
+      accessorKey: "razonSocialProveedor" as keyof CompraResumen,
       cell: (row: CompraResumen) =>
-        row.proveedorRazonSocial || `Prov.`,
+        row.razonSocialProveedor || `Prov.`,
     },
     {
       header: "Comprobante",
@@ -279,9 +279,9 @@ export default function PaginaCompras() {
                   {
                     idProveedor: compraSeleccionada.idProveedor,
                     razonSocialProveedor:
-                      compraSeleccionada.proveedorRazonSocial,
+                      compraSeleccionada.razonSocialProveedor,
                     numeroDocumentoProveedor:
-                      compraSeleccionada.proveedorNumeroDocumento,
+                      compraSeleccionada.numeroDocumentoProveedor,
                     idAlmacen: compraSeleccionada.idAlmacen,
                     idMoneda:
                       compraSeleccionada.idMoneda,

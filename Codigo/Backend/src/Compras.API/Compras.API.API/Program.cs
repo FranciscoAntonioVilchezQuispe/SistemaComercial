@@ -11,6 +11,7 @@ using MediatR;
 using Nucleo.Comun.Application.Comportamientos;
 
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.AddCentralizedLogging();

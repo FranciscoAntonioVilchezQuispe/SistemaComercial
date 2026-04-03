@@ -1,4 +1,12 @@
 import { useState, useEffect } from "react";
+import { 
+  FileText, 
+  MessageSquare, 
+  RotateCcw, 
+  CheckCircle2, 
+  HelpCircle,
+  Settings
+} from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -60,22 +68,24 @@ export function ModalCrearNotaSunatCompra({
     try {
       setIsLoading(true);
       
+      const compraDetalle = compra as any;
+      
       const payload = {
         idCompraReferencia: compra.id,
         tipoNota: tipoNota,
         idTipoNota: parseInt(motivoSunat),
         motivoSustento: sustento,
         afectaStock: afectaStock,
-        detalles: compra.detalles?.map(d => ({
+        detalles: (compraDetalle.detalles || []).map((d: any) => ({
           idProducto: d.idProducto,
           idCompraDetalle: d.id,
           descripcion: d.nombreProducto || "Producto",
           cantidad: d.cantidad,
           precioUnitario: d.precioUnitarioCompra,
           subtotal: d.subtotal,
-          igv: d.subtotal * 0.18, // Simplificado, idealmente viene de la compra
+          igv: d.subtotal * 0.18, 
           total: d.subtotal * 1.18
-        })) || []
+        }))
       };
 
       if (tipoNota === TipoComprobanteSunat.NotaCredito) {
@@ -105,42 +115,46 @@ export function ModalCrearNotaSunatCompra({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="grid gap-4 py-4">
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="tipoNota" className="text-right font-bold">Tipo</Label>
-            <div className="col-span-3">
+        <div className="flex flex-col gap-5 py-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="tipoNota" className="flex items-center gap-1.5 font-semibold text-sm">
+                <FileText className="h-4 w-4 text-primary" />
+                Tipo de Nota
+              </Label>
               <Select 
                 value={tipoNota} 
                 onValueChange={(val: TipoComprobanteSunat) => setTipoNota(val)}
               >
-                <SelectTrigger id="tipoNota">
-                  <SelectValue placeholder="Seleccione Tipo de Nota" />
+                <SelectTrigger id="tipoNota" className="bg-muted/30 border-muted-foreground/20">
+                  <SelectValue placeholder="Seleccione Tipo" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value={TipoComprobanteSunat.NotaCredito}>Nota de Crédito (07) - Salida</SelectItem>
-                  <SelectItem value={TipoComprobanteSunat.NotaDebito}>Nota de Débito (08) - Ingreso Extra</SelectItem>
+                  <SelectItem value={TipoComprobanteSunat.NotaCredito}>Crédito (07)</SelectItem>
+                  <SelectItem value={TipoComprobanteSunat.NotaDebito}>Débito (08)</SelectItem>
                 </SelectContent>
               </Select>
             </div>
-          </div>
 
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="motivoSunat" className="text-right font-bold text-xs">Motivo</Label>
-            <div className="col-span-3">
+            <div className="space-y-2">
+              <Label htmlFor="motivoSunat" className="flex items-center gap-1.5 font-semibold text-sm">
+                <Settings className="h-4 w-4 text-primary" />
+                Motivo SUNAT
+              </Label>
               <Select value={motivoSunat} onValueChange={setMotivoSunat}>
-                <SelectTrigger id="motivoSunat">
-                  <SelectValue placeholder="Seleccione Motivo" />
+                <SelectTrigger id="motivoSunat" className="bg-muted/30 border-muted-foreground/20">
+                  <SelectValue placeholder="Motivo" />
                 </SelectTrigger>
                 <SelectContent>
                   {tipoNota === TipoComprobanteSunat.NotaCredito ? (
                     <>
-                      <SelectItem value={MotivoNotaCredito.AnulacionOperacion}>01 - Anulación de la operación</SelectItem>
-                      <SelectItem value={MotivoNotaCredito.DevolucionTotal}>06 - Devolución total</SelectItem>
+                      <SelectItem value={MotivoNotaCredito.AnulacionOperacion}>Anulación Operación</SelectItem>
+                      <SelectItem value={MotivoNotaCredito.DevolucionTotal}>Devolución Total</SelectItem>
                     </>
                   ) : (
                     <>
-                      <SelectItem value="01">01 - Intereses por mora</SelectItem>
-                      <SelectItem value="02">02 - Aumento en el valor</SelectItem>
+                      <SelectItem value="01">Intereses por mora</SelectItem>
+                      <SelectItem value="02">Aumento de valor</SelectItem>
                     </>
                   )}
                 </SelectContent>
@@ -148,34 +162,58 @@ export function ModalCrearNotaSunatCompra({
             </div>
           </div>
 
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="sustento" className="text-right font-bold">Sustento</Label>
+          <div className="space-y-2">
+            <Label htmlFor="sustento" className="flex items-center gap-1.5 font-semibold text-sm">
+              <MessageSquare className="h-4 w-4 text-primary" />
+              Sustento detallado
+            </Label>
             <Textarea 
               id="sustento" 
-              className="col-span-3" 
-              placeholder="Explicación del motivo..." 
+              className="resize-none min-h-[90px] bg-muted/30 border-muted-foreground/20 focus:bg-background transition-colors" 
+              placeholder="Describa el motivo de la nota..." 
               value={sustento}
               onChange={(e) => setSustento(e.target.value)}
             />
           </div>
 
-          <div className="flex items-center justify-between col-span-4 px-10">
-            <div className="space-y-0.5">
-              <Label className="text-base">¿Reversar Almacén?</Label>
-              <p className="text-xs text-muted-foreground">
-                Si está activo, se ajustará el stock automáticamente.
-              </p>
+          <div className="p-4 rounded-xl border border-primary/20 bg-primary/5 flex items-center justify-between group hover:bg-primary/10 transition-colors">
+            <div className="flex gap-3 items-center">
+              <div className="p-2.5 rounded-lg bg-primary/10 text-primary group-hover:scale-110 transition-transform">
+                <RotateCcw className="h-5 w-5" />
+              </div>
+              <div className="space-y-0.5">
+                <Label className="text-sm font-bold cursor-pointer" onClick={() => setAfectaStock(!afectaStock)}>
+                  ¿Reversar Inventario?
+                </Label>
+                <p className="text-[11px] text-muted-foreground flex items-center gap-1">
+                  <HelpCircle className="h-3 w-3" />
+                  El stock se ajustará automáticamente
+                </p>
+              </div>
             </div>
-            <Switch checked={afectaStock} onCheckedChange={setAfectaStock} />
+            <Switch 
+              checked={afectaStock} 
+              onCheckedChange={setAfectaStock}
+              className="data-[state=checked]:bg-primary"
+            />
           </div>
         </div>
 
-        <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={isLoading}>
-            Cancelar
+        <DialogFooter className="gap-2 sm:gap-0">
+          <Button variant="ghost" onClick={() => onOpenChange(false)} disabled={isLoading} className="hover:bg-muted/50">
+            Cerrar
           </Button>
-          <Button onClick={handleGuardar} disabled={isLoading}>
-            {isLoading ? "Registrando..." : "Confirmar Nota"}
+          <Button 
+            onClick={handleGuardar} 
+            disabled={isLoading}
+            className="gap-2 shadow-lg shadow-primary/20 font-bold"
+          >
+            {isLoading ? "Procesando..." : (
+              <>
+                <CheckCircle2 className="h-4 w-4" /> 
+                Confirmar Nota
+              </>
+            )}
           </Button>
         </DialogFooter>
       </DialogContent>

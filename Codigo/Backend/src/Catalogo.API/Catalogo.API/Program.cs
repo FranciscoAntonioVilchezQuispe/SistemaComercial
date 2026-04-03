@@ -9,6 +9,7 @@ builder.AddCentralizedLogging();
 
 // Fix for Npgsql Timestamp
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
 
 // Configurar DB
 builder.Services.AddDbContext<CatalogoDbContext>(options =>

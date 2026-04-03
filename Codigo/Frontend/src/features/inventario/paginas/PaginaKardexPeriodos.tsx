@@ -20,7 +20,7 @@ type FormValues = {
 import { ModuleTabBar } from "@/componentes/shared/ModuleTabBar";
 import { RUTAS_TITULOS } from "@/config/rutasTitulos";
 
-export default function PaginaKardexPeriodos() {
+export function PaginaKardexPeriodos() {
   const [procesandoAbrir, setProcesandoAbrir] = useState(false);
   const [procesandoCerrar, setProcesandoCerrar] = useState(false);
 

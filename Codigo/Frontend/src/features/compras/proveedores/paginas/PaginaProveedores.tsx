@@ -30,7 +30,7 @@ import { useTipoDocumento } from "@/features/configuracion/hooks/useTipoDocument
 import { ModuleTabBar } from "@/componentes/shared/ModuleTabBar";
 import { RUTAS_TITULOS } from "@/config/rutasTitulos";
 
-export default function PaginaProveedores() {
+export function PaginaProveedores() {
   const [dialogoOpen, setDialogoOpen] = useState(false);
   const [idProveedorAEditar, setIdProveedorAEditar] = useState<number | null>(null);
   

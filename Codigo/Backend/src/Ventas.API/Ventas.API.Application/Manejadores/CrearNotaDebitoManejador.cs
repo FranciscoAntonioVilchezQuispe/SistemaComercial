@@ -28,64 +28,118 @@ namespace Ventas.API.Application.Manejadores
         {
             var dto = request.Nota;
 
-            // 1. Validar venta de referencia
+            // 1. Validar que la venta de referencia exista y cargar cliente
             var venta = await _context.Ventas
+                .Include(v => v.Cliente)
+                .Include(v => v.Detalles)
                 .FirstOrDefaultAsync(v => v.Id == dto.IdVentaReferencia, cancellationToken);
             
             if (venta == null)
                 throw new Exception("La venta de referencia no existe.");
 
-            // 2. Mapear a Entidad
+            // 2. Obtener Porcentaje IGV dinámicamente de BD
+            var impuesto = await _context.ImpuestosRef.FirstOrDefaultAsync(x => x.CodigoSunat == "1000", cancellationToken);
+            decimal porcentajeIgv = impuesto?.Porcentaje ?? 18.00m;
+
+            // 3. Obtener correlativo de serie
+            var serieObj = await _context.SeriesComprobantes
+                .FirstOrDefaultAsync(s => s.Serie == dto.Serie, cancellationToken);
+
+            if (serieObj == null)
+                throw new Exception($"La serie seleccionada ({dto.Serie}) no existe o no está configurada.");
+
+            serieObj.CorrelativoActual += 1;
+            long nuevoNumero = serieObj.CorrelativoActual;
+
+            // 4. Mapear a Entidad y Calcular dinámicamente
+            decimal tSubtotal = 0;
+            decimal tIgv = 0;
+            decimal tTotal = 0;
+            var detallesNota = new List<NotaDebitoDetalle>();
+
+            foreach (var detDto in dto.Detalles)
+            {
+                var ventaDetOri = venta.Detalles.FirstOrDefault(d => d.Id == detDto.IdVentaDetalle);
+                
+                // Recálculo seguro en backend
+                decimal cant = detDto.Cantidad > 0 ? detDto.Cantidad : (ventaDetOri?.Cantidad ?? 1);
+                decimal pu = ventaDetOri?.PrecioUnitario ?? detDto.PrecioUnitario;
+                
+                decimal valItem = pu / (1 + (porcentajeIgv / 100));
+                decimal subtotalLinea = valItem * cant;
+                decimal igvLinea = Math.Round(subtotalLinea * (porcentajeIgv / 100), 2);
+                subtotalLinea = Math.Round(subtotalLinea, 2);
+                decimal totalLinea = subtotalLinea + igvLinea;
+
+                tSubtotal += subtotalLinea;
+                tIgv += igvLinea;
+                tTotal += totalLinea;
+
+                detallesNota.Add(new NotaDebitoDetalle
+                {
+                    IdVentaDetalle = detDto.IdVentaDetalle,
+                    IdProducto = detDto.IdProducto,
+                    Descripcion = detDto.Descripcion ?? ventaDetOri?.DescripcionProducto ?? "Desconocido",
+                    UnidadMedida = detDto.UnidadMedida ?? "NIU",
+                    Cantidad = cant,
+                    PrecioUnitario = pu,
+                    ValorItem = valItem,
+                    PrecioUnitarioBase = pu,
+                    PorcentajeImpuesto = porcentajeIgv,
+                    Subtotal = subtotalLinea,
+                    Igv = igvLinea,
+                    Total = totalLinea,
+                    IdAfectacionIgv = ventaDetOri?.IdAfectacionIgv, // Heredar
+                    IdTributo = ventaDetOri?.IdTributo,
+                    IdUnidadMedida = ventaDetOri?.IdUnidadMedida
+                });
+            }
+
+            var tipocomp = await _context.TiposComprobanteRef.FirstOrDefaultAsync(x => x.Id == venta.IdTipoComprobante);
+
             var nota = new NotaDebito
             {
                 Serie = dto.Serie,
-                Numero = dto.Numero,
+                Numero = nuevoNumero, // Asignado por BE
                 TipoComprobante = "08",
                 IdVentaReferencia = dto.IdVentaReferencia,
                 SerieReferencia = venta.Serie,
                 NumeroReferencia = venta.Numero,
-                TipoDocReferencia = "01",
+                TipoDocReferencia = tipocomp?.Codigo ?? "01",
                 IdTipoNota = dto.IdTipoNota,
                 MotivoSustento = dto.MotivoSustento,
                 
+                // Ignorar datos del cliente del dto y usar venta original
                 ClienteTipoDoc = dto.ClienteTipoDoc,
-                ClienteNroDoc = dto.ClienteNroDoc,
-                ClienteRazonSocial = dto.ClienteRazonSocial,
+                ClienteNroDoc = venta.Cliente.NumeroDocumento,
+                ClienteRazonSocial = venta.Cliente.RazonSocial,
                 
-                Subtotal = dto.Subtotal,
-                Igv = dto.Igv,
-                Total = dto.Total,
-                Moneda = dto.Moneda,
-                TipoCambio = dto.TipoCambio,
+                SubtotalGravado = tSubtotal,
+                Subtotal = tSubtotal,
+                Igv = tIgv,
+                Total = tTotal,
+                Moneda = venta.Moneda,
+                TipoCambio = venta.TipoCambio,
+                PorcentajeIgv = porcentajeIgv,
                 
                 AfectaStock = dto.AfectaStock,
-                FechaEmision = dto.FechaEmision == default ? DateTime.UtcNow : dto.FechaEmision,
+                FechaEmision = DateTime.UtcNow,
                 Estado = "PENDIENTE",
+                IdEstadoCpe = "PENDIENTE",
                 
-                Detalles = dto.Detalles.Select(d => new NotaDebitoDetalle
-                {
-                    IdVentaDetalle = d.IdVentaDetalle,
-                    IdProducto = d.IdProducto,
-                    Descripcion = d.Descripcion,
-                    UnidadMedida = d.UnidadMedida,
-                    Cantidad = d.Cantidad,
-                    PrecioUnitario = d.PrecioUnitario,
-                    Subtotal = d.Subtotal,
-                    Igv = d.Igv,
-                    Total = d.Total
-                }).ToList()
+                Detalles = detallesNota
             };
 
-            // 3. Persistir Nota
+            // 5. Persistir Nota
             _context.NotasDebito.Add(nota);
             await _context.SaveChangesAsync(cancellationToken);
 
-            // 4. Actualizar Inventario si afecta stock (Nota de Débito = Salida por incremento de cantidad/precio que exige más stock?)
+            // 6. Actualizar Inventario si afecta stock
             if (nota.AfectaStock)
             {
                 foreach (var det in nota.Detalles)
                 {
-                    long idAlmacen = 1; // TODO: Obtener dinámico
+                    long idAlmacen = venta.IdAlmacen; 
 
                     var success = await _inventarioServicio.RegistrarSalidaNotaDebitoAsync(
                         det.IdProducto, 
@@ -103,7 +157,15 @@ namespace Ventas.API.Application.Manejadores
                 }
             }
 
+            // Devolver DTO poblado
             dto.Id = nota.Id;
+            dto.Numero = nota.Numero;
+            dto.Subtotal = tSubtotal;
+            dto.Igv = tIgv;
+            dto.Total = tTotal;
+            dto.ClienteNroDoc = nota.ClienteNroDoc;
+            dto.ClienteRazonSocial = nota.ClienteRazonSocial;
+
             return dto;
         }
     }

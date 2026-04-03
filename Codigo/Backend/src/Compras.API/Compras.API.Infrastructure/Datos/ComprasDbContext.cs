@@ -18,8 +18,6 @@ namespace Compras.API.Infrastructure.Datos
         public DbSet<DetalleOrdenCompra> DetallesOrdenCompra { get; set; }
         public DbSet<Proveedor> Proveedores { get; set; }
         public DbSet<Compras.API.Domain.Entidades.Referencias.CatalogoReferencia> Catalogos { get; set; }
-        public DbSet<Nota> Notas { get; set; } = null!;
-        public DbSet<DetalleNota> DetallesNota { get; set; } = null!;
         public DbSet<NotaCreditoCompra> NotasCredito { get; set; } = null!;
         public DbSet<NotaCreditoDetalleCompra> NotasCreditoDetalles { get; set; } = null!;
         public DbSet<NotaDebitoCompra> NotasDebito { get; set; } = null!;

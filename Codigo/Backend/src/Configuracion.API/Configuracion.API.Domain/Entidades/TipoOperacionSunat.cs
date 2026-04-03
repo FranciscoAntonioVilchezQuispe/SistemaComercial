@@ -20,7 +20,6 @@ namespace Configuracion.API.Domain.Entidades
         [Column("nombre")]
         public string Nombre { get; set; } = null!;
 
-        [Column("activado")]
-        public bool Activado { get; set; } = true;
+
     }
 }

@@ -22,6 +22,7 @@ namespace Compras.API.Domain.DTOs
         public decimal Total { get; set; }
         public decimal SaldoPendiente { get; set; }
         
+        public string EstadoNombre { get; set; } = "EMITIDO";
         public string NombreAlmacen { get; set; } = string.Empty;
 
         // Propiedad técnica para PagedResponse

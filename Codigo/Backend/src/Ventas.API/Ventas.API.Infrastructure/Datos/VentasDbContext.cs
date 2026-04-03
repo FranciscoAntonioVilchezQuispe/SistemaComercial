@@ -24,13 +24,15 @@ namespace Ventas.API.Infrastructure.Datos
         public DbSet<Cliente> Clientes { get; set; }
         public DbSet<Ventas.API.Domain.Entidades.Referencias.CatalogoReferencia> Catalogos { get; set; }
         public DbSet<SeriesComprobante> SeriesComprobantes { get; set; } = null!;
-        public DbSet<Nota> Notas { get; set; } = null!;
-        public DbSet<DetalleNota> DetallesNota { get; set; } = null!;
         public DbSet<NotaCredito> NotasCredito { get; set; } = null!;
         public DbSet<NotaCreditoDetalle> NotasCreditoDetalles { get; set; } = null!;
         public DbSet<NotaDebito> NotasDebito { get; set; } = null!;
         public DbSet<NotaDebitoDetalle> NotasDebitoDetalles { get; set; } = null!;
         public DbSet<Ventas.API.Domain.Entidades.Referencias.TipoComprobanteReferencia> TiposComprobanteRef { get; set; } = null!;
+        public DbSet<Ventas.API.Domain.Entidades.Referencias.ImpuestoReferencia> ImpuestosRef { get; set; } = null!;
+        public DbSet<LogEnvioCpe> LogsEnvioCpe { get; set; } = null!;
+        public DbSet<EstadoCpe> EstadosCpe { get; set; } = null!;
+        public DbSet<VentaCuotaPago> CuotasPago { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -40,7 +42,14 @@ namespace Ventas.API.Infrastructure.Datos
             // Re-mapear clientes si es necesario ya que están en otro esquema
             modelBuilder.Entity<Cliente>().ToTable("clientes", "clientes");
             modelBuilder.Entity<ContactoCliente>().ToTable("contactos_cliente", "clientes");
+            modelBuilder.Entity<MetodoPago>().ToTable("metodos_pago", "configuracion", t => t.ExcludeFromMigrations());
             modelBuilder.Entity<Ventas.API.Domain.Entidades.Referencias.TipoComprobanteReferencia>().ToTable("tipo_comprobante", "configuracion", t => t.ExcludeFromMigrations());
+            modelBuilder.Entity<Ventas.API.Domain.Entidades.Referencias.ImpuestoReferencia>().ToTable("impuestos", "configuracion", t => t.ExcludeFromMigrations());
+            
+            // Tablas SUNAT
+            modelBuilder.Entity<EstadoCpe>().ToTable("cat_estado_cpe", "sunat", t => t.ExcludeFromMigrations());
+            modelBuilder.Entity<LogEnvioCpe>().ToTable("log_envio_cpe", "sunat");
+            modelBuilder.Entity<VentaCuotaPago>().ToTable("venta_cuota_pago", "ventas");
         }
 
         protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)

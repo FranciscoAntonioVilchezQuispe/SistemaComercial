@@ -8,6 +8,7 @@ using Nucleo.Comun.API.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.AddCentralizedLogging();
+Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
 
 // Add services to the container.
 builder.Services.AddDbContext<ClientesDbContext>(options =>

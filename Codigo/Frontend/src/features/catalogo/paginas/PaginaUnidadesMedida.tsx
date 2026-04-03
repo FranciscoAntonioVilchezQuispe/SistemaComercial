@@ -165,4 +165,4 @@ export function PaginaUnidadesMedida() {
   );
 }
 
-export default PaginaUnidadesMedida;
+

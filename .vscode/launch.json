@@ -8,7 +8,7 @@
       "name": "Backend: Gateway.API",
       "type": "coreclr",
       "request": "launch",
-      "preLaunchTask": "build-gateway-api",
+      "preLaunchTask": "prepare-full-stack",
       "program": "${workspaceFolder}/Codigo/Backend/src/Gateway.API/bin/Debug/net8.0/Gateway.API.dll",
       "args": [],
       "cwd": "${workspaceFolder}/Codigo/Backend/src/Gateway.API",
@@ -18,18 +18,16 @@
         "ASPNETCORE_URLS": "http://localhost:5000"
       },
       "serverReadyAction": {
-        "action": "debugWithChrome",
-        "pattern": "\\\\bNow listening on:\\\\s+(https?://\\\\S+)",
-        "uriFormat": "%s/swagger",
-        "webRoot": "${workspaceFolder}/Codigo/Backend/src/Gateway.API",
-        "runtimeExecutable": "C:\\\\Program Files\\\\Mozilla Firefox\\\\firefox.exe"
+        "action": "openExternally",
+        "pattern": "\\bNow listening on:\\s+(https?://\\S+)",
+        "uriFormat": "%s/swagger"
       }
     },
     {
       "name": "Backend: Catalogo.API",
       "type": "coreclr",
       "request": "launch",
-      "preLaunchTask": "build-catalogo-api",
+      "preLaunchTask": "build-backend-solution",
       "program": "${workspaceFolder}/Codigo/Backend/src/Catalogo.API/Catalogo.API/bin/Debug/net8.0/Catalogo.API.dll",
       "args": [],
       "cwd": "${workspaceFolder}/Codigo/Backend/src/Catalogo.API/Catalogo.API",
@@ -39,18 +37,16 @@
         "ASPNETCORE_URLS": "http://localhost:5008"
       },
       "serverReadyAction": {
-        "action": "debugWithChrome",
-        "pattern": "\\\\bNow listening on:\\\\s+(https?://\\\\S+)",
-        "uriFormat": "%s/swagger",
-        "webRoot": "${workspaceFolder}/Codigo/Backend/src/Catalogo.API/Catalogo.API",
-        "runtimeExecutable": "C:\\\\Program Files\\\\Mozilla Firefox\\\\firefox.exe"
+        "action": "openExternally",
+        "pattern": "\\bNow listening on:\\s+(https?://\\S+)",
+        "uriFormat": "%s/swagger"
       }
     },
     {
       "name": "Backend: Clientes.API",
       "type": "coreclr",
       "request": "launch",
-      "preLaunchTask": "build-clientes-api",
+      "preLaunchTask": "build-backend-solution",
       "program": "${workspaceFolder}/Codigo/Backend/src/Clientes.API/Clientes.API.API/bin/Debug/net8.0/Clientes.API.API.dll",
       "args": [],
       "cwd": "${workspaceFolder}/Codigo/Backend/src/Clientes.API/Clientes.API.API",
@@ -60,18 +56,16 @@
         "ASPNETCORE_URLS": "http://localhost:5009"
       },
       "serverReadyAction": {
-        "action": "debugWithChrome",
-        "pattern": "\\\\bNow listening on:\\\\s+(https?://\\\\S+)",
-        "uriFormat": "%s/swagger",
-        "webRoot": "${workspaceFolder}/Codigo/Backend/src/Clientes.API/Clientes.API.API",
-        "runtimeExecutable": "C:\\\\Program Files\\\\Mozilla Firefox\\\\firefox.exe"
+        "action": "openExternally",
+        "pattern": "\\bNow listening on:\\s+(https?://\\S+)",
+        "uriFormat": "%s/swagger"
       }
     },
     {
       "name": "Backend: Compras.API",
       "type": "coreclr",
       "request": "launch",
-      "preLaunchTask": "build-compras-api",
+      "preLaunchTask": "build-backend-solution",
       "program": "${workspaceFolder}/Codigo/Backend/src/Compras.API/Compras.API.API/bin/Debug/net8.0/Compras.API.API.dll",
       "args": [],
       "cwd": "${workspaceFolder}/Codigo/Backend/src/Compras.API/Compras.API.API",
@@ -81,18 +75,16 @@
         "ASPNETCORE_URLS": "http://localhost:5010"
       },
       "serverReadyAction": {
-        "action": "debugWithChrome",
-        "pattern": "\\\\bNow listening on:\\\\s+(https?://\\\\S+)",
-        "uriFormat": "%s/swagger",
-        "webRoot": "${workspaceFolder}/Codigo/Backend/src/Compras.API/Compras.API.API",
-        "runtimeExecutable": "C:\\\\Program Files\\\\Mozilla Firefox\\\\firefox.exe"
+        "action": "openExternally",
+        "pattern": "\\bNow listening on:\\s+(https?://\\S+)",
+        "uriFormat": "%s/swagger"
       }
     },
     {
       "name": "Backend: Configuracion.API",
       "type": "coreclr",
       "request": "launch",
-      "preLaunchTask": "build-configuracion-api",
+      "preLaunchTask": "build-backend-solution",
       "program": "${workspaceFolder}/Codigo/Backend/src/Configuracion.API/Configuracion.API.API/bin/Debug/net8.0/Configuracion.API.API.dll",
       "args": [],
       "cwd": "${workspaceFolder}/Codigo/Backend/src/Configuracion.API/Configuracion.API.API",
@@ -102,18 +94,16 @@
         "ASPNETCORE_URLS": "http://localhost:5002"
       },
       "serverReadyAction": {
-        "action": "debugWithChrome",
-        "pattern": "\\\\bNow listening on:\\\\s+(https?://\\\\S+)",
-        "uriFormat": "%s/swagger",
-        "webRoot": "${workspaceFolder}/Codigo/Backend/src/Configuracion.API/Configuracion.API.API",
-        "runtimeExecutable": "C:\\\\Program Files\\\\Mozilla Firefox\\\\firefox.exe"
+        "action": "openExternally",
+        "pattern": "\\bNow listening on:\\s+(https?://\\S+)",
+        "uriFormat": "%s/swagger"
       }
     },
     {
       "name": "Backend: Contabilidad.API",
       "type": "coreclr",
       "request": "launch",
-      "preLaunchTask": "build-contabilidad-api",
+      "preLaunchTask": "build-backend-solution",
       "program": "${workspaceFolder}/Codigo/Backend/src/Contabilidad.API/Contabilidad.API.API/bin/Debug/net8.0/Contabilidad.API.API.dll",
       "args": [],
       "cwd": "${workspaceFolder}/Codigo/Backend/src/Contabilidad.API/Contabilidad.API.API",
@@ -123,18 +113,16 @@
         "ASPNETCORE_URLS": "http://localhost:5004"
       },
       "serverReadyAction": {
-        "action": "debugWithChrome",
-        "pattern": "\\\\bNow listening on:\\\\s+(https?://\\\\S+)",
-        "uriFormat": "%s/swagger",
-        "webRoot": "${workspaceFolder}/Codigo/Backend/src/Contabilidad.API/Contabilidad.API.API",
-        "runtimeExecutable": "C:\\\\Program Files\\\\Mozilla Firefox\\\\firefox.exe"
+        "action": "openExternally",
+        "pattern": "\\bNow listening on:\\s+(https?://\\S+)",
+        "uriFormat": "%s/swagger"
       }
     },
     {
       "name": "Backend: Identidad.API",
       "type": "coreclr",
       "request": "launch",
-      "preLaunchTask": "build-identidad-api",
+      "preLaunchTask": "build-backend-solution",
       "program": "${workspaceFolder}/Codigo/Backend/src/Identidad.API/Identidad.API.API/bin/Debug/net8.0/Identidad.API.API.dll",
       "args": [],
       "cwd": "${workspaceFolder}/Codigo/Backend/src/Identidad.API/Identidad.API.API",
@@ -144,18 +132,16 @@
         "ASPNETCORE_URLS": "http://localhost:5001"
       },
       "serverReadyAction": {
-        "action": "debugWithChrome",
-        "pattern": "\\\\bNow listening on:\\\\s+(https?://\\\\S+)",
-        "uriFormat": "%s/swagger",
-        "webRoot": "${workspaceFolder}/Codigo/Backend/src/Identidad.API/Identidad.API.API",
-        "runtimeExecutable": "C:\\\\Program Files\\\\Mozilla Firefox\\\\firefox.exe"
+        "action": "openExternally",
+        "pattern": "\\bNow listening on:\\s+(https?://\\S+)",
+        "uriFormat": "%s/swagger"
       }
     },
     {
       "name": "Backend: Inventario.API",
       "type": "coreclr",
       "request": "launch",
-      "preLaunchTask": "build-inventario-api",
+      "preLaunchTask": "build-backend-solution",
       "program": "${workspaceFolder}/Codigo/Backend/src/Inventario.API/Inventario.API.API/bin/Debug/net8.0/Inventario.API.API.dll",
       "args": [],
       "cwd": "${workspaceFolder}/Codigo/Backend/src/Inventario.API/Inventario.API.API",
@@ -165,18 +151,16 @@
         "ASPNETCORE_URLS": "http://localhost:5003"
       },
       "serverReadyAction": {
-        "action": "debugWithChrome",
-        "pattern": "\\\\bNow listening on:\\\\s+(https?://\\\\S+)",
-        "uriFormat": "%s/swagger",
-        "webRoot": "${workspaceFolder}/Codigo/Backend/src/Inventario.API/Inventario.API.API",
-        "runtimeExecutable": "C:\\\\Program Files\\\\Mozilla Firefox\\\\firefox.exe"
+        "action": "openExternally",
+        "pattern": "\\bNow listening on:\\s+(https?://\\S+)",
+        "uriFormat": "%s/swagger"
       }
     },
     {
       "name": "Backend: Ventas.API",
       "type": "coreclr",
       "request": "launch",
-      "preLaunchTask": "build-ventas-api",
+      "preLaunchTask": "build-backend-solution",
       "program": "${workspaceFolder}/Codigo/Backend/src/Ventas.API/Ventas.API.API/bin/Debug/net8.0/Ventas.API.API.dll",
       "args": [],
       "cwd": "${workspaceFolder}/Codigo/Backend/src/Ventas.API/Ventas.API.API",
@@ -186,11 +170,9 @@
         "ASPNETCORE_URLS": "http://localhost:5005"
       },
       "serverReadyAction": {
-        "action": "debugWithChrome",
-        "pattern": "\\\\bNow listening on:\\\\s+(https?://\\\\S+)",
-        "uriFormat": "%s/swagger",
-        "webRoot": "${workspaceFolder}/Codigo/Backend/src/Ventas.API/Ventas.API.API",
-        "runtimeExecutable": "C:\\\\Program Files\\\\Mozilla Firefox\\\\firefox.exe"
+        "action": "openExternally",
+        "pattern": "\\bNow listening on:\\s+(https?://\\S+)",
+        "uriFormat": "%s/swagger"
       }
     },
     // ============================================
@@ -202,7 +184,6 @@
       "request": "launch",
       "url": "http://localhost:5180",
       "webRoot": "${workspaceFolder}/Codigo/Frontend/src",
-      "runtimeExecutable": "C:\\\\Program Files\\\\Mozilla Firefox\\\\firefox.exe",
       "preLaunchTask": "npm: dev - Frontend"
     },
     {
@@ -211,8 +192,7 @@
       "request": "attach",
       "port": 9222,
       "url": "http://localhost:5180",
-      "webRoot": "${workspaceFolder}/Codigo/Frontend/src",
-      "runtimeExecutable": "C:\\\\Program Files\\\\Mozilla Firefox\\\\firefox.exe"
+      "webRoot": "${workspaceFolder}/Codigo/Frontend/src"
     }
   ],
   "compounds": [

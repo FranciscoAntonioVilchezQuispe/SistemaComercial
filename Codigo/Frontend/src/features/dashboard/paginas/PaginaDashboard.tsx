@@ -44,7 +44,7 @@ const itemVariants: Variants = {
   }
 };
 
-export default function PaginaDashboard() {
+export function PaginaDashboard() {
   const navigate = useNavigate();
   const [moduloSeleccionado, setModuloSeleccionado] = useState<ItemMenu | null>(null);
 

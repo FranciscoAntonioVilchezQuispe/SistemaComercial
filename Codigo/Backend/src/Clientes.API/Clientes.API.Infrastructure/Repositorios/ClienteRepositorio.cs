@@ -34,11 +34,11 @@ namespace Clientes.API.Infrastructure.Repositorios
                        c.es_agente_retencion, c.es_buen_contribuyente, c.es_agente_percepcion,
                        c.fecha_ultima_consulta_sunat, c.activado
                 FROM clientes.clientes c
-                LEFT JOIN configuracion.tipo_documento td ON td.id_tipo_documento = c.id_tipo_documento
+                LEFT JOIN configuracion.tipo_documento td ON td.id_regla = c.id_tipo_documento
                 WHERE c.id_cliente = @id;
 
                 -- Contactos
-                SELECT id_contacto as Id, nombre, cargo, telefono, email
+                SELECT id_contacto as Id, nombres, cargo, telefono, email
                 FROM clientes.contactos_cliente
                 WHERE id_cliente = @id;";
 
@@ -103,7 +103,7 @@ namespace Clientes.API.Infrastructure.Repositorios
                        c.numero_documento, c.razon_social, c.email, c.telefono, c.activado,
                        COUNT(*) OVER() AS TotalRegistros
                 FROM clientes.clientes c
-                LEFT JOIN configuracion.tipo_documento td ON td.id_tipo_documento = c.id_tipo_documento
+                LEFT JOIN configuracion.tipo_documento td ON td.id_regla = c.id_tipo_documento
                 WHERE (@search IS NULL OR 
                        c.razon_social ILIKE '%' || @search || '%' OR 
                        c.numero_documento ILIKE '%' || @search || '%')

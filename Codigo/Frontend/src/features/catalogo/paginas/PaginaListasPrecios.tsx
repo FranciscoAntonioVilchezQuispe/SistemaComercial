@@ -168,4 +168,4 @@ export function PaginaListasPrecios() {
   );
 }
 
-export default PaginaListasPrecios;
+

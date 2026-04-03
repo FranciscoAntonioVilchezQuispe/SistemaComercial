@@ -16,8 +16,8 @@ export interface CompraResumen {
   serieComprobante: string;
   numeroComprobante: string;
   fechaEmision: string;
-  proveedorRazonSocial: string;
-  proveedorNumeroDocumento: string;
+  razonSocialProveedor: string;
+  numeroDocumentoProveedor: string;
   moneda: string;
   total: number;
   estadoNombre: string;
@@ -28,8 +28,8 @@ export interface CompraResumen {
 export interface CompraDetalle {
   id: number;
   idProveedor: number;
-  proveedorRazonSocial?: string;
-  proveedorNumeroDocumento?: string;
+  razonSocialProveedor?: string;
+  numeroDocumentoProveedor?: string;
   idAlmacen: number;
   nombreAlmacen?: string;
   idMoneda: number;

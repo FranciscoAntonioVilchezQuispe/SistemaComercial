@@ -45,6 +45,30 @@ namespace Ventas.API.Domain.Entidades
         [Column("total", TypeName = "decimal(12,2)")]
         public decimal Total { get; set; }
 
+        [Column("id_afectacion_igv")]
+        public long? IdAfectacionIgv { get; set; }
+
+        [Column("id_tributo")]
+        public long? IdTributo { get; set; }
+
+        [Column("precio_unitario_base", TypeName = "decimal(12,4)")]
+        public decimal? PrecioUnitarioBase { get; set; }
+
+        [Column("valor_item", TypeName = "decimal(12,4)")]
+        public decimal? ValorItem { get; set; }
+
+        [Column("descuento_item", TypeName = "decimal(12,4)")]
+        public decimal DescuentoItem { get; set; }
+
+        [Column("porcentaje_impuesto", TypeName = "decimal(5,2)")]
+        public decimal PorcentajeImpuesto { get; set; }
+
+        [Column("numero_linea")]
+        public int? NumeroLinea { get; set; }
+
+        [Column("id_unidad_medida")]
+        public long? IdUnidadMedida { get; set; }
+
         // Navegación
         [ForeignKey("IdNotaDebito")]
         public virtual NotaDebito NotaDebito { get; set; } = null!;

@@ -22,16 +22,14 @@ class Program
             using var command = new NpgsqlCommand(sql, connection);
             command.CommandTimeout = 120; // 2 minutos
 
-            var reader = command.ExecuteReader();
-            
-            // Leer resultados de la verificación
-            Console.WriteLine("\n=== RESULTADOS ===");
-            while (reader.Read())
+            // Capturar los RAISE NOTICE del script
+            connection.Notice += (sender, e) =>
             {
-                Console.WriteLine($"{reader.GetString(0)}: {reader.GetInt64(1)} registros");
-            }
+                Console.WriteLine($"📋 {e.Notice.MessageText}");
+            };
 
-            Console.WriteLine("\n✅ Script ejecutado exitosamente!");
+            var result = command.ExecuteNonQuery();
+            Console.WriteLine($"\n✅ Script ejecutado exitosamente! ({result} filas afectadas)");
         }
         catch (Exception ex)
         {

@@ -257,67 +257,6 @@ namespace Compras.API.Infrastructure.Migrations
                     b.ToTable("detalle_compra", "compras");
                 });
 
-            modelBuilder.Entity("Compras.API.Domain.Entidades.DetalleNota", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasColumnName("id_detalle_nota");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
-
-                    b.Property<bool>("Activado")
-                        .HasColumnType("boolean")
-                        .HasColumnName("activado");
-
-                    b.Property<decimal>("Cantidad")
-                        .HasColumnType("decimal(10,3)")
-                        .HasColumnName("cantidad");
-
-                    b.Property<DateTime?>("FechaActualizacion")
-                        .HasColumnType("timestamp without time zone")
-                        .HasColumnName("fecha_modificacion");
-
-                    b.Property<DateTime>("FechaCreacion")
-                        .HasColumnType("timestamp without time zone")
-                        .HasColumnName("fecha_creacion");
-
-                    b.Property<long>("IdNota")
-                        .HasColumnType("bigint")
-                        .HasColumnName("id_nota");
-
-                    b.Property<long>("IdProducto")
-                        .HasColumnType("bigint")
-                        .HasColumnName("id_producto");
-
-                    b.Property<decimal>("PrecioUnitario")
-                        .HasColumnType("decimal(12,2)")
-                        .HasColumnName("precio_unitario");
-
-                    b.Property<decimal>("Subtotal")
-                        .HasColumnType("decimal(12,2)")
-                        .HasColumnName("subtotal");
-
-                    b.Property<string>("UsuarioActualizacion")
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("usuario_modificacion");
-
-                    b.Property<string>("UsuarioCreacion")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("usuario_creacion");
-
-                    b.HasKey("Id")
-                        .HasName("pk_detalle_notas");
-
-                    b.HasIndex("IdNota")
-                        .HasDatabaseName("ix_detalle_notas_id_nota");
-
-                    b.ToTable("detalle_notas", "compras");
-                });
-
             modelBuilder.Entity("Compras.API.Domain.Entidades.DetalleOrdenCompra", b =>
                 {
                     b.Property<long>("Id")
@@ -438,113 +377,6 @@ namespace Compras.API.Infrastructure.Migrations
                         {
                             t.ExcludeFromMigrations();
                         });
-                });
-
-            modelBuilder.Entity("Compras.API.Domain.Entidades.Nota", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasColumnName("id_nota");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
-
-                    b.Property<bool>("Activado")
-                        .HasColumnType("boolean")
-                        .HasColumnName("activado");
-
-                    b.Property<string>("CodigoMotivo")
-                        .HasMaxLength(2)
-                        .HasColumnType("character varying(2)")
-                        .HasColumnName("codigo_motivo");
-
-                    b.Property<string>("CodigoTipoComprobanteRef")
-                        .HasMaxLength(10)
-                        .HasColumnType("character varying(10)")
-                        .HasColumnName("codigo_tipo_comprobante_ref");
-
-                    b.Property<string>("DescripcionMotivo")
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)")
-                        .HasColumnName("descripcion_motivo");
-
-                    b.Property<DateTime?>("FechaActualizacion")
-                        .HasColumnType("timestamp without time zone")
-                        .HasColumnName("fecha_modificacion");
-
-                    b.Property<DateTime>("FechaCreacion")
-                        .HasColumnType("timestamp without time zone")
-                        .HasColumnName("fecha_creacion");
-
-                    b.Property<DateTime>("FechaEmision")
-                        .HasColumnType("timestamp without time zone")
-                        .HasColumnName("fecha_emision");
-
-                    b.Property<long>("IdCompraReferencia")
-                        .HasColumnType("bigint")
-                        .HasColumnName("id_compra_referencia");
-
-                    b.Property<long>("IdTipoComprobante")
-                        .HasColumnType("bigint")
-                        .HasColumnName("id_tipo_comprobante");
-
-                    b.Property<decimal>("Impuesto")
-                        .HasColumnType("decimal(12,2)")
-                        .HasColumnName("impuesto");
-
-                    b.Property<string>("MotivoSustento")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("motivo_sustento");
-
-                    b.Property<string>("NumeroComprobante")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)")
-                        .HasColumnName("numero_comprobante");
-
-                    b.Property<string>("NumeroRef")
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)")
-                        .HasColumnName("numero_ref");
-
-                    b.Property<string>("SerieComprobante")
-                        .IsRequired()
-                        .HasMaxLength(10)
-                        .HasColumnType("character varying(10)")
-                        .HasColumnName("serie_comprobante");
-
-                    b.Property<string>("SerieRef")
-                        .HasMaxLength(10)
-                        .HasColumnType("character varying(10)")
-                        .HasColumnName("serie_ref");
-
-                    b.Property<decimal>("Subtotal")
-                        .HasColumnType("decimal(12,2)")
-                        .HasColumnName("subtotal");
-
-                    b.Property<decimal>("Total")
-                        .HasColumnType("decimal(12,2)")
-                        .HasColumnName("total");
-
-                    b.Property<string>("UsuarioActualizacion")
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("usuario_modificacion");
-
-                    b.Property<string>("UsuarioCreacion")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("usuario_creacion");
-
-                    b.HasKey("Id")
-                        .HasName("pk_notas");
-
-                    b.HasIndex("IdCompraReferencia")
-                        .HasDatabaseName("ix_notas_id_compra_referencia");
-
-                    b.ToTable("notas", "compras");
                 });
 
             modelBuilder.Entity("Compras.API.Domain.Entidades.NotaCreditoCompra", b =>
@@ -1436,18 +1268,6 @@ namespace Compras.API.Infrastructure.Migrations
                     b.Navigation("Compra");
                 });
 
-            modelBuilder.Entity("Compras.API.Domain.Entidades.DetalleNota", b =>
-                {
-                    b.HasOne("Compras.API.Domain.Entidades.Nota", "Nota")
-                        .WithMany("Detalles")
-                        .HasForeignKey("IdNota")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_detalle_notas_notas_id_nota");
-
-                    b.Navigation("Nota");
-                });
-
             modelBuilder.Entity("Compras.API.Domain.Entidades.DetalleOrdenCompra", b =>
                 {
                     b.HasOne("Compras.API.Domain.Entidades.OrdenCompra", "OrdenCompra")
@@ -1458,18 +1278,6 @@ namespace Compras.API.Infrastructure.Migrations
                         .HasConstraintName("fk_detalle_orden_compra_ordenes_compra_id_orden_compra");
 
                     b.Navigation("OrdenCompra");
-                });
-
-            modelBuilder.Entity("Compras.API.Domain.Entidades.Nota", b =>
-                {
-                    b.HasOne("Compras.API.Domain.Entidades.Compra", "Compra")
-                        .WithMany()
-                        .HasForeignKey("IdCompraReferencia")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_notas_compras_id_compra_referencia");
-
-                    b.Navigation("Compra");
                 });
 
             modelBuilder.Entity("Compras.API.Domain.Entidades.NotaCreditoCompra", b =>
@@ -1577,11 +1385,6 @@ namespace Compras.API.Infrastructure.Migrations
                 });
 
             modelBuilder.Entity("Compras.API.Domain.Entidades.Compra", b =>
-                {
-                    b.Navigation("Detalles");
-                });
-
-            modelBuilder.Entity("Compras.API.Domain.Entidades.Nota", b =>
                 {
                     b.Navigation("Detalles");
                 });

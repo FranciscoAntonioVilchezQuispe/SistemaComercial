@@ -7,7 +7,7 @@ const BASE_URL = "/metodos-pago";
 export const servicioMetodoPago = {
   obtenerTodos: async (params?: PagedRequest): Promise<PagedResponse<MetodoPago>> => {
     const response: any = await apiConfiguracion.get(BASE_URL, { params });
-    return response.datos || response.data || response;
+    return response as PagedResponse<MetodoPago>;
   },
 
   obtenerPorId: async (id: number): Promise<MetodoPago> => {

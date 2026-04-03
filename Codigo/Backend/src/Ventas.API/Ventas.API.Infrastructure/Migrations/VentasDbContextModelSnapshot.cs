@@ -425,75 +425,6 @@ namespace Ventas.API.Infrastructure.Migrations
                     b.ToTable("detalle_cotizacion", "ventas");
                 });
 
-            modelBuilder.Entity("Ventas.API.Domain.Entidades.DetalleNota", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasColumnName("id_detalle_nota");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
-
-                    b.Property<bool>("Activado")
-                        .HasColumnType("boolean")
-                        .HasColumnName("activado");
-
-                    b.Property<decimal>("Cantidad")
-                        .HasColumnType("decimal(10,3)")
-                        .HasColumnName("cantidad");
-
-                    b.Property<DateTime?>("FechaActualizacion")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("fecha_modificacion");
-
-                    b.Property<DateTime>("FechaCreacion")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("fecha_creacion");
-
-                    b.Property<long>("IdNota")
-                        .HasColumnType("bigint")
-                        .HasColumnName("id_nota");
-
-                    b.Property<long>("IdProducto")
-                        .HasColumnType("bigint")
-                        .HasColumnName("id_producto");
-
-                    b.Property<long?>("IdVariante")
-                        .HasColumnType("bigint")
-                        .HasColumnName("id_variante");
-
-                    b.Property<decimal>("ImpuestoItem")
-                        .HasColumnType("decimal(12,2)")
-                        .HasColumnName("impuesto_item");
-
-                    b.Property<decimal>("PrecioUnitario")
-                        .HasColumnType("decimal(12,2)")
-                        .HasColumnName("precio_unitario");
-
-                    b.Property<decimal>("TotalItem")
-                        .HasColumnType("decimal(12,2)")
-                        .HasColumnName("total_item");
-
-                    b.Property<string>("UsuarioActualizacion")
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("usuario_modificacion");
-
-                    b.Property<string>("UsuarioCreacion")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("usuario_creacion");
-
-                    b.HasKey("Id")
-                        .HasName("pk_detalle_notas");
-
-                    b.HasIndex("IdNota")
-                        .HasDatabaseName("ix_detalle_notas_id_nota");
-
-                    b.ToTable("detalle_notas", "ventas");
-                });
-
             modelBuilder.Entity("Ventas.API.Domain.Entidades.DetalleVenta", b =>
                 {
                     b.Property<long>("Id")
@@ -515,6 +446,16 @@ namespace Ventas.API.Infrastructure.Migrations
                         .HasMaxLength(2)
                         .HasColumnType("character varying(2)")
                         .HasColumnName("codigo_afectacion_igv");
+
+                    b.Property<string>("CodigoProductoSunat")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("codigo_producto_sunat");
+
+                    b.Property<string>("CodigoProductoVendedor")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("codigo_producto_vendedor");
 
                     b.Property<string>("CodigoTributo")
                         .HasMaxLength(4)
@@ -538,9 +479,21 @@ namespace Ventas.API.Infrastructure.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("fecha_creacion");
 
+                    b.Property<long?>("IdAfectacionIgv")
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_afectacion_igv");
+
                     b.Property<long>("IdProducto")
                         .HasColumnType("bigint")
                         .HasColumnName("id_producto");
+
+                    b.Property<long?>("IdTributo")
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_tributo");
+
+                    b.Property<long?>("IdUnidadMedida")
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_unidad_medida");
 
                     b.Property<long?>("IdVariante")
                         .HasColumnType("bigint")
@@ -553,6 +506,10 @@ namespace Ventas.API.Infrastructure.Migrations
                     b.Property<decimal>("ImpuestoItem")
                         .HasColumnType("decimal(12,2)")
                         .HasColumnName("impuesto_item");
+
+                    b.Property<int?>("NumeroLinea")
+                        .HasColumnType("integer")
+                        .HasColumnName("numero_linea");
 
                     b.Property<decimal>("PorcentajeImpuesto")
                         .HasColumnType("decimal(5,2)")
@@ -596,6 +553,159 @@ namespace Ventas.API.Infrastructure.Migrations
                         .HasDatabaseName("ix_detalle_venta_id_venta");
 
                     b.ToTable("detalle_venta", "ventas");
+                });
+
+            modelBuilder.Entity("Ventas.API.Domain.Entidades.EstadoCpe", b =>
+                {
+                    b.Property<string>("IdEstado")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("id_estado");
+
+                    b.Property<bool>("Activado")
+                        .HasColumnType("boolean")
+                        .HasColumnName("activado");
+
+                    b.Property<string>("Descripcion")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("descripcion");
+
+                    b.Property<bool>("EsFinal")
+                        .HasColumnType("boolean")
+                        .HasColumnName("es_final");
+
+                    b.Property<DateTime>("FechaCreacion")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fecha_creacion");
+
+                    b.Property<DateTime?>("FechaModificacion")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fecha_modificacion");
+
+                    b.Property<bool>("PermiteReenvio")
+                        .HasColumnType("boolean")
+                        .HasColumnName("permite_reenvio");
+
+                    b.Property<string>("UsuarioCreacion")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("usuario_creacion");
+
+                    b.Property<string>("UsuarioModificacion")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("usuario_modificacion");
+
+                    b.HasKey("IdEstado")
+                        .HasName("pk_cat_estado_cpe");
+
+                    b.ToTable("cat_estado_cpe", "sunat", t =>
+                        {
+                            t.ExcludeFromMigrations();
+                        });
+                });
+
+            modelBuilder.Entity("Ventas.API.Domain.Entidades.LogEnvioCpe", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_log");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<bool>("Activado")
+                        .HasColumnType("boolean")
+                        .HasColumnName("activado");
+
+                    b.Property<string>("CodigoRespuesta")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("codigo_respuesta");
+
+                    b.Property<bool>("Exito")
+                        .HasColumnType("boolean")
+                        .HasColumnName("exito");
+
+                    b.Property<DateTime?>("FechaActualizacion")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fecha_modificacion");
+
+                    b.Property<DateTime>("FechaCreacion")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fecha_creacion");
+
+                    b.Property<DateTime>("FechaEnvio")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fecha_envio");
+
+                    b.Property<string>("IdEstadoCpe")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("id_estado_cpe");
+
+                    b.Property<long?>("IdNotaCredito")
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_nota_credito");
+
+                    b.Property<long?>("IdNotaDebito")
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_nota_debito");
+
+                    b.Property<long?>("IdVenta")
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_venta");
+
+                    b.Property<string>("MensajeRespuesta")
+                        .HasColumnType("text")
+                        .HasColumnName("mensaje_respuesta");
+
+                    b.Property<string>("Ticket")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("ticket");
+
+                    b.Property<string>("TipoDocumento")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)")
+                        .HasColumnName("tipo_documento");
+
+                    b.Property<string>("UsuarioActualizacion")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("usuario_modificacion");
+
+                    b.Property<string>("UsuarioCreacion")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("usuario_creacion");
+
+                    b.Property<string>("XmlEnviado")
+                        .HasColumnType("text")
+                        .HasColumnName("xml_enviado");
+
+                    b.Property<string>("XmlRespuesta")
+                        .HasColumnType("text")
+                        .HasColumnName("xml_respuesta");
+
+                    b.HasKey("Id")
+                        .HasName("pk_log_envio_cpe");
+
+                    b.HasIndex("IdNotaCredito")
+                        .HasDatabaseName("ix_log_envio_cpe_id_nota_credito");
+
+                    b.HasIndex("IdNotaDebito")
+                        .HasDatabaseName("ix_log_envio_cpe_id_nota_debito");
+
+                    b.HasIndex("IdVenta")
+                        .HasDatabaseName("ix_log_envio_cpe_id_venta");
+
+                    b.ToTable("log_envio_cpe", "sunat");
                 });
 
             modelBuilder.Entity("Ventas.API.Domain.Entidades.MetodoPago", b =>
@@ -649,7 +759,10 @@ namespace Ventas.API.Infrastructure.Migrations
                     b.HasKey("Id")
                         .HasName("pk_metodos_pago");
 
-                    b.ToTable("metodos_pago", "ventas");
+                    b.ToTable("metodos_pago", "configuracion", t =>
+                        {
+                            t.ExcludeFromMigrations();
+                        });
                 });
 
             modelBuilder.Entity("Ventas.API.Domain.Entidades.MovimientoCaja", b =>
@@ -728,129 +841,6 @@ namespace Ventas.API.Infrastructure.Migrations
                     b.ToTable("movimientos_caja", "ventas");
                 });
 
-            modelBuilder.Entity("Ventas.API.Domain.Entidades.Nota", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasColumnName("id_nota");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
-
-                    b.Property<bool>("Activado")
-                        .HasColumnType("boolean")
-                        .HasColumnName("activado");
-
-                    b.Property<string>("CodigoMotivo")
-                        .HasMaxLength(2)
-                        .HasColumnType("character varying(2)")
-                        .HasColumnName("codigo_motivo");
-
-                    b.Property<string>("CodigoTipoComprobanteRef")
-                        .HasMaxLength(10)
-                        .HasColumnType("character varying(10)")
-                        .HasColumnName("codigo_tipo_comprobante_ref");
-
-                    b.Property<string>("DescripcionMotivo")
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)")
-                        .HasColumnName("descripcion_motivo");
-
-                    b.Property<DateTime?>("FechaActualizacion")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("fecha_modificacion");
-
-                    b.Property<DateTime>("FechaCreacion")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("fecha_creacion");
-
-                    b.Property<DateTime>("FechaEmision")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("fecha_emision");
-
-                    b.Property<long>("IdEstado")
-                        .HasColumnType("bigint")
-                        .HasColumnName("id_estado");
-
-                    b.Property<long>("IdTipoComprobante")
-                        .HasColumnType("bigint")
-                        .HasColumnName("id_tipo_comprobante");
-
-                    b.Property<long>("IdTipoNota")
-                        .HasColumnType("bigint")
-                        .HasColumnName("id_tipo_nota");
-
-                    b.Property<long>("IdVentaReferencia")
-                        .HasColumnType("bigint")
-                        .HasColumnName("id_venta_referencia");
-
-                    b.Property<string>("Moneda")
-                        .IsRequired()
-                        .HasMaxLength(3)
-                        .HasColumnType("character varying(3)")
-                        .HasColumnName("moneda");
-
-                    b.Property<string>("MotivoSustento")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("motivo_sustento");
-
-                    b.Property<long>("Numero")
-                        .HasColumnType("bigint")
-                        .HasColumnName("numero");
-
-                    b.Property<string>("NumeroRef")
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)")
-                        .HasColumnName("numero_ref");
-
-                    b.Property<string>("Serie")
-                        .IsRequired()
-                        .HasMaxLength(4)
-                        .HasColumnType("character varying(4)")
-                        .HasColumnName("serie");
-
-                    b.Property<string>("SerieRef")
-                        .HasMaxLength(10)
-                        .HasColumnType("character varying(10)")
-                        .HasColumnName("serie_ref");
-
-                    b.Property<decimal>("SubtotalGravado")
-                        .HasColumnType("decimal(12,2)")
-                        .HasColumnName("subtotal_gravado");
-
-                    b.Property<decimal>("TipoCambio")
-                        .HasColumnType("decimal(10,4)")
-                        .HasColumnName("tipo_cambio");
-
-                    b.Property<decimal>("TotalImpuesto")
-                        .HasColumnType("decimal(12,2)")
-                        .HasColumnName("total_impuesto");
-
-                    b.Property<decimal>("TotalNota")
-                        .HasColumnType("decimal(12,2)")
-                        .HasColumnName("total_nota");
-
-                    b.Property<string>("UsuarioActualizacion")
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("usuario_modificacion");
-
-                    b.Property<string>("UsuarioCreacion")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("usuario_creacion");
-
-                    b.HasKey("Id")
-                        .HasName("pk_notas");
-
-                    b.HasIndex("IdVentaReferencia")
-                        .HasDatabaseName("ix_notas_id_venta_referencia");
-
-                    b.ToTable("notas", "ventas");
-                });
-
             modelBuilder.Entity("Ventas.API.Domain.Entidades.NotaCredito", b =>
                 {
                     b.Property<long>("Id")
@@ -912,9 +902,26 @@ namespace Ventas.API.Infrastructure.Migrations
                         .HasColumnType("text")
                         .HasColumnName("hash_cdr");
 
+                    b.Property<string>("HashCpe")
+                        .HasColumnType("text")
+                        .HasColumnName("hash_cpe");
+
+                    b.Property<long?>("IdEmpresa")
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_empresa");
+
+                    b.Property<string>("IdEstadoCpe")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("id_estado_cpe");
+
                     b.Property<long>("IdTipoNota")
                         .HasColumnType("bigint")
                         .HasColumnName("id_tipo_nota");
+
+                    b.Property<long?>("IdTipoOperacion")
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_tipo_operacion");
 
                     b.Property<long>("IdVentaReferencia")
                         .HasColumnType("bigint")
@@ -942,6 +949,11 @@ namespace Ventas.API.Infrastructure.Migrations
                     b.Property<long>("NumeroReferencia")
                         .HasColumnType("bigint")
                         .HasColumnName("numero_referencia");
+
+                    b.Property<string>("NumeroTicketSunat")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("numero_ticket_sunat");
 
                     b.Property<decimal>("PorcentajeIgv")
                         .HasColumnType("decimal(5,2)")
@@ -971,6 +983,18 @@ namespace Ventas.API.Infrastructure.Migrations
                     b.Property<decimal>("Subtotal")
                         .HasColumnType("decimal(12,2)")
                         .HasColumnName("subtotal");
+
+                    b.Property<decimal>("SubtotalExonerado")
+                        .HasColumnType("decimal(12,2)")
+                        .HasColumnName("subtotal_exonerado");
+
+                    b.Property<decimal>("SubtotalGravado")
+                        .HasColumnType("decimal(12,2)")
+                        .HasColumnName("subtotal_gravado");
+
+                    b.Property<decimal>("SubtotalInafecto")
+                        .HasColumnType("decimal(12,2)")
+                        .HasColumnName("subtotal_inafecto");
 
                     b.Property<decimal?>("TipoCambio")
                         .HasColumnType("decimal(10,4)")
@@ -1039,6 +1063,10 @@ namespace Ventas.API.Infrastructure.Migrations
                         .HasColumnType("character varying(500)")
                         .HasColumnName("descripcion");
 
+                    b.Property<decimal>("DescuentoItem")
+                        .HasColumnType("decimal(12,4)")
+                        .HasColumnName("descuento_item");
+
                     b.Property<DateTime?>("FechaActualizacion")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("fecha_modificacion");
@@ -1046,6 +1074,10 @@ namespace Ventas.API.Infrastructure.Migrations
                     b.Property<DateTime>("FechaCreacion")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("fecha_creacion");
+
+                    b.Property<long?>("IdAfectacionIgv")
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_afectacion_igv");
 
                     b.Property<long>("IdNotaCredito")
                         .HasColumnType("bigint")
@@ -1055,6 +1087,14 @@ namespace Ventas.API.Infrastructure.Migrations
                         .HasColumnType("bigint")
                         .HasColumnName("id_producto");
 
+                    b.Property<long?>("IdTributo")
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_tributo");
+
+                    b.Property<long?>("IdUnidadMedida")
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_unidad_medida");
+
                     b.Property<long?>("IdVentaDetalle")
                         .HasColumnType("bigint")
                         .HasColumnName("id_venta_detalle");
@@ -1063,9 +1103,21 @@ namespace Ventas.API.Infrastructure.Migrations
                         .HasColumnType("decimal(12,2)")
                         .HasColumnName("igv");
 
+                    b.Property<int?>("NumeroLinea")
+                        .HasColumnType("integer")
+                        .HasColumnName("numero_linea");
+
+                    b.Property<decimal>("PorcentajeImpuesto")
+                        .HasColumnType("decimal(5,2)")
+                        .HasColumnName("porcentaje_impuesto");
+
                     b.Property<decimal>("PrecioUnitario")
                         .HasColumnType("decimal(12,4)")
                         .HasColumnName("precio_unitario");
+
+                    b.Property<decimal?>("PrecioUnitarioBase")
+                        .HasColumnType("decimal(12,4)")
+                        .HasColumnName("precio_unitario_base");
 
                     b.Property<decimal>("Subtotal")
                         .HasColumnType("decimal(12,2)")
@@ -1091,6 +1143,10 @@ namespace Ventas.API.Infrastructure.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)")
                         .HasColumnName("usuario_creacion");
+
+                    b.Property<decimal?>("ValorItem")
+                        .HasColumnType("decimal(12,4)")
+                        .HasColumnName("valor_item");
 
                     b.HasKey("Id")
                         .HasName("pk_nota_credito_detalle");
@@ -1165,9 +1221,26 @@ namespace Ventas.API.Infrastructure.Migrations
                         .HasColumnType("text")
                         .HasColumnName("hash_cdr");
 
+                    b.Property<string>("HashCpe")
+                        .HasColumnType("text")
+                        .HasColumnName("hash_cpe");
+
+                    b.Property<long?>("IdEmpresa")
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_empresa");
+
+                    b.Property<string>("IdEstadoCpe")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("id_estado_cpe");
+
                     b.Property<long>("IdTipoNota")
                         .HasColumnType("bigint")
                         .HasColumnName("id_tipo_nota");
+
+                    b.Property<long?>("IdTipoOperacion")
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_tipo_operacion");
 
                     b.Property<long>("IdVentaReferencia")
                         .HasColumnType("bigint")
@@ -1195,6 +1268,11 @@ namespace Ventas.API.Infrastructure.Migrations
                     b.Property<long>("NumeroReferencia")
                         .HasColumnType("bigint")
                         .HasColumnName("numero_referencia");
+
+                    b.Property<string>("NumeroTicketSunat")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("numero_ticket_sunat");
 
                     b.Property<decimal>("PorcentajeIgv")
                         .HasColumnType("decimal(5,2)")
@@ -1224,6 +1302,18 @@ namespace Ventas.API.Infrastructure.Migrations
                     b.Property<decimal>("Subtotal")
                         .HasColumnType("decimal(12,2)")
                         .HasColumnName("subtotal");
+
+                    b.Property<decimal>("SubtotalExonerado")
+                        .HasColumnType("decimal(12,2)")
+                        .HasColumnName("subtotal_exonerado");
+
+                    b.Property<decimal>("SubtotalGravado")
+                        .HasColumnType("decimal(12,2)")
+                        .HasColumnName("subtotal_gravado");
+
+                    b.Property<decimal>("SubtotalInafecto")
+                        .HasColumnType("decimal(12,2)")
+                        .HasColumnName("subtotal_inafecto");
 
                     b.Property<decimal?>("TipoCambio")
                         .HasColumnType("decimal(10,4)")
@@ -1292,6 +1382,10 @@ namespace Ventas.API.Infrastructure.Migrations
                         .HasColumnType("character varying(500)")
                         .HasColumnName("descripcion");
 
+                    b.Property<decimal>("DescuentoItem")
+                        .HasColumnType("decimal(12,4)")
+                        .HasColumnName("descuento_item");
+
                     b.Property<DateTime?>("FechaActualizacion")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("fecha_modificacion");
@@ -1299,6 +1393,10 @@ namespace Ventas.API.Infrastructure.Migrations
                     b.Property<DateTime>("FechaCreacion")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("fecha_creacion");
+
+                    b.Property<long?>("IdAfectacionIgv")
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_afectacion_igv");
 
                     b.Property<long>("IdNotaDebito")
                         .HasColumnType("bigint")
@@ -1308,6 +1406,14 @@ namespace Ventas.API.Infrastructure.Migrations
                         .HasColumnType("bigint")
                         .HasColumnName("id_producto");
 
+                    b.Property<long?>("IdTributo")
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_tributo");
+
+                    b.Property<long?>("IdUnidadMedida")
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_unidad_medida");
+
                     b.Property<long?>("IdVentaDetalle")
                         .HasColumnType("bigint")
                         .HasColumnName("id_venta_detalle");
@@ -1316,9 +1422,21 @@ namespace Ventas.API.Infrastructure.Migrations
                         .HasColumnType("decimal(12,2)")
                         .HasColumnName("igv");
 
+                    b.Property<int?>("NumeroLinea")
+                        .HasColumnType("integer")
+                        .HasColumnName("numero_linea");
+
+                    b.Property<decimal>("PorcentajeImpuesto")
+                        .HasColumnType("decimal(5,2)")
+                        .HasColumnName("porcentaje_impuesto");
+
                     b.Property<decimal>("PrecioUnitario")
                         .HasColumnType("decimal(12,4)")
                         .HasColumnName("precio_unitario");
+
+                    b.Property<decimal?>("PrecioUnitarioBase")
+                        .HasColumnType("decimal(12,4)")
+                        .HasColumnName("precio_unitario_base");
 
                     b.Property<decimal>("Subtotal")
                         .HasColumnType("decimal(12,2)")
@@ -1344,6 +1462,10 @@ namespace Ventas.API.Infrastructure.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)")
                         .HasColumnName("usuario_creacion");
+
+                    b.Property<decimal?>("ValorItem")
+                        .HasColumnType("decimal(12,4)")
+                        .HasColumnName("valor_item");
 
                     b.HasKey("Id")
                         .HasName("pk_nota_debito_detalle");
@@ -1445,6 +1567,67 @@ namespace Ventas.API.Infrastructure.Migrations
                         .HasName("pk_tablas_generales_detalle");
 
                     b.ToTable("tablas_generales_detalle", "configuracion");
+                });
+
+            modelBuilder.Entity("Ventas.API.Domain.Entidades.Referencias.ImpuestoReferencia", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_impuesto");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<bool>("Activado")
+                        .HasColumnType("boolean")
+                        .HasColumnName("activado");
+
+                    b.Property<string>("CodigoSunat")
+                        .IsRequired()
+                        .HasMaxLength(4)
+                        .HasColumnType("character varying(4)")
+                        .HasColumnName("codigo_sunat");
+
+                    b.Property<bool>("EsPorcentaje")
+                        .HasColumnType("boolean")
+                        .HasColumnName("es_porcentaje");
+
+                    b.Property<DateTime?>("FechaActualizacion")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fecha_modificacion");
+
+                    b.Property<DateTime>("FechaCreacion")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fecha_creacion");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("nombre");
+
+                    b.Property<decimal>("Porcentaje")
+                        .HasColumnType("decimal(5,2)")
+                        .HasColumnName("porcentaje");
+
+                    b.Property<string>("UsuarioActualizacion")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("usuario_modificacion");
+
+                    b.Property<string>("UsuarioCreacion")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("usuario_creacion");
+
+                    b.HasKey("Id")
+                        .HasName("pk_impuestos");
+
+                    b.ToTable("impuestos", "configuracion", t =>
+                        {
+                            t.ExcludeFromMigrations();
+                        });
                 });
 
             modelBuilder.Entity("Ventas.API.Domain.Entidades.Referencias.SeriesComprobante", b =>
@@ -1569,6 +1752,10 @@ namespace Ventas.API.Infrastructure.Migrations
                         .HasColumnType("boolean")
                         .HasColumnName("activado");
 
+                    b.Property<string>("DescripcionCdr")
+                        .HasColumnType("text")
+                        .HasColumnName("descripcion_cdr");
+
                     b.Property<string>("EstadoSunat")
                         .IsRequired()
                         .HasColumnType("text")
@@ -1590,9 +1777,27 @@ namespace Ventas.API.Infrastructure.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("fecha_emision");
 
+                    b.Property<DateTime?>("FechaEnvioSunat")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fecha_envio_sunat");
+
                     b.Property<DateTime?>("FechaVencimientoPago")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("fecha_vencimiento_pago");
+
+                    b.Property<string>("FormaPago")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("forma_pago");
+
+                    b.Property<string>("HashCdr")
+                        .HasColumnType("text")
+                        .HasColumnName("hash_cdr");
+
+                    b.Property<string>("HashCpe")
+                        .HasColumnType("text")
+                        .HasColumnName("hash_cpe");
 
                     b.Property<long>("IdAlmacen")
                         .HasColumnType("bigint")
@@ -1618,6 +1823,11 @@ namespace Ventas.API.Infrastructure.Migrations
                         .HasColumnType("bigint")
                         .HasColumnName("id_estado");
 
+                    b.Property<string>("IdEstadoCpe")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("id_estado_cpe");
+
                     b.Property<long>("IdEstadoPago")
                         .HasColumnType("bigint")
                         .HasColumnName("id_estado_pago");
@@ -1625,6 +1835,10 @@ namespace Ventas.API.Infrastructure.Migrations
                     b.Property<long>("IdTipoComprobante")
                         .HasColumnType("bigint")
                         .HasColumnName("id_tipo_comprobante");
+
+                    b.Property<long?>("IdTipoOperacion")
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_tipo_operacion");
 
                     b.Property<long>("IdUsuarioVendedor")
                         .HasColumnType("bigint")
@@ -1648,9 +1862,19 @@ namespace Ventas.API.Infrastructure.Migrations
                         .HasColumnType("text")
                         .HasColumnName("numero_resumen_baja");
 
+                    b.Property<string>("NumeroTicketSunat")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("numero_ticket_sunat");
+
                     b.Property<string>("Observaciones")
                         .HasColumnType("text")
                         .HasColumnName("observaciones");
+
+                    b.Property<string>("OrdenCompraReferencia")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("orden_compra_referencia");
 
                     b.Property<decimal>("SaldoPendiente")
                         .HasColumnType("decimal(12,2)")
@@ -1682,6 +1906,14 @@ namespace Ventas.API.Infrastructure.Migrations
                         .HasColumnType("decimal(12,2)")
                         .HasColumnName("total_descuento_global");
 
+                    b.Property<decimal>("TotalDescuentoItem")
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("total_descuento_item");
+
+                    b.Property<decimal>("TotalGratuito")
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("total_gratuito");
+
                     b.Property<decimal>("TotalImpuesto")
                         .HasColumnType("decimal(12,2)")
                         .HasColumnName("total_impuesto");
@@ -1701,6 +1933,10 @@ namespace Ventas.API.Infrastructure.Migrations
                         .HasColumnType("character varying(100)")
                         .HasColumnName("usuario_creacion");
 
+                    b.Property<string>("XmlGenerado")
+                        .HasColumnType("text")
+                        .HasColumnName("xml_generado");
+
                     b.HasKey("Id")
                         .HasName("pk_ventas");
 
@@ -1711,6 +1947,71 @@ namespace Ventas.API.Infrastructure.Migrations
                         .HasDatabaseName("ix_ventas_id_cliente");
 
                     b.ToTable("ventas", "ventas");
+                });
+
+            modelBuilder.Entity("Ventas.API.Domain.Entidades.VentaCuotaPago", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_cuota");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<bool>("Activado")
+                        .HasColumnType("boolean")
+                        .HasColumnName("activado");
+
+                    b.Property<DateTime?>("FechaActualizacion")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fecha_modificacion");
+
+                    b.Property<DateTime>("FechaCreacion")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fecha_creacion");
+
+                    b.Property<DateTime?>("FechaPago")
+                        .HasColumnType("date")
+                        .HasColumnName("fecha_pago");
+
+                    b.Property<DateTime>("FechaVencimiento")
+                        .HasColumnType("date")
+                        .HasColumnName("fecha_vencimiento");
+
+                    b.Property<long>("IdVenta")
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_venta");
+
+                    b.Property<decimal>("MontoCuota")
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("monto_cuota");
+
+                    b.Property<int>("NumeroCuota")
+                        .HasColumnType("integer")
+                        .HasColumnName("numero_cuota");
+
+                    b.Property<bool>("Pagado")
+                        .HasColumnType("boolean")
+                        .HasColumnName("pagado");
+
+                    b.Property<string>("UsuarioActualizacion")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("usuario_modificacion");
+
+                    b.Property<string>("UsuarioCreacion")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("usuario_creacion");
+
+                    b.HasKey("Id")
+                        .HasName("pk_venta_cuota_pago");
+
+                    b.HasIndex("IdVenta")
+                        .HasDatabaseName("ix_venta_cuota_pago_id_venta");
+
+                    b.ToTable("venta_cuota_pago", "ventas");
                 });
 
             modelBuilder.Entity("Ventas.API.Domain.Entidades.ContactoCliente", b =>
@@ -1749,18 +2050,6 @@ namespace Ventas.API.Infrastructure.Migrations
                     b.Navigation("Cotizacion");
                 });
 
-            modelBuilder.Entity("Ventas.API.Domain.Entidades.DetalleNota", b =>
-                {
-                    b.HasOne("Ventas.API.Domain.Entidades.Nota", "Nota")
-                        .WithMany("Detalles")
-                        .HasForeignKey("IdNota")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_detalle_notas_notas_id_nota");
-
-                    b.Navigation("Nota");
-                });
-
             modelBuilder.Entity("Ventas.API.Domain.Entidades.DetalleVenta", b =>
                 {
                     b.HasOne("Ventas.API.Domain.Entidades.Venta", "Venta")
@@ -1769,6 +2058,30 @@ namespace Ventas.API.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_detalle_venta_ventas_id_venta");
+
+                    b.Navigation("Venta");
+                });
+
+            modelBuilder.Entity("Ventas.API.Domain.Entidades.LogEnvioCpe", b =>
+                {
+                    b.HasOne("Ventas.API.Domain.Entidades.NotaCredito", "NotaCredito")
+                        .WithMany()
+                        .HasForeignKey("IdNotaCredito")
+                        .HasConstraintName("fk_log_envio_cpe_nota_credito_id_nota_credito");
+
+                    b.HasOne("Ventas.API.Domain.Entidades.NotaDebito", "NotaDebito")
+                        .WithMany()
+                        .HasForeignKey("IdNotaDebito")
+                        .HasConstraintName("fk_log_envio_cpe_nota_debito_id_nota_debito");
+
+                    b.HasOne("Ventas.API.Domain.Entidades.Venta", "Venta")
+                        .WithMany()
+                        .HasForeignKey("IdVenta")
+                        .HasConstraintName("fk_log_envio_cpe_ventas_id_venta");
+
+                    b.Navigation("NotaCredito");
+
+                    b.Navigation("NotaDebito");
 
                     b.Navigation("Venta");
                 });
@@ -1790,18 +2103,6 @@ namespace Ventas.API.Infrastructure.Migrations
                     b.Navigation("Caja");
 
                     b.Navigation("PagoRelacionado");
-                });
-
-            modelBuilder.Entity("Ventas.API.Domain.Entidades.Nota", b =>
-                {
-                    b.HasOne("Ventas.API.Domain.Entidades.Venta", "Venta")
-                        .WithMany()
-                        .HasForeignKey("IdVentaReferencia")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_notas_ventas_id_venta_referencia");
-
-                    b.Navigation("Venta");
                 });
 
             modelBuilder.Entity("Ventas.API.Domain.Entidades.NotaCredito", b =>
@@ -1906,17 +2207,24 @@ namespace Ventas.API.Infrastructure.Migrations
                     b.Navigation("Cliente");
                 });
 
+            modelBuilder.Entity("Ventas.API.Domain.Entidades.VentaCuotaPago", b =>
+                {
+                    b.HasOne("Ventas.API.Domain.Entidades.Venta", "Venta")
+                        .WithMany()
+                        .HasForeignKey("IdVenta")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_venta_cuota_pago_ventas_id_venta");
+
+                    b.Navigation("Venta");
+                });
+
             modelBuilder.Entity("Ventas.API.Domain.Entidades.Cliente", b =>
                 {
                     b.Navigation("Contactos");
                 });
 
             modelBuilder.Entity("Ventas.API.Domain.Entidades.Cotizacion", b =>
-                {
-                    b.Navigation("Detalles");
-                });
-
-            modelBuilder.Entity("Ventas.API.Domain.Entidades.Nota", b =>
                 {
                     b.Navigation("Detalles");
                 });

@@ -10,6 +10,7 @@ using Nucleo.Comun.Application.Extensions;
 using Nucleo.Comun.API.Extensions;
 
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.AddCentralizedLogging();

@@ -3,8 +3,10 @@ import { createBrowserRouter, Navigate } from "react-router-dom";
 import { LayoutPrincipal } from "@/layouts/LayoutPrincipal/LayoutPrincipal";
 
 // Carga perezosa de páginas para optimizar el rendimiento
-const PaginaDashboard = lazy(
-  () => import("@/features/dashboard/paginas/PaginaDashboard"),
+const PaginaDashboard = lazy(() =>
+  import("@/features/dashboard/paginas/PaginaDashboard").then((m) => ({
+    default: m.PaginaDashboard,
+  })),
 );
 const PaginaProductos = lazy(() =>
   import("@/features/catalogo/paginas/PaginaProductos").then((m) => ({
@@ -70,7 +72,11 @@ const PaginaOperacionesSunat = lazy(() =>
 const PaginaMatrizReglas = lazy(() => import("@/features/configuracion/paginas/PaginaMatrizReglas").then((m) => ({ default: m.PaginaMatrizReglas })));
 const PaginaUbigeos = lazy(() => import("@/features/configuracion/paginas/PaginaUbigeos").then((m) => ({ default: m.PaginaUbigeos })));
 
-const PaginaPOS = lazy(() => import("@/features/ventas/paginas/PaginaPOS"));
+const PaginaPOS = lazy(() =>
+  import("@/features/ventas/paginas/PaginaPOS").then((m) => ({
+    default: m.PaginaPOS,
+  })),
+);
 const PaginaClientes = lazy(() =>
   import("@/features/clientes/paginas/PaginaClientes").then((m) => ({
     default: m.PaginaClientes,
@@ -79,25 +85,35 @@ const PaginaClientes = lazy(() =>
 const PaginaProveedores = lazy(() =>
   import("@/features/compras/proveedores/paginas/PaginaProveedores").then(
     (m) => ({
-      default: m.default,
+      default: m.PaginaProveedores,
     }),
   ),
 );
 const PaginaCompras = lazy(() =>
   import("@/features/compras/compras/paginas/PaginaCompras").then((m) => ({
-    default: m.default,
+    default: m.PaginaCompras,
   })),
 );
 const PaginaOrdenesCompra = lazy(() =>
   import("@/features/compras/ordenes-compra/paginas/PaginaOrdenCompra").then(
     (m) => ({
-      default: m.default,
+      default: m.PaginaOrdenCompra,
     }),
   ),
 );
 const PaginaVentas = lazy(() =>
   import("@/features/ventas/paginas/PaginaVentas").then((m) => ({
     default: m.PaginaVentas,
+  })),
+);
+const PaginaNotas = lazy(() =>
+  import("@/features/ventas/paginas/PaginaNotas").then((m) => ({
+    default: m.PaginaNotas,
+  })),
+);
+const PaginaCatalogosSunat = lazy(() =>
+  import("@/features/configuracion/paginas/PaginaCatalogosSunat").then((m) => ({
+    default: m.PaginaCatalogosSunat,
   })),
 );
 const PaginaCotizaciones = lazy(() =>
@@ -107,12 +123,12 @@ const PaginaCotizaciones = lazy(() =>
 );
 const PaginaUnidadesMedida = lazy(() =>
   import("@/features/catalogo/paginas/PaginaUnidadesMedida").then((m) => ({
-    default: m.default,
+    default: m.PaginaUnidadesMedida,
   })),
 );
 const PaginaListasPrecios = lazy(() =>
   import("@/features/catalogo/paginas/PaginaListasPrecios").then((m) => ({
-    default: m.default,
+    default: m.PaginaListasPrecios,
   })),
 );
 const PaginaStock = lazy(() =>
@@ -128,13 +144,13 @@ const PaginaMovimientos = lazy(() =>
 const PaginaAlmacenes = lazy(() =>
   import("@/features/inventario/almacenes/paginas/PaginaAlmacenes").then(
     (m) => ({
-      default: m.default,
+      default: m.PaginaAlmacenes,
     }),
   ),
 );
 const PaginaKardexPeriodos = lazy(() =>
   import("@/features/inventario/paginas/PaginaKardexPeriodos").then((m) => ({
-    default: m.default,
+    default: m.PaginaKardexPeriodos,
   })),
 );
 const PaginaKardexReporte = lazy(() =>
@@ -298,6 +314,14 @@ export const ruteador = createBrowserRouter(
             </Suspense>
           ),
         },
+        {
+          path: "configuracion/sunat",
+          element: (
+            <Suspense fallback={<CargandoPagina />}>
+              <PaginaCatalogosSunat />
+            </Suspense>
+          ),
+        },
 
         {
           path: "clientes",
@@ -392,6 +416,14 @@ export const ruteador = createBrowserRouter(
           element: (
             <Suspense fallback={<CargandoPagina />}>
               <PaginaCotizaciones />
+            </Suspense>
+          ),
+        },
+        {
+          path: "ventas/notas",
+          element: (
+            <Suspense fallback={<CargandoPagina />}>
+              <PaginaNotas />
             </Suspense>
           ),
         },

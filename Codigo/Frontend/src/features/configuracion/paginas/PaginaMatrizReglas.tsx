@@ -72,13 +72,13 @@ function FormularioMatriz({
   cargando: boolean;
 }) {
   const { data: operaciones } = useTiposOperacion();
-  const { data: comprobantes } = useTiposComprobante();
+  const { data: comprobantes } = useTiposComprobante({ pageNumber: 1, pageSize: 100 });
 
   const [form, setForm] = useState<MatrizReglaSunatFormData>({
     idTipoOperacion: datosIniciales?.idTipoOperacion ?? 0,
     idTipoComprobante: datosIniciales?.idTipoComprobante ?? 0,
     nivelObligatoriedad: datosIniciales?.nivelObligatoriedad ?? 0,
-    activo: datosIniciales?.activo ?? true,
+    activado: datosIniciales?.activado ?? true,
   });
 
   return (
@@ -150,11 +150,11 @@ function FormularioMatriz({
 
       <div className="flex items-center gap-3 py-2">
         <Switch
-          id="activo"
-          checked={form.activo}
-          onCheckedChange={(v) => setForm((p) => ({ ...p, activo: v }))}
+          id="activado"
+          checked={form.activado}
+          onCheckedChange={(v) => setForm((p) => ({ ...p, activado: v }))}
         />
-        <Label htmlFor="activo" className="cursor-pointer">Activo</Label>
+        <Label htmlFor="activado" className="cursor-pointer">Activo</Label>
       </div>
 
       <div className="flex justify-end gap-2 pt-4 border-t">
@@ -262,9 +262,9 @@ export function PaginaMatrizReglas() {
     },
     {
       header: "Estado",
-      accessorKey: "activo" as keyof MatrizReglaSunat,
+      accessorKey: "activado" as keyof MatrizReglaSunat,
       cell: (row: MatrizReglaSunat) =>
-        row.activo ? (
+        row.activado ? (
           <Badge variant="default" className="gap-1 bg-green-500/10 text-green-600 border-green-200 hover:bg-green-500/20 shadow-none text-[11px] h-5">
             <CheckCircle className="h-3 w-3" /> Activo
           </Badge>

@@ -96,6 +96,46 @@ namespace Ventas.API.Domain.Entidades
         [Column("saldo_pendiente", TypeName = "decimal(12,2)")]
         public decimal SaldoPendiente { get; set; } = 0;
 
+        [Column("id_tipo_operacion")]
+        public long? IdTipoOperacion { get; set; }
+
+        [Column("forma_pago")]
+        [MaxLength(20)]
+        public string FormaPago { get; set; } = "Contado";
+
+        [Column("total_descuento_item", TypeName = "decimal(18,2)")]
+        public decimal TotalDescuentoItem { get; set; } = 0;
+
+        [Column("total_gratuito", TypeName = "decimal(18,2)")]
+        public decimal TotalGratuito { get; set; } = 0;
+
+        [Column("hash_cpe")]
+        public string? HashCpe { get; set; }
+
+        [Column("hash_cdr")]
+        public string? HashCdr { get; set; }
+
+        [Column("descripcion_cdr")]
+        public string? DescripcionCdr { get; set; }
+
+        [Column("fecha_envio_sunat")]
+        public DateTime? FechaEnvioSunat { get; set; }
+
+        [Column("numero_ticket_sunat")]
+        [MaxLength(100)]
+        public string? NumeroTicketSunat { get; set; }
+
+        [Column("orden_compra_referencia")]
+        [MaxLength(50)]
+        public string? OrdenCompraReferencia { get; set; }
+
+        [Column("xml_generado")]
+        public string? XmlGenerado { get; set; }
+
+        [Column("id_estado_cpe")]
+        [MaxLength(20)]
+        public string? IdEstadoCpe { get; set; }
+
         [Column("observaciones", TypeName = "text")]
         public string? Observaciones { get; set; }
 

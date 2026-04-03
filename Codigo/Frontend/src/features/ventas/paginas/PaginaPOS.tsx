@@ -30,4 +30,4 @@ export function PaginaPOS() {
   );
 }
 
-export default PaginaPOS;
+

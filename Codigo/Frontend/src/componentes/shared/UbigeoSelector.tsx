@@ -54,10 +54,15 @@ export function UbigeoSelector({
 
   // 2. Manejar Precarga si llega un valor inicial (6 dígitos)
   useEffect(() => {
-    if (value && value.length === 6 && !selectedDist) {
+    // Si el valor llega del padre y es diferente al seleccionado internamente
+    if (value && value.length === 6 && value !== selectedDist) {
       const precargarJerarquia = async () => {
         setLoading(true);
         try {
+          // Limpiar estados previos para evitar inconsistencias visuales
+          setProvincias([]);
+          setDistritos([]);
+
           const detalle = await servicioUbigeo.getDetalle(value);
           if (detalle) {
             setSelectedDept(detalle.codigoDepartamento);
@@ -79,8 +84,15 @@ export function UbigeoSelector({
         }
       };
       precargarJerarquia();
+    } else if (!value) {
+      // Limpiar todo si el valor desde el padre es vacío
+      setSelectedDept("");
+      setSelectedProv("");
+      setSelectedDist("");
+      setProvincias([]);
+      setDistritos([]);
     }
-  }, [value]);
+  }, [value, selectedDist]);
 
   // Handler: Cambio Departamento
   const handleDeptChange = async (deptCode: string) => {

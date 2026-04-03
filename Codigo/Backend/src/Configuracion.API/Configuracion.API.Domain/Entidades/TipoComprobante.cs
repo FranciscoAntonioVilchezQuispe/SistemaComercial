@@ -30,8 +30,6 @@ namespace Configuracion.API.Domain.Entidades
         [Column("tipo_movimiento_stock")]
         public string TipoMovimientoStock { get; set; } = "DEPENDIENTE";
 
-        [Column("activado")]
-        public bool Activado { get; set; } = true;
 
         [Column("es_compra")]
         public bool EsCompra { get; set; }

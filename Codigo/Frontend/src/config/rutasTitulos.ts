@@ -10,6 +10,7 @@ export const RUTAS_TITULOS: Record<string, string> = {
   '/ventas/lista':                 'Ventas',
   '/ventas/nueva':                 'Nueva Venta',
   '/ventas/pos':                   'POS',
+  '/ventas/notas':                 'Notas SUNAT',
   '/ventas/cotizaciones':          'Cotizaciones',
   '/ventas/devoluciones':          'Devoluciones',
   '/comprobantes/facturas':        'Facturas',

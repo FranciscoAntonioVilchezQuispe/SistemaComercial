@@ -6,6 +6,8 @@ import axios, {
 } from "axios";
 import { toast } from "sonner";
 
+import { capturadorErrores } from "../compartido/utilidades/capturadorErrores";
+
 // Función factory para crear instancias con interceptores comunes
 const createApiInstance = (baseURL: string): AxiosInstance => {
   const instance = axios.create({
@@ -24,7 +26,10 @@ const createApiInstance = (baseURL: string): AxiosInstance => {
       }
       return config;
     },
-    (error) => Promise.reject(error),
+    (error) => {
+      capturadorErrores.capturar(error, 'API', { componente: 'AxiosRequest' });
+      return Promise.reject(error);
+    },
   );
 
   // Interceptor para manejar respuestas estandarizadas o errores
@@ -36,17 +41,25 @@ const createApiInstance = (baseURL: string): AxiosInstance => {
       // y ese status indica un error (distinto de 200 o 201), lanzamos error.
       if (data && typeof data.status === 'number' && ![200, 201].includes(data.status)) {
         const mensajeError = data.message || "Error en la operación";
+        
+        // Capturamos el error interno del negocio
+        capturadorErrores.capturar(mensajeError, 'API', {
+          metadata: { 
+            statusInterno: data.status,
+            url: response.config.url,
+            metodo: response.config.method
+          }
+        });
+
         toast.error(mensajeError, {
           description: `Código Interno: ${data.status}`,
         });
         
-        // Creamos un error personalizado para que sea capturado por el bloque catch/error
         const error = new Error(mensajeError);
         (error as any).response = response;
         throw error;
       }
 
-      // Devolvemos el data directamente que contiene el Wrapper ToReturn/ToReturnList
       return data;
     },
     (error) => {
@@ -57,6 +70,16 @@ const createApiInstance = (baseURL: string): AxiosInstance => {
         }
       }
 
+      // Registro sistemático del error de red
+      capturadorErrores.capturar(error, 'API', {
+        metadata: {
+          status: error.response?.status,
+          url: error.config?.url,
+          metodo: error.config?.method,
+          data: error.response?.data
+        }
+      });
+
       // Manejo de alertas automáticas
       const errorData = error.response?.data;
       let mensaje =
@@ -65,7 +88,6 @@ const createApiInstance = (baseURL: string): AxiosInstance => {
         error.message ||
         "Ocurrió un error inesperado";
 
-      // Si hay errores de validación específicos del backend (FluentValidation), mostrar el primero
       if (errorData?.errors && Array.isArray(errorData.errors) && errorData.errors.length > 0) {
           const primerError = errorData.errors[0];
           mensaje = primerError.error || primerError.message || mensaje;

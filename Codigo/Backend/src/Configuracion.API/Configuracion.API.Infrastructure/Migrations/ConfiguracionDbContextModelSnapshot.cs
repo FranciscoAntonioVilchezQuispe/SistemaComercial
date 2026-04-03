@@ -55,14 +55,14 @@ namespace Configuracion.API.Infrastructure.Migrations
                         .HasColumnName("id_tipo_comprobante");
 
                     b.Property<string>("UsuarioActualizacion")
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
                         .HasColumnName("usuario_modificacion");
 
                     b.Property<string>("UsuarioCreacion")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
                         .HasColumnName("usuario_creacion");
 
                     b.HasKey("Id")
@@ -147,14 +147,14 @@ namespace Configuracion.API.Infrastructure.Migrations
                         .HasColumnName("nombre");
 
                     b.Property<string>("UsuarioActualizacion")
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
                         .HasColumnName("usuario_modificacion");
 
                     b.Property<string>("UsuarioCreacion")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
                         .HasColumnName("usuario_creacion");
 
                     b.HasKey("Id")
@@ -237,14 +237,14 @@ namespace Configuracion.API.Infrastructure.Migrations
                         .HasColumnName("telefono");
 
                     b.Property<string>("UsuarioActualizacion")
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
                         .HasColumnName("usuario_modificacion");
 
                     b.Property<string>("UsuarioCreacion")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
                         .HasColumnName("usuario_creacion");
 
                     b.HasKey("Id")
@@ -295,14 +295,14 @@ namespace Configuracion.API.Infrastructure.Migrations
                         .HasColumnName("porcentaje");
 
                     b.Property<string>("UsuarioActualizacion")
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
                         .HasColumnName("usuario_modificacion");
 
                     b.Property<string>("UsuarioCreacion")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
                         .HasColumnName("usuario_creacion");
 
                     b.HasKey("Id")
@@ -345,14 +345,14 @@ namespace Configuracion.API.Infrastructure.Migrations
                         .HasColumnName("nivel_obligatoriedad");
 
                     b.Property<string>("UsuarioActualizacion")
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
                         .HasColumnName("usuario_modificacion");
 
                     b.Property<string>("UsuarioCreacion")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
                         .HasColumnName("usuario_creacion");
 
                     b.HasKey("Id")
@@ -409,20 +409,20 @@ namespace Configuracion.API.Infrastructure.Migrations
                         .HasColumnName("nombre");
 
                     b.Property<string>("UsuarioActualizacion")
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
                         .HasColumnName("usuario_modificacion");
 
                     b.Property<string>("UsuarioCreacion")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
                         .HasColumnName("usuario_creacion");
 
                     b.HasKey("Id")
-                        .HasName("pk_metodo_pago");
+                        .HasName("pk_metodos_pago");
 
-                    b.ToTable("metodo_pago", "configuracion");
+                    b.ToTable("metodos_pago", "configuracion");
                 });
 
             modelBuilder.Entity("Configuracion.API.Domain.Entidades.ParametroConfiguracion", b =>
@@ -463,14 +463,14 @@ namespace Configuracion.API.Infrastructure.Migrations
                         .HasColumnName("grupo");
 
                     b.Property<string>("UsuarioActualizacion")
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
                         .HasColumnName("usuario_modificacion");
 
                     b.Property<string>("UsuarioCreacion")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
                         .HasColumnName("usuario_creacion");
 
                     b.Property<string>("Valor")
@@ -524,14 +524,14 @@ namespace Configuracion.API.Infrastructure.Migrations
                         .HasColumnName("serie");
 
                     b.Property<string>("UsuarioActualizacion")
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
                         .HasColumnName("usuario_modificacion");
 
                     b.Property<string>("UsuarioCreacion")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
                         .HasColumnName("usuario_creacion");
 
                     b.HasKey("Id")
@@ -595,14 +595,14 @@ namespace Configuracion.API.Infrastructure.Migrations
                         .HasColumnName("telefono");
 
                     b.Property<string>("UsuarioActualizacion")
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
                         .HasColumnName("usuario_modificacion");
 
                     b.Property<string>("UsuarioCreacion")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
                         .HasColumnName("usuario_creacion");
 
                     b.HasKey("Id")
@@ -657,14 +657,14 @@ namespace Configuracion.API.Infrastructure.Migrations
                         .HasColumnName("nombre");
 
                     b.Property<string>("UsuarioActualizacion")
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
                         .HasColumnName("usuario_modificacion");
 
                     b.Property<string>("UsuarioCreacion")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
                         .HasColumnName("usuario_creacion");
 
                     b.HasKey("Id")
@@ -719,14 +719,14 @@ namespace Configuracion.API.Infrastructure.Migrations
                         .HasColumnName("orden");
 
                     b.Property<string>("UsuarioActualizacion")
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
                         .HasColumnName("usuario_modificacion");
 
                     b.Property<string>("UsuarioCreacion")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
                         .HasColumnName("usuario_creacion");
 
                     b.HasKey("Id")
@@ -814,14 +814,14 @@ namespace Configuracion.API.Infrastructure.Migrations
                         .HasColumnName("tipo_movimiento_stock");
 
                     b.Property<string>("UsuarioActualizacion")
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
                         .HasColumnName("usuario_modificacion");
 
                     b.Property<string>("UsuarioCreacion")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
                         .HasColumnName("usuario_creacion");
 
                     b.HasKey("Id")
@@ -864,14 +864,14 @@ namespace Configuracion.API.Infrastructure.Migrations
                         .HasColumnName("nombre");
 
                     b.Property<string>("UsuarioActualizacion")
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
                         .HasColumnName("usuario_modificacion");
 
                     b.Property<string>("UsuarioCreacion")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
                         .HasColumnName("usuario_creacion");
 
                     b.HasKey("Id")
@@ -919,14 +919,14 @@ namespace Configuracion.API.Infrastructure.Migrations
                         .HasColumnName("parent_id");
 
                     b.Property<string>("UsuarioActualizacion")
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
                         .HasColumnName("usuario_modificacion");
 
                     b.Property<string>("UsuarioCreacion")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
                         .HasColumnName("usuario_creacion");
 
                     b.HasKey("Codigo")

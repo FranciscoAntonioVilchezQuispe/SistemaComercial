@@ -2,6 +2,42 @@
   "version": "2.0.0",
   "tasks": [
     // ============================================
+    // UTILS & SHARED TASKS
+    // ============================================
+    {
+      "label": "kill-ports",
+      "type": "process",
+      "command": "powershell",
+      "args": [
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}/Codigo/Backend/scripts/kill_ports.ps1"
+      ],
+      "problemMatcher": []
+    },
+    {
+      "label": "build-backend-solution",
+      "command": "dotnet",
+      "type": "process",
+      "args": [
+        "build",
+        "${workspaceFolder}/Codigo/Backend/SistemaComercial.sln",
+        "/property:GenerateFullPaths=true",
+        "/consoleloggerparameters:NoSummary"
+      ],
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "prepare-full-stack",
+      "dependsOrder": "sequence",
+      "dependsOn": [
+        "kill-ports",
+        "build-backend-solution"
+      ],
+      "problemMatcher": []
+    },
+    // ============================================
     // BACKEND BUILD TASKS
     // ============================================
     {

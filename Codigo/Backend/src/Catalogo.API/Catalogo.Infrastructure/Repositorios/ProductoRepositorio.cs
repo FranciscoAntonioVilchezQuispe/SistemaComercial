@@ -28,27 +28,31 @@ namespace Catalogo.Infrastructure.Repositorios
             var sql = @"
                 -- Cabecera de Producto
                 SELECT p.id_producto as Id, p.codigo_producto as Codigo, p.nombre_producto as Nombre, p.descripcion,
-                       p.id_categoria, c.nombre as CategoriaNombre,
-                       p.id_marca, m.nombre as MarcaNombre,
-                       p.id_unidad_medida, um.nombre as UnidadMedidaNombre, um.sigla as UnidadMedidaSigla,
+                       p.id_categoria, c.nombre_categoria as CategoriaNombre,
+                       p.id_marca, m.nombre_marca as MarcaNombre,
+                       p.id_unidad as IdUnidadMedida, um.nombre_unidad as UnidadMedidaNombre, um.simbolo as UnidadMedidaSigla,
                        p.id_tipo_producto, p.codigo_barras, p.sku,
                        p.precio_compra, p.precio_venta_publico, p.precio_venta_mayorista, p.precio_venta_distribuidor,
                        p.stock_minimo, p.stock_maximo, p.tiene_variantes, p.permite_inventario_negativo,
                        p.metodo_valuacion, p.gravado_impuesto, p.porcentaje_impuesto, p.imagen_principal_url,
-                       p.activado as Activo, p.fecha_creacion, p.fecha_actualizacion as FechaModificacion
+                       p.activado as Activo, p.fecha_creacion, p.fecha_modificacion as FechaModificacion
                 FROM catalogo.productos p
                 INNER JOIN catalogo.categorias c ON c.id_categoria = p.id_categoria
                 INNER JOIN catalogo.marcas m ON m.id_marca = p.id_marca
-                INNER JOIN catalogo.unidades_medida um ON um.id_unidad_medida = p.id_unidad_medida
+                INNER JOIN catalogo.unidades_medida um ON um.id_unidad = p.id_unidad
                 WHERE p.id_producto = @id;
 
                 -- Imágenes
-                SELECT id_imagen as Id, url_imagen as Url, es_principal
+                SELECT id_imagen as Id, url_imagen as UrlImagen, es_principal as EsPrincipal, orden
                 FROM catalogo.imagenes_producto
                 WHERE id_producto = @id;
 
                 -- Variantes
-                SELECT id_variante as Id, codigo_variante as Codigo, nombre_variante as Nombre, stock_actual, precio_vendedor
+                SELECT id_variante as Id, sku_variante as SkuVariante, 
+                       codigo_barras_variante as CodigoBarrasVariante, 
+                       nombre_completo_variante as NombreCompletoVariante, 
+                       atributos_json as AtributosJson, 
+                       precio_adicional as PrecioAdicional
                 FROM catalogo.variantes_producto
                 WHERE id_producto = @id;";
 
@@ -102,13 +106,13 @@ namespace Catalogo.Infrastructure.Repositorios
             var offset = (pagina - 1) * elementosPorPagina;
             var sql = @"
                 SELECT p.id_producto as Id, p.codigo_producto as Codigo, p.nombre_producto as Nombre,
-                       c.nombre as CategoriaNombre, m.nombre as MarcaNombre, um.sigla as UnidadMedidaSigla,
+                       c.nombre_categoria as CategoriaNombre, m.nombre_marca as MarcaNombre, um.simbolo as UnidadMedidaSigla,
                        p.precio_venta_publico as PrecioVenta, p.imagen_principal_url, p.activado as Activo,
                        COUNT(*) OVER() AS TotalRegistros
                 FROM catalogo.productos p
                 INNER JOIN catalogo.categorias c ON c.id_categoria = p.id_categoria
                 INNER JOIN catalogo.marcas m ON m.id_marca = p.id_marca
-                INNER JOIN catalogo.unidades_medida um ON um.id_unidad_medida = p.id_unidad_medida
+                INNER JOIN catalogo.unidades_medida um ON um.id_unidad = p.id_unidad
                 WHERE (@busqueda IS NULL OR 
                        p.nombre_producto ILIKE '%' || @busqueda || '%' OR 
                        p.codigo_producto ILIKE '%' || @busqueda || '%' OR

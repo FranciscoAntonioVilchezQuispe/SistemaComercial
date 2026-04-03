@@ -56,7 +56,7 @@ namespace Ventas.API.Infrastructure.Repositorios
                 SELECT p.id_pago as Id, p.fecha_pago, p.monto_pago, p.id_metodo_pago,
                        mp.nombre AS MetodoPagoNombre
                 FROM ventas.pagos p
-                LEFT JOIN ventas.metodos_pago mp  ON mp.id_metodo_pago = p.id_metodo_pago
+                LEFT JOIN configuracion.metodos_pago mp  ON mp.id_metodo_pago = p.id_metodo_pago
                 WHERE p.id_venta = @id;";
 
             using var multi = await connection.QueryMultipleAsync(sql, new { id });

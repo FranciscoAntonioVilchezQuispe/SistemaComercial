@@ -46,7 +46,7 @@ import { usePagination } from "@/hooks/usePagination";
 import { ModuleTabBar } from "@/componentes/shared/ModuleTabBar";
 import { RUTAS_TITULOS } from "@/config/rutasTitulos";
 
-export default function PaginaOrdenCompra() {
+export function PaginaOrdenCompra() {
   const navigate = useNavigate();
   const [dialogoOpen, setDialogoOpen] = useState(false);
   const [ordenSeleccionada, setOrdenSeleccionada] =

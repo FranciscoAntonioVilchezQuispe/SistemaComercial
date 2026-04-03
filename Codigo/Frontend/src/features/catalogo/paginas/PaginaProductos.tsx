@@ -223,4 +223,4 @@ export function PaginaProductos() {
   );
 }
 
-export default PaginaProductos;
+

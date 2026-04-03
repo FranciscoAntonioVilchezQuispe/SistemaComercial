@@ -11,6 +11,7 @@ using Configuracion.API.Infrastructure.Servicios; // Added for IReglasDocumentoS
 
 var builder = WebApplication.CreateBuilder(args);
 builder.AddCentralizedLogging();
+Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
 
 // Configuración de DbContext
 builder.Services.AddDbContext<ConfiguracionDbContext>(options =>

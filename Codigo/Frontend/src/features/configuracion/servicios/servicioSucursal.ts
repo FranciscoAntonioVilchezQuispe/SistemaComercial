@@ -7,7 +7,7 @@ const BASE_URL = "/sucursales";
 export const servicioSucursal = {
   obtenerTodas: async (params?: PagedRequest): Promise<PagedResponse<Sucursal>> => {
     const response: any = await apiConfiguracion.get(BASE_URL, { params });
-    return response.datos || response.data || response;
+    return response as PagedResponse<Sucursal>;
   },
 
   obtenerPorId: async (id: number): Promise<Sucursal> => {

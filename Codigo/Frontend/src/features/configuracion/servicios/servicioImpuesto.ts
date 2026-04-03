@@ -7,7 +7,7 @@ const BASE_URL = "/impuestos";
 export const servicioImpuesto = {
   obtenerTodos: async (params?: PagedRequest): Promise<PagedResponse<Impuesto>> => {
     const response: any = await apiConfiguracion.get(BASE_URL, { params });
-    return response.datos || response.data || response;
+    return response as PagedResponse<Impuesto>;
   },
 
   obtenerPorId: async (id: number): Promise<Impuesto> => {

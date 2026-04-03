@@ -37,8 +37,8 @@ namespace Compras.API.Infrastructure.Repositorios
                        c.base_exonerada, c.base_inafecta, c.impuesto, c.total, c.saldo_pendiente,
                        c.id_estado_pago, c.observaciones
                 FROM compras.compras c
-                INNER JOIN clientes.proveedores p ON p.id_proveedor = c.id_proveedor
-                INNER JOIN configuracion.tipo_documento td ON td.id_tipo_documento = p.id_tipo_documento
+                INNER JOIN compras.proveedores p ON p.id_proveedor = c.id_proveedor
+                INNER JOIN configuracion.tipo_documento td ON td.id_regla = p.id_tipo_documento
                 INNER JOIN inventario.almacenes alm ON alm.id_almacen = c.id_almacen
                 INNER JOIN configuracion.tipo_comprobante tc ON tc.id_tipo_comprobante = c.id_tipo_comprobante
                 WHERE c.id_compra = @id;
@@ -100,10 +100,10 @@ namespace Compras.API.Infrastructure.Repositorios
                 SELECT c.id_compra as Id, c.serie_comprobante, c.numero_comprobante, c.fecha_emision,
                        p.razon_social as RazonSocialProveedor, p.numero_documento as NumeroDocumentoProveedor,
                        tc.nombre as NombreTipoComprobante, c.moneda, c.total, c.saldo_pendiente,
-                       alm.nombre_almacen as NombreAlmacen,
+                       c.estado_sunat as EstadoNombre, alm.nombre_almacen as NombreAlmacen,
                        COUNT(*) OVER() AS TotalRegistros
                 FROM compras.compras c
-                INNER JOIN clientes.proveedores p ON p.id_proveedor = c.id_proveedor
+                INNER JOIN compras.proveedores p ON p.id_proveedor = c.id_proveedor
                 INNER JOIN configuracion.tipo_comprobante tc ON tc.id_tipo_comprobante = c.id_tipo_comprobante
                 INNER JOIN inventario.almacenes alm ON alm.id_almacen = c.id_almacen
                 WHERE (@busqueda IS NULL OR 

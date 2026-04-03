@@ -79,4 +79,29 @@ export const servicioVentas = {
     const response: any = await apiVentas.post("/notas/debito", datos);
     return response.datos || response.data;
   },
+
+  obtenerMotivosCredito: async (): Promise<any[]> => {
+    const response: any = await apiVentas.get("/notas/catalogos/motivos-credito");
+    return response.datos || response.data || [];
+  },
+
+  obtenerMotivosDebito: async (): Promise<any[]> => {
+    const response: any = await apiVentas.get("/notas/catalogos/motivos-debito");
+    return response.datos || response.data || [];
+  },
+
+  obtenerEstadosCpe: async (): Promise<any[]> => {
+    const response: any = await apiVentas.get("/notas/catalogos/estado-cpe");
+    return response.datos || response.data || [];
+  },
+
+  obtenerNotasCredito: async (params?: PagedRequest): Promise<PagedResponse<any>> => {
+    const response: any = await apiVentas.get("/notas/credito", { params });
+    return response.datos ? response : (response.data || response);
+  },
+
+  obtenerNotasDebito: async (params?: PagedRequest): Promise<PagedResponse<any>> => {
+    const response: any = await apiVentas.get("/notas/debito", { params });
+    return response.datos ? response : (response.data || response);
+  },
 };

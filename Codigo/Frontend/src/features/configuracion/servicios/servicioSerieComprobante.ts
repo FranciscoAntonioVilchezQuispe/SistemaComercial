@@ -10,7 +10,7 @@ const BASE_URL = "/series";
 export const servicioSerieComprobante = {
   obtenerTodas: async (params?: PagedRequest): Promise<PagedResponse<SerieComprobante>> => {
     const response: any = await apiConfiguracion.get(BASE_URL, { params });
-    return response.datos || response.data || response;
+    return response as PagedResponse<SerieComprobante>;
   },
 
   obtenerPorTipo: async (idTipo: number): Promise<SerieComprobante[]> => {

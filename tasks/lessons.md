@@ -39,7 +39,10 @@
 - **Magic Numbers**: El uso de IDs hardcodeados (ej: `IdEstadoPago = 40`) es extremadamente frágil. En este proyecto, los IDs del backend no coincidían con los de la semilla de la BD (donde `Pendiente` era 49). 
 - **Solución**: Centralizar todos los estados en Enums dentro de `Nucleo.Comun.Domain` para garantizar una única fuente de verdad tipada.
 - **Esquemas de Detalle**: Las tablas de detalle (ej: `detalle_venta`) deben incluir siempre columnas de auditoría (`activado`, `fecha_creacion`) si la entidad hereda de `EntidadBase`. De lo contrario, EF Core fallará al intentar mapear o insertar estos campos obligatorios.
-- **Normalización UTC**: En PostgreSQL con Npgsql, el error `DateTimeKind.Unspecified` es persistente. La mejor práctica es interceptar `SaveChangesAsync` y recorrer recursivamente todas las propiedades `DateTime` de todas las entidades rastreadas para forzar `DateTimeKind.Utc`.
+
+## [2026-03-28] Normalización UTC — ValueConverters vs SaveChangesAsync
+- **Patrón anterior**: Interceptar `SaveChangesAsync` y recorrer recursivamente todas las propiedades `DateTime` era funcional pero frágil.
+- **Patrón definitivo**: Usar `ConfigureConventions` con `ValueConverter<DateTime, DateTime>` para normalizar automáticamente DateTimeKind.Utc en **todos** los DbContexts. Es global, no invasivo y no requiere lógica manual por entidad.
 
 ## [2026-03-29] Estabilización Global de Esquema
 - **Desafío**: Múltiples tablas en esquemas `ventas`, `catalogo`, `inventario` y `contabilidad` fueron creadas manualmente sin las columnas de auditoría (`fecha_modificacion`, `usuario_modificacion`). Esto causaba errores de persistencia en el backend debido al contrato de `EntidadBase`.
@@ -51,3 +54,35 @@
 - **DataTable & Tipado**: Exportar la interfaz `DataTableColumn<T>` desde el componente base permite un tipado estricto en el consumidor. Sin esto, TypeScript infiere `accessorKey` como `string` genérico, rompiendo la seguridad de tipos de la tabla.
 - **Sincronización de Enums**: Los IDs de los enums en el Frontend (ej. `EstadoVenta.Completada = 29`) DEBEN ser copias exactas de los Enums del Backend (Domain). Usar IDs genéricos (1, 2, 3) es una trampa de mantenimiento que causa que los colores de los Badges o la lógica de negocio fallen de forma silenciosa.
 - **Propiedades de API**: Al refactorizar interfaces de API (ej. `Venta`), se debe realizar un barrido completo de componentes auxiliares (`Modales`, `Buscadores`) para actualizar los nombres de propiedades (`fecha` -> `fechaEmision`). Ignorar esto deja el sistema en un estado de "error en cascada".
+
+## [2026-03-30] Consolidación de Tablas entre Esquemas
+- **Problema**: La tabla `metodos_pago` existía duplicada en los esquemas `ventas` y `configuracion`, con estructuras y datos divergentes.
+- **Lección**: Las entidades de catálogo compartido (métodos de pago, tipos de documento, monedas) deben vivir EXCLUSIVAMENTE en el esquema `configuracion`. Los microservicios consumidores (Ventas, Compras) las referencian con `ExcludeFromMigrations()` en su DbContext.
+- **Patrón de migración**: Al consolidar una tabla entre esquemas, el flujo correcto es:
+  1. Crear la tabla destino (migración EF Core o `CREATE TABLE`).
+  2. Insertar datos semilla en la nueva tabla.
+  3. Actualizar FKs existentes en tablas dependientes (mapear IDs por código, no por valor numérico).
+  4. Eliminar la tabla legacy con `DROP TABLE ... CASCADE`.
+- **Error común con EF Core**: Si la tabla original nunca existió físicamente en el esquema esperado, `RenameTable` falla con `42P01`. En esos casos, sustituir manualmente por `CreateTable` en el archivo `.cs` de la migración.
+- **Prevención**: Antes de crear una tabla nueva, SIEMPRE verificar que no exista una equivalente en otro esquema. El principio es: **una tabla, un esquema, una fuente de verdad**.
+
+## [2026-03-30] Auditoría UBL 2.1 — Hallazgos en Notas de Crédito/Débito
+- **Cálculos en frontend**: El handler `CrearNotaCreditoManejador.cs` acepta `subtotal`, `igv` y `total` directamente del DTO del frontend sin recalcular ni validar. Esto viola la regla de GEMINI.md de "cálculos en backend, nunca en frontend". Se detectó además un **bug**: `subtotal` y `total` usan el mismo campo (`d.totalItem`), resultando en valores idénticos.
+- **Numeración insegura**: NC/ND aceptan `numero` del DTO frontend (`Numero = dto.Numero`) sin correlativo automático. Difiere del patrón correcto de `ventas.ventas` que usa `ObtenerSiguienteCorrelativoAsync`.
+- **Datos del cliente no validados**: El handler copia `ClienteTipoDoc/NroDoc/RazonSocial` del DTO del frontend en vez de la venta referenciada. Esto permite datos manipulados.
+- **FK sin constraint**: `id_tipo_nota` en ambas tablas NC/ND es un `bigint NOT NULL` sin `REFERENCES` declarado en el DDL. No hay integridad referencial.
+- **Sin efecto en venta**: Al crear una NC de anulación total (tipo 01/06), el handler NO actualiza `id_estado`, `fecha_anulacion` ni `saldo_pendiente` de la venta referenciada.
+- **IGV hardcodeado**: Valor `18.00m` como default en entidades `NotaCredito.cs:L77` y `NotaDebito.cs:L77`.
+- **Motivos parciales en frontend**: `ModalCrearNotaSunat.tsx` solo muestra 3/13 motivos NC y 2/6 ND, aunque el enum tiene todos los valores definidos.
+- **Lección general**: Al auditar un módulo para cumplimiento normativo, revisar **handlers + entidades + DDL + frontend** como un todo integral. Los problemas no se limitan a una capa.
+
+## [2026-03-30] Investigación de Catálogos SUNAT — Reutilización vs Creación
+- **Hallazgo**: Antes de crear tablas nuevas para catálogos SUNAT, siempre verificar las existentes. En este proyecto:
+  - `configuracion.tipo_afectacion_igv` ya cubre Cat.07 (21 registros completos).
+  - `configuracion.tipo_operacion_sunat` ya cubre Cat.51 (21 registros).
+  - `catalogo.unidades_medida` ya cubre Cat.03 (10 registros, faltan 4 menores).
+  - `configuracion.impuestos` ya cubre Cat.05 parcialmente (falta 9995 y 9999).
+  - `configuracion.motivo_nota_credito` ya cubre Cat.09 (13 registros completos).
+  - `configuracion.motivo_nota_debito` ya cubre Cat.10 (6 registros completos).
+- **Principio**: Solo crear tablas en el schema `sunat` para entidades genuinamente nuevas (no cubiertas): `cat_estado_cpe`, `log_envio_cpe`.
+- **Consistencia de nombres**: Cuando una columna existe en múltiples tablas con nombres distintos (`codigo_hash_cdr` vs `hash_cdr`), estandarizar al nombre más corto y claro (`hash_cdr`) en todas las tablas.

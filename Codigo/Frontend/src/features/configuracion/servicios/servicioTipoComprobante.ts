@@ -10,7 +10,7 @@ const BASE_URL = "/tipos-comprobante";
 export const servicioTipoComprobante = {
   obtenerTodos: async (params?: PagedRequest & { modulo?: string }): Promise<PagedResponse<TipoComprobante>> => {
     const response: any = await apiConfiguracion.get(BASE_URL, { params });
-    return response.datos || response.data || response;
+    return response as PagedResponse<TipoComprobante>;
   },
 
   crear: async (datos: TipoComprobanteFormData): Promise<TipoComprobante> => {
