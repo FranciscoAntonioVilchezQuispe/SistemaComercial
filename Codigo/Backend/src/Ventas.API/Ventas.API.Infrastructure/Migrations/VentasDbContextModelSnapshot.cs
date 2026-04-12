@@ -910,6 +910,10 @@ namespace Ventas.API.Infrastructure.Migrations
                         .HasColumnType("bigint")
                         .HasColumnName("id_empresa");
 
+                    b.Property<long>("IdEstado")
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_estado");
+
                     b.Property<string>("IdEstadoCpe")
                         .HasMaxLength(20)
                         .HasColumnType("character varying(20)")
@@ -1228,6 +1232,10 @@ namespace Ventas.API.Infrastructure.Migrations
                     b.Property<long?>("IdEmpresa")
                         .HasColumnType("bigint")
                         .HasColumnName("id_empresa");
+
+                    b.Property<long>("IdEstado")
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_estado");
 
                     b.Property<string>("IdEstadoCpe")
                         .HasMaxLength(20)
@@ -1832,6 +1840,14 @@ namespace Ventas.API.Infrastructure.Migrations
                         .HasColumnType("bigint")
                         .HasColumnName("id_estado_pago");
 
+                    b.Property<long?>("IdNotaCredito")
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_nota_credito");
+
+                    b.Property<long?>("IdNotaDebito")
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_nota_debito");
+
                     b.Property<long>("IdTipoComprobante")
                         .HasColumnType("bigint")
                         .HasColumnName("id_tipo_comprobante");
@@ -1897,6 +1913,10 @@ namespace Ventas.API.Infrastructure.Migrations
                     b.Property<decimal>("SubtotalInafecto")
                         .HasColumnType("decimal(12,2)")
                         .HasColumnName("subtotal_inafecto");
+
+                    b.Property<string>("TipoAnulacion")
+                        .HasColumnType("text")
+                        .HasColumnName("tipo_anulacion");
 
                     b.Property<decimal>("TipoCambio")
                         .HasColumnType("decimal(10,4)")

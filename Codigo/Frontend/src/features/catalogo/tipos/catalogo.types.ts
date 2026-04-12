@@ -11,6 +11,7 @@ export interface ProductoResumen {
   id: number;
   codigo: string;
   nombre: string;
+  descripcion?: string;
   categoriaNombre?: string;
   marcaNombre?: string;
   unidadMedidaNombre?: string;
@@ -18,6 +19,21 @@ export interface ProductoResumen {
   stock: number;
   activo: boolean;
   imagenPrincipalUrl?: string;
+  codigoBarras?: string;
+  permiteInventarioNegativo: boolean;
+  gravadoImpuesto: boolean;
+  porcentajeImpuesto: number;
+  idCategoria: number;
+  idMarca: number;
+  idUnidadMedida: number;
+  idTipoProducto?: number;
+  precioCompra: number;
+  stockMinimo: number;
+  tieneVariantes: boolean;
+  metodoValuacion: string;
+  categoria?: Categoria;
+  marca?: Marca;
+  unidadMedida?: UnidadMedida;
 }
 
 /** Interface completa para la ficha técnica del producto */

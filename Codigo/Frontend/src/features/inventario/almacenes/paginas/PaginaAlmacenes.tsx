@@ -218,7 +218,10 @@ export function PaginaAlmacenes() {
                       toast.success("Almacén eliminado correctamente");
                       setEliminarId(null);
                     },
-                    onError: () => toast.error("Error al eliminar el almacén"),
+                    onError: (error) => {
+                      console.error("Error al eliminar el almacén:", error);
+                      setEliminarId(null);
+                    },
                   });
                 }
               }}

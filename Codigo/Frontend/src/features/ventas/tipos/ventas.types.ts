@@ -17,16 +17,30 @@ export interface VentaResumen {
   id: number;
   serie: string;
   numero: number;
+  numeroFormateado: string;
   fechaEmision: string;
+  idCliente: number;
+  nombreCliente: string;
   clienteRazonSocial: string;
   clienteNumeroDocumento: string;
+  idTipoComprobante: number;
+  tipoComprobante: string;
   tipoComprobanteNombre: string;
-  estadoNombre: string;
-  estadoPagoNombre: string;
-  totalVenta: number;
-  // IDs para lógica visual (colores en el grid)
   idEstado: number;
+  estado: string;
+  estadoNombre: string;
   idEstadoPago: number;
+  estadoPago: string;
+  estadoPagoNombre: string;
+  subtotalGravado: number;
+  totalImpuesto: number;
+  totalDescuentoGlobal: number;
+  totalVenta: number;
+  moneda: string;
+  tipoCambio: number;
+  observaciones?: string;
+  detalles?: DetalleVenta[];
+  fechaCreacion?: string;
 }
 
 /** Interface completa para el detalle de una venta (Vista Previa / Edición) */
@@ -63,6 +77,7 @@ export interface VentaDetalle {
   observaciones?: string;
   detalles: DetalleVenta[];
   pagos?: PagoDetalle[];
+  fechaCreacion?: string;
 }
 
 /** Tipo legado para compatibilidad durante la transición */
@@ -80,12 +95,15 @@ export interface DetalleVenta {
   id: number;
   idProducto: number;
   idVariante?: number;
+  producto?: Producto;
   descripcionProducto: string;
   cantidad: number;
   precioUnitario: number;
   precioListaOriginal?: number;
   porcentajeImpuesto: number;
   impuestoItem: number;
+  subtotal: number;
+  descuento: number;
   totalItem: number;
 }
 

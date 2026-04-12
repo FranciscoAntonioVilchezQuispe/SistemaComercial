@@ -77,9 +77,7 @@ export const useRegistrarMovimiento = (): UseMutationResult<
       toast.success("Movimiento registrado correctamente");
     },
     onError: (error: any) => {
-      toast.error(
-        error.response?.data?.mensaje || "Error al registrar el movimiento",
-      );
+      console.error("Error al registrar el movimiento:", error);
     },
   });
 };
@@ -99,9 +97,7 @@ export const useAjustarStock = (): UseMutationResult<
       toast.success("Ajuste de stock realizado correctamente");
     },
     onError: (error: any) => {
-      toast.error(
-        error.response?.data?.mensaje || "Error al realizar el ajuste",
-      );
+      console.error("Error al realizar el ajuste:", error);
     },
   });
 };

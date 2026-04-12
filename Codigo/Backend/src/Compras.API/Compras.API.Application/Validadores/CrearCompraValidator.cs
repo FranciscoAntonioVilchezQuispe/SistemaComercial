@@ -4,6 +4,8 @@ using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using System.Threading;
 using System.Threading.Tasks;
+using Nucleo.Comun.Domain.Enums;
+using System.Linq;
 
 namespace Compras.API.Application.Validadores
 {
@@ -47,7 +49,10 @@ namespace Compras.API.Application.Validadores
                             && c.IdTipoComprobante == compraDto.IdTipoComprobante
                             && c.SerieComprobante == compraDto.SerieComprobante
                             && c.NumeroComprobante == compraDto.NumeroComprobante
-                            && c.Activado, cancellationToken);
+                             && c.Activado
+                             && c.IdEstado != (long)EstadoDocumento.AnuladoDirecto
+                             && c.IdEstado != (long)EstadoDocumento.AnuladoNotaCredito
+                             && c.IdEstado != (long)EstadoDocumento.AnuladoNotaDebito, cancellationToken);
 
             return !existe;
         }

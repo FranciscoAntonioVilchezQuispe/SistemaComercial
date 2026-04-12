@@ -14,6 +14,19 @@ namespace Inventario.API.Application.Interfaces
         DbSet<Inventario.API.Domain.Entidades.Integracion.SyncTipoOperacionSunat> SyncTiposOperacionSunat { get; set; }
         DbSet<Inventario.API.Domain.Entidades.Integracion.SyncTipoComprobante> SyncTiposComprobante { get; set; }
         DbSet<Inventario.API.Domain.Entidades.Integracion.SyncMatrizReglaSunat> SyncMatrizReglasSunat { get; set; }
+        
+        // Notas de Compras
+        DbSet<Inventario.API.Domain.Entidades.Integracion.SyncNotaCreditoCompra> SyncNotaCreditoCompras { get; set; }
+        DbSet<Inventario.API.Domain.Entidades.Integracion.SyncDetalleNotaCreditoCompra> SyncDetalleNotaCreditoCompras { get; set; }
+        DbSet<Inventario.API.Domain.Entidades.Integracion.SyncNotaDebitoCompra> SyncNotaDebitoCompras { get; set; }
+        DbSet<Inventario.API.Domain.Entidades.Integracion.SyncDetalleNotaDebitoCompra> SyncDetalleNotaDebitoCompras { get; set; }
+
+        // Notas de Ventas
+        DbSet<Inventario.API.Domain.Entidades.Integracion.SyncNotaCreditoVenta> SyncNotaCreditoVentas { get; set; }
+        DbSet<Inventario.API.Domain.Entidades.Integracion.SyncDetalleNotaCreditoVenta> SyncDetalleNotaCreditoVentas { get; set; }
+        DbSet<Inventario.API.Domain.Entidades.Integracion.SyncNotaDebitoVenta> SyncNotaDebitoVentas { get; set; }
+        DbSet<Inventario.API.Domain.Entidades.Integracion.SyncDetalleNotaDebitoVenta> SyncDetalleNotaDebitoVentas { get; set; }
+
         DbSet<Inventario.API.Domain.Entidades.Stock> Stocks { get; set; }
         DbSet<Inventario.API.Domain.Entidades.Referencias.TipoMovimientoReferencia> TiposMovimiento { get; set; }
         DbSet<Inventario.API.Domain.Entidades.Kardex.KardexMovimiento> KardexMovimientos { get; set; }

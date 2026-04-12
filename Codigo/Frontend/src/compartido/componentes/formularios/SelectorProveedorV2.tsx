@@ -124,8 +124,7 @@ export const SelectorProveedorV2: React.FC<SelectorProveedorProps> = ({
         toast.success("Proveedor registrado y seleccionado");
       }
     } catch (error: any) {
-      console.error(error);
-      toast.error("Error al registrar proveedor rápido");
+      console.error("Error al registrar proveedor rápido:", error);
     }
   };
 

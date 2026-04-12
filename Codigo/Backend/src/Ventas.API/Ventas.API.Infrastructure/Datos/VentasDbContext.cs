@@ -33,6 +33,8 @@ namespace Ventas.API.Infrastructure.Datos
         public DbSet<LogEnvioCpe> LogsEnvioCpe { get; set; } = null!;
         public DbSet<EstadoCpe> EstadosCpe { get; set; } = null!;
         public DbSet<VentaCuotaPago> CuotasPago { get; set; } = null!;
+        public DbSet<Ventas.API.Domain.Entidades.Referencias.ReglaDocumentoReferencia> ReglasDocumentoRef { get; set; } = null!;
+        public DbSet<Ventas.API.Domain.Entidades.Referencias.TipoDocumentoReferencia> TiposDocumentoRef { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -45,6 +47,8 @@ namespace Ventas.API.Infrastructure.Datos
             modelBuilder.Entity<MetodoPago>().ToTable("metodos_pago", "configuracion", t => t.ExcludeFromMigrations());
             modelBuilder.Entity<Ventas.API.Domain.Entidades.Referencias.TipoComprobanteReferencia>().ToTable("tipo_comprobante", "configuracion", t => t.ExcludeFromMigrations());
             modelBuilder.Entity<Ventas.API.Domain.Entidades.Referencias.ImpuestoReferencia>().ToTable("impuestos", "configuracion", t => t.ExcludeFromMigrations());
+            modelBuilder.Entity<Ventas.API.Domain.Entidades.Referencias.ReglaDocumentoReferencia>().ToTable("regla_documento_comprobante", "configuracion", t => t.ExcludeFromMigrations());
+            modelBuilder.Entity<Ventas.API.Domain.Entidades.Referencias.TipoDocumentoReferencia>().ToTable("tipo_documento", "configuracion", t => t.ExcludeFromMigrations());
             
             // Tablas SUNAT
             modelBuilder.Entity<EstadoCpe>().ToTable("cat_estado_cpe", "sunat", t => t.ExcludeFromMigrations());

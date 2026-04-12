@@ -53,8 +53,8 @@ export function PaginaClientes() {
         toast.success("Cliente eliminado correctamente");
         setEliminarId(null);
       },
-      onError: () => {
-        toast.error("Error al eliminar el cliente");
+      onError: (error) => {
+        console.error("Error al eliminar el cliente:", error);
         setEliminarId(null);
       },
     });
@@ -161,6 +161,7 @@ export function PaginaClientes() {
           onPageSizeChange={cambiarPageSize}
           onSearchChange={cambiarBusqueda}
           onActiveFilterChange={cambiarFiltroActivo}
+          searchValue={paginacion.search}
           isLoading={isLoading}
           searchPlaceholder="Buscar por nombre o documento..."
         />

@@ -1,3 +1,4 @@
+import { useState, useEffect, useCallback, useRef } from "react";
 import {
   Table,
   TableBody,
@@ -39,6 +40,7 @@ interface DataTableProps<T> {
   onPageSizeChange?: (pageSize: number) => void;
   onSearchChange?: (search: string) => void;
   onActiveFilterChange?: (active: boolean | null) => void;
+  searchValue?: string; // Propiedad para sincronizar el término de búsqueda actual
   searchPlaceholder?: string;
   isLoading?: boolean;
   actionElement?: React.ReactNode;
@@ -52,10 +54,52 @@ export function DataTable<T extends { id: number | string }>({
   onPageSizeChange,
   onSearchChange,
   onActiveFilterChange,
+  searchValue = "",
   searchPlaceholder = "Buscar...",
   isLoading = false,
   actionElement,
 }: DataTableProps<T>) {
+  const [valorBusqueda, setValorBusqueda] = useState(searchValue);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Sincronizar con el estado externo si cambia (ej. reset de filtros desde el padre)
+  useEffect(() => {
+    if (searchValue !== valorBusqueda) {
+      setValorBusqueda(searchValue);
+    }
+  }, [searchValue]);
+
+  // Limpieza del temporizador al desmontar
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
+  }, []);
+
+  const dispararBusqueda = useCallback((valor: string) => {
+    if (timerRef.current) clearTimeout(timerRef.current);
+    onSearchChange?.(valor);
+  }, [onSearchChange]);
+
+  const manejarCambioInput = (valor: string) => {
+    setValorBusqueda(valor);
+    
+    if (timerRef.current) clearTimeout(timerRef.current);
+
+    // Regla estricta: buscar si es vacío (reset) o si tiene >= 3 caracteres
+    if (valor.length === 0 || valor.length >= 3) {
+      timerRef.current = setTimeout(() => {
+        dispararBusqueda(valor);
+      }, 500); // Debounce de 500ms
+    }
+  };
+
+  const manejarKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      dispararBusqueda(valorBusqueda);
+    }
+  };
+
   return (
     <div className="space-y-4">
       {/* Toolbar */}
@@ -64,7 +108,9 @@ export function DataTable<T extends { id: number | string }>({
           <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder={searchPlaceholder}
-            onChange={(e) => onSearchChange?.(e.target.value)}
+            value={valorBusqueda}
+            onChange={(e) => manejarCambioInput(e.target.value)}
+            onKeyDown={manejarKeyDown}
             className="pl-8"
           />
         </div>

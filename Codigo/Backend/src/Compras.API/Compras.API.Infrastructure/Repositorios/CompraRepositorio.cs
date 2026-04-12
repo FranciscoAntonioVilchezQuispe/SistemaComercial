@@ -35,12 +35,13 @@ namespace Compras.API.Infrastructure.Repositorios
                        c.serie_comprobante, c.numero_comprobante, c.fecha_emision, c.fecha_contable,
                        c.fecha_vencimiento, c.moneda, c.tipo_cambio, c.subtotal, c.base_gravada,
                        c.base_exonerada, c.base_inafecta, c.impuesto, c.total, c.saldo_pendiente,
-                       c.id_estado_pago, c.observaciones
+                       c.id_estado_pago, c.id_estado as IdEstado, tgd.nombre as EstadoNombre, c.observaciones
                 FROM compras.compras c
                 INNER JOIN compras.proveedores p ON p.id_proveedor = c.id_proveedor
                 INNER JOIN configuracion.tipo_documento td ON td.id_regla = p.id_tipo_documento
                 INNER JOIN inventario.almacenes alm ON alm.id_almacen = c.id_almacen
                 INNER JOIN configuracion.tipo_comprobante tc ON tc.id_tipo_comprobante = c.id_tipo_comprobante
+                LEFT JOIN configuracion.tablas_generales_detalle tgd ON tgd.id_tabla = 15 AND tgd.id_detalle = c.id_estado
                 WHERE c.id_compra = @id;
 
                 -- Detalles
@@ -100,12 +101,13 @@ namespace Compras.API.Infrastructure.Repositorios
                 SELECT c.id_compra as Id, c.serie_comprobante, c.numero_comprobante, c.fecha_emision,
                        p.razon_social as RazonSocialProveedor, p.numero_documento as NumeroDocumentoProveedor,
                        tc.nombre as NombreTipoComprobante, c.moneda, c.total, c.saldo_pendiente,
-                       c.estado_sunat as EstadoNombre, alm.nombre_almacen as NombreAlmacen,
+                       c.id_estado as IdEstado, tgd.nombre as EstadoNombre, alm.nombre_almacen as NombreAlmacen,
                        COUNT(*) OVER() AS TotalRegistros
                 FROM compras.compras c
                 INNER JOIN compras.proveedores p ON p.id_proveedor = c.id_proveedor
                 INNER JOIN configuracion.tipo_comprobante tc ON tc.id_tipo_comprobante = c.id_tipo_comprobante
                 INNER JOIN inventario.almacenes alm ON alm.id_almacen = c.id_almacen
+                LEFT JOIN configuracion.tablas_generales_detalle tgd ON tgd.id_tabla = 15 AND tgd.id_detalle = c.id_estado
                 WHERE (@busqueda IS NULL OR 
                        c.serie_comprobante ILIKE '%' || @busqueda || '%' OR 
                        c.numero_comprobante ILIKE '%' || @busqueda || '%' OR

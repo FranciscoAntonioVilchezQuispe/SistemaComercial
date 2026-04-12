@@ -1,4 +1,4 @@
-﻿{
+{
   "$schema": "https://json.schemastore.org/launchsettings.json",
   "profiles": {
     "http": {
@@ -8,7 +8,9 @@
       "launchUrl": "swagger",
       "applicationUrl": "http://0.0.0.0:5010",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "DOTNET_JITMinOpts": "1",
+        "DOTNET_ReadyToRun": "0"
       }
     }
   }

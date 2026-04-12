@@ -20,8 +20,10 @@ export interface CompraResumen {
   numeroDocumentoProveedor: string;
   moneda: string;
   total: number;
+  idEstado: number;
   estadoNombre: string;
   estadoPagoNombre: string;
+  fechaCreacion?: string;
 }
 
 /** Interface completa para el detalle de la compra */
@@ -51,8 +53,10 @@ export interface CompraDetalle {
   impuesto: number;
   total: number;
   saldoPendiente?: number;
+  idEstado: number;
   idEstadoPago: number;
   estadoPagoNombre?: string;
+  fechaCreacion?: string;
 
   detalles: DetalleCompra[];
 }

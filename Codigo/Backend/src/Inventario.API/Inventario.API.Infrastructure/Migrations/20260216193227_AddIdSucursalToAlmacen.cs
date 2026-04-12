@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -10,53 +10,59 @@ namespace Inventario.API.Infrastructure.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<decimal>(
-                name: "costo_promedio",
-                schema: "inventario",
-                table: "stock",
-                type: "numeric(12,4)",
-                nullable: false,
-                defaultValue: 0m);
+            // costo_promedio en stock
+            migrationBuilder.Sql(@"
+            DO $$ 
+            BEGIN 
+                IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='inventario' AND table_name='stock' AND column_name='costo_promedio') THEN
+                    ALTER TABLE inventario.stock ADD COLUMN costo_promedio numeric(12,4) NOT NULL DEFAULT 0;
+                END IF;
+            END $$;");
 
-            migrationBuilder.AddColumn<decimal>(
-                name: "valor_total",
-                schema: "inventario",
-                table: "stock",
-                type: "numeric(12,2)",
-                nullable: false,
-                defaultValue: 0m);
+            // valor_total en stock
+            migrationBuilder.Sql(@"
+            DO $$ 
+            BEGIN 
+                IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='inventario' AND table_name='stock' AND column_name='valor_total') THEN
+                    ALTER TABLE inventario.stock ADD COLUMN valor_total numeric(12,2) NOT NULL DEFAULT 0;
+                END IF;
+            END $$;");
 
-            migrationBuilder.AddColumn<decimal>(
-                name: "costo_promedio_actual",
-                schema: "inventario",
-                table: "movimientos_inventario",
-                type: "numeric(12,4)",
-                nullable: false,
-                defaultValue: 0m);
+            // costo_promedio_actual en movimientos_inventario
+            migrationBuilder.Sql(@"
+            DO $$ 
+            BEGIN 
+                IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='inventario' AND table_name='movimientos_inventario' AND column_name='costo_promedio_actual') THEN
+                    ALTER TABLE inventario.movimientos_inventario ADD COLUMN costo_promedio_actual numeric(12,4) NOT NULL DEFAULT 0;
+                END IF;
+            END $$;");
 
-            migrationBuilder.AddColumn<decimal>(
-                name: "saldo_cantidad",
-                schema: "inventario",
-                table: "movimientos_inventario",
-                type: "numeric(10,3)",
-                nullable: false,
-                defaultValue: 0m);
+            // saldo_cantidad en movimientos_inventario
+            migrationBuilder.Sql(@"
+            DO $$ 
+            BEGIN 
+                IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='inventario' AND table_name='movimientos_inventario' AND column_name='saldo_cantidad') THEN
+                    ALTER TABLE inventario.movimientos_inventario ADD COLUMN saldo_cantidad numeric(10,3) NOT NULL DEFAULT 0;
+                END IF;
+            END $$;");
 
-            migrationBuilder.AddColumn<decimal>(
-                name: "saldo_valorizado",
-                schema: "inventario",
-                table: "movimientos_inventario",
-                type: "numeric(12,2)",
-                nullable: false,
-                defaultValue: 0m);
+            // saldo_valorizado en movimientos_inventario
+            migrationBuilder.Sql(@"
+            DO $$ 
+            BEGIN 
+                IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='inventario' AND table_name='movimientos_inventario' AND column_name='saldo_valorizado') THEN
+                    ALTER TABLE inventario.movimientos_inventario ADD COLUMN saldo_valorizado numeric(12,2) NOT NULL DEFAULT 0;
+                END IF;
+            END $$;");
 
-            migrationBuilder.AddColumn<long>(
-                name: "id_sucursal",
-                schema: "inventario",
-                table: "almacenes",
-                type: "bigint",
-                nullable: false,
-                defaultValue: 0L);
+            // id_sucursal en almacenes
+            migrationBuilder.Sql(@"
+            DO $$ 
+            BEGIN 
+                IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='inventario' AND table_name='almacenes' AND column_name='id_sucursal') THEN
+                    ALTER TABLE inventario.almacenes ADD COLUMN id_sucursal bigint NOT NULL DEFAULT 0;
+                END IF;
+            END $$;");
         }
 
         /// <inheritdoc />

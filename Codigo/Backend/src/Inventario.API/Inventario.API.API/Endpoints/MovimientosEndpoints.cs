@@ -23,7 +23,6 @@ namespace Inventario.API.Endpoints
             app.MapGet("/api/inventario/tipos-movimiento", async (IInventarioDbContext context) =>
             {
                 var tipos = await context.TiposMovimiento
-                    .Where(t => t.IdTabla == 6)
                     .Select(t => new TipoMovimientoDto
                     {
                         Id = t.Id,

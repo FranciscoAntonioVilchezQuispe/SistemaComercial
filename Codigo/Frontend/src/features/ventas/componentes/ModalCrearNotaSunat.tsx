@@ -32,6 +32,8 @@ import { VentaDetalle } from "../tipos/ventas.types";
 import { servicioVentas } from "../servicios/servicioVentas";
 import { toast } from "sonner";
 import { MotivoNota } from "../tipos/notas.types";
+import { useTiposComprobante } from "@/features/configuracion/hooks/useTiposComprobante";
+import { SerieComprobante } from "@/features/configuracion/tipos/serieComprobante.types";
 
 interface ModalCrearNotaSunatProps {
   idVenta: number | null;
@@ -54,7 +56,14 @@ export function ModalCrearNotaSunat({
   const [isLoading, setIsLoading] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
 
+  const [idTipoComprobante, setIdTipoComprobante] = useState<number | null>(null);
+  const [series, setSeries] = useState<SerieComprobante[]>([]);
+  const [serieSeleccionada, setSerieSeleccionada] = useState<string>("");
+
   const [motivos, setMotivos] = useState<MotivoNota[]>([]);
+
+  // Hook para cargar los tipos de comprobante y encontrar el ID correspondiente
+  const { data: dataTipos } = useTiposComprobante({ pageNumber: 1, pageSize: 100 });
 
   useEffect(() => {
     if (open && idVenta) {
@@ -68,10 +77,39 @@ export function ModalCrearNotaSunat({
   }, [open, idVenta]);
 
   useEffect(() => {
+    if (open && dataTipos?.datos) {
+      const tipo = dataTipos.datos.find(t => t.codigo === (tipoNota as string));
+      if (tipo) {
+        setIdTipoComprobante(tipo.id);
+      }
+    }
+  }, [tipoNota, open, dataTipos]);
+
+  useEffect(() => {
+    if (open && idTipoComprobante && venta?.idAlmacen) {
+      cargarSeries(idTipoComprobante, venta.idAlmacen);
+    }
+  }, [idTipoComprobante, venta, open]);
+
+  useEffect(() => {
     if (open) {
       cargarMotivos(tipoNota);
     }
   }, [tipoNota, open]);
+
+  const cargarSeries = async (idTipo: number, idAlm: number) => {
+    try {
+      const data = await servicioVentas.obtenerSeries(idTipo, idAlm);
+      setSeries(data);
+      if (data.length > 0) {
+        setSerieSeleccionada(data[0].serie);
+      } else {
+        setSerieSeleccionada("");
+      }
+    } catch (error) {
+      console.error("Error al cargar las series:", error);
+    }
+  };
 
   const cargarMotivos = async (tipo: string) => {
     try {
@@ -81,7 +119,7 @@ export function ModalCrearNotaSunat({
       setMotivos(data);
       if (data.length > 0) setMotivoSunat(data[0].idMotivo.toString());
     } catch (error) {
-      toast.error("Error al cargar los motivos SUNAT");
+      console.error("Error al cargar los motivos SUNAT:", error);
     }
   };
 
@@ -93,7 +131,7 @@ export function ModalCrearNotaSunat({
       setSustento(`Nota de Crédito/Débito por la venta ${data.serie}-${data.numero.toString().padStart(8, '0')}`);
       // El motivoSunat se setea en cargarMotivos automáticamente
     } catch (error) {
-      toast.error("No se pudo cargar el detalle de la venta");
+      console.error("No se pudo cargar el detalle de la venta:", error);
       onOpenChange(false);
     } finally {
       setIsFetching(false);
@@ -104,8 +142,8 @@ export function ModalCrearNotaSunat({
 
   const handleGuardar = async () => {
     if (!venta) return;
-    if (!motivoSunat || !sustento.trim()) {
-      toast.error("Complete todos los campos obligatorios");
+    if (!motivoSunat || !sustento.trim() || !serieSeleccionada) {
+      toast.error("Complete todos los campos obligatorios (incluyendo la serie)");
       return;
     }
 
@@ -114,6 +152,7 @@ export function ModalCrearNotaSunat({
       
       const payload = {
         idVentaReferencia: venta.id,
+        serie: serieSeleccionada, // Campo obligatorio corregido
         tipoNota: tipoNota,
         idTipoNota: parseInt(motivoSunat),
         motivoSustento: sustento,
@@ -121,12 +160,9 @@ export function ModalCrearNotaSunat({
         detalles: venta.detalles?.map(d => ({
           idProducto: d.idProducto,
           idVentaDetalle: d.id,
-          descripcion: d.descripcionProducto || "Producto",
+          descripcion: d.descripcionProducto,
           cantidad: d.cantidad,
-          precioUnitario: d.precioUnitario,
-          subtotal: d.totalItem, // Usando los campos del nuevo DTO
-          igv: d.impuestoItem,
-          total: d.totalItem
+          precioUnitario: d.precioUnitario
         })) || []
       };
 
@@ -141,7 +177,7 @@ export function ModalCrearNotaSunat({
       onSuccess();
       onOpenChange(false);
     } catch (error: any) {
-      toast.error(error.message || "Error al generar la nota");
+      console.error("Error al generar la nota:", error);
     } finally {
       setIsLoading(false);
     }
@@ -150,6 +186,13 @@ export function ModalCrearNotaSunat({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[500px]">
+        <DialogHeader className="sr-only">
+          <DialogTitle>Emitir Nota SUNAT</DialogTitle>
+          <DialogDescription>
+            Formulario para la emisión de notas de crédito y débito electrónicas.
+          </DialogDescription>
+        </DialogHeader>
+        
         {isFetching ? (
           <div className="flex flex-col items-center justify-center p-20 gap-4">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -163,8 +206,9 @@ export function ModalCrearNotaSunat({
                 Seleccione el tipo de nota e indique el motivo SUNAT correspondiente.
               </DialogDescription>
             </DialogHeader>
-
+            {/* ... resto del contenido ... */}
             <div className="flex flex-col gap-5 py-4">
+              {/* ... contenido del formulario ... */}
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="tipoNota" className="flex items-center gap-1.5 font-semibold text-sm">
@@ -183,6 +227,32 @@ export function ModalCrearNotaSunat({
                       <SelectItem value={TipoComprobanteSunat.NotaDebito}>Débito (08)</SelectItem>
                     </SelectContent>
                   </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="serieNota" className="flex items-center gap-1.5 font-semibold text-sm">
+                    <Settings className="h-4 w-4 text-primary" />
+                    Serie de Nota
+                  </Label>
+                  <Select 
+                    value={serieSeleccionada} 
+                    onValueChange={setSerieSeleccionada}
+                    disabled={series.length === 0}
+                  >
+                    <SelectTrigger id="serieNota" className="bg-muted/30 border-muted-foreground/20">
+                      <SelectValue placeholder={series.length > 0 ? "Seleccione Serie" : "Sin Series"} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {series.map(s => (
+                        <SelectItem key={s.id} value={s.serie}>
+                          {s.serie} (Sig: {s.correlativoActual + 1})
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {series.length === 0 && !isFetching && (
+                    <p className="text-[10px] text-destructive font-medium italic">No hay series configuradas para este comprobante.</p>
+                  )}
                 </div>
 
                 <div className="space-y-2">
@@ -261,7 +331,7 @@ export function ModalCrearNotaSunat({
             </DialogFooter>
           </>
         ) : (
-          <div className="p-10 text-center">Error al cargar datos.</div>
+          <div className="p-10 text-center text-destructive font-medium">No se pudieron cargar los datos de la venta.</div>
         )}
       </DialogContent>
     </Dialog>

@@ -152,7 +152,7 @@ export function PaginaListasPrecios() {
                       setEliminarId(null);
                     },
                     onError: (e: any) => {
-                      toast.error("Error: " + e.message);
+                      console.error("Error al eliminar lista:", e);
                       setEliminarId(null);
                     },
                   });

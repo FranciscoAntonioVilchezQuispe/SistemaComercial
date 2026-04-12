@@ -29,9 +29,10 @@ export const servicioVentas = {
     return response.datos || response.data;
   },
 
-  anularVenta: async (id: number, motivo: string): Promise<any> => {
+  anularVenta: async (id: number, motivo: string, usuarioId: number): Promise<any> => {
     const response: any = await apiVentas.patch(`${BASE_URL}/${id}/anular`, {
       motivo,
+      usuarioId,
     });
     return response.datos || response.data;
   },

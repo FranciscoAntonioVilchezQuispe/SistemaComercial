@@ -38,10 +38,7 @@ export const useCrearTraslado = (): UseMutationResult<
       toast.success("Traslado despachado exitosamente");
     },
     onError: (error: any) => {
-      toast.error(
-        "Error al despachar traslado: " +
-          (error.response?.data?.message || error.message),
-      );
+      console.error("Error al despachar traslado:", error);
     },
   });
 };
@@ -61,10 +58,7 @@ export const useRecibirTraslado = (): UseMutationResult<
       toast.success("Traslado recibido y stock actualizado");
     },
     onError: (error: any) => {
-      toast.error(
-        "Error al recibir traslado: " +
-          (error.response?.data?.message || error.message),
-      );
+      console.error("Error al recibir traslado:", error);
     },
   });
 };

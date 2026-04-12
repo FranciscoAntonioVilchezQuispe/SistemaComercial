@@ -209,7 +209,7 @@ export function PaginaMatrizReglas() {
             toast.success("Regla actualizada");
             setDialogoOpen(false);
           },
-          onError: (e) => toast.error("Error: " + e.message),
+          onError: (e) => console.error("Error al actualizar regla:", e),
         },
       );
     } else {
@@ -218,7 +218,7 @@ export function PaginaMatrizReglas() {
           toast.success("Regla creada");
           setDialogoOpen(false);
         },
-        onError: (e) => toast.error("Error: " + e.message),
+        onError: (e) => console.error("Error al crear regla:", e),
       });
     }
   };
@@ -373,7 +373,7 @@ export function PaginaMatrizReglas() {
                       setEliminarId(null);
                     },
                     onError: (e: any) => {
-                      toast.error("Error: " + e.message);
+                      console.error("Error al eliminar regla:", e);
                       setEliminarId(null);
                     },
                   });

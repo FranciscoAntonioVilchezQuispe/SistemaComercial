@@ -50,7 +50,7 @@ export function PaginaEmpresa() {
         toast.success("Empresa actualizada correctamente");
       },
       onError: (err) => {
-        toast.error("Error al actualizar empresa: " + err.message);
+        console.error("Error al actualizar empresa:", err);
       },
     });
   };
@@ -200,3 +200,5 @@ export function PaginaEmpresa() {
     </div>
   );
 }
+
+export default PaginaEmpresa;

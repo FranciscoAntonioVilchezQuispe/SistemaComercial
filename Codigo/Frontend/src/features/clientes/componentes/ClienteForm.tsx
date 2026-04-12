@@ -184,7 +184,6 @@ export function ClienteForm({
               toast.success("Cliente registrado y también agregado como proveedor");
             } catch (error) {
               console.error("Error al crear proveedor:", error);
-              toast.error("Cliente registrado, pero hubo un error al crear el proveedor");
             }
           } else {
             toast.success("Cliente registrado exitosamente");

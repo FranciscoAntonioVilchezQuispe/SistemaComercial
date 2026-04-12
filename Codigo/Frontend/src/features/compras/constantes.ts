@@ -1,4 +1,4 @@
-import { EstadoOrdenCompra, TablasGenerales } from "@compartido/enums";
+import { EstadoOrdenCompra, TablasGenerales } from "../../compartido/enums";
 
 export { EstadoOrdenCompra, TablasGenerales };
 

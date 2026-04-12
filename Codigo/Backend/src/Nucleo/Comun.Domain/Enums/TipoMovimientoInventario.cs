@@ -9,6 +9,10 @@ namespace Nucleo.Comun.Domain.Enums
         SalidaVenta = 20,
         AjustePositivo = 21,
         AjusteNegativo = 22,
-        TransferenciaAlmacen = 23
+        TransferenciaAlmacen = 23,
+        DevolucionCompra = 24,
+        DevolucionVenta = 25,
+        NotaDebitoCompra = 26,
+        NotaDebitoVenta = 27
     }
 }

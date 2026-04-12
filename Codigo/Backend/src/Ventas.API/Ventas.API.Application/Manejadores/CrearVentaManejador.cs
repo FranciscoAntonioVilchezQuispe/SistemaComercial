@@ -6,7 +6,10 @@ using Ventas.API.Application.Eventos;
 using Ventas.API.Application.Interfaces;
 using Ventas.API.Domain.Entidades;
 using Ventas.API.Domain.Interfaces;
+using Nucleo.Comun.Domain;
 using Nucleo.Comun.Domain.Enums;
+using System.Linq;
+using System.Collections.Generic;
 
 namespace Ventas.API.Application.Manejadores
 {
@@ -26,6 +29,40 @@ namespace Ventas.API.Application.Manejadores
         public async Task<VentaDto> Handle(CrearVentaComando request, CancellationToken cancellationToken)
         {
             var dto = request.Venta;
+
+            // 0. Validar Relación Tipo Documento vs Tipo Comprobante (Regla SUNAT)
+            var clienteInfo = await _context.Clientes
+                .Where(c => c.Id == dto.IdCliente || (dto.IdCliente <= 0 && c.NumeroDocumento == "00000000"))
+                .Select(c => new { c.Id, c.IdTipoDocumento })
+                .FirstOrDefaultAsync(cancellationToken);
+
+            if (clienteInfo != null)
+            {
+                var codigoDocumento = await _context.TiposDocumentoRef
+                    .Where(td => td.Id == clienteInfo.IdTipoDocumento)
+                    .Select(td => td.Codigo)
+                    .FirstOrDefaultAsync(cancellationToken);
+
+                if (!string.IsNullOrEmpty(codigoDocumento))
+                {
+                    // Verificar si existen reglas configuradas para este tipo de documento
+                    var reglasConfiguradas = await _context.ReglasDocumentoRef
+                        .Where(r => r.CodigoDocumento == codigoDocumento && r.Activado)
+                        .Select(r => r.IdTipoComprobante)
+                        .ToListAsync(cancellationToken);
+
+                    // Si hay reglas, el comprobante seleccionado DEBE estar en la lista
+                    if (reglasConfiguradas.Any() && !reglasConfiguradas.Contains(dto.IdTipoComprobante))
+                    {
+                        var nombreComprobante = await _context.TiposComprobanteRef
+                            .Where(tc => tc.Id == dto.IdTipoComprobante)
+                            .Select(tc => tc.Nombre)
+                            .FirstOrDefaultAsync(cancellationToken) ?? "Comprobante Desconocido";
+                        
+                        throw new AppException("SUNAT_VALIDATION", $"El tipo de documento del cliente no permite emitir {nombreComprobante}.");
+                    }
+                }
+            }
 
             // 1. Obtener siguiente correlativo de forma atómica
             long numeroDocumento = await _ventaRepositorio.ObtenerSiguienteCorrelativoAsync(dto.IdAlmacen, dto.IdTipoComprobante, dto.Serie);
@@ -138,13 +175,17 @@ namespace Ventas.API.Application.Manejadores
                 }).ToList() ?? new List<Pago>()
             };
 
-            // Manejar Cliente "Público General" si Id es 0
-            if (venta.IdCliente <= 0)
+            // Manejar Cliente "Público General" si Id es 0 (Ya obtenido al inicio en clienteInfo)
+            if (venta.IdCliente <= 0 && clienteInfo != null)
             {
+                venta.IdCliente = clienteInfo.Id;
+            }
+            else if (venta.IdCliente <= 0)
+            {
+                // Fallback de seguridad si no se encontró en la validación inicial
                 var clienteDefault = await _context.Clientes
                     .FirstOrDefaultAsync(c => c.NumeroDocumento == "00000000", cancellationToken);
-                if (clienteDefault != null) venta.IdCliente = clienteDefault.Id;
-                else venta.IdCliente = 1; 
+                venta.IdCliente = clienteDefault?.Id ?? 1;
             }
 
             // 3. Persistir Venta
@@ -158,6 +199,7 @@ namespace Ventas.API.Application.Manejadores
                 venta.IdTipoComprobante,
                 venta.Serie ?? string.Empty,
                 venta.Numero.ToString(),
+                venta.FechaEmision,
                 venta.Detalles.Select(d => new VentaItemDetalle(d.IdProducto, d.Cantidad)).ToList()
             );
             await _mediator.Publish(evento, cancellationToken);

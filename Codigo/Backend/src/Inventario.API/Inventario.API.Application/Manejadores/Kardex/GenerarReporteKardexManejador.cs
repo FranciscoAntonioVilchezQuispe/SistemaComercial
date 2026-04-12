@@ -43,7 +43,7 @@ namespace Inventario.API.Application.Manejadores.Kardex
                 .ThenByDescending(m => m.CorrelativoKardex)
                 .FirstOrDefaultAsync(cancellationToken);
 
-            if (ultimoMovimientoAnterior != null && ultimoMovimientoAnterior.SaldoCantidad > 0)
+            if (ultimoMovimientoAnterior != null)
             {
                 reporte.Detalles.Add(new KardexReporteItemDto
                 {
@@ -66,6 +66,27 @@ namespace Inventario.API.Application.Manejadores.Kardex
                     SaldoCostoTotal = ultimoMovimientoAnterior.SaldoCostoTotal
                 });
             }
+            else
+            {
+                 // Si no hay saldo anterior, mostramos fila inicial en cero para coherencia del reporte
+                 reporte.Detalles.Add(new KardexReporteItemDto
+                {
+                    Fecha = request.FechaInicio.Date,
+                    TipoDocumentoSunat = "00", 
+                    SerieDocumento = "-",
+                    NumeroDocumento = "0",
+                    TipoOperacionSunat = "16", 
+                    EntradaCantidad = 0,
+                    EntradaCostoUnitario = 0,
+                    EntradaCostoTotal = 0,
+                    SalidaCantidad = 0,
+                    SalidaCostoUnitario = 0,
+                    SalidaCostoTotal = 0,
+                    SaldoCantidad = 0,
+                    SaldoCostoUnitario = 0,
+                    SaldoCostoTotal = 0
+                });
+            }
 
             // 2. Traer movimientos paginados
             var query = _context.KardexMovimientos
@@ -79,6 +100,7 @@ namespace Inventario.API.Application.Manejadores.Kardex
             
             var movimientos = await query
                 .OrderBy(m => m.FechaHoraCompuesta)
+                .ThenBy(m => m.TipoOperacion == "16" ? 1 : (m.EntradaCantidad > 0 ? 2 : 3))
                 .ThenBy(m => m.CorrelativoKardex)
                 .Skip((request.PageNumber - 1) * request.PageSize)
                 .Take(request.PageSize)
@@ -98,7 +120,7 @@ namespace Inventario.API.Application.Manejadores.Kardex
                     TipoDocumentoSunat = mov.TipoDocumento ?? "00",
                     SerieDocumento = mov.SerieDocumento ?? "-",
                     NumeroDocumento = mov.NumeroDocumento ?? "-",
-                    TipoOperacionSunat = mov.MotivoTrasladoSunat ?? "00",
+                    TipoOperacionSunat = mov.TipoOperacion ?? "00",
 
                     EntradaCantidad = mov.EntradaCantidad ?? 0,
                     EntradaCostoUnitario = mov.EntradaCostoUnitario ?? 0,

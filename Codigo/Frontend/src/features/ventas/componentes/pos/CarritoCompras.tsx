@@ -121,7 +121,6 @@ export function CarritoCompras() {
       setDialogoOpen(false);
     } catch (error) {
       console.error("Error al procesar la venta:", error);
-      toast.error("Error al procesar la venta");
       throw error;
     }
   };
@@ -308,10 +307,15 @@ export function CarritoCompras() {
             razonSocial: "Público General",
             numeroDocumento: "00000000",
             idTipoDocumento: 1,
+            tipoDocumentoNombre: "DNI",
+            tipoDocumentoCodigo: "1",
             idTipoCliente: 1,
             email: "",
             telefono: "",
             direccion: "",
+            ubigeo: "",
+            condicionSunat: "HABIDO",
+            estadoSunat: "ACTIVO",
             activado: true,
             esAgenteRetencion: false,
             esBuenContribuyente: false,

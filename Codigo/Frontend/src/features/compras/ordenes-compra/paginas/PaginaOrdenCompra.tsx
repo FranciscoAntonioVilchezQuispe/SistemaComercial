@@ -94,8 +94,8 @@ export function PaginaOrdenCompra() {
             setDialogoOpen(false);
           }
         },
-        onError: () => {
-          toast.error("Error al cambiar el estado de la orden");
+        onError: (error) => {
+          console.error("Error al cambiar el estado de la orden:", error);
         },
       },
     );
@@ -370,3 +370,5 @@ export function PaginaOrdenCompra() {
     </div>
   );
 }
+
+export default PaginaOrdenCompra;

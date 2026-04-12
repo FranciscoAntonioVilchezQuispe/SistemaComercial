@@ -32,6 +32,7 @@ namespace Ventas.API.Infrastructure.Repositorios
                        v.subtotal_inafecto, v.total_impuesto, v.total_descuento_global, v.saldo_pendiente, v.observaciones,
                        v.moneda, v.tipo_cambio, v.fecha_vencimiento_pago, v.id_empresa, v.id_almacen, v.id_caja, v.id_cliente,
                        v.id_usuario_vendedor, v.id_cotizacion_origen, v.id_tipo_comprobante, v.id_estado, v.id_estado_pago,
+                       v.fecha_creacion,
                        tc.nombre AS TipoComprobante,
                        c.razon_social AS NombreCliente,
                        c.numero_documento AS NumeroDocumentoCliente,
@@ -40,7 +41,7 @@ namespace Ventas.API.Infrastructure.Repositorios
                 FROM ventas.ventas v
                 INNER JOIN configuracion.tipo_comprobante tc ON tc.id_tipo_comprobante = v.id_tipo_comprobante
                 INNER JOIN clientes.clientes c ON c.id_cliente = v.id_cliente
-                LEFT JOIN configuracion.tablas_generales_detalle tgd ON tgd.id_tabla = 8 AND tgd.id_detalle = v.id_estado
+                LEFT JOIN configuracion.tablas_generales_detalle tgd ON tgd.id_tabla = 15 AND tgd.id_detalle = v.id_estado
                 LEFT JOIN configuracion.tablas_generales_detalle tgd2 ON tgd2.id_tabla = 13 AND tgd2.id_detalle = v.id_estado_pago
                 WHERE v.id_venta = @id;
 
@@ -104,7 +105,7 @@ namespace Ventas.API.Infrastructure.Repositorios
 
             var sql = @"
                 SELECT v.id_venta AS Id, v.serie, v.numero, v.fecha_emision, v.total_venta,
-                       v.id_estado, v.id_estado_pago,
+                       v.id_estado, v.id_estado_pago, v.fecha_creacion,
                        tc.nombre AS tipo_comprobante_nombre,
                        c.razon_social AS cliente_razon_social,
                        c.numero_documento AS cliente_numero_documento,
@@ -114,7 +115,7 @@ namespace Ventas.API.Infrastructure.Repositorios
                 FROM ventas.ventas v
                 INNER JOIN configuracion.tipo_comprobante tc ON tc.id_tipo_comprobante = v.id_tipo_comprobante
                 INNER JOIN clientes.clientes c ON c.id_cliente = v.id_cliente
-                LEFT JOIN configuracion.tablas_generales_detalle tgd ON tgd.id_tabla = 8 AND tgd.id_detalle = v.id_estado
+                LEFT JOIN configuracion.tablas_generales_detalle tgd ON tgd.id_tabla = 15 AND tgd.id_detalle = v.id_estado
                 LEFT JOIN configuracion.tablas_generales_detalle tgd2 ON tgd2.id_tabla = 13 AND tgd2.id_detalle = v.id_estado_pago
                 WHERE (@search IS NULL 
                    OR v.serie ILIKE @search 

@@ -35,23 +35,70 @@ namespace Inventario.API.Application.Manejadores
             if (tipoMovimiento == null)
                 throw new Exception($"El tipo de movimiento con ID {request.IdTipoMovimiento} no existe.");
 
-            // 2. Determinar Factor (Suma/Resta)
+            // 2. Determinar Factor (Suma/Resta) Dinámicamente
             decimal factor = 0;
-            switch (tipoMovimiento.Codigo)
+            string tipoComprobanteSunat = "00";
+            
+            if (request.IdTipoDocumento.HasValue)
             {
-                case "ING_COM":
-                case "AJU_POS":
-                case "INV_INI":
-                case "ING_TRA": // Ingreso por Traslado
-                    factor = 1;
-                    break;
-                case "SAL_VEN":
-                case "AJU_NEG":
-                case "TRA_ALM":
-                    factor = -1;
-                    break;
-                default:
-                    throw new Exception($"Código de movimiento '{tipoMovimiento.Codigo}' no soportado.");
+                var comprobante = await _context.SyncTiposComprobante
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(c => c.Id == request.IdTipoDocumento.Value, cancellationToken);
+                
+                if (comprobante != null)
+                {
+                    tipoComprobanteSunat = comprobante.Codigo;
+
+                    if (!comprobante.MueveStock)
+                    {
+                        Console.WriteLine($"[DEBUG] [Inventario.API] Documento {comprobante.Codigo} configurado con mueve_stock = false. Factor Neutro.");
+                        factor = 0;
+                    }
+                    else if (comprobante.TipoMovimientoStock == "ENTRADA") factor = 1;
+                    else if (comprobante.TipoMovimientoStock == "SALIDA") factor = -1;
+                    else if (comprobante.TipoMovimientoStock == "DEPENDIENTE")
+                    {
+                        // Lógica dependiente del módulo (Compras/Ventas)
+                        string modulo = request.ReferenciaModulo?.ToUpper() ?? "";
+                        if (modulo.Contains("COMPRAS"))
+                        {
+                            if (comprobante.MovimientoStockCompra == "ENTRADA") factor = 1;
+                            else if (comprobante.MovimientoStockCompra == "SALIDA") factor = -1;
+                        }
+                        else if (modulo.Contains("VENTAS"))
+                        {
+                            if (comprobante.MovimientoStockVenta == "ENTRADA") factor = 1;
+                            else if (comprobante.MovimientoStockVenta == "SALIDA") factor = -1;
+                        }
+                    }
+                }
+            }
+
+            // Fallback a lógica antigua por código de movimiento si no se determinó por documento
+            if (factor == 0 && request.IdTipoDocumento.HasValue == false)
+            {
+                switch (tipoMovimiento.Codigo)
+                {
+                    case "ING_COM":
+                    case "AJU_POS":
+                    case "INV_INI":
+                    case "ING_TRA":
+                        factor = 1;
+                        break;
+                    case "SAL_VEN":
+                    case "AJU_NEG":
+                    case "TRA_ALM":
+                        factor = -1;
+                        break;
+                    default:
+                        factor = 0; // Neutro por defecto si no coincide
+                        break;
+                }
+            }
+
+            if (factor == 0 && request.IdTipoDocumento.HasValue == false && tipoMovimiento.Codigo != "NEUTRO")
+            {
+                 throw new Exception($"No se pudo determinar el factor de movimiento para '{tipoMovimiento.Codigo}'.");
             }
 
             // 3. Obtener o Crear Stock
@@ -82,8 +129,8 @@ namespace Inventario.API.Application.Manejadores
             decimal cantidadCambio = request.Cantidad * factor;
             decimal cantidadNueva = cantidadAnterior + cantidadCambio;
 
-            if (cantidadNueva < 0)
-                throw new Exception($"Stock insuficiente. Stock actual: {cantidadAnterior}");
+            if (cantidadNueva < 0 && !request.PermitirStockNegativo)
+                throw new Exception($"Stock insuficiente. Stock actual: {cantidadAnterior}, Módulo: {request.ReferenciaModulo}, Factor: {factor}, Cantidad solicitada: {request.Cantidad * factor}");
 
             // --- LÓGICA DE VALORIZACIÓN (CPP) ---
             decimal costoUnitarioMovimiento = request.CostoUnitario ?? 0;
@@ -112,6 +159,8 @@ namespace Inventario.API.Application.Manejadores
             stock.CostoPromedio = nuevoCostoPromedio;
 
             // 4. Crear Movimiento
+
+            // 4. Crear Movimiento
             var movimiento = new MovimientoInventario
             {
                 IdTipoMovimiento = request.IdTipoMovimiento,
@@ -127,36 +176,41 @@ namespace Inventario.API.Application.Manejadores
                 IdReferencia = request.IdReferencia,
                 Observaciones = request.Observaciones,
                 UsuarioCreacion = "SISTEMA",
-                FechaCreacion = request.FechaMovimiento ?? DateTime.UtcNow
+                FechaCreacion = request.FechaMovimiento ?? DateTime.UtcNow,
+
+                // Nuevos campos para Sincronización Total (SUNAT)
+                TipoDocumento = tipoComprobanteSunat,
+                SerieDocumento = request.SerieDocumento ?? string.Empty,
+                NumeroDocumento = request.NumeroDocumento ?? string.Empty,
+                CodigoOperacionSunat = request.CodigoOperacionSunat ?? string.Empty
             };
 
             _context.MovimientosInventario.Add(movimiento);
 
             // 5. Integración con el Kardex Valorizado SUNAT
-            string tipoComprobanteSunat = "00";
-            if (request.IdTipoDocumento.HasValue)
-            {
-                // LOOKUP REAL del código SUNAT
-                var comprobante = await _context.SyncTiposComprobante
-                    .AsNoTracking()
-                    .FirstOrDefaultAsync(c => c.Id == request.IdTipoDocumento.Value, cancellationToken);
-
-                tipoComprobanteSunat = comprobante?.Codigo ?? "00";
-                Console.WriteLine($"[DEBUG] [Inventario.API] Comprobante SUNAT obtenido: {tipoComprobanteSunat} para Id {request.IdTipoDocumento}");
-            }
 
             string motivoSunat = "99";
             switch (tipoMovimiento.Codigo)
             {
-                case "ING_COM": motivoSunat = "0101"; break; // Venta Interna/Genérico
+                case "02": // COMPRA NACIONAL
+                case "ING_COM": motivoSunat = "0101"; break; 
+                
+                case "01": // VENTA NACIONAL
                 case "SAL_VEN": motivoSunat = "0101"; break;
+                
+                case "04": // TRANSFERENCIA ENTRE ALMACENES
                 case "TRA_ALM":
-                case "ING_TRA": motivoSunat = "0401"; break; // Traslado entre establecimientos
+                case "ING_TRA": motivoSunat = "0401"; break; 
+                
+                case "06": // NC COMPRA (DEVOLUCION A PROVEEDOR)
+                case "05": // NC VENTA (DEVOLUCION DE CLIENTE)
+                    motivoSunat = "0101"; break; // Usar el código general de venta/compra interna permitido
+
                 case "INV_INI": motivoSunat = "0101"; break;
             }
 
-            // Validar Reglas SUNAT (Cruce Doc x Op)
-            if (request.IdTipoDocumento.HasValue)
+            // 5. Validar Regla SUNAT (Bypass en sincronización histórica)
+            if (!request.PermitirStockNegativo && request.IdTipoDocumento.HasValue)
             {
                 var nivelRelacion = await _validacionSunat.ValidarReglaAsync(motivoSunat, request.IdTipoDocumento.Value, cancellationToken);
                 if (nivelRelacion == 0)
@@ -165,6 +219,10 @@ namespace Inventario.API.Application.Manejadores
                     throw new Exception($"Regla SUNAT: Operación [{motivoSunat}] no permitida con Documento [{tipoComprobanteSunat}].");
                 }
                 Console.WriteLine($"[DEBUG] [Inventario.API] Regla SUNAT validada ok (Nivel {nivelRelacion}).");
+            }
+            else
+            {
+                Console.WriteLine("[DEBUG] Sincronización histórica o sin documento: Omitiendo validación SUNAT.");
             }
 
             var kardexDto = new RegistrarMovimientoKardexDto
@@ -182,11 +240,12 @@ namespace Inventario.API.Application.Manejadores
                 ReferenciaId = request.IdReferencia,
                 ReferenciaTipo = request.ReferenciaModulo,
                 UsuarioRegistroId = 1,
-                FechaMovimiento = request.FechaMovimiento?.Date ?? DateTime.UtcNow.Date,
+                FechaMovimiento = request.FechaMovimiento?.Date ?? DateTime.UtcNow,
                 HoraMovimiento = request.FechaMovimiento?.TimeOfDay ?? DateTime.UtcNow.TimeOfDay,
                 Cantidad = request.Cantidad,
                 CostoUnitarioIngreso = factor > 0 ? costoUnitarioMovimiento : null,
-                ProductoPermiteStockNegativo = false,
+                CodigoOperacionSunat = request.CodigoOperacionSunat ?? (factor > 0 ? "02" : "01"), 
+                ProductoPermiteStockNegativo = request.PermitirStockNegativo,
                 ProductoMetodoValuacion = "PP"
             };
 
@@ -194,7 +253,19 @@ namespace Inventario.API.Application.Manejadores
             else await _kardexService.RegistrarSalidaAsync(kardexDto);
 
             Console.WriteLine($"[DEBUG] [Inventario.API] Persistiendo cambios en BD...");
-            await _context.SaveChangesAsync(cancellationToken);
+            try 
+            {
+                await _context.SaveChangesAsync(cancellationToken);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[ERROR] [Inventario.API] Error persistiendo movimiento en BD: {ex.Message}");
+                if (ex.InnerException != null)
+                {
+                    Console.WriteLine($"[ERROR] Inner Exception: {ex.InnerException.Message}");
+                }
+                throw;
+            }
             Console.WriteLine($"[DEBUG] [Inventario.API] Movimiento registrado exitosamente. ID: {movimiento.Id}");
 
             return movimiento.Id;

@@ -26,6 +26,10 @@
         "/property:GenerateFullPaths=true",
         "/consoleloggerparameters:NoSummary"
       ],
+      "dependsOrder": "sequence",
+      "dependsOn": [
+        "kill-ports"
+      ],
       "problemMatcher": "$msCompile"
     },
     {
@@ -157,6 +161,10 @@
       "script": "dev",
       "path": "Codigo/Frontend/",
       "isBackground": true,
+      "dependsOrder": "sequence",
+      "dependsOn": [
+        "kill-ports"
+      ],
       "problemMatcher": {
         "owner": "typescript",
         "pattern": {

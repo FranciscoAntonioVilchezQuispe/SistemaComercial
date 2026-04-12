@@ -35,6 +35,16 @@ export function ModalAnularCompra({
   if (!compra) return null;
 
   const handleAnular = async () => {
+    // 1. Validar tiempo (v1.0: 24 horas)
+    const fechaRef = compra.fechaCreacion ? new Date(compra.fechaCreacion) : new Date(compra.fechaEmision);
+    const limite24h = new Date(fechaRef.getTime() + 24 * 60 * 60 * 1000);
+    const ahora = new Date();
+
+    if (ahora > limite24h) {
+      toast.error("No se puede anular directamente: Han pasado más de 24 horas. Use Nota de Crédito.");
+      return;
+    }
+
     if (!motivo.trim()) {
       toast.error("Debe ingresar un motivo de anulación");
       return;
@@ -42,13 +52,14 @@ export function ModalAnularCompra({
 
     try {
       setIsLoading(true);
-      await anularCompra(compra.id); // El backend debería recibir el motivo si se añade al endpoint
+      // TODO: Obtener ID real del usuario desde AuthContext/Redux
+      await anularCompra(compra.id, motivo, 1); 
       toast.success("Compra anulada correctamente");
       onSuccess();
       onOpenChange(false);
       setMotivo("");
     } catch (error: any) {
-      toast.error(error.message || "Error al anular la compra");
+      console.error("Error al anular la compra:", error);
     } finally {
       setIsLoading(false);
     }
@@ -71,6 +82,10 @@ export function ModalAnularCompra({
               <h5 className="font-bold text-amber-900 leading-none mb-1">Atención</h5>
               <p className="text-sm text-amber-800">
                 Al anular esta compra del {formatFecha(new Date(compra.fechaEmision), "dd/MM/yyyy")}, se eliminarán los movimientos de almacén generados.
+                <br />
+                <span className="font-semibold text-amber-900 mt-2 block">
+                  Regla v1.0: Solo permitido dentro de las primeras 24 horas del registro.
+                </span>
               </p>
             </div>
           </div>

@@ -30,14 +30,15 @@ namespace Inventario.API.Infrastructure.Repositorios
             }
 
             var sql = @"
-                SELECT km.id_kardex_movimiento as Id, km.id_tipo_movimiento, km.id_stock, km.id_producto,
-                       km.id_almacen, km.cantidad, km.cantidad_anterior, km.cantidad_nueva,
-                       km.costo_unitario_movimiento, km.saldo_cantidad, km.saldo_valorizado,
-                       km.costo_promedio_actual, km.referencia_modulo, km.referencia_id,
-                       km.observaciones, km.fecha_movimiento as FechaHoraMovimiento,
-                       km.fecha_creacion as FechaCreacion, km.usuario_creacion
+                SELECT km.id as Id, km.tipo_operacion as IdTipoMovimiento, km.producto_id as IdProducto,
+                       km.almacen_id as IdAlmacen, COALESCE(km.entrada_cantidad, km.salida_cantidad, 0) as Cantidad, 
+                       km.saldo_cantidad as CantidadNueva, km.saldo_costo_unitario as CostoUnitarioMovimiento, 
+                       km.saldo_cantidad, km.saldo_costo_total as SaldoValorizado,
+                       km.saldo_costo_unitario as CostoPromedioActual, km.modulo_origen as ReferenciaModulo, 
+                       km.referencia_id as ReferenciaId, km.observaciones, km.fecha_movimiento as FechaHoraMovimiento,
+                       km.fecha_movimiento as FechaCreacion, km.usuario_registro_id as UsuarioCreacion
                 FROM inventario.inv_kardex_movimiento km
-                WHERE km.id_kardex_movimiento = @id;";
+                WHERE km.id = @id;";
 
             return await connection.QueryFirstOrDefaultAsync<MovimientoDetalleDto>(sql, new { id });
         }
@@ -56,7 +57,7 @@ namespace Inventario.API.Infrastructure.Repositorios
 
         public async Task BloquearFilaParaCalculoAsync(long almacenId, long productoId)
         {
-            var sql = $"SELECT 1 FROM inventario.inv_kardex_movimiento WHERE id_almacen = {almacenId} AND id_producto = {productoId} FOR UPDATE";
+            var sql = $"SELECT 1 FROM inventario.inv_kardex_movimiento WHERE almacen_id = {almacenId} AND producto_id = {productoId} FOR UPDATE";
             await ((DbContext)_context).Database.ExecuteSqlRawAsync(sql);
         }
 
@@ -103,13 +104,14 @@ namespace Inventario.API.Infrastructure.Repositorios
 
             var offset = (pagina - 1) * elementosPorPagina;
             var sql = @"
-                SELECT km.id_kardex_movimiento as Id, km.cantidad, km.cantidad_nueva,
-                       km.fecha_movimiento as FechaCreacion, km.usuario_creacion,
+                SELECT km.id as Id, COALESCE(km.entrada_cantidad, km.salida_cantidad, 0) as Cantidad, 
+                       km.saldo_cantidad as CantidadNueva,
+                       km.fecha_movimiento as FechaCreacion, km.usuario_registro_id as UsuarioCreacion,
                        COUNT(*) OVER() AS TotalRegistros
                 FROM inventario.inv_kardex_movimiento km
-                WHERE (@idAlmacen IS NULL OR km.id_almacen = @idAlmacen)
-                  AND (@idProducto IS NULL OR km.id_producto = @idProducto)
-                ORDER BY km.fecha_movimiento DESC, km.id_kardex_movimiento DESC
+                WHERE (@idAlmacen IS NULL OR km.almacen_id = @idAlmacen)
+                  AND (@idProducto IS NULL OR km.producto_id = @idProducto)
+                ORDER BY km.fecha_movimiento DESC, km.id DESC
                 LIMIT @elementosPorPagina OFFSET @offset;";
 
             var parameters = new { idAlmacen, idProducto, elementosPorPagina, offset };

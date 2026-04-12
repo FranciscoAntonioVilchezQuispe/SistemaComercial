@@ -192,6 +192,7 @@ export function PaginaProductos() {
         onPageSizeChange={cambiarPageSize}
         onSearchChange={cambiarBusqueda}
         onActiveFilterChange={cambiarFiltroActivo}
+        searchValue={paginacion.search}
         searchPlaceholder="Buscar por nombre o código..."
         isLoading={isLoading}
       />

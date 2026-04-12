@@ -41,6 +41,8 @@ namespace Compras.API.Domain.DTOs
         public decimal Total { get; set; }
         public decimal? SaldoPendiente { get; set; }
         public long IdEstadoPago { get; set; }
+        public long IdEstado { get; set; }
+        public string? EstadoNombre { get; set; } = "EMITIDO";
         public string? Observaciones { get; set; }
 
         public List<DetalleCompraDto> Detalles { get; set; } = new();

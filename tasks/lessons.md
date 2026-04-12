@@ -76,13 +76,11 @@
 - **Motivos parciales en frontend**: `ModalCrearNotaSunat.tsx` solo muestra 3/13 motivos NC y 2/6 ND, aunque el enum tiene todos los valores definidos.
 - **Lección general**: Al auditar un módulo para cumplimiento normativo, revisar **handlers + entidades + DDL + frontend** como un todo integral. Los problemas no se limitan a una capa.
 
-## [2026-03-30] Investigación de Catálogos SUNAT — Reutilización vs Creación
-- **Hallazgo**: Antes de crear tablas nuevas para catálogos SUNAT, siempre verificar las existentes. En este proyecto:
-  - `configuracion.tipo_afectacion_igv` ya cubre Cat.07 (21 registros completos).
-  - `configuracion.tipo_operacion_sunat` ya cubre Cat.51 (21 registros).
-  - `catalogo.unidades_medida` ya cubre Cat.03 (10 registros, faltan 4 menores).
-  - `configuracion.impuestos` ya cubre Cat.05 parcialmente (falta 9995 y 9999).
-  - `configuracion.motivo_nota_credito` ya cubre Cat.09 (13 registros completos).
-  - `configuracion.motivo_nota_debito` ya cubre Cat.10 (6 registros completos).
-- **Principio**: Solo crear tablas en el schema `sunat` para entidades genuinamente nuevas (no cubiertas): `cat_estado_cpe`, `log_envio_cpe`.
-- **Consistencia de nombres**: Cuando una columna existe en múltiples tablas con nombres distintos (`codigo_hash_cdr` vs `hash_cdr`), estandarizar al nombre más corto y claro (`hash_cdr`) en todas las tablas.
+## [2026-04-12] Sincronización Histórica de Kardex — Integridad y Mapeo
+- **Mapeo Dapper (Tuplas vs Dynamic)**: El uso de ValueTuples `(long Id, ...)` en Dapper sin `MatchNamesWithUnderscores` es extremadamente frágil. Si los aliases SQL no coinciden exactamente (case-sensitive) o el orden varía, el mapeo falla silenciosamente devolviendo valores por defecto (`0`).
+    - **Solución**: Preferir `QueryAsync<dynamic>` o clases DTO planas para lecturas de sistema.
+- **Compilación - Orden de Argumentos**: En refactors de métodos con muchos parámetros (ej: `ProcesarDocumento`), es fácil trasponer argumentos del mismo tipo (`string` por `string`, `DateTime` por `DateTime`). C# no detectará el error lógico si los tipos coinciden, pero fallará la lógica de negocio.
+    - **Prevención**: Usar argumentos nombrados (`idRef: n.Id, fecha: n.FechaEmision`) en llamadas críticas para mayor claridad y seguridad.
+- **Integridad Referencial en Reconstrucciones**: Al reconstruir el Kardex desde tablas de integración (Compras/Ventas del ERP), SIEMPRE validar que los IDs secundarios (Almacén, Tipo Documento) existan en las tablas maestras del sistema actual.
+    - **Patrón**: Implementar un remapeo de seguridad al **Almacén Principal** si el ID original es inválido o nulo. Esto evita errores `23503` (FK violation) que detienen procesos masivos de carga.
+- **Validaciones de Stock en Sincronización**: Los métodos de creación de movimientos (`CrearMovimientoInventarioManejador`) suelen tener validaciones de stock insuficiente. Estas validaciones deben ser omitibles mediante un flag (`PermitirStockNegativo`) durante sincronizaciones históricas, ya que el historial puede contener baches temporales de stock que se regularizan al final del proceso.

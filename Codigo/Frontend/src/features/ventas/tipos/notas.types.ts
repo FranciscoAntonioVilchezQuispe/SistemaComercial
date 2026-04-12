@@ -10,6 +10,8 @@ export interface NotaResumen {
   tipoComprobante: string;
   fechaEmision: string;
   clienteRazonSocial: string;
+  idEstado: number;
+  estadoNombre: string;
   estadoCpe: string;
   total: number;
   totalFilas: number;

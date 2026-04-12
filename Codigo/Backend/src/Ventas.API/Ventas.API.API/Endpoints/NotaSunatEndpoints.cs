@@ -76,12 +76,12 @@ namespace Ventas.API.Endpoints
             });
 
             // Recrear POST original
-            grupo.MapPost("/credito", async (CrearNotaCreditoComando comando, IMediator mediator) =>
+            grupo.MapPost("/credito", async (NotaCreditoDto dto, IMediator mediator) =>
             {
                 try
                 {
-                    var id = await mediator.Send(comando);
-                    return Results.Created($"/api/notas/credito/{id}", new { id });
+                    var result = await mediator.Send(new CrearNotaCreditoComando(dto));
+                    return Results.Created($"/api/notas/credito/{result.Id}", result);
                 }
                 catch (Exception ex)
                 {
@@ -120,12 +120,12 @@ namespace Ventas.API.Endpoints
             });
 
             // Recrear POST original
-            grupo.MapPost("/debito", async (CrearNotaDebitoComando comando, IMediator mediator) =>
+            grupo.MapPost("/debito", async (NotaDebitoDto dto, IMediator mediator) =>
             {
                 try
                 {
-                    var id = await mediator.Send(comando);
-                    return Results.Created($"/api/notas/debito/{id}", new { id });
+                    var result = await mediator.Send(new CrearNotaDebitoComando(dto));
+                    return Results.Created($"/api/notas/debito/{result.Id}", result);
                 }
                 catch (Exception ex)
                 {

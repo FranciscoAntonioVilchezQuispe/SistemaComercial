@@ -1,4 +1,4 @@
-﻿-- SCRIPT DE EVOLUCION Y ACTUALIZACION
+-- SCRIPT DE EVOLUCION Y ACTUALIZACION
 -- ARCHIVO: 02_fix_configuracion_metodos_pago.sql
 -- SCRIPT DE CORRECIÃ“N PARA MÃ‰TODOS DE PAGO (FASE 9)
 -- Crea la tabla faltante en el esquema de configuraciÃ³n para el microservicio Configuracion.API
@@ -1307,6 +1307,7 @@ CREATE TABLE IF NOT EXISTS compras.nota_credito (
     tipo_cambio numeric(10,4),
     afecta_stock boolean NOT NULL,
     fecha_emision date NOT NULL,
+    id_estado bigint NOT NULL DEFAULT 60,
     estado character varying(20) NOT NULL,
     activado boolean NOT NULL,
     fecha_creacion timestamp without time zone NOT NULL,
@@ -1341,6 +1342,7 @@ CREATE TABLE IF NOT EXISTS compras.nota_debito (
     tipo_cambio numeric(10,4),
     afecta_stock boolean NOT NULL,
     fecha_emision date NOT NULL,
+    id_estado bigint NOT NULL DEFAULT 60,
     estado character varying(20) NOT NULL,
     activado boolean NOT NULL,
     fecha_creacion timestamp without time zone NOT NULL,

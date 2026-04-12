@@ -197,9 +197,6 @@ export function ProveedorForm({
                 );
               } catch (error) {
                 console.error("Error al crear cliente:", error);
-                toast.error(
-                  "Proveedor registrado, pero hubo un error al crear el cliente",
-                );
               }
             } else {
               toast.info(
@@ -230,8 +227,8 @@ export function ProveedorForm({
           });
           // No llamamos a onSuccess() para mantener el diálogo abierto
         },
-        onError: () => {
-          toast.error("Error al registrar el proveedor");
+        onError: (error) => {
+          console.error("Error al registrar el proveedor:", error);
         },
       });
     }

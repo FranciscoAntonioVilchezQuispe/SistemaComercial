@@ -12,7 +12,8 @@ namespace Inventario.API.Application.DTOs
         public string NumeroDocumento { get; set; } = null!;
         
         // Operación
-        public string TipoOperacion { get; set; } = null!; // 'E' o 'S'
+        public string TipoOperacion { get; set; } = null!; // Discriminador interno 'E' o 'S'
+        public string CodigoOperacionSunat { get; set; } = null!; // Código Tabla 12 SUNAT (01, 02, 05, 07...)
         public string MotivoTrasladoSunat { get; set; } = null!; // 01, 02, 04...
         public string DescripcionMovimiento { get; set; } = null!;
 

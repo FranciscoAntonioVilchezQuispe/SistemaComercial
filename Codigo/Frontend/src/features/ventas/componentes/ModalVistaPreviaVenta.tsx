@@ -52,7 +52,6 @@ export function ModalVistaPreviaVenta({
       setVenta(data);
     } catch (error) {
       console.error("Error al cargar detalle de venta:", error);
-      toast.error("No se pudo cargar el detalle de la venta");
       onOpenChange(false);
     } finally {
       setCargando(false);

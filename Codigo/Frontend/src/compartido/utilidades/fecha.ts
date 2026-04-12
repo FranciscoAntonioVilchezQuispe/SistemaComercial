@@ -1,4 +1,4 @@
-import { format, parseISO, formatDistanceToNow } from "date-fns";
+import { format, parseISO, formatDistanceToNow, differenceInHours } from "date-fns";
 import { es } from "date-fns/locale";
 
 export const APP_LOCALE = es;
@@ -70,4 +70,22 @@ export const formatearFechaRelativa = (fecha: string | Date | null | undefined):
  */
 export const formatearFechaLarga = (fecha: string | Date | null | undefined): string => {
   return formatFecha(fecha, "d 'de' MMMM 'de' yyyy");
+};
+
+/**
+ * Determina si han pasado menos de 24 horas desde la fecha indicada (v1.0)
+ * @param fecha Fecha de referencia (ISO string o Date)
+ */
+export const quedenMenosDe24Horas = (fecha: string | Date | null | undefined): boolean => {
+  if (!fecha) return false;
+  try {
+    const fechaObj = typeof fecha === "string" ? parseISO(fecha) : fecha;
+    if (fechaObj instanceof Date && isNaN(fechaObj.getTime())) return false;
+    
+    // Calcula la diferencia en horas entre "ahora" y la fecha de creación
+    const horasTranscurridas = Math.abs(differenceInHours(new Date(), fechaObj));
+    return horasTranscurridas < 24;
+  } catch (error) {
+    return false;
+  }
 };

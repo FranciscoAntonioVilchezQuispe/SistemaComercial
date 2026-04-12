@@ -1,4 +1,4 @@
-﻿{
+{
   "$schema": "https://json.schemastore.org/launchsettings.json",
   "profiles": {
     "http": {
@@ -8,7 +8,9 @@
       "launchUrl": "swagger",
       "applicationUrl": "http://localhost:5008",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "DOTNET_JITMinOpts": "1",
+        "DOTNET_ReadyToRun": "0"
       }
     },
     "https": {
@@ -17,7 +19,9 @@
       "launchBrowser": false,
       "applicationUrl": "https://localhost:7194;http://localhost:5008",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "DOTNET_JITMinOpts": "1",
+        "DOTNET_ReadyToRun": "0"
       }
     }
   }

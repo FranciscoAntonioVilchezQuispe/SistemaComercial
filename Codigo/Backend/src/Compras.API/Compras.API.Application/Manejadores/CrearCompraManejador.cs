@@ -5,6 +5,7 @@ using Compras.API.Application.Interfaces;
 using Compras.API.Domain.Entidades;
 using Compras.API.Application.Eventos;
 using Nucleo.Comun.Domain;
+using Nucleo.Comun.Domain.Enums;
 
 namespace Compras.API.Application.Manejadores
 {
@@ -58,6 +59,7 @@ namespace Compras.API.Application.Manejadores
                 Impuesto = dto.Impuesto,
                 Total = dto.Total,
                 SaldoPendiente = dto.SaldoPendiente,
+                IdEstado = (long)EstadoDocumento.Registrado, // Registrado
                 IdEstadoPago = dto.IdEstadoPago,
                 Observaciones = dto.Observaciones,
                 Detalles = dto.Detalles.Select(d => new DetalleCompra

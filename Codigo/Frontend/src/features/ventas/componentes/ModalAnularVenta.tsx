@@ -42,25 +42,30 @@ export function ModalAnularVenta({
 
     try {
       setIsLoading(true);
-      await servicioVentas.anularVenta(venta.id, motivo);
+      // TODO: Obtener ID real del usuario desde AuthContext/Redux
+      await servicioVentas.anularVenta(venta.id, motivo, 1);
       toast.success("Venta anulada correctamente");
       onSuccess();
       onOpenChange(false);
       setMotivo("");
     } catch (error: any) {
-      toast.error(error.message || "Error al anular la venta");
+      console.error("Error al anular la venta:", error);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const esMismoDia = () => {
-    const hoy = new Date().toISOString().split("T")[0];
-    const fechaVenta = new Date(venta.fechaEmision).toISOString().split("T")[0];
-    return hoy === fechaVenta;
+  const obtenerTiempoRestante = () => {
+    const fechaRef = venta.fechaCreacion ? new Date(venta.fechaCreacion) : new Date(venta.fechaEmision);
+    const limite24h = new Date(fechaRef.getTime() + 24 * 60 * 60 * 1000);
+    const ahora = new Date();
+    return {
+      permitido: ahora <= limite24h,
+      limite: limite24h
+    };
   };
 
-  const puedeAnularDirectamente = esMismoDia();
+  const { permitido: puedeAnularDirectamente, limite } = obtenerTiempoRestante();
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -79,8 +84,11 @@ export function ModalAnularVenta({
               <div>
                 <h5 className="font-bold text-amber-900 leading-none mb-1">Atención</h5>
                 <p className="text-sm text-amber-800">
-                  Esta venta no es del día de hoy ({formatearFechaHora(venta.fechaEmision)}). 
-                  Según normativa SUNAT, para facturas de días anteriores debe emitir una <b>Nota de Crédito</b>.
+                  Ha vencido el plazo de 24 horas para la anulación directa (Límite: {formatearFechaHora(limite.toISOString())}).
+                  <br />
+                  <span className="font-semibold block mt-1">
+                    Según normativa SUNAT (v1.0), debe emitir una Nota de Crédito para anular este documento.
+                  </span>
                 </p>
               </div>
             </div>

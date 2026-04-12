@@ -59,6 +59,15 @@ namespace Ventas.API.Domain.Entidades
         [Column("estado_sunat")]
         public string EstadoSunat { get; set; } = "PENDIENTE";
 
+        [Column("tipo_anulacion")]
+        public string? TipoAnulacion { get; set; }
+
+        [Column("id_nota_credito")]
+        public long? IdNotaCredito { get; set; }
+
+        [Column("id_nota_debito")]
+        public long? IdNotaDebito { get; set; }
+
         [Column("fecha_anulacion")]
         public DateTime? FechaAnulacion { get; set; }
 

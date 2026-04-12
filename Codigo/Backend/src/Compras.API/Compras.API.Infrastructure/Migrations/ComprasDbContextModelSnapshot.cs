@@ -51,7 +51,7 @@ namespace Compras.API.Infrastructure.Migrations
                     b.Property<string>("EstadoSunat")
                         .IsRequired()
                         .HasColumnType("text")
-                        .HasColumnName("estado_sunat");
+                        .HasColumnName("id_estado_sunat");
 
                     b.Property<DateTime?>("FechaActualizacion")
                         .HasColumnType("timestamp without time zone")
@@ -81,9 +81,21 @@ namespace Compras.API.Infrastructure.Migrations
                         .HasColumnType("bigint")
                         .HasColumnName("id_almacen");
 
+                    b.Property<long>("IdEstado")
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_estado");
+
                     b.Property<long>("IdEstadoPago")
                         .HasColumnType("bigint")
                         .HasColumnName("id_estado_pago");
+
+                    b.Property<long?>("IdNotaCredito")
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_nota_credito");
+
+                    b.Property<long?>("IdNotaDebito")
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_nota_debito");
 
                     b.Property<long?>("IdOrdenCompraRef")
                         .HasColumnType("bigint")
@@ -135,6 +147,10 @@ namespace Compras.API.Infrastructure.Migrations
                     b.Property<decimal>("Subtotal")
                         .HasColumnType("decimal(12,2)")
                         .HasColumnName("subtotal");
+
+                    b.Property<string>("TipoAnulacion")
+                        .HasColumnType("text")
+                        .HasColumnName("tipo_anulacion");
 
                     b.Property<decimal>("TipoCambio")
                         .HasColumnType("decimal(10,4)")
@@ -418,6 +434,10 @@ namespace Compras.API.Infrastructure.Migrations
                         .HasColumnType("bigint")
                         .HasColumnName("id_compra_referencia");
 
+                    b.Property<long>("IdEstado")
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_estado");
+
                     b.Property<long>("IdProveedor")
                         .HasColumnType("bigint")
                         .HasColumnName("id_proveedor");
@@ -656,6 +676,10 @@ namespace Compras.API.Infrastructure.Migrations
                     b.Property<long>("IdCompraReferencia")
                         .HasColumnType("bigint")
                         .HasColumnName("id_compra_referencia");
+
+                    b.Property<long>("IdEstado")
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_estado");
 
                     b.Property<long>("IdProveedor")
                         .HasColumnType("bigint")

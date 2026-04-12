@@ -20,6 +20,7 @@ namespace Ventas.API.Domain.DTOs
         public string TipoComprobanteNombre { get; set; } = default!;
         public string EstadoNombre { get; set; } = default!;
         public string EstadoPagoNombre { get; set; } = default!;
+        public DateTime FechaCreacion { get; set; }
         
         // IDs para lógica visual (colores en el grid)
         public long IdEstado { get; set; }

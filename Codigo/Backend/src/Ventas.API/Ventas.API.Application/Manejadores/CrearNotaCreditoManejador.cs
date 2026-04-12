@@ -1,6 +1,7 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Nucleo.Comun.Domain.Enums;
 using Ventas.API.Application.Comandos;
 using Ventas.API.Application.DTOs;
 using Ventas.API.Application.Interfaces;
@@ -41,6 +42,10 @@ namespace Ventas.API.Application.Manejadores
             var impuesto = await _context.ImpuestosRef.FirstOrDefaultAsync(x => x.CodigoSunat == "1000", cancellationToken);
             decimal porcentajeIgv = impuesto?.Porcentaje ?? 18.00m;
 
+            // 2.1 Obtener Tipo Documento del Cliente para SUNAT (Evitar nulos del DTO)
+            var tipoDocCliente = await _context.TiposDocumentoRef.FirstOrDefaultAsync(x => x.Id == venta.Cliente.IdTipoDocumento, cancellationToken);
+            string codigoTipoDocCliente = tipoDocCliente?.Codigo ?? "1"; // DNI por defecto
+
             // 3. Obtener correlativo de serie
             var serieObj = await _context.SeriesComprobantes
                 .FirstOrDefaultAsync(s => s.Serie == dto.Serie, cancellationToken);
@@ -56,6 +61,7 @@ namespace Ventas.API.Application.Manejadores
             decimal tIgv = 0;
             decimal tTotal = 0;
             var detallesNota = new List<NotaCreditoDetalle>();
+            int contadorItem = 1;
 
             foreach (var detDto in dto.Detalles)
             {
@@ -89,9 +95,10 @@ namespace Ventas.API.Application.Manejadores
                     Subtotal = subtotalLinea,
                     Igv = igvLinea,
                     Total = totalLinea,
-                    IdAfectacionIgv = ventaDetOri?.IdAfectacionIgv, // Hedar la afectación original
+                    IdAfectacionIgv = ventaDetOri?.IdAfectacionIgv, // Heredar la afectación original
                     IdTributo = ventaDetOri?.IdTributo,
-                    IdUnidadMedida = ventaDetOri?.IdUnidadMedida
+                    IdUnidadMedida = ventaDetOri?.IdUnidadMedida,
+                    NumeroLinea = contadorItem++
                 });
             }
 
@@ -109,8 +116,10 @@ namespace Ventas.API.Application.Manejadores
                 IdTipoNota = dto.IdTipoNota,
                 MotivoSustento = dto.MotivoSustento,
                 
-                // Ignorar datos del cliente del dto parcialmente y usar venta original
-                ClienteTipoDoc = dto.ClienteTipoDoc,
+                // Usar datos de la venta original/base de datos (Flujo robusto)
+                IdEmpresa = venta.IdEmpresa,
+                IdTipoOperacion = venta.IdTipoOperacion,
+                ClienteTipoDoc = codigoTipoDocCliente,
                 ClienteNroDoc = venta.Cliente.NumeroDocumento,
                 ClienteRazonSocial = venta.Cliente.RazonSocial,
                 
@@ -126,12 +135,23 @@ namespace Ventas.API.Application.Manejadores
                 FechaEmision = DateTime.UtcNow,
                 Estado = "PENDIENTE",
                 IdEstadoCpe = "PENDIENTE",
+                IdEstado = (long)EstadoDocumento.Registrado, // Registrado
                 
                 Detalles = detallesNota
             };
 
             // 5. Persistir Nota
             _context.NotasCredito.Add(nota);
+            
+            // 5.1 Actualizar Venta de Referencia (v1.0)
+            venta.IdEstado = (long)EstadoDocumento.AnuladoNotaCredito;
+            venta.IdNotaCredito = nota.Id;
+            venta.TipoAnulacion = "nota_credito";
+            venta.FechaAnulacion = DateTime.UtcNow;
+            venta.MotivoAnulacion = nota.MotivoSustento;
+            venta.Observaciones += $"\n[ANULACIÓN NC] {DateTime.UtcNow}: Nota {nota.Serie}-{nota.Numero} generada.";
+
+            _context.Ventas.Update(venta);
             await _context.SaveChangesAsync(cancellationToken);
 
             // 6. Actualizar Inventario si afecta stock (Nota de Crédito = Reingreso de mercadería)
@@ -147,7 +167,9 @@ namespace Ventas.API.Application.Manejadores
                         det.Cantidad, 
                         nota.Id, 
                         nota.Serie, 
-                        nota.Numero.ToString());
+                        nota.Numero.ToString(),
+                        serieObj.IdTipoComprobante ?? 0,
+                        nota.FechaEmision);
 
                     if (!success)
                     {

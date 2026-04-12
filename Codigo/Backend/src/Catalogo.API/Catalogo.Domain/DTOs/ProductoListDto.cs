@@ -15,7 +15,7 @@ namespace Catalogo.Domain.DTOs
         public string MarcaNombre { get; set; } = string.Empty;
         public string UnidadMedidaSigla { get; set; } = string.Empty;
         
-        public decimal PrecioVenta { get; set; }
+        public decimal PrecioVentaPublico { get; set; }
         public decimal StockActual { get; set; }
         
         public string? ImagenPrincipalUrl { get; set; }

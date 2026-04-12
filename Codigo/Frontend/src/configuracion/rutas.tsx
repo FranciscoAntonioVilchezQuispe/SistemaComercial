@@ -30,11 +30,7 @@ const PaginaTablasGenerales = lazy(() =>
     }),
   ),
 );
-const PaginaEmpresa = lazy(() =>
-  import("@/features/configuracion/paginas/PaginaEmpresa").then((m) => ({
-    default: m.PaginaEmpresa,
-  })),
-);
+const PaginaEmpresa = lazy(() => import("@/features/configuracion/paginas/PaginaEmpresa"));
 const PaginaSucursales = lazy(() =>
   import("@/features/configuracion/paginas/PaginaSucursales").then((m) => ({
     default: m.PaginaSucursales,
@@ -94,13 +90,7 @@ const PaginaCompras = lazy(() =>
     default: m.PaginaCompras,
   })),
 );
-const PaginaOrdenesCompra = lazy(() =>
-  import("@/features/compras/ordenes-compra/paginas/PaginaOrdenCompra").then(
-    (m) => ({
-      default: m.PaginaOrdenCompra,
-    }),
-  ),
-);
+const PaginaOrdenesCompra = lazy(() => import("@/features/compras/ordenes-compra/paginas/PaginaOrdenCompra"));
 const PaginaVentas = lazy(() =>
   import("@/features/ventas/paginas/PaginaVentas").then((m) => ({
     default: m.PaginaVentas,

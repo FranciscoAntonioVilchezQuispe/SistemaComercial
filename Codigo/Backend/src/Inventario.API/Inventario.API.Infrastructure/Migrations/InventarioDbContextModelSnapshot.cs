@@ -32,10 +32,6 @@ namespace Inventario.API.Infrastructure.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
-                    b.Property<bool>("Activado")
-                        .HasColumnType("boolean")
-                        .HasColumnName("activado");
-
                     b.Property<string>("Direccion")
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)")
@@ -44,14 +40,6 @@ namespace Inventario.API.Infrastructure.Migrations
                     b.Property<bool>("EsPrincipal")
                         .HasColumnType("boolean")
                         .HasColumnName("es_principal");
-
-                    b.Property<DateTime?>("FechaActualizacion")
-                        .HasColumnType("timestamp without time zone")
-                        .HasColumnName("fecha_modificacion");
-
-                    b.Property<DateTime>("FechaCreacion")
-                        .HasColumnType("timestamp without time zone")
-                        .HasColumnName("fecha_creacion");
 
                     b.Property<long>("IdSucursal")
                         .HasColumnType("bigint")
@@ -62,17 +50,6 @@ namespace Inventario.API.Infrastructure.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)")
                         .HasColumnName("nombre_almacen");
-
-                    b.Property<string>("UsuarioActualizacion")
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
-                        .HasColumnName("usuario_modificacion");
-
-                    b.Property<string>("UsuarioCreacion")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
-                        .HasColumnName("usuario_creacion");
 
                     b.HasKey("Id")
                         .HasName("pk_almacenes");
@@ -158,6 +135,154 @@ namespace Inventario.API.Infrastructure.Migrations
                         });
                 });
 
+            modelBuilder.Entity("Inventario.API.Domain.Entidades.Integracion.SyncDetalleNotaCreditoCompra", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_detalle");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<decimal>("Cantidad")
+                        .HasColumnType("numeric")
+                        .HasColumnName("cantidad");
+
+                    b.Property<long>("IdNota")
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_nota_credito");
+
+                    b.Property<long>("IdProducto")
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_producto");
+
+                    b.Property<decimal>("PrecioUnitario")
+                        .HasColumnType("numeric")
+                        .HasColumnName("precio_unitario");
+
+                    b.HasKey("Id")
+                        .HasName("pk_nota_credito_detalle");
+
+                    b.HasIndex("IdNota")
+                        .HasDatabaseName("ix_nota_credito_detalle_id_nota");
+
+                    b.ToTable("nota_credito_detalle", "compras", t =>
+                        {
+                            t.ExcludeFromMigrations();
+                        });
+                });
+
+            modelBuilder.Entity("Inventario.API.Domain.Entidades.Integracion.SyncDetalleNotaCreditoVenta", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_detalle");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<decimal>("Cantidad")
+                        .HasColumnType("numeric")
+                        .HasColumnName("cantidad");
+
+                    b.Property<long>("IdNota")
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_nota_credito");
+
+                    b.Property<long>("IdProducto")
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_producto");
+
+                    b.Property<decimal>("PrecioUnitario")
+                        .HasColumnType("numeric")
+                        .HasColumnName("precio_unitario");
+
+                    b.HasKey("Id")
+                        .HasName("pk_nota_credito_detalle");
+
+                    b.HasIndex("IdNota")
+                        .HasDatabaseName("ix_nota_credito_detalle_id_nota1");
+
+                    b.ToTable("nota_credito_detalle", "ventas", t =>
+                        {
+                            t.ExcludeFromMigrations();
+                        });
+                });
+
+            modelBuilder.Entity("Inventario.API.Domain.Entidades.Integracion.SyncDetalleNotaDebitoCompra", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_detalle");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<decimal>("Cantidad")
+                        .HasColumnType("numeric")
+                        .HasColumnName("cantidad");
+
+                    b.Property<long>("IdNota")
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_nota_debito");
+
+                    b.Property<long>("IdProducto")
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_producto");
+
+                    b.Property<decimal>("PrecioUnitario")
+                        .HasColumnType("numeric")
+                        .HasColumnName("precio_unitario");
+
+                    b.HasKey("Id")
+                        .HasName("pk_nota_debito_detalle");
+
+                    b.HasIndex("IdNota")
+                        .HasDatabaseName("ix_nota_debito_detalle_id_nota");
+
+                    b.ToTable("nota_debito_detalle", "compras", t =>
+                        {
+                            t.ExcludeFromMigrations();
+                        });
+                });
+
+            modelBuilder.Entity("Inventario.API.Domain.Entidades.Integracion.SyncDetalleNotaDebitoVenta", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_detalle");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<decimal>("Cantidad")
+                        .HasColumnType("numeric")
+                        .HasColumnName("cantidad");
+
+                    b.Property<long>("IdNota")
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_nota_debito");
+
+                    b.Property<long>("IdProducto")
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_producto");
+
+                    b.Property<decimal>("PrecioUnitario")
+                        .HasColumnType("numeric")
+                        .HasColumnName("precio_unitario");
+
+                    b.HasKey("Id")
+                        .HasName("pk_nota_debito_detalle");
+
+                    b.HasIndex("IdNota")
+                        .HasDatabaseName("ix_nota_debito_detalle_id_nota1");
+
+                    b.ToTable("nota_debito_detalle", "ventas", t =>
+                        {
+                            t.ExcludeFromMigrations();
+                        });
+                });
+
             modelBuilder.Entity("Inventario.API.Domain.Entidades.Integracion.SyncDetalleVenta", b =>
                 {
                     b.Property<long>("Id")
@@ -190,6 +315,319 @@ namespace Inventario.API.Infrastructure.Migrations
                         .HasDatabaseName("ix_detalle_venta_id_venta");
 
                     b.ToTable("detalle_venta", "ventas", t =>
+                        {
+                            t.ExcludeFromMigrations();
+                        });
+                });
+
+            modelBuilder.Entity("Inventario.API.Domain.Entidades.Integracion.SyncMatrizReglaSunat", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_regla");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<bool>("Activado")
+                        .HasColumnType("boolean")
+                        .HasColumnName("activado");
+
+                    b.Property<long>("IdTipoComprobante")
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_tipo_comprobante");
+
+                    b.Property<long>("IdTipoOperacion")
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_tipo_operacion");
+
+                    b.Property<int>("NivelObligatoriedad")
+                        .HasColumnType("integer")
+                        .HasColumnName("nivel_obligatoriedad");
+
+                    b.HasKey("Id")
+                        .HasName("pk_matriz_regla_sunat");
+
+                    b.ToTable("matriz_regla_sunat", "configuracion", t =>
+                        {
+                            t.ExcludeFromMigrations();
+                        });
+                });
+
+            modelBuilder.Entity("Inventario.API.Domain.Entidades.Integracion.SyncNotaCreditoCompra", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_nota");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<bool>("AfectaStock")
+                        .HasColumnType("boolean")
+                        .HasColumnName("afecta_stock");
+
+                    b.Property<DateTime>("FechaEmision")
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("fecha_emision");
+
+                    b.Property<long>("IdCompraReferencia")
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_compra_referencia");
+
+                    b.Property<long>("IdProveedor")
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_proveedor");
+
+                    b.Property<string>("Numero")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("numero");
+
+                    b.Property<string>("Serie")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("serie");
+
+                    b.Property<decimal>("Total")
+                        .HasColumnType("numeric")
+                        .HasColumnName("total");
+
+                    b.HasKey("Id")
+                        .HasName("pk_nota_credito");
+
+                    b.HasIndex("IdCompraReferencia")
+                        .HasDatabaseName("ix_nota_credito_id_compra_referencia");
+
+                    b.ToTable("nota_credito", "compras", t =>
+                        {
+                            t.ExcludeFromMigrations();
+                        });
+                });
+
+            modelBuilder.Entity("Inventario.API.Domain.Entidades.Integracion.SyncNotaCreditoVenta", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_nota");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<bool>("AfectaStock")
+                        .HasColumnType("boolean")
+                        .HasColumnName("afecta_stock");
+
+                    b.Property<DateTime>("FechaEmision")
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("fecha_emision");
+
+                    b.Property<long>("IdVentaReferencia")
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_venta_referencia");
+
+                    b.Property<long>("Numero")
+                        .HasColumnType("bigint")
+                        .HasColumnName("numero");
+
+                    b.Property<string>("Serie")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("serie");
+
+                    b.Property<decimal>("Total")
+                        .HasColumnType("numeric")
+                        .HasColumnName("total");
+
+                    b.HasKey("Id")
+                        .HasName("pk_nota_credito");
+
+                    b.HasIndex("IdVentaReferencia")
+                        .HasDatabaseName("ix_nota_credito_id_venta_referencia");
+
+                    b.ToTable("nota_credito", "ventas", t =>
+                        {
+                            t.ExcludeFromMigrations();
+                        });
+                });
+
+            modelBuilder.Entity("Inventario.API.Domain.Entidades.Integracion.SyncNotaDebitoCompra", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_nota");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<bool>("AfectaStock")
+                        .HasColumnType("boolean")
+                        .HasColumnName("afecta_stock");
+
+                    b.Property<DateTime>("FechaEmision")
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("fecha_emision");
+
+                    b.Property<long>("IdCompraReferencia")
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_compra_referencia");
+
+                    b.Property<long>("IdProveedor")
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_proveedor");
+
+                    b.Property<string>("Numero")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("numero");
+
+                    b.Property<string>("Serie")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("serie");
+
+                    b.Property<decimal>("Total")
+                        .HasColumnType("numeric")
+                        .HasColumnName("total");
+
+                    b.HasKey("Id")
+                        .HasName("pk_nota_debito");
+
+                    b.HasIndex("IdCompraReferencia")
+                        .HasDatabaseName("ix_nota_debito_id_compra_referencia");
+
+                    b.ToTable("nota_debito", "compras", t =>
+                        {
+                            t.ExcludeFromMigrations();
+                        });
+                });
+
+            modelBuilder.Entity("Inventario.API.Domain.Entidades.Integracion.SyncNotaDebitoVenta", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_nota");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<bool>("AfectaStock")
+                        .HasColumnType("boolean")
+                        .HasColumnName("afecta_stock");
+
+                    b.Property<DateTime>("FechaEmision")
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("fecha_emision");
+
+                    b.Property<long>("IdVentaReferencia")
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_venta_referencia");
+
+                    b.Property<long>("Numero")
+                        .HasColumnType("bigint")
+                        .HasColumnName("numero");
+
+                    b.Property<string>("Serie")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("serie");
+
+                    b.Property<decimal>("Total")
+                        .HasColumnType("numeric")
+                        .HasColumnName("total");
+
+                    b.HasKey("Id")
+                        .HasName("pk_nota_debito");
+
+                    b.HasIndex("IdVentaReferencia")
+                        .HasDatabaseName("ix_nota_debito_id_venta_referencia");
+
+                    b.ToTable("nota_debito", "ventas", t =>
+                        {
+                            t.ExcludeFromMigrations();
+                        });
+                });
+
+            modelBuilder.Entity("Inventario.API.Domain.Entidades.Integracion.SyncTipoComprobante", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_tipo_comprobante");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<bool>("Activado")
+                        .HasColumnType("boolean")
+                        .HasColumnName("activado");
+
+                    b.Property<string>("Codigo")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)")
+                        .HasColumnName("codigo");
+
+                    b.Property<string>("MovimientoStockCompra")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("movimiento_stock_compra");
+
+                    b.Property<string>("MovimientoStockVenta")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("movimiento_stock_venta");
+
+                    b.Property<bool>("MueveStock")
+                        .HasColumnType("boolean")
+                        .HasColumnName("mueve_stock");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("nombre");
+
+                    b.Property<string>("TipoMovimientoStock")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("tipo_movimiento_stock");
+
+                    b.HasKey("Id")
+                        .HasName("pk_tipo_comprobante");
+
+                    b.ToTable("tipo_comprobante", "configuracion", t =>
+                        {
+                            t.ExcludeFromMigrations();
+                        });
+                });
+
+            modelBuilder.Entity("Inventario.API.Domain.Entidades.Integracion.SyncTipoOperacionSunat", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_tipo_operacion");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<bool>("Activado")
+                        .HasColumnType("boolean")
+                        .HasColumnName("activado");
+
+                    b.Property<string>("Codigo")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("codigo");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("nombre");
+
+                    b.HasKey("Id")
+                        .HasName("pk_tipo_operacion_sunat");
+
+                    b.ToTable("tipo_operacion_sunat", "configuracion", t =>
                         {
                             t.ExcludeFromMigrations();
                         });
@@ -293,14 +731,14 @@ namespace Inventario.API.Infrastructure.Migrations
                         .HasColumnName("producto_id");
 
                     b.Property<string>("UsuarioActualizacion")
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
                         .HasColumnName("usuario_modificacion");
 
                     b.Property<string>("UsuarioCreacion")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
                         .HasColumnName("usuario_creacion");
 
                     b.HasKey("Id")
@@ -404,8 +842,8 @@ namespace Inventario.API.Infrastructure.Migrations
 
                     b.Property<string>("MotivoTrasladoSunat")
                         .IsRequired()
-                        .HasMaxLength(2)
-                        .HasColumnType("character varying(2)")
+                        .HasMaxLength(4)
+                        .HasColumnType("character varying(4)")
                         .HasColumnName("motivo_traslado_sunat");
 
                     b.Property<string>("NumeroDocumento")
@@ -483,8 +921,8 @@ namespace Inventario.API.Infrastructure.Migrations
 
                     b.Property<string>("TipoOperacion")
                         .IsRequired()
-                        .HasMaxLength(1)
-                        .HasColumnType("character varying(1)")
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)")
                         .HasColumnName("tipo_operacion");
 
                     b.Property<string>("UnidadMedidaCodigo")
@@ -494,8 +932,8 @@ namespace Inventario.API.Infrastructure.Migrations
                         .HasColumnName("unidad_medida_codigo");
 
                     b.Property<string>("UsuarioActualizacion")
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
                         .HasColumnName("usuario_modificacion");
 
                     b.Property<long?>("UsuarioAnulacionId")
@@ -504,8 +942,8 @@ namespace Inventario.API.Infrastructure.Migrations
 
                     b.Property<string>("UsuarioCreacion")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
                         .HasColumnName("usuario_creacion");
 
                     b.Property<long>("UsuarioRegistroId")
@@ -598,8 +1036,8 @@ namespace Inventario.API.Infrastructure.Migrations
 
                     b.Property<string>("Motivo")
                         .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("character varying(30)")
+                        .HasMaxLength(250)
+                        .HasColumnType("character varying(250)")
                         .HasColumnName("motivo");
 
                     b.Property<int>("ProductoId")
@@ -641,6 +1079,12 @@ namespace Inventario.API.Infrastructure.Migrations
                         .HasColumnType("decimal(10,3)")
                         .HasColumnName("cantidad_nueva");
 
+                    b.Property<string>("CodigoOperacionSunat")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)")
+                        .HasColumnName("codigo_operacion_sunat");
+
                     b.Property<decimal>("CostoPromedioActual")
                         .HasColumnType("decimal(12,4)")
                         .HasColumnName("costo_promedio_actual");
@@ -665,6 +1109,12 @@ namespace Inventario.API.Infrastructure.Migrations
                         .HasColumnType("bigint")
                         .HasColumnName("id_tipo_movimiento");
 
+                    b.Property<string>("NumeroDocumento")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("numero_documento");
+
                     b.Property<string>("Observaciones")
                         .HasColumnType("text")
                         .HasColumnName("observaciones");
@@ -682,10 +1132,22 @@ namespace Inventario.API.Infrastructure.Migrations
                         .HasColumnType("decimal(12,2)")
                         .HasColumnName("saldo_valorizado");
 
+                    b.Property<string>("SerieDocumento")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)")
+                        .HasColumnName("serie_documento");
+
+                    b.Property<string>("TipoDocumento")
+                        .IsRequired()
+                        .HasMaxLength(2)
+                        .HasColumnType("character varying(2)")
+                        .HasColumnName("tipo_documento");
+
                     b.Property<string>("UsuarioCreacion")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
                         .HasColumnName("usuario_creacion");
 
                     b.HasKey("Id")
@@ -702,7 +1164,7 @@ namespace Inventario.API.Infrastructure.Migrations
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
-                        .HasColumnName("id_detalle");
+                        .HasColumnName("id_tipo_movimiento");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
@@ -711,15 +1173,26 @@ namespace Inventario.API.Infrastructure.Migrations
                         .HasColumnType("text")
                         .HasColumnName("codigo");
 
+                    b.Property<decimal>("Factor")
+                        .HasColumnType("numeric")
+                        .HasColumnName("factor");
+
+                    b.Property<bool>("MueveStock")
+                        .HasColumnType("boolean")
+                        .HasColumnName("mueve_stock");
+
                     b.Property<string>("Nombre")
                         .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("nombre");
 
                     b.HasKey("Id")
-                        .HasName("pk_tablas_generales_detalle");
+                        .HasName("pk_tipos_movimiento");
 
-                    b.ToTable("tablas_generales_detalle", "configuracion");
+                    b.ToTable("tipos_movimiento", "inventario", t =>
+                        {
+                            t.ExcludeFromMigrations();
+                        });
                 });
 
             modelBuilder.Entity("Inventario.API.Domain.Entidades.Stock", b =>
@@ -743,6 +1216,10 @@ namespace Inventario.API.Infrastructure.Migrations
                         .HasColumnType("decimal(12,4)")
                         .HasColumnName("costo_promedio");
 
+                    b.Property<DateTime?>("FechaActualizacion")
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("fecha_modificacion");
+
                     b.Property<long>("IdAlmacen")
                         .HasColumnType("bigint")
                         .HasColumnName("id_almacen");
@@ -759,6 +1236,11 @@ namespace Inventario.API.Infrastructure.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)")
                         .HasColumnName("ubicacion_fisica");
+
+                    b.Property<string>("UsuarioActualizacion")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("usuario_modificacion");
 
                     b.Property<decimal>("ValorTotal")
                         .HasColumnType("decimal(12,2)")
@@ -785,10 +1267,6 @@ namespace Inventario.API.Infrastructure.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
-                    b.Property<bool>("Activado")
-                        .HasColumnType("boolean")
-                        .HasColumnName("activado");
-
                     b.Property<long>("AlmacenDestinoId")
                         .HasColumnType("bigint")
                         .HasColumnName("almacen_destino_id");
@@ -802,14 +1280,6 @@ namespace Inventario.API.Infrastructure.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("character varying(20)")
                         .HasColumnName("estado");
-
-                    b.Property<DateTime?>("FechaActualizacion")
-                        .HasColumnType("timestamp without time zone")
-                        .HasColumnName("fecha_modificacion");
-
-                    b.Property<DateTime>("FechaCreacion")
-                        .HasColumnType("timestamp without time zone")
-                        .HasColumnName("fecha_creacion");
 
                     b.Property<DateTime?>("FechaDespacho")
                         .HasColumnType("timestamp without time zone")
@@ -850,17 +1320,6 @@ namespace Inventario.API.Infrastructure.Migrations
                     b.Property<string>("Observaciones")
                         .HasColumnType("text")
                         .HasColumnName("observaciones");
-
-                    b.Property<string>("UsuarioActualizacion")
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
-                        .HasColumnName("usuario_modificacion");
-
-                    b.Property<string>("UsuarioCreacion")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
-                        .HasColumnName("usuario_creacion");
 
                     b.HasKey("Id")
                         .HasName("pk_traslados");
@@ -930,6 +1389,54 @@ namespace Inventario.API.Infrastructure.Migrations
                     b.Navigation("Compra");
                 });
 
+            modelBuilder.Entity("Inventario.API.Domain.Entidades.Integracion.SyncDetalleNotaCreditoCompra", b =>
+                {
+                    b.HasOne("Inventario.API.Domain.Entidades.Integracion.SyncNotaCreditoCompra", "Nota")
+                        .WithMany("Detalles")
+                        .HasForeignKey("IdNota")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_nota_credito_detalle_nota_credito_id_nota");
+
+                    b.Navigation("Nota");
+                });
+
+            modelBuilder.Entity("Inventario.API.Domain.Entidades.Integracion.SyncDetalleNotaCreditoVenta", b =>
+                {
+                    b.HasOne("Inventario.API.Domain.Entidades.Integracion.SyncNotaCreditoVenta", "Nota")
+                        .WithMany("Detalles")
+                        .HasForeignKey("IdNota")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_nota_credito_detalle_nota_credito_id_nota");
+
+                    b.Navigation("Nota");
+                });
+
+            modelBuilder.Entity("Inventario.API.Domain.Entidades.Integracion.SyncDetalleNotaDebitoCompra", b =>
+                {
+                    b.HasOne("Inventario.API.Domain.Entidades.Integracion.SyncNotaDebitoCompra", "Nota")
+                        .WithMany("Detalles")
+                        .HasForeignKey("IdNota")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_nota_debito_detalle_nota_debito_id_nota");
+
+                    b.Navigation("Nota");
+                });
+
+            modelBuilder.Entity("Inventario.API.Domain.Entidades.Integracion.SyncDetalleNotaDebitoVenta", b =>
+                {
+                    b.HasOne("Inventario.API.Domain.Entidades.Integracion.SyncNotaDebitoVenta", "Nota")
+                        .WithMany("Detalles")
+                        .HasForeignKey("IdNota")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_nota_debito_detalle_nota_debito_id_nota");
+
+                    b.Navigation("Nota");
+                });
+
             modelBuilder.Entity("Inventario.API.Domain.Entidades.Integracion.SyncDetalleVenta", b =>
                 {
                     b.HasOne("Inventario.API.Domain.Entidades.Integracion.SyncVenta", "Venta")
@@ -938,6 +1445,54 @@ namespace Inventario.API.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_detalle_venta_ventas_id_venta");
+
+                    b.Navigation("Venta");
+                });
+
+            modelBuilder.Entity("Inventario.API.Domain.Entidades.Integracion.SyncNotaCreditoCompra", b =>
+                {
+                    b.HasOne("Inventario.API.Domain.Entidades.Integracion.SyncCompra", "Compra")
+                        .WithMany()
+                        .HasForeignKey("IdCompraReferencia")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_nota_credito_compras_id_compra_referencia");
+
+                    b.Navigation("Compra");
+                });
+
+            modelBuilder.Entity("Inventario.API.Domain.Entidades.Integracion.SyncNotaCreditoVenta", b =>
+                {
+                    b.HasOne("Inventario.API.Domain.Entidades.Integracion.SyncVenta", "Venta")
+                        .WithMany()
+                        .HasForeignKey("IdVentaReferencia")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_nota_credito_ventas_id_venta_referencia");
+
+                    b.Navigation("Venta");
+                });
+
+            modelBuilder.Entity("Inventario.API.Domain.Entidades.Integracion.SyncNotaDebitoCompra", b =>
+                {
+                    b.HasOne("Inventario.API.Domain.Entidades.Integracion.SyncCompra", "Compra")
+                        .WithMany()
+                        .HasForeignKey("IdCompraReferencia")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_nota_debito_compras_id_compra_referencia");
+
+                    b.Navigation("Compra");
+                });
+
+            modelBuilder.Entity("Inventario.API.Domain.Entidades.Integracion.SyncNotaDebitoVenta", b =>
+                {
+                    b.HasOne("Inventario.API.Domain.Entidades.Integracion.SyncVenta", "Venta")
+                        .WithMany()
+                        .HasForeignKey("IdVentaReferencia")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_nota_debito_ventas_id_venta_referencia");
 
                     b.Navigation("Venta");
                 });
@@ -969,7 +1524,7 @@ namespace Inventario.API.Infrastructure.Migrations
             modelBuilder.Entity("Inventario.API.Domain.Entidades.TrasladoDetalle", b =>
                 {
                     b.HasOne("Inventario.API.Domain.Entidades.Traslado", "Traslado")
-                        .WithMany()
+                        .WithMany("Detalles")
                         .HasForeignKey("TrasladoId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
@@ -983,7 +1538,32 @@ namespace Inventario.API.Infrastructure.Migrations
                     b.Navigation("Detalles");
                 });
 
+            modelBuilder.Entity("Inventario.API.Domain.Entidades.Integracion.SyncNotaCreditoCompra", b =>
+                {
+                    b.Navigation("Detalles");
+                });
+
+            modelBuilder.Entity("Inventario.API.Domain.Entidades.Integracion.SyncNotaCreditoVenta", b =>
+                {
+                    b.Navigation("Detalles");
+                });
+
+            modelBuilder.Entity("Inventario.API.Domain.Entidades.Integracion.SyncNotaDebitoCompra", b =>
+                {
+                    b.Navigation("Detalles");
+                });
+
+            modelBuilder.Entity("Inventario.API.Domain.Entidades.Integracion.SyncNotaDebitoVenta", b =>
+                {
+                    b.Navigation("Detalles");
+                });
+
             modelBuilder.Entity("Inventario.API.Domain.Entidades.Integracion.SyncVenta", b =>
+                {
+                    b.Navigation("Detalles");
+                });
+
+            modelBuilder.Entity("Inventario.API.Domain.Entidades.Traslado", b =>
                 {
                     b.Navigation("Detalles");
                 });

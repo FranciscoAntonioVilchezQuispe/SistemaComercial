@@ -33,7 +33,8 @@ namespace Ventas.API.Application.Manejadores
                     notification.VentaId,
                     notification.IdTipoComprobante,
                     notification.Serie,
-                    notification.Numero);
+                    notification.Numero,
+                    notification.FechaEmision);
 
                 if (!success)
                 {

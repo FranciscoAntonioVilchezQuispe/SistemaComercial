@@ -65,15 +65,17 @@ export function DialogoFinalizarVenta({
   onConfirmar,
   tipoComprobanteSeleccionado,
 }: DialogoFinalizarVentaProps) {
-  // Carga filtrada de comprobantes segun el documento del cliente (DNI/RUC)
-  const { data: tiposComprobanteRules = [] } =
-    useComprobantesPorDocumento(cliente.idTipoDocumento?.toString());
+  // Carga filtrada de comprobantes segun el documento del cliente (DNI/RUC) usando el Código SUNAT
+  const { data: tiposComprobanteRules = [], isLoading: cargandoReglas } =
+    useComprobantesPorDocumento(cliente.tipoDocumentoCodigo);
 
-  // Si no hay reglas (cliente nuevo o error), fallback al hook general
+  // Hook general para obtener todos (fallback solo si no hay reglas configuradas para nadie, de lo contrario manda la regla)
   const { data: pagedTiposGen } = useTipoComprobante("VENTA");
 
   const tiposComprobante =
-    tiposComprobanteRules.length > 0 ? tiposComprobanteRules : (pagedTiposGen?.datos || []);
+    tiposComprobanteRules.length > 0 
+      ? tiposComprobanteRules 
+      : (!cargandoReglas && cliente.tipoDocumentoCodigo ? [] : (pagedTiposGen?.datos || []));
 
   const { data: tiposOperacion = [] } =
     useTiposOperacionSunat();

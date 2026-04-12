@@ -230,8 +230,10 @@ export function PaginaProveedores() {
                       toast.success("Proveedor eliminado correctamente");
                       setEliminarId(null);
                     },
-                    onError: () =>
-                      toast.error("Error al eliminar el proveedor"),
+                    onError: (error) => {
+                      console.error("Error al eliminar el proveedor:", error);
+                      setEliminarId(null);
+                    },
                   });
                 }
               }}

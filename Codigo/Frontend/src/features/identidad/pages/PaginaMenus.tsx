@@ -39,7 +39,6 @@ export function PaginaMenus() {
     },
     onError: (e: any) => {
       console.error("Error al eliminar menú:", e);
-      toast.error("Error al eliminar el menú");
     },
   });
 

@@ -22,5 +22,20 @@ namespace Inventario.API.Domain.Entidades.Integracion
 
         [Column("activado")]
         public bool Activado { get; set; } = true;
+
+        [Column("mueve_stock")]
+        public bool MueveStock { get; set; }
+
+        [Column("tipo_movimiento_stock")]
+        [MaxLength(20)]
+        public string? TipoMovimientoStock { get; set; }
+
+        [Column("movimiento_stock_venta")]
+        [MaxLength(20)]
+        public string? MovimientoStockVenta { get; set; }
+
+        [Column("movimiento_stock_compra")]
+        [MaxLength(20)]
+        public string? MovimientoStockCompra { get; set; }
     }
 }

@@ -139,7 +139,7 @@ export const servicioInventario = {
   /**
    * Ejecuta la sincronización masiva de compras y ventas históricas
    */
-  sincronizarHistorico: async (reiniciar: boolean = true) => {
+  sincronizarHistorico: async (reiniciar: boolean = false) => {
     const response: any = await apiInventario.post(
       `${API_URL}/movimientos/sincronizar-compras?reiniciar=${reiniciar}`,
     );

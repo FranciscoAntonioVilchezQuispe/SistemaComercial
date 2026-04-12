@@ -11,17 +11,17 @@ namespace Compras.API.Application.DTOs
         public string TipoComprobante { get; set; } = "07";
 
         public long IdCompraReferencia { get; set; }
-        public string SerieReferencia { get; set; } = null!;
-        public string NumeroReferencia { get; set; } = null!;
-        public string TipoDocReferencia { get; set; } = null!;
+        public string? SerieReferencia { get; set; }
+        public string? NumeroReferencia { get; set; }
+        public string? TipoDocReferencia { get; set; }
 
         public long IdTipoNota { get; set; }
         public string MotivoSustento { get; set; } = null!;
 
-        public long IdProveedor { get; set; }
-        public string ProveedorTipoDoc { get; set; } = null!;
-        public string ProveedorNroDoc { get; set; } = null!;
-        public string ProveedorRazonSocial { get; set; } = null!;
+        public long? IdProveedor { get; set; }
+        public string? ProveedorTipoDoc { get; set; }
+        public string? ProveedorNroDoc { get; set; }
+        public string? ProveedorRazonSocial { get; set; }
 
         public decimal Subtotal { get; set; }
         public decimal Igv { get; set; }

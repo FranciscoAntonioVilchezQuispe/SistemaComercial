@@ -3,11 +3,23 @@ export interface ClienteResumen {
   id: number;
   idTipoDocumento: number;
   tipoDocumentoNombre: string;
+  tipoDocumentoCodigo: string; // Código SUNAT (ej. 1 para DNI, 6 para RUC)
   numeroDocumento: string;
   razonSocial: string;
   nombreComercial?: string;
+  direccion?: string;
+  email?: string;
+  telefono?: string;
+  ubigeo?: string;
   condicionSunat?: string;
   estadoSunat?: string;
+  esAgenteRetencion?: boolean;
+  esBuenContribuyente?: boolean;
+  esAgentePercepcion?: boolean;
+  fechaUltimaConsultaSunat?: string;
+  idListaPrecioAsignada?: number;
+  diasCredito?: number;
+  idTipoCliente: number;
   activado: boolean;
 }
 
@@ -16,6 +28,7 @@ export interface ClienteDetalle {
   id: number;
   idTipoDocumento: number;
   tipoDocumentoNombre: string;
+  tipoDocumentoCodigo: string; // Código SUNAT (ej. 1 para DNI, 6 para RUC)
   numeroDocumento: string;
   razonSocial: string;
   nombreComercial?: string;
@@ -27,13 +40,13 @@ export interface ClienteDetalle {
   limiteCredito?: number;
   diasCredito?: number;
   idListaPrecioAsignada?: number;
-  activado: boolean;
+  activado?: boolean;
   ubigeo?: string;
   condicionSunat?: string;
   estadoSunat?: string;
-  esAgenteRetencion: boolean;
-  esBuenContribuyente: boolean;
-  esAgentePercepcion: boolean;
+  esAgenteRetencion?: boolean;
+  esBuenContribuyente?: boolean;
+  esAgentePercepcion?: boolean;
   fechaUltimaConsultaSunat?: string;
   contactos?: ContactoCliente[];
 }
@@ -64,12 +77,12 @@ export interface ClienteFormData {
   limiteCredito?: number;
   diasCredito?: number;
   idListaPrecioAsignada?: number;
-  activado: boolean;
+  activado?: boolean;
   ubigeo?: string;
   condicionSunat?: string;
   estadoSunat?: string;
-  esAgenteRetencion: boolean;
-  esBuenContribuyente: boolean;
-  esAgentePercepcion: boolean;
+  esAgenteRetencion?: boolean;
+  esBuenContribuyente?: boolean;
+  esAgentePercepcion?: boolean;
   fechaUltimaConsultaSunat?: string;
 }

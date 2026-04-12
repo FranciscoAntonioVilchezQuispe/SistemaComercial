@@ -26,8 +26,8 @@ export const confirmarCompra = async (id: number): Promise<void> => {
   await api.post(`/compras/${id}/confirmar`);
 };
 
-export const anularCompra = async (id: number): Promise<void> => {
-  await api.post(`/compras/${id}/anular`);
+export const anularCompra = async (id: number, motivo: string, usuarioId: number): Promise<void> => {
+  await api.post(`/compras/${id}/anular`, { motivo, usuarioId });
 };
 
 export const eliminarCompra = async (id: number): Promise<void> => {

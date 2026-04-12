@@ -10,6 +10,16 @@ export enum TipoMovimientoInventario {
   TransferenciaAlmacen = 23,
 }
 
+export enum EstadoDocumento {
+  Registrado = 60,
+  AnuladoDirecto = 61,
+  Rechazado = 62,
+  Pendiente = 63,
+  AnuladoNotaCredito = 64,
+  AnuladoNotaDebito = 65,
+  Completado = 66,
+}
+
 export enum TablasGenerales {
   TIPO_DOCUMENTO = "TIPO_DOCUMENTO",
   TIPO_CLIENTE = "TIPO_CLIENTE",
@@ -24,4 +34,5 @@ export enum TablasGenerales {
   ESTADO_ASIENTO = "ESTADO_ASIENTO",
   ESTADO_PAGO = "ESTADO_PAGO",
   TIPO_MONEDA = "TIPO_MONEDA",
+  ESTADO_DOCUMENTO = "ESTADO_DOCUMENTO",
 }

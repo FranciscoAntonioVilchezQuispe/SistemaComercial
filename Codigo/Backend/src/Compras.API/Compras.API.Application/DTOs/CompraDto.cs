@@ -28,7 +28,8 @@ namespace Compras.API.Application.DTOs
         public decimal Total { get; set; }
         public decimal? SaldoPendiente { get; set; }
         public long IdEstadoPago { get; set; }
-
+        public long IdEstado { get; set; }
+        public DateTime FechaCreacion { get; set; }
         public string? Observaciones { get; set; }
         public string? NumeroDocumentoProveedor { get; set; }
         public string? NombreTipoDocumentoProveedor { get; set; }

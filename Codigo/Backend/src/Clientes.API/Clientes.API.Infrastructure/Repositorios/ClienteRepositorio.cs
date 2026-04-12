@@ -28,6 +28,7 @@ namespace Clientes.API.Infrastructure.Repositorios
             var sql = @"
                 -- Cabecera de Cliente
                 SELECT c.id_cliente as Id, c.id_tipo_documento, td.nombre as TipoDocumentoNombre,
+                       td.codigo as TipoDocumentoCodigo,
                        c.numero_documento, c.razon_social, c.nombre_comercial, c.direccion,
                        c.telefono, c.email, c.id_tipo_cliente, c.limite_credito, c.dias_credito,
                        c.id_lista_precio_asignada, c.ubigeo, c.condicion_sunat, c.estado_sunat,
@@ -100,6 +101,7 @@ namespace Clientes.API.Infrastructure.Repositorios
             var offset = (pageNumber - 1) * pageSize;
             var sql = @"
                 SELECT c.id_cliente as Id, c.id_tipo_documento, td.nombre as TipoDocumentoNombre,
+                       td.codigo as TipoDocumentoCodigo,
                        c.numero_documento, c.razon_social, c.email, c.telefono, c.activado,
                        COUNT(*) OVER() AS TotalRegistros
                 FROM clientes.clientes c

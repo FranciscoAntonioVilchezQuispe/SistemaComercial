@@ -53,7 +53,7 @@ namespace Inventario.API.Application.Servicios
                 decimal costoMovimientoUnitarioAplicable = 0;
                 decimal costoMovimientoTotalAplicable = 0;
 
-                if (mov.TipoOperacion == "E")
+                if (mov.EntradaCantidad > 0)
                 {
                     // ENTRADA: Trae su propio costo original, recalculamos el TOTAL en base a ese costo
                     costoMovimientoUnitarioAplicable = mov.EntradaCostoUnitario ?? 0;
@@ -71,7 +71,7 @@ namespace Inventario.API.Application.Servicios
                     // Actualizar Fila
                     mov.EntradaCostoTotal = costoMovimientoTotalAplicable; // Por si hubo precision error antes
                 }
-                else if (mov.TipoOperacion == "S")
+                else if (mov.SalidaCantidad > 0)
                 {
                     // SALIDA: Dependerá del método. Por ahora, Promedio Ponderado => Toma Costo Promedio Unitario INMEDIATO ANTERIOR (saldoAcumCostoUnitario)
                     costoMovimientoUnitarioAplicable = saldoAcumCostoUnitario;

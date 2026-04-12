@@ -66,9 +66,9 @@ namespace Inventario.API.Domain.Entidades.Kardex
 
         // Tipo de operación
         [Required]
-        [MaxLength(1)]
+        [MaxLength(10)]
         [Column("tipo_operacion")]
-        public string TipoOperacion { get; set; } = null!; // 'E'=Entrada / 'S'=Salida
+        public string TipoOperacion { get; set; } = null!; // Tabla 12 SUNAT (01, 02, 05, 07...)
 
         [Required]
         [MaxLength(4)]

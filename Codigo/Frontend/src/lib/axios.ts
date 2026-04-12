@@ -3,6 +3,7 @@ import axios, {
   AxiosInstance,
   AxiosResponse,
   InternalAxiosRequestConfig,
+  AxiosRequestConfig
 } from "axios";
 import { toast } from "sonner";
 
@@ -81,21 +82,31 @@ const createApiInstance = (baseURL: string): AxiosInstance => {
       });
 
       // Manejo de alertas automáticas
-      const errorData = error.response?.data;
-      let mensaje =
-        errorData?.message ||
-        errorData?.Message ||
-        error.message ||
-        "Ocurrió un error inesperado";
+      const skipToast = (error.config as any)?._skipToast;
+      
+      if (!skipToast) {
+        const errorData = error.response?.data;
+        let mensaje =
+          errorData?.message ||
+          errorData?.Message ||
+          (typeof errorData === 'string' ? errorData : null) ||
+          error.message ||
+          "Ocurrió un error inesperado";
 
-      if (errorData?.errors && Array.isArray(errorData.errors) && errorData.errors.length > 0) {
-          const primerError = errorData.errors[0];
-          mensaje = primerError.error || primerError.message || mensaje;
+        if (errorData?.errors && typeof errorData.errors === 'object') {
+           // Si es un objeto de errores de validación (FluentValidation)
+           const primerError = Object.values(errorData.errors)[0];
+           if (Array.isArray(primerError) && primerError.length > 0) {
+             mensaje = primerError[0];
+           }
+        }
+
+        toast.error(mensaje, {
+          description: `Código: ${error.response?.status || 500}`,
+        });
+
+        (error as any)._sentToast = true;
       }
-
-      toast.error(mensaje, {
-        description: `Código: ${error.response?.status || 500}`,
-      });
 
       return Promise.reject(error);
     },

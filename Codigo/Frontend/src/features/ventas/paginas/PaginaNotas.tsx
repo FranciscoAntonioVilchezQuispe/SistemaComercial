@@ -11,11 +11,23 @@ import { servicioVentas } from "../servicios/servicioVentas";
 import { toast } from "sonner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
+import { EstadoDocumento } from "@compartido/enums";
+
 const ESTADO_CPE_COLORES: Record<string, string> = {
   PENDIENTE: "bg-amber-100 text-amber-700 border-amber-200",
   ENVIADO: "bg-blue-100 text-blue-700 border-blue-200",
   ACEPTADO: "bg-emerald-100 text-emerald-700 border-emerald-200",
   RECHAZADO: "bg-red-100 text-red-700 border-red-200",
+};
+
+const ESTADO_DOCUMENTO_COLORES: Record<number, string> = {
+  [EstadoDocumento.Registrado]: "bg-blue-50 text-blue-700 border-blue-200",
+  [EstadoDocumento.AnuladoDirecto]: "bg-red-50 text-red-700 border-red-200",
+  [EstadoDocumento.Rechazado]: "bg-gray-50 text-gray-700 border-gray-200",
+  [EstadoDocumento.Pendiente]: "bg-amber-50 text-amber-700 border-amber-200",
+  [EstadoDocumento.AnuladoNotaCredito]: "bg-rose-50 text-rose-700 border-rose-200",
+  [EstadoDocumento.AnuladoNotaDebito]: "bg-pink-50 text-pink-700 border-pink-200",
+  [EstadoDocumento.Completado]: "bg-green-50 text-green-700 border-green-200",
 };
 
 export function PaginaNotas() {
@@ -45,7 +57,7 @@ export function PaginaNotas() {
             });
       setDataRe(resp);
     } catch (e) {
-      toast.error("No se pudieron cargar las notas " + tipoRender);
+      console.error("Error al cargar notas:", e);
     } finally {
       setIsLoading(false);
     }
@@ -95,6 +107,17 @@ export function PaginaNotas() {
         <span className="font-bold text-base">
           {formatearMoneda(nota.total)}
         </span>
+      ),
+    },
+    {
+      header: "Estado",
+      cell: (nota: NotaResumen) => (
+        <Badge
+          variant="outline"
+          className={ESTADO_DOCUMENTO_COLORES[nota.idEstado] || "bg-gray-100 text-gray-700"}
+        >
+          {nota.estadoNombre}
+        </Badge>
       ),
     },
     {

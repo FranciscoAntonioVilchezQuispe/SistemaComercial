@@ -16,6 +16,7 @@ namespace Clientes.API.Domain.DTOs
         public string? Email { get; set; }
         public string? Telefono { get; set; }
         public bool Activado { get; set; }
+        public string TipoDocumentoCodigo { get; set; } = string.Empty; // Código SUNAT (ej. 1 para DNI, 6 para RUC)
 
         // Propiedad técnica para PagedResponse
         public int TotalRegistros { get; set; }

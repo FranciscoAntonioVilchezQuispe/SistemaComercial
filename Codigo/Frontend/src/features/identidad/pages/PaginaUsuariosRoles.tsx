@@ -51,7 +51,6 @@ export function PaginaUsuariosRoles() {
       }
     } catch (error) {
       console.error("Error al cargar usuarios:", error);
-      toast.error("Error al cargar los usuarios");
     } finally {
       setLoading(false);
     }
@@ -68,7 +67,6 @@ export function PaginaUsuariosRoles() {
       setMenusDisponibles(menus);
     } catch (error) {
       console.error("Error al cargar datos del usuario:", error);
-      toast.error("Error al cargar los datos del usuario");
     }
   };
 

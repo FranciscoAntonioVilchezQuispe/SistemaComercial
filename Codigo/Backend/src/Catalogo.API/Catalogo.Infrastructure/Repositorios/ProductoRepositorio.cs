@@ -107,7 +107,7 @@ namespace Catalogo.Infrastructure.Repositorios
             var sql = @"
                 SELECT p.id_producto as Id, p.codigo_producto as Codigo, p.nombre_producto as Nombre,
                        c.nombre_categoria as CategoriaNombre, m.nombre_marca as MarcaNombre, um.simbolo as UnidadMedidaSigla,
-                       p.precio_venta_publico as PrecioVenta, p.imagen_principal_url, p.activado as Activo,
+                       p.precio_venta_publico as PrecioVentaPublico, p.imagen_principal_url, p.activado as Activo,
                        COUNT(*) OVER() AS TotalRegistros
                 FROM catalogo.productos p
                 INNER JOIN catalogo.categorias c ON c.id_categoria = p.id_categoria

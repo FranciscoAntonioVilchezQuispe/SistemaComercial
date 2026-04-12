@@ -122,9 +122,7 @@ export function PaginaKardexReporte() {
       setPageSize(size);
       toast.success("Kardex generado correctamente");
     } catch (error: any) {
-      toast.error(
-        error.response?.data?.message || "Error al obtener el Kardex",
-      );
+      console.error("Error al obtener el Kardex:", error);
       setReporte(null);
     } finally {
       setCargando(false);
@@ -150,9 +148,7 @@ export function PaginaKardexReporte() {
       toast.success("Recálculo completado. Refrescando reporte...");
       await buscarReporte(data);
     } catch (error: any) {
-      toast.error(
-        error.response?.data?.message || "Error al ejecutar el recálculo",
-      );
+      console.error("Error al ejecutar el recálculo:", error);
     } finally {
       setRecalculando(false);
     }
@@ -161,15 +157,16 @@ export function PaginaKardexReporte() {
   const ejecutarSincronizacion = async () => {
     try {
       setSincronizando(true);
-      const mensaje = await servicioInventario.sincronizarHistorico();
-      toast.success(mensaje || "Sincronización completada");
+      // Pasamos true para forzar el reinicio total y limpieza de duplicados/horas
+      const mensaje = await servicioInventario.sincronizarHistorico(true);
+      toast.success(mensaje || "Sincronización y recálculo completado");
 
       const data = getValues();
       if (data.productoId > 0) {
         await buscarReporte(data);
       }
     } catch (error: any) {
-      toast.error("Error al sincronizar datos históricos");
+      console.error("Error al sincronizar datos históricos:", error);
     } finally {
       setSincronizando(false);
       setConfirmarSincronizacion(false);
@@ -261,11 +258,11 @@ export function PaginaKardexReporte() {
 
                 <Button
                   type="button"
-                  onClick={ejecutarSincronizacion}
+                  onClick={() => setConfirmarSincronizacion(true)}
                   disabled={sincronizando || cargando}
                   variant="outline"
                   className="border-blue-200 text-blue-700 hover:bg-blue-50"
-                  title="Sincronizar compras y ventas que no figuran en el Kardex"
+                  title="Sincronizar compras, ventas y notas que no figuran en el Kardex"
                 >
                   <Database
                     className={`w-4 h-4 mr-2 ${sincronizando ? "animate-pulse" : ""}`}
@@ -593,7 +590,8 @@ export function PaginaKardexReporte() {
           <AlertDialogHeader>
             <AlertDialogTitle>¿Sincronizar histórico?</AlertDialogTitle>
             <AlertDialogDescription>
-              Este proceso buscará documentos de compras y ventas históricos que no figuren en el Kardex y los regularizará automáticamente. ¿Desea continuar?
+              Este proceso realizará una <strong>limpieza total</strong> de los movimientos sincronizados previamente y reconstruirá el Kardex cronológicamente con horas estandarizadas. 
+              Esto solucionará problemas de duplicados y ordenamiento incorrecto. ¿Desea continuar con el reinicio total?
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

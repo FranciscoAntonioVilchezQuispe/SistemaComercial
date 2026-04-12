@@ -93,7 +93,7 @@ export function PaginaSucursales() {
             toast.success("Sucursal actualizada");
             setDialogoOpen(false);
           },
-          onError: (err) => toast.error("Error al actualizar: " + err.message),
+          onError: (err) => console.error("Error al actualizar:", err),
         },
       );
     } else {
@@ -102,7 +102,7 @@ export function PaginaSucursales() {
           toast.success("Sucursal creada");
           setDialogoOpen(false);
         },
-        onError: (err) => toast.error("Error al crear: " + err.message),
+        onError: (err) => console.error("Error al crear:", err),
       });
     }
   };
@@ -242,7 +242,10 @@ export function PaginaSucursales() {
                       toast.success("Sucursal eliminada");
                       setEliminarId(null);
                     },
-                    onError: () => toast.error("Error al eliminar sucursal"),
+                    onError: (err) => {
+                      console.error("Error al eliminar sucursal:", err);
+                      setEliminarId(null);
+                    },
                   });
                 }
               }}

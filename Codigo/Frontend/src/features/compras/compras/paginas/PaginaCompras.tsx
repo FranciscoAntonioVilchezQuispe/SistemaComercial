@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Plus, Eye } from "lucide-react";
 import { useLocation } from "react-router-dom";
-import { formatFecha } from "@compartido/utilidades";
+import { formatFecha, quedenMenosDe24Horas } from "@compartido/utilidades";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -42,6 +42,17 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { MoreHorizontal, FileMinus, RefreshCcw } from "lucide-react";
+import { EstadoDocumento } from "@compartido/enums";
+
+const ESTADO_COMPRA_COLORES: Record<number, string> = {
+  [EstadoDocumento.Registrado]: "bg-blue-50 text-blue-700 border-blue-200",
+  [EstadoDocumento.AnuladoDirecto]: "bg-red-50 text-red-700 border-red-200",
+  [EstadoDocumento.AnuladoNotaCredito]: "bg-orange-50 text-orange-700 border-orange-200",
+  [EstadoDocumento.AnuladoNotaDebito]: "bg-purple-50 text-purple-700 border-purple-200",
+  [EstadoDocumento.Completado]: "bg-green-50 text-green-700 border-green-200",
+  [EstadoDocumento.Pendiente]: "bg-amber-50 text-amber-700 border-amber-200",
+  [EstadoDocumento.Rechazado]: "bg-gray-50 text-gray-700 border-gray-200",
+};
 
 export function PaginaCompras() {
   const location = useLocation();
@@ -57,7 +68,7 @@ export function PaginaCompras() {
   // Estados para nuevas acciones
   const [compraAAnular, setCompraAAnular] = useState<CompraResumen | null>(null);
   const [mostrarAnular, setMostrarAnular] = useState(false);
-  const [compraParaNota, setCompraParaNota] = useState<CompraResumen | null>(null);
+  const [compraParaNotaId, setCompraParaNotaId] = useState<number | null>(null);
   const [mostrarCrearNota, setMostrarCrearNota] = useState(false);
 
   const {
@@ -159,7 +170,10 @@ export function PaginaCompras() {
       header: "Estado",
       accessorKey: "estadoNombre" as keyof CompraResumen,
       cell: (row: CompraResumen) => (
-        <Badge variant={row.estadoNombre === "CONFIRMADO" ? "default" : "secondary"}>
+        <Badge
+          variant="outline"
+          className={ESTADO_COMPRA_COLORES[row.idEstado] || "bg-gray-100 text-gray-700"}
+        >
           {row.estadoNombre}
         </Badge>
       ),
@@ -185,28 +199,35 @@ export function PaginaCompras() {
                 <Eye className="mr-2 h-4 w-4" />
                 Ver Detalle
               </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem 
-                onClick={() => {
-                  setCompraParaNota(row);
-                  setMostrarCrearNota(true);
-                }}
-                disabled={row.estadoNombre === "ANULADO"}
-              >
-                <FileMinus className="mr-2 h-4 w-4" />
-                Emitir Nota (NC/ND)
-              </DropdownMenuItem>
-              <DropdownMenuItem 
-                className="text-destructive" 
-                onClick={() => {
-                  setCompraAAnular(row);
-                  setMostrarAnular(true);
-                }}
-                disabled={row.estadoNombre === "ANULADO"}
-              >
-                <RefreshCcw className="mr-2 h-4 w-4" />
-                Anular Compra
-              </DropdownMenuItem>
+              {/* Solo mostrar opciones de anulación si el documento NO está ya anulado (v1.0) */}
+              {![EstadoDocumento.AnuladoDirecto, EstadoDocumento.AnuladoNotaCredito, EstadoDocumento.AnuladoNotaDebito].includes(row.idEstado) && (
+                <>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem 
+                    onClick={() => {
+                      setCompraParaNotaId(row.id);
+                      setMostrarCrearNota(true);
+                    }}
+                  >
+                    <FileMinus className="mr-2 h-4 w-4" />
+                    Emitir Nota (NC/ND)
+                  </DropdownMenuItem>
+
+                  {/* La anulación directa solo es visible en las primeras 24 horas (v1.0) */}
+                  {quedenMenosDe24Horas(row.fechaCreacion) && (
+                    <DropdownMenuItem 
+                      className="text-destructive font-medium" 
+                      onClick={() => {
+                        setCompraAAnular(row);
+                        setMostrarAnular(true);
+                      }}
+                    >
+                      <RefreshCcw className="mr-2 h-4 w-4 text-destructive" />
+                      Anular Compra
+                    </DropdownMenuItem>
+                  )}
+                </>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
@@ -330,7 +351,7 @@ export function PaginaCompras() {
                     await eliminarMutation.mutateAsync(eliminarId);
                     toast.success("Compra eliminada correctamente");
                   } catch (err) {
-                    toast.error("Error al eliminar la compra");
+                    console.error("Error al eliminar la compra:", err);
                   } finally {
                     setEliminarId(null);
                   }
@@ -352,7 +373,7 @@ export function PaginaCompras() {
       />
 
       <ModalCrearNotaSunatCompra
-        compra={compraParaNota}
+        idCompra={compraParaNotaId}
         open={mostrarCrearNota}
         onOpenChange={setMostrarCrearNota}
         onSuccess={() => refetch()}

@@ -38,6 +38,26 @@ namespace Inventario.API.Domain.Entidades
         [Column("costo_promedio_actual", TypeName = "decimal(12,4)")]
         public decimal CostoPromedioActual { get; set; }
 
+        [Required]
+        [MaxLength(2)]
+        [Column("tipo_documento")]
+        public string TipoDocumento { get; set; } = string.Empty;
+
+        [Required]
+        [MaxLength(10)]
+        [Column("serie_documento")]
+        public string SerieDocumento { get; set; } = string.Empty;
+
+        [Required]
+        [MaxLength(20)]
+        [Column("numero_documento")]
+        public string NumeroDocumento { get; set; } = string.Empty;
+
+        [Required]
+        [MaxLength(10)]
+        [Column("codigo_operacion_sunat")]
+        public string CodigoOperacionSunat { get; set; } = string.Empty;
+
         [MaxLength(50)]
         [Column("referencia_modulo")]
         public string? ReferenciaModulo { get; set; }

@@ -48,6 +48,13 @@ namespace Compras.API.Endpoints
                 return Results.Ok(new ToReturn<bool>(true));
             });
 
+            grupo.MapPost("/{id}/anular", async (long id, AnularCompraRequest request, IMediator mediator) =>
+            {
+                var exito = await mediator.Send(new AnularCompraComando(id, request.Motivo, request.UsuarioId));
+                if (!exito) return Results.BadRequest(new ToReturnError<bool>("No se pudo anular la compra", 400));
+                return Results.Ok(new ToReturn<bool>(true));
+            });
+
             grupo.MapGet("/debug-fix-db", async (ComprasDbContext context) =>
             {
                 string sql = @"
@@ -68,6 +75,11 @@ BEGIN
     IF NOT EXISTS (SELECT 1 FROM information_schema.table_constraints WHERE constraint_name = 'fk_detalle_compra_compras_id_compra' AND table_name = 'detalle_compra' AND table_schema = 'compras') THEN
         ALTER TABLE compras.detalle_compra ADD CONSTRAINT fk_detalle_compra_compras_id_compra FOREIGN KEY (id_compra) REFERENCES compras.compras (id_compra) ON DELETE CASCADE;
     END IF;
+
+    -- Notas SUNAT (Corrección Esquema)
+    ALTER TABLE compras.nota_credito ADD COLUMN IF NOT EXISTS id_estado bigint DEFAULT 60;
+    ALTER TABLE compras.nota_debito ADD COLUMN IF NOT EXISTS id_estado bigint DEFAULT 60;
+
 
     CREATE TABLE IF NOT EXISTS compras.""__EFMigrationsHistory"" (
         ""MigrationId"" character varying(150) NOT NULL,
@@ -119,6 +131,8 @@ $$;";
             Total = c.Total,
             SaldoPendiente = c.SaldoPendiente,
             IdEstadoPago = c.IdEstadoPago,
+            IdEstado = c.IdEstado,
+            FechaCreacion = c.FechaCreacion,
             Observaciones = c.Observaciones,
             NombreAlmacen = c.NombreAlmacen,
             NombreTipoComprobante = c.NombreTipoComprobante,

@@ -22,7 +22,7 @@ namespace Inventario.API.Domain.Entidades.Kardex
         public DateOnly DesdeFecha { get; set; }
 
         [Required]
-        [MaxLength(30)]
+        [MaxLength(250)]
         [Column("motivo")]
         public string Motivo { get; set; } = null!; // ENUM texto: 'ANULACION', etc.
 

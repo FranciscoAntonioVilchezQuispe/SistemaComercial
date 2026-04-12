@@ -24,6 +24,8 @@ namespace Ventas.API.Application.Interfaces
         DbSet<Ventas.API.Domain.Entidades.LogEnvioCpe> LogsEnvioCpe { get; set; }
         DbSet<Ventas.API.Domain.Entidades.EstadoCpe> EstadosCpe { get; set; }
         DbSet<Ventas.API.Domain.Entidades.VentaCuotaPago> CuotasPago { get; set; }
+        DbSet<Ventas.API.Domain.Entidades.Referencias.ReglaDocumentoReferencia> ReglasDocumentoRef { get; set; }
+        DbSet<Ventas.API.Domain.Entidades.Referencias.TipoDocumentoReferencia> TiposDocumentoRef { get; set; }
         Microsoft.EntityFrameworkCore.Infrastructure.DatabaseFacade Database { get; }
 
         Task<int> SaveChangesAsync(CancellationToken cancellationToken);

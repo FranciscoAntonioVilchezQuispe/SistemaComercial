@@ -5,6 +5,7 @@ using Compras.API.Application.DTOs;
 using Compras.API.Application.Interfaces;
 using Compras.API.Domain.Entidades;
 using Microsoft.Extensions.Logging;
+using Nucleo.Comun.Domain.Enums;
 
 namespace Compras.API.Application.Manejadores
 {
@@ -28,8 +29,9 @@ namespace Compras.API.Application.Manejadores
         {
             var dto = request.Nota;
 
-            // 1. Validar compra de referencia
+            // 1. Validar compra de referencia (incluyendo proveedor)
             var compra = await _context.Compras
+                .Include(c => c.Proveedor)
                 .FirstOrDefaultAsync(c => c.Id == dto.IdCompraReferencia, cancellationToken);
             
             if (compra == null)
@@ -48,10 +50,10 @@ namespace Compras.API.Application.Manejadores
                 IdTipoNota = dto.IdTipoNota,
                 MotivoSustento = dto.MotivoSustento,
                 
-                IdProveedor = dto.IdProveedor,
-                ProveedorTipoDoc = dto.ProveedorTipoDoc,
-                ProveedorNroDoc = dto.ProveedorNroDoc,
-                ProveedorRazonSocial = dto.ProveedorRazonSocial,
+                IdProveedor = compra.IdProveedor,
+                ProveedorTipoDoc = compra.Proveedor.IdTipoDocumento == (long)TipoDocumentoIdentidad.DNI ? ((long)TipoDocumentoIdentidad.DNI).ToString() : ((long)TipoDocumentoIdentidad.RUC).ToString(),
+                ProveedorNroDoc = compra.Proveedor.NumeroDocumento,
+                ProveedorRazonSocial = compra.Proveedor.RazonSocial,
                 
                 Subtotal = dto.Subtotal,
                 Igv = dto.Igv,
@@ -62,6 +64,7 @@ namespace Compras.API.Application.Manejadores
                 AfectaStock = dto.AfectaStock,
                 FechaEmision = dto.FechaEmision == default ? DateTime.UtcNow : dto.FechaEmision,
                 Estado = "PENDIENTE",
+                IdEstado = (long)EstadoDocumento.Registrado, // Registrado
                 
                 Detalles = dto.Detalles.Select(d => new NotaDebitoDetalleCompra
                 {
@@ -79,6 +82,27 @@ namespace Compras.API.Application.Manejadores
 
             // 3. Persistir Nota
             _context.NotasDebito.Add(nota);
+            
+            // 3.1 Vincular con Compra (v1.0)
+            compra.IdEstado = (long)EstadoDocumento.AnuladoNotaDebito;
+            compra.IdNotaDebito = nota.Id;
+            compra.TipoAnulacion = "nota_debito";
+            compra.FechaAnulacion = DateTime.UtcNow;
+            compra.MotivoAnulacion = nota.MotivoSustento;
+            compra.Observaciones += $"\n[NOTA DÉBITO] {DateTime.UtcNow}: Nota {nota.Serie}-{nota.Numero} generada.";
+            _context.Compras.Update(compra);
+
+            // 3.2 Liberar Orden de Compra si existe referencia (v1.0)
+            var orden = await _context.OrdenesCompra.FirstOrDefaultAsync(o => o.CompraId == compra.Id, cancellationToken);
+            if (orden != null)
+            {
+                _logger.LogInformation("Liberando Orden de Compra {CodigoOrden} por emisión de ND en Compra {CompraId}", orden.CodigoOrden, compra.Id);
+                orden.CompraId = null;
+                orden.IdEstado = (long)EstadoOrdenCompra.Aprobada;
+                orden.Observaciones += $"\n[LIBERACIÓN POR ND] {DateTime.UtcNow}: Nota {nota.Serie}-{nota.Numero} generada.";
+                _context.OrdenesCompra.Update(orden);
+            }
+
             await _context.SaveChangesAsync(cancellationToken);
 
             // 4. Inventario (Nota de Débito Compra es ENTRADA de stock)
@@ -86,8 +110,12 @@ namespace Compras.API.Application.Manejadores
             {
                 foreach (var det in nota.Detalles)
                 {
-                    // TODO: Obtener AlmacenId dinámico
-                    long idAlmacen = 1;
+                    long idAlmacen = compra.IdAlmacen;
+
+                    // Buscar el tipo de comprobante por serie para obtener su ID
+                    var serieObj = await _context.SeriesComprobantesRef
+                        .FirstOrDefaultAsync(s => s.Serie == nota.Serie, cancellationToken);
+                    long idTipoComprobante = serieObj?.IdTipoComprobante ?? 0;
 
                     var success = await _inventarioServicio.RegistrarEntradaNotaDebitoAsync(
                         det.IdProducto,
@@ -96,7 +124,8 @@ namespace Compras.API.Application.Manejadores
                         det.PrecioUnitario,
                         nota.Id,
                         nota.Serie,
-                        nota.Numero);
+                        nota.Numero,
+                        idTipoComprobante);
 
                     if (!success)
                     {

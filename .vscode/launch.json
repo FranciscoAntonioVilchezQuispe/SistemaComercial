@@ -8,7 +8,7 @@
       "name": "Backend: Gateway.API",
       "type": "coreclr",
       "request": "launch",
-      "preLaunchTask": "prepare-full-stack",
+      "preLaunchTask": "build-backend-solution",
       "program": "${workspaceFolder}/Codigo/Backend/src/Gateway.API/bin/Debug/net8.0/Gateway.API.dll",
       "args": [],
       "cwd": "${workspaceFolder}/Codigo/Backend/src/Gateway.API",
@@ -18,7 +18,7 @@
         "ASPNETCORE_URLS": "http://localhost:5000"
       },
       "serverReadyAction": {
-        "action": "openExternally",
+        "action": "debugWithFirefox",
         "pattern": "\\bNow listening on:\\s+(https?://\\S+)",
         "uriFormat": "%s/swagger"
       }
@@ -37,7 +37,7 @@
         "ASPNETCORE_URLS": "http://localhost:5008"
       },
       "serverReadyAction": {
-        "action": "openExternally",
+        "action": "debugWithFirefox",
         "pattern": "\\bNow listening on:\\s+(https?://\\S+)",
         "uriFormat": "%s/swagger"
       }
@@ -56,7 +56,7 @@
         "ASPNETCORE_URLS": "http://localhost:5009"
       },
       "serverReadyAction": {
-        "action": "openExternally",
+        "action": "debugWithFirefox",
         "pattern": "\\bNow listening on:\\s+(https?://\\S+)",
         "uriFormat": "%s/swagger"
       }
@@ -75,7 +75,7 @@
         "ASPNETCORE_URLS": "http://localhost:5010"
       },
       "serverReadyAction": {
-        "action": "openExternally",
+        "action": "debugWithFirefox",
         "pattern": "\\bNow listening on:\\s+(https?://\\S+)",
         "uriFormat": "%s/swagger"
       }
@@ -94,7 +94,7 @@
         "ASPNETCORE_URLS": "http://localhost:5002"
       },
       "serverReadyAction": {
-        "action": "openExternally",
+        "action": "debugWithFirefox",
         "pattern": "\\bNow listening on:\\s+(https?://\\S+)",
         "uriFormat": "%s/swagger"
       }
@@ -113,7 +113,7 @@
         "ASPNETCORE_URLS": "http://localhost:5004"
       },
       "serverReadyAction": {
-        "action": "openExternally",
+        "action": "debugWithFirefox",
         "pattern": "\\bNow listening on:\\s+(https?://\\S+)",
         "uriFormat": "%s/swagger"
       }
@@ -132,7 +132,7 @@
         "ASPNETCORE_URLS": "http://localhost:5001"
       },
       "serverReadyAction": {
-        "action": "openExternally",
+        "action": "debugWithFirefox",
         "pattern": "\\bNow listening on:\\s+(https?://\\S+)",
         "uriFormat": "%s/swagger"
       }
@@ -151,7 +151,7 @@
         "ASPNETCORE_URLS": "http://localhost:5003"
       },
       "serverReadyAction": {
-        "action": "openExternally",
+        "action": "debugWithFirefox",
         "pattern": "\\bNow listening on:\\s+(https?://\\S+)",
         "uriFormat": "%s/swagger"
       }
@@ -170,7 +170,7 @@
         "ASPNETCORE_URLS": "http://localhost:5005"
       },
       "serverReadyAction": {
-        "action": "openExternally",
+        "action": "debugWithFirefox",
         "pattern": "\\bNow listening on:\\s+(https?://\\S+)",
         "uriFormat": "%s/swagger"
       }

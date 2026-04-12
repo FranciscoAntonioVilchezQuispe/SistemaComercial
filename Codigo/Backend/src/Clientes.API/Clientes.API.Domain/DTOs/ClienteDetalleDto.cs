@@ -12,6 +12,7 @@ namespace Clientes.API.Domain.DTOs
         public long Id { get; set; }
         public long IdTipoDocumento { get; set; }
         public string? TipoDocumentoNombre { get; set; }
+        public string TipoDocumentoCodigo { get; set; } = string.Empty; // Código SUNAT (ej. 1 para DNI, 6 para RUC)
         public string NumeroDocumento { get; set; } = null!;
         public string RazonSocial { get; set; } = null!;
         public string? NombreComercial { get; set; }

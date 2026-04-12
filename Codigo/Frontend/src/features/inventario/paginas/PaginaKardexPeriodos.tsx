@@ -56,7 +56,7 @@ export function PaginaKardexPeriodos() {
       });
       toast.success(res.message || `Periodo ${data.periodo} abierto`);
     } catch (error: any) {
-      toast.error(error.response?.data?.message || "Error al abrir el periodo");
+      console.error("Error al abrir el periodo:", error);
     } finally {
       setProcesandoAbrir(false);
     }
@@ -71,9 +71,7 @@ export function PaginaKardexPeriodos() {
       });
       toast.success(res.message || `Periodo ${data.periodo} cerrado`);
     } catch (error: any) {
-      toast.error(
-        error.response?.data?.message || "Error al cerrar el periodo",
-      );
+      console.error("Error al cerrar el periodo:", error);
     } finally {
       setProcesandoCerrar(false);
     }

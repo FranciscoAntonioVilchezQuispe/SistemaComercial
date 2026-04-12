@@ -1,9 +1,9 @@
 using Compras.API.Application.Comandos;
+using Compras.API.Application.DTOs;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
-using Microsoft.AspNetCore.Mvc;
 
 namespace Compras.API.Endpoints
 {
@@ -14,12 +14,12 @@ namespace Compras.API.Endpoints
             var grupo = app.MapGroup("/api/compras/notas").WithTags("Notas SUNAT (Compras)");
 
             // Notas de Crédito Compra
-            grupo.MapPost("/credito", async (CrearNotaCreditoCompraComando comando, IMediator mediator) =>
+            grupo.MapPost("/credito", async (NotaCreditoCompraDto dto, IMediator mediator) =>
             {
                 try
                 {
-                    var id = await mediator.Send(comando);
-                    return Results.Created($"/api/compras/notas/credito/{id}", new { id });
+                    var resultado = await mediator.Send(new CrearNotaCreditoCompraComando(dto));
+                    return Results.Created($"/api/compras/notas/credito/{resultado.Id}", resultado);
                 }
                 catch (Exception ex)
                 {
@@ -28,12 +28,12 @@ namespace Compras.API.Endpoints
             });
 
             // Notas de Débito Compra
-            grupo.MapPost("/debito", async (CrearNotaDebitoCompraComando comando, IMediator mediator) =>
+            grupo.MapPost("/debito", async (NotaDebitoCompraDto dto, IMediator mediator) =>
             {
                 try
                 {
-                    var id = await mediator.Send(comando);
-                    return Results.Created($"/api/compras/notas/debito/{id}", new { id });
+                    var resultado = await mediator.Send(new CrearNotaDebitoCompraComando(dto));
+                    return Results.Created($"/api/compras/notas/debito/{resultado.Id}", resultado);
                 }
                 catch (Exception ex)
                 {

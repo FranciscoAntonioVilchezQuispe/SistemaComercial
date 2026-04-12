@@ -14,7 +14,9 @@ namespace Inventario.API.Application.Comandos
         long? IdTipoDocumento,
         string? SerieDocumento,
         string? NumeroDocumento,
-        DateTime? FechaMovimiento = null
+        DateTime? FechaMovimiento = null,
+        string? CodigoOperacionSunat = null,
+        bool PermitirStockNegativo = false
     ) : IRequest<long>;
 
 }

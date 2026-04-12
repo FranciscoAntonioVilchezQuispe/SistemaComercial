@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Search, Package } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
@@ -25,10 +25,24 @@ interface RespuestaStock {
 
 export function GridProductosPOS() {
   const [busqueda, setBusqueda] = useState("");
-  const busquedaDebounced = useDebounce(busqueda, 300);
+  const [busquedaAplicada, setBusquedaAplicada] = useState("");
+  const busquedaDebounced = useDebounce(busqueda, 500);
+
+  // Regla: Solo buscar si el texto es vacío (reset) o tiene >= 3 caracteres
+  useEffect(() => {
+    if (busquedaDebounced.length === 0 || busquedaDebounced.length >= 3) {
+      setBusquedaAplicada(busquedaDebounced);
+    }
+  }, [busquedaDebounced]);
+
+  const manejarKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      setBusquedaAplicada(busqueda);
+    }
+  };
 
   const { data, isLoading } = useProductos({
-    search: busquedaDebounced,
+    search: busquedaAplicada,
     activo: true,
     pageNumber: 1,
     pageSize: 20,
@@ -60,6 +74,7 @@ export function GridProductosPOS() {
           placeholder="Buscar productos por nombre o código..."
           value={busqueda}
           onChange={(e) => setBusqueda(e.target.value)}
+          onKeyDown={manejarKeyDown}
           className="pl-10"
         />
       </div>

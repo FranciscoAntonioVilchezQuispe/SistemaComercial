@@ -149,7 +149,7 @@ export function PaginaUnidadesMedida() {
                       setEliminarId(null);
                     },
                     onError: (e: any) => {
-                      toast.error("Error: " + e.message);
+                      console.error("Error al eliminar unidad:", e);
                       setEliminarId(null);
                     },
                   });

@@ -15,7 +15,7 @@ namespace Compras.API.Application.Integracion
             _logger = logger;
         }
 
-        public async Task<bool> RegistrarEntradaCompraAsync(long idProducto, long idAlmacen, decimal cantidad, decimal costoUnitario, long idCompra, long idTipoComprobante, string serie, string numero)
+        public async Task<bool> RegistrarEntradaCompraAsync(long idProducto, long idAlmacen, decimal cantidad, decimal costoUnitario, long idCompra, long idTipoComprobante, string serie, string numero, string codigoOperacionSunat = "02")
 
         {
             try
@@ -33,7 +33,8 @@ namespace Compras.API.Application.Integracion
                     Observaciones = $"Ingreso automático por Compra #" + idCompra,
                     IdTipoDocumento = idTipoComprobante,
                     SerieDocumento = serie,
-                    NumeroDocumento = numero
+                    NumeroDocumento = numero,
+                    CodigoOperacionSunat = codigoOperacionSunat
                 };
 
                 var response = await _httpClient.PostAsJsonAsync("inventario/movimientos", comando);
@@ -68,7 +69,7 @@ namespace Compras.API.Application.Integracion
             }
         }
 
-        public async Task<bool> RegistrarSalidaNotaCreditoAsync(long idProducto, long idAlmacen, decimal cantidad, long idNota, string serie, string numero)
+        public async Task<bool> RegistrarSalidaNotaCreditoAsync(long idProducto, long idAlmacen, decimal cantidad, long idNota, string serie, string numero, long idTipoComprobante, string codigoOperacionSunat = "07")
         {
             try
             {
@@ -76,14 +77,15 @@ namespace Compras.API.Application.Integracion
                 {
                     IdProducto = idProducto,
                     IdAlmacen = idAlmacen,
-                    IdTipoMovimiento = 21, // SAL_DEV (Salida por Devolución a Proveedor)
+                    IdTipoMovimiento = 24, // DevolucionCompra (NC Compra)
                     Cantidad = Math.Abs(cantidad),
-                    ReferenciaModulo = "NC_COMPRA",
+                    ReferenciaModulo = "COMPRAS",
                     IdReferencia = idNota,
                     Observaciones = $"Salida por Devolución - Nota de Crédito #" + idNota,
-                    IdTipoDocumento = "07",
+                    IdTipoDocumento = idTipoComprobante,
                     SerieDocumento = serie,
-                    NumeroDocumento = numero
+                    NumeroDocumento = numero,
+                    CodigoOperacionSunat = codigoOperacionSunat
                 };
 
                 var response = await _httpClient.PostAsJsonAsync("inventario/movimientos", comando);
@@ -96,7 +98,7 @@ namespace Compras.API.Application.Integracion
             }
         }
 
-        public async Task<bool> RegistrarEntradaNotaDebitoAsync(long idProducto, long idAlmacen, decimal cantidad, decimal costoUnitario, long idNota, string serie, string numero)
+        public async Task<bool> RegistrarEntradaNotaDebitoAsync(long idProducto, long idAlmacen, decimal cantidad, decimal costoUnitario, long idNota, string serie, string numero, long idTipoComprobante, string codigoOperacionSunat = "02")
         {
             try
             {
@@ -104,15 +106,16 @@ namespace Compras.API.Application.Integracion
                 {
                     IdProducto = idProducto,
                     IdAlmacen = idAlmacen,
-                    IdTipoMovimiento = 19, // ING_COM (Ingreso por Compra)
+                    IdTipoMovimiento = 26, // NotaDebitoCompra (ND Compra)
                     Cantidad = cantidad,
                     CostoUnitario = costoUnitario,
-                    ReferenciaModulo = "ND_COMPRA",
+                    ReferenciaModulo = "COMPRAS",
                     IdReferencia = idNota,
                     Observaciones = $"Ingreso adicional por Nota de Débito #" + idNota,
-                    IdTipoDocumento = "08",
+                    IdTipoDocumento = idTipoComprobante,
                     SerieDocumento = serie,
-                    NumeroDocumento = numero
+                    NumeroDocumento = numero,
+                    CodigoOperacionSunat = codigoOperacionSunat
                 };
 
                 var response = await _httpClient.PostAsJsonAsync("inventario/movimientos", comando);

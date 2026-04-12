@@ -11,11 +11,16 @@ namespace Inventario.API.Application.Servicios
     {
         private readonly IKardexMovimientoRepositorio _kardexRepo;
         private readonly IKardexPeriodoControlRepositorio _periodoRepo;
+        private readonly IKardexRecalculoService _recalculoService;
 
-        public KardexService(IKardexMovimientoRepositorio kardexRepo, IKardexPeriodoControlRepositorio periodoRepo)
+        public KardexService(
+            IKardexMovimientoRepositorio kardexRepo, 
+            IKardexPeriodoControlRepositorio periodoRepo,
+            IKardexRecalculoService recalculoService)
         {
             _kardexRepo = kardexRepo;
             _periodoRepo = periodoRepo;
+            _recalculoService = recalculoService;
         }
 
         public async Task AnularMovimientoAsync(long movimientoId, string motivoAnulacion, long usuarioId)
@@ -37,7 +42,14 @@ namespace Inventario.API.Application.Servicios
 
             await _kardexRepo.ActualizarAsync(mov);
 
-            // TODO: Disparar el Recálculo Retroactivo enviando el Punto de Quiebre (mov.FechaHoraCompuesta)
+            // Disparar el Recálculo Retroactivo enviando el Punto de Quiebre (mov.FechaHoraCompuesta)
+            await _recalculoService.RecalcularDesdePuntoDeQuiebreAsync(
+                mov.AlmacenId, 
+                mov.ProductoId, 
+                mov.FechaMovimiento, 
+                mov.HoraMovimiento, 
+                $"Anulación de movimiento {movimientoId}", 
+                usuarioId);
         }
 
         public async Task<KardexMovimiento> RegistrarEntradaAsync(RegistrarMovimientoKardexDto dto)
@@ -135,9 +147,18 @@ namespace Inventario.API.Application.Servicios
                 }
 
                 // 5. Persistir en la Base de Datos
-                Console.WriteLine($"[DEBUG] [Inventario.API] [KardexService] Agregando movimiento al repositorio...");
+                Console.WriteLine($"[DEBUG] [Inventario.API] Agregando movimiento al repositorio...");
                 await _kardexRepo.AgregarAsync(movimiento);
-                Console.WriteLine($"[DEBUG] [Inventario.API] [KardexService] Registro exitoso.");
+                Console.WriteLine($"[DEBUG] [Inventario.API] Registro exitoso.");
+
+                // Disparar recálculo retroactivo para asegurar consistencia de saldos posteriores
+                await _recalculoService.RecalcularDesdePuntoDeQuiebreAsync(
+                    movimiento.AlmacenId,
+                    movimiento.ProductoId,
+                    movimiento.FechaMovimiento,
+                    movimiento.HoraMovimiento,
+                    $"Registro de movimiento {operacion} - {movimiento.SerieDocumento}-{movimiento.NumeroDocumento}",
+                    dto.UsuarioRegistroId);
 
                 return movimiento;
             }
@@ -164,7 +185,7 @@ namespace Inventario.API.Application.Servicios
                 TipoDocumento = dto.TipoDocumento,
                 SerieDocumento = dto.SerieDocumento,
                 NumeroDocumento = dto.NumeroDocumento,
-                TipoOperacion = tpOpe,
+                TipoOperacion = dto.CodigoOperacionSunat, // Código Tabla 12 SUNAT (01, 02, 05, 07...)
                 MotivoTrasladoSunat = dto.MotivoTrasladoSunat,
                 DescripcionMovimiento = dto.DescripcionMovimiento,
                 AlmacenId = dto.AlmacenId,

@@ -73,7 +73,7 @@ namespace Ventas.API.Endpoints
             {
                 try
                 {
-                    var exito = await mediator.Send(new AnularVentaComando(id, string.IsNullOrWhiteSpace(request?.Motivo) ? "Anulación solicitada por el usuario" : request.Motivo));
+                    var exito = await mediator.Send(new AnularVentaComando(id, string.IsNullOrWhiteSpace(request?.Motivo) ? "Anulación solicitada por el usuario" : request.Motivo, request?.UsuarioId ?? 0));
                     return exito ? Results.Ok(new ToReturn<bool>(true)) : Results.BadRequest(new ToReturnError<bool>("No se pudo anular la venta", 400));
                 }
                 catch (Exception ex)

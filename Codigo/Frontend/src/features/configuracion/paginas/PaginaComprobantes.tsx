@@ -133,7 +133,7 @@ export function PaginaComprobantes() {
             toast.success("Tipo actualizado");
             setDialogoTipoOpen(false);
           },
-          onError: (e) => toast.error("Error: " + e.message),
+          onError: (e) => console.error("Error al actualizar tipo:", e),
         },
       );
     } else {
@@ -142,7 +142,7 @@ export function PaginaComprobantes() {
           toast.success("Tipo creado");
           setDialogoTipoOpen(false);
         },
-        onError: (e) => toast.error("Error: " + e.message),
+        onError: (e) => console.error("Error al crear tipo:", e),
       });
     }
   };
@@ -157,7 +157,7 @@ export function PaginaComprobantes() {
             toast.success("Serie actualizada");
             setDialogoSerieOpen(false);
           },
-          onError: (e) => toast.error("Error: " + e.message),
+          onError: (e) => console.error("Error al actualizar serie:", e),
         },
       );
     } else {
@@ -166,7 +166,7 @@ export function PaginaComprobantes() {
           toast.success("Serie creada");
           setDialogoSerieOpen(false);
         },
-        onError: (e) => toast.error("Error: " + e.message),
+        onError: (e) => console.error("Error al crear serie:", e),
       });
     }
   };
@@ -423,7 +423,7 @@ export function PaginaComprobantes() {
                       setEliminarTipoId(null);
                     },
                     onError: (e: any) => {
-                      toast.error("Error: " + e.message);
+                      console.error("Error al eliminar tipo:", e);
                       setEliminarTipoId(null);
                     },
                   });
@@ -461,7 +461,7 @@ export function PaginaComprobantes() {
                       setEliminarSerieId(null);
                     },
                     onError: (e: any) => {
-                      toast.error("Error: " + e.message);
+                      console.error("Error al eliminar serie:", e);
                       setEliminarSerieId(null);
                     },
                   });

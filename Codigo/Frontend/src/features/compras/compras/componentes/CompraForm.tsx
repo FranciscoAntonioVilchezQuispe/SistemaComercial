@@ -427,8 +427,7 @@ export function CompraForm({
           `Datos cargados de la Orden ${ordenEncontrada.codigoOrden}`,
         );
       } catch (error) {
-        console.error(error);
-        toast.error("Error al buscar la orden de compra.");
+        console.error("Error al buscar la orden de compra:", error);
       } finally {
         setBuscandoOrden(false);
       }

@@ -8,6 +8,8 @@ interface ErrorResponse {
 
 export const manejadorErrores = (error: unknown) => {
   if (error instanceof AxiosError) {
+    if ((error as any)._sentToast) return;
+    
     const errorData = error.response?.data as ErrorResponse;
 
     // Error de validación (400)

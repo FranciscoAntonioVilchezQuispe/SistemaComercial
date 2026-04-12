@@ -59,7 +59,6 @@ export function PaginaRolesPermisos() {
       }
     } catch (error) {
       console.error("Error al cargar datos:", error);
-      toast.error("Error al cargar los datos");
     } finally {
       setLoading(false);
     }
@@ -71,7 +70,6 @@ export function PaginaRolesPermisos() {
       setRolesMenus(data);
     } catch (error) {
       console.error("Error al cargar permisos del rol:", error);
-      toast.error("Error al cargar los permisos del rol");
     }
   };
 

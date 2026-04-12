@@ -90,6 +90,9 @@ namespace Ventas.API.Domain.Entidades
         [Column("fecha_emision", TypeName = "date")]
         public DateTime FechaEmision { get; set; }
 
+        [Column("id_estado")]
+        public long IdEstado { get; set; } = 60; // Registrado
+
         [Required]
         [MaxLength(20)]
         [Column("estado")]

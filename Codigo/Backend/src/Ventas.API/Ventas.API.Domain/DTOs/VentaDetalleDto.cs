@@ -38,6 +38,7 @@ namespace Ventas.API.Domain.DTOs
         public decimal SaldoPendiente { get; set; }
         public long IdEstadoPago { get; set; }
         public string EstadoPago { get; set; } = string.Empty;
+        public DateTime FechaCreacion { get; set; }
         public string? Observaciones { get; set; }
 
         public List<DetalleVentaDto> Detalles { get; set; } = new();

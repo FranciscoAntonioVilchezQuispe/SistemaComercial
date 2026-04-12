@@ -8,6 +8,7 @@ namespace Ventas.API.Application.Eventos
         long IdTipoComprobante, 
         string Serie, 
         string Numero, 
+        DateTime FechaEmision,
         List<VentaItemDetalle> Items) : INotification;
 
     public record VentaItemDetalle(long IdProducto, decimal Cantidad);
