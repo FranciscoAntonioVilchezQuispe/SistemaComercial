@@ -2,6 +2,8 @@ using Ventas.API.Domain.Entidades;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Ventas.API.Domain.DTOs;
+using Ventas.API.Domain.DTOs.Reportes;
+using System;
 
 namespace Ventas.API.Domain.Interfaces
 {
@@ -13,6 +15,10 @@ namespace Ventas.API.Domain.Interfaces
         Task<IEnumerable<Venta>> ObtenerTodasAsync();
         Task<(IEnumerable<VentaListDto> Datos, int Total)> ObtenerPaginadoAsync(string? search, int pageNumber, int pageSize);
         Task<long> ObtenerSiguienteCorrelativoAsync(long idAlmacen, long idTipoComprobante, string serie);
+        
+        // Reportes
+        Task<IEnumerable<RankingProductoDto>> ObtenerRankingProductosAsync(DateTime fechaInicio, DateTime fechaFin, int top);
+        Task<IEnumerable<TopClienteDto>> ObtenerTopClientesAsync(DateTime fechaInicio, DateTime fechaFin, int top);
     }
 
     public interface ICotizacionRepositorio

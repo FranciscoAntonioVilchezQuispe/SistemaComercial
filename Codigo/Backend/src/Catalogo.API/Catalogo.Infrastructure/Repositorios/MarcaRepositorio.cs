@@ -41,7 +41,6 @@ namespace Catalogo.Infrastructure.Repositorios
             {
                 marca.Activado = !marca.Activado;
                 marca.UsuarioActualizacion = "SISTEMA";
-                marca.FechaActualizacion = DateTime.UtcNow;
                 await _context.SaveChangesAsync();
             }
         }

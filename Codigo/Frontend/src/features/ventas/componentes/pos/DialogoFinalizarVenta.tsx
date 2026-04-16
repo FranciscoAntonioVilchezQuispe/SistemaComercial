@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
+import { FISCAL_CONFIG } from "@compartido/configuracion/fiscal.config";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Cliente } from "@/features/clientes/types/cliente.types";
 import { ItemCarrito } from "../../tipos/ventas.types";
@@ -37,7 +38,10 @@ interface DialogoFinalizarVentaProps {
   carrito: ItemCarrito[];
   cliente: Cliente;
   metodoPago: MetodoPago;
-  subtotal: number;
+  subtotalGravado: number;
+  subtotalExonerado: number;
+  subtotalInafecto: number;
+  totalGratuito: number;
   descuento: number;
   igv: number;
   total: number;
@@ -57,7 +61,10 @@ export function DialogoFinalizarVenta({
   carrito,
   cliente,
   metodoPago,
-  subtotal,
+  subtotalGravado,
+  subtotalExonerado,
+  subtotalInafecto,
+  totalGratuito,
   descuento,
   igv,
   total,
@@ -190,9 +197,27 @@ export function DialogoFinalizarVenta({
 
                   <div className="space-y-2 p-3 border rounded-md bg-accent/50 text-sm">
                     <div className="flex justify-between text-xs text-muted-foreground">
-                      <span>Subtotal:</span>
-                      <span>{formatearMoneda(subtotal)}</span>
+                      <span>Op. Gravada:</span>
+                      <span>{formatearMoneda(subtotalGravado)}</span>
                     </div>
+                    {subtotalExonerado > 0 && (
+                      <div className="flex justify-between text-xs text-muted-foreground">
+                        <span>Op. Exonerada:</span>
+                        <span>{formatearMoneda(subtotalExonerado)}</span>
+                      </div>
+                    )}
+                    {subtotalInafecto > 0 && (
+                      <div className="flex justify-between text-xs text-muted-foreground">
+                        <span>Op. Inafecta:</span>
+                        <span>{formatearMoneda(subtotalInafecto)}</span>
+                      </div>
+                    )}
+                    {totalGratuito > 0 && (
+                      <div className="flex justify-between text-xs text-green-600">
+                        <span>Transferencia Gratuita:</span>
+                        <span>{formatearMoneda(totalGratuito)}</span>
+                      </div>
+                    )}
                     {descuento > 0 && (
                       <div className="flex justify-between text-xs text-destructive">
                         <span>Descuento:</span>
@@ -200,7 +225,9 @@ export function DialogoFinalizarVenta({
                       </div>
                     )}
                     <div className="flex justify-between text-xs text-muted-foreground">
-                      <span>IGV (18%):</span>
+                      <span>
+                        {FISCAL_CONFIG.TRIBUTOS.IGV === "1000" ? "IGV" : "Impuesto"} ({FISCAL_CONFIG.PORCENTAJE_IGV}%):
+                      </span>
                       <span>{formatearMoneda(igv)}</span>
                     </div>
                     <Separator className="my-2" />

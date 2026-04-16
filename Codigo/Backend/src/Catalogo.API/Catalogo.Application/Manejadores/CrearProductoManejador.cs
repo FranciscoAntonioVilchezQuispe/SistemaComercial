@@ -45,6 +45,8 @@ namespace Catalogo.Application.Manejadores
                 // Configuración fiscal
                 GravadoImpuesto = request.GravadoImpuesto,
                 PorcentajeImpuesto = request.PorcentajeImpuesto,
+                IdTipoAfectacionIgv = request.IdTipoAfectacionIgv,
+                IdTipoTributo = request.IdTipoTributo,
 
                 // Imagen
                 ImagenPrincipalUrl = request.ImagenPrincipalUrl

@@ -22,7 +22,8 @@ export interface VentaResumen {
   idCliente: number;
   nombreCliente: string;
   clienteRazonSocial: string;
-  clienteNumeroDocumento: string;
+  numeroDocumentoCliente: string;
+  direccionCliente?: string;
   idTipoComprobante: number;
   tipoComprobante: string;
   tipoComprobanteNombre: string;
@@ -52,6 +53,7 @@ export interface VentaDetalle {
   idCliente: number;
   nombreCliente: string;
   numeroDocumentoCliente: string;
+  direccionCliente: string;
   idUsuarioVendedor: number;
   idCotizacionOrigen?: number;
   idTipoComprobante: number;
@@ -118,6 +120,7 @@ export interface VentaFormData {
   subtotalGravado: number;
   totalImpuesto: number;
   totalVenta: number;
+  turnoVendedorId: number;
   observaciones?: string;
   detalles: DetalleVentaFormData[];
   pagos?: PagoFormData[];
@@ -178,6 +181,10 @@ export interface ItemCarrito {
 export interface Carrito {
   items: ItemCarrito[];
   subtotal: number;
+  subtotalGravado: number;
+  subtotalExonerado: number;
+  subtotalInafecto: number;
+  totalGratuito: number;
   descuento: number;
   igv: number;
   total: number;

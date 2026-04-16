@@ -43,4 +43,26 @@ namespace Configuracion.API.Application.DTOs
         public bool EsEfectivo { get; set; }
         public long? IdTipoDocumentoPago { get; set; }
     }
+
+    public class TipoAfectacionIgvDto
+    {
+        public long Id { get; set; }
+        public string Codigo { get; set; } = null!;
+        public string Descripcion { get; set; } = null!;
+        public bool EsGravado { get; set; }
+        public bool EsExonerado { get; set; }
+        public bool EsInafecto { get; set; }
+        public bool EsGratuito { get; set; }
+        public string? CodigoTributoDefault { get; set; }
+        public string? NombreTributoDefault { get; set; }
+    }
+
+    public class TipoTributoDto
+    {
+        public long Id { get; set; }
+        public string Codigo { get; set; } = null!;
+        public string Nombre { get; set; } = null!;
+        public string CodigoInternacional { get; set; } = null!;
+        public string? Descripcion { get; set; }
+    }
 }

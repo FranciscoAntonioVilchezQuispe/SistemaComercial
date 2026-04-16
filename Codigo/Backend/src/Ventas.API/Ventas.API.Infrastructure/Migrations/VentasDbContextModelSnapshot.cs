@@ -95,6 +95,90 @@ namespace Ventas.API.Infrastructure.Migrations
                     b.ToTable("cajas", "ventas");
                 });
 
+            modelBuilder.Entity("Ventas.API.Domain.Entidades.CierreTurno", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_cierre_turno");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<bool>("Activado")
+                        .HasColumnType("boolean")
+                        .HasColumnName("activado");
+
+                    b.Property<int>("CantidadTransacciones")
+                        .HasColumnType("integer")
+                        .HasColumnName("cantidad_transacciones");
+
+                    b.Property<string>("Estado")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("estado");
+
+                    b.Property<DateTime?>("FechaActualizacion")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fecha_modificacion");
+
+                    b.Property<DateTime>("FechaCreacion")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fecha_creacion");
+
+                    b.Property<DateTime>("FechaGeneracion")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fecha_generacion");
+
+                    b.Property<string>("Observaciones")
+                        .HasColumnType("text")
+                        .HasColumnName("observaciones");
+
+                    b.Property<decimal>("TotalEfectivo")
+                        .HasColumnType("decimal(12,2)")
+                        .HasColumnName("total_efectivo");
+
+                    b.Property<decimal>("TotalOtros")
+                        .HasColumnType("decimal(12,2)")
+                        .HasColumnName("total_otros");
+
+                    b.Property<decimal>("TotalTarjeta")
+                        .HasColumnType("decimal(12,2)")
+                        .HasColumnName("total_tarjeta");
+
+                    b.Property<decimal>("TotalTransferencia")
+                        .HasColumnType("decimal(12,2)")
+                        .HasColumnName("total_transferencia");
+
+                    b.Property<decimal>("TotalVentas")
+                        .HasColumnType("decimal(12,2)")
+                        .HasColumnName("total_ventas");
+
+                    b.Property<long>("TurnoVendedorId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_turno_vendedor");
+
+                    b.Property<string>("UsuarioActualizacion")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("usuario_modificacion");
+
+                    b.Property<string>("UsuarioCreacion")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("usuario_creacion");
+
+                    b.HasKey("Id")
+                        .HasName("pk_cierre_turno");
+
+                    b.HasIndex("TurnoVendedorId")
+                        .IsUnique()
+                        .HasDatabaseName("ix_cierre_turno_id_turno_vendedor");
+
+                    b.ToTable("cierre_turno", "ventas");
+                });
+
             modelBuilder.Entity("Ventas.API.Domain.Entidades.Cliente", b =>
                 {
                     b.Property<long>("Id")
@@ -1638,6 +1722,68 @@ namespace Ventas.API.Infrastructure.Migrations
                         });
                 });
 
+            modelBuilder.Entity("Ventas.API.Domain.Entidades.Referencias.ProductoRef", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_producto");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<long?>("IdTipoAfectacionIgv")
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_afectacion_igv");
+
+                    b.Property<long?>("IdTipoTributo")
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_tipo_tributo");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("nombre_producto");
+
+                    b.HasKey("Id")
+                        .HasName("pk_productos");
+
+                    b.ToTable("productos", "catalogo", t =>
+                        {
+                            t.ExcludeFromMigrations();
+                        });
+                });
+
+            modelBuilder.Entity("Ventas.API.Domain.Entidades.Referencias.ReglaDocumentoReferencia", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_relacion");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<bool>("Activado")
+                        .HasColumnType("boolean")
+                        .HasColumnName("activado");
+
+                    b.Property<string>("CodigoDocumento")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("codigo_documento");
+
+                    b.Property<long>("IdTipoComprobante")
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_tipo_comprobante");
+
+                    b.HasKey("Id")
+                        .HasName("pk_regla_documento_comprobante");
+
+                    b.ToTable("regla_documento_comprobante", "configuracion", t =>
+                        {
+                            t.ExcludeFromMigrations();
+                        });
+                });
+
             modelBuilder.Entity("Ventas.API.Domain.Entidades.Referencias.SeriesComprobante", b =>
                 {
                     b.Property<long>("Id")
@@ -1694,6 +1840,50 @@ namespace Ventas.API.Infrastructure.Migrations
                     b.ToTable("series_comprobantes", "configuracion");
                 });
 
+            modelBuilder.Entity("Ventas.API.Domain.Entidades.Referencias.TipoAfectacionIgvRef", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_afectacion");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("CodigoSunat")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("codigo_sunat");
+
+                    b.Property<string>("Descripcion")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("descripcion");
+
+                    b.Property<bool>("EsExonerado")
+                        .HasColumnType("boolean")
+                        .HasColumnName("es_exonerado");
+
+                    b.Property<bool>("EsGratuito")
+                        .HasColumnType("boolean")
+                        .HasColumnName("es_gratuito");
+
+                    b.Property<bool>("EsGravado")
+                        .HasColumnType("boolean")
+                        .HasColumnName("es_gravado");
+
+                    b.Property<bool>("EsInafecto")
+                        .HasColumnType("boolean")
+                        .HasColumnName("es_inafecto");
+
+                    b.HasKey("Id")
+                        .HasName("pk_tipo_afectacion_igv");
+
+                    b.ToTable("tipo_afectacion_igv", "configuracion", t =>
+                        {
+                            t.ExcludeFromMigrations();
+                        });
+                });
+
             modelBuilder.Entity("Ventas.API.Domain.Entidades.Referencias.TipoComprobanteReferencia", b =>
                 {
                     b.Property<long>("Id")
@@ -1745,6 +1935,142 @@ namespace Ventas.API.Infrastructure.Migrations
                         {
                             t.ExcludeFromMigrations();
                         });
+                });
+
+            modelBuilder.Entity("Ventas.API.Domain.Entidades.Referencias.TipoDocumentoReferencia", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_regla");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("Codigo")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("codigo");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("nombre");
+
+                    b.HasKey("Id")
+                        .HasName("pk_tipo_documento");
+
+                    b.ToTable("tipo_documento", "configuracion", t =>
+                        {
+                            t.ExcludeFromMigrations();
+                        });
+                });
+
+            modelBuilder.Entity("Ventas.API.Domain.Entidades.Referencias.TipoTributoRef", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_tributo");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("Codigo")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("codigo_sunat");
+
+                    b.Property<string>("CodigoInternacional")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("codigo_internacional");
+
+                    b.Property<string>("Descripcion")
+                        .HasColumnType("text")
+                        .HasColumnName("descripcion");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("nombre");
+
+                    b.HasKey("Id")
+                        .HasName("pk_tipo_tributo");
+
+                    b.ToTable("tipo_tributo", "configuracion", t =>
+                        {
+                            t.ExcludeFromMigrations();
+                        });
+                });
+
+            modelBuilder.Entity("Ventas.API.Domain.Entidades.TurnoVendedor", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_turno_vendedor");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<bool>("Activado")
+                        .HasColumnType("boolean")
+                        .HasColumnName("activado");
+
+                    b.Property<long>("CajaId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_caja");
+
+                    b.Property<string>("Estado")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("estado");
+
+                    b.Property<DateTime?>("FechaActualizacion")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fecha_modificacion");
+
+                    b.Property<DateTime>("FechaCreacion")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fecha_creacion");
+
+                    b.Property<DateTime?>("FechaFin")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fecha_fin");
+
+                    b.Property<DateTime>("FechaInicio")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fecha_inicio");
+
+                    b.Property<decimal>("MontoApertura")
+                        .HasColumnType("decimal(12,2)")
+                        .HasColumnName("monto_apertura");
+
+                    b.Property<decimal?>("MontoCierre")
+                        .HasColumnType("decimal(12,2)")
+                        .HasColumnName("monto_cierre");
+
+                    b.Property<string>("UsuarioActualizacion")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("usuario_modificacion");
+
+                    b.Property<string>("UsuarioCreacion")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("usuario_creacion");
+
+                    b.Property<long>("UsuarioVendedorId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_usuario_vendedor");
+
+                    b.HasKey("Id")
+                        .HasName("pk_turno_vendedor");
+
+                    b.HasIndex("CajaId")
+                        .HasDatabaseName("ix_turno_vendedor_id_caja");
+
+                    b.ToTable("turno_vendedor", "ventas");
                 });
 
             modelBuilder.Entity("Ventas.API.Domain.Entidades.Venta", b =>
@@ -1942,6 +2268,10 @@ namespace Ventas.API.Infrastructure.Migrations
                         .HasColumnType("decimal(12,2)")
                         .HasColumnName("total_venta");
 
+                    b.Property<long?>("TurnoVendedorId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_turno_vendedor");
+
                     b.Property<string>("UsuarioActualizacion")
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)")
@@ -1965,6 +2295,9 @@ namespace Ventas.API.Infrastructure.Migrations
 
                     b.HasIndex("IdCliente")
                         .HasDatabaseName("ix_ventas_id_cliente");
+
+                    b.HasIndex("TurnoVendedorId")
+                        .HasDatabaseName("ix_ventas_id_turno_vendedor");
 
                     b.ToTable("ventas", "ventas");
                 });
@@ -2032,6 +2365,18 @@ namespace Ventas.API.Infrastructure.Migrations
                         .HasDatabaseName("ix_venta_cuota_pago_id_venta");
 
                     b.ToTable("venta_cuota_pago", "ventas");
+                });
+
+            modelBuilder.Entity("Ventas.API.Domain.Entidades.CierreTurno", b =>
+                {
+                    b.HasOne("Ventas.API.Domain.Entidades.TurnoVendedor", "TurnoVendedor")
+                        .WithOne("CierreTurno")
+                        .HasForeignKey("Ventas.API.Domain.Entidades.CierreTurno", "TurnoVendedorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_cierre_turno_turno_vendedor_id_turno_vendedor");
+
+                    b.Navigation("TurnoVendedor");
                 });
 
             modelBuilder.Entity("Ventas.API.Domain.Entidades.ContactoCliente", b =>
@@ -2208,6 +2553,18 @@ namespace Ventas.API.Infrastructure.Migrations
                     b.Navigation("Venta");
                 });
 
+            modelBuilder.Entity("Ventas.API.Domain.Entidades.TurnoVendedor", b =>
+                {
+                    b.HasOne("Ventas.API.Domain.Entidades.Caja", "Caja")
+                        .WithMany()
+                        .HasForeignKey("CajaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_turno_vendedor_cajas_id_caja");
+
+                    b.Navigation("Caja");
+                });
+
             modelBuilder.Entity("Ventas.API.Domain.Entidades.Venta", b =>
                 {
                     b.HasOne("Ventas.API.Domain.Entidades.Caja", "Caja")
@@ -2222,9 +2579,16 @@ namespace Ventas.API.Infrastructure.Migrations
                         .IsRequired()
                         .HasConstraintName("fk_ventas_clientes_id_cliente");
 
+                    b.HasOne("Ventas.API.Domain.Entidades.TurnoVendedor", "TurnoVendedor")
+                        .WithMany("Ventas")
+                        .HasForeignKey("TurnoVendedorId")
+                        .HasConstraintName("fk_ventas_turno_vendedor_id_turno_vendedor");
+
                     b.Navigation("Caja");
 
                     b.Navigation("Cliente");
+
+                    b.Navigation("TurnoVendedor");
                 });
 
             modelBuilder.Entity("Ventas.API.Domain.Entidades.VentaCuotaPago", b =>
@@ -2257,6 +2621,13 @@ namespace Ventas.API.Infrastructure.Migrations
             modelBuilder.Entity("Ventas.API.Domain.Entidades.NotaDebito", b =>
                 {
                     b.Navigation("Detalles");
+                });
+
+            modelBuilder.Entity("Ventas.API.Domain.Entidades.TurnoVendedor", b =>
+                {
+                    b.Navigation("CierreTurno");
+
+                    b.Navigation("Ventas");
                 });
 
             modelBuilder.Entity("Ventas.API.Domain.Entidades.Venta", b =>

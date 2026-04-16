@@ -28,8 +28,26 @@ class Program
                 Console.WriteLine($"📋 {e.Notice.MessageText}");
             };
 
-            var result = command.ExecuteNonQuery();
-            Console.WriteLine($"\n✅ Script ejecutado exitosamente! ({result} filas afectadas)");
+            if (sql.TrimStart().StartsWith("SELECT", StringComparison.OrdinalIgnoreCase))
+            {
+                using var reader = command.ExecuteReader();
+                int rowCount = 0;
+                while (reader.Read())
+                {
+                    var rowData = new System.Collections.Generic.List<string>();
+                    for (int i = 0; i < reader.FieldCount; i++)
+                    {
+                        rowData.Add($"{reader.GetName(i)}: {reader.GetValue(i)}");
+                    }
+                    Console.WriteLine($"[Fila {++rowCount}] {string.Join(" | ", rowData)}");
+                }
+                Console.WriteLine($"\n✅ Consulta completada! ({rowCount} filas obtenidas)");
+            }
+            else
+            {
+                var result = command.ExecuteNonQuery();
+                Console.WriteLine($"\n✅ Script ejecutado exitosamente! ({result} filas afectadas)");
+            }
         }
         catch (Exception ex)
         {

@@ -1,168 +1,216 @@
-# TODO: SistemaComercial
+# Registro de Tareas — Sistema Comercial
 
-## Tareas Completadas ✅
-
-### Fase 1: Estabilización Backend Inicial
-- [x] Corregir errores de compilación en Backend (Inventario.API, Configuracion.API).
-- [x] Resolver error `TypeError: .map is not a function` en Frontend.
-- [x] Estandarizar acceso a `.datos` en componentes de búsqueda y formularios.
-- [x] Corregir lógica de eliminación de compras (Reversión de ValorTotal y Anulación de Kardex).
-- [x] Corregir esquema de base de datos para `Sucursal` (Backend).
-
-### Fase 2: Correcciones Frontend
-- [x] Corregir error de sintaxis en `DialogoFinalizarVenta.tsx`.
-- [x] Reparar importación rota de `reglasDocumentoService`.
-
-### Fase 3: Sistema de Ubigeos
-- [x] Implementar Sistema de Ubigeo Recursivo (Backend Dapper + Frontend Select Cascada).
-- [x] Integrar Ubigeos en Dashboard y Menú de Configuración (PaginaUbigeos).
-- [x] Generar carga masiva de Ubigeos (2115 registros) desde CSV con ID corregido.
-
-### Fase 4: Reversión de Stock y Sincronización
-- [x] Implementar reversión de stock en eliminación/anulación.
-- [x] Sincronizar Cliente-Proveedor con switch "Agregar a".
-- [x] Implementar FluentValidation y correlativos atómicos.
-- [x] Estandarizar PagedResponse y UI Premium POS.
-
-### Fase 5: Módulo de Ventas (POS)
-- [x] Combos dinámicos para Estado, Estado Pago y Moneda (Usando Hooks).
-- [x] Zero-padding (8 dígitos) para campo `numero`.
-- [x] Corregir cálculo de `saldo_pendiente` e incluir `monto_pagado`.
-- [x] Generar Serie/Correlativo atómicamente en el guardado (backend).
-- [x] Pantalla de éxito premium animada con Framer Motion.
-- [x] Corregir padding de 8 dígitos para documentos SUNAT.
-
-### Fase 6: Estabilización de Persistencia
-- [x] BUG FIX: Resolver error de Npgsql DateTime UTC en `VentasDbContext.cs`.
-- [x] Verificar persistencia de `SeriesComprobante` tras el fix.
-- [x] Refrescar stock en UI (invalidar caché de productos tras venta).
-- [x] Corregir envío de pagos para cálculo de `saldo_pendiente`.
-- [x] Corregir Operación SUNAT y persistencia en Formulario de Compras (Fix UTC).
-- [x] Corrección de migraciones EF Core (Ventas y Compras).
-- [x] Ejecución de `dotnet ef database update` para ambos contextos.
-
-### Fase 7: Refactorización de Dominio
-- [x] Sincronizar esquema `ventas.detalle_venta` (Añadir columnas de auditoría).
-- [x] Corregir IDs de catálogo en `CrearVentaManejador.cs` (Magic Numbers Fix).
-- [x] Implementar normalización recursiva de fechas UTC en `VentasDbContext`.
-- [x] Refactorizar a Enums centralizados (`EstadoVenta`, `EstadoPago`, `TipoMovimiento`).
-
-### Fase 8: Estabilización Global de Esquemas
-- [x] Estabilización Global de Base de Datos (Auditoría en Esquemas: Ventas, Catalogo, Inventario, Contabilidad).
-- [x] Unificación y Organización de Scripts SQL en Carpeta Central.
-- [x] Herramientas: Botón de consulta SUNAT (Simulado).
-- [x] Estabilización: Reseteo de secuencias en PostgreSQL.
-
-### Fase 9: Frontend — Enums y Vista Previa
-- [x] Centralizar enums en `src/compartido/enums` (Sincronizados con Backend).
-- [x] Refactorizar `PaginaVentas.tsx` para usar enums y tipado estricto en DataTable.
-- [x] Actualizar componentes auxiliares con nuevos nombres de propiedades.
-- [x] Robustecer utilidades de `fecha.ts` y `moneda.ts` para manejar nulos/NaN.
-- [x] Implementar modal de vista previa de comprobantes con estilos de impresión.
-
-### Fase 10: Consolidación de Métodos de Pago (Unificación de Esquemas)
-- [x] Actualizar `MetodoPago.cs` (Ventas.Domain) — Schema `"ventas"` → `"configuracion"`.
-- [x] Actualizar `VentasDbContext.cs` — `ExcludeFromMigrations()` para MetodoPago.
-- [x] Actualizar `VentaRepositorio.cs` — SQL Join a `configuracion.metodos_pago`.
-- [x] Migración EF Core Configuracion (`PluralizarMetodosPago`) — CreateTable.
-- [x] Migración EF Core Ventas (`ExcluirMetodosPago`).
-- [x] `dotnet ef database update` — Configuracion ✅.
-- [x] `dotnet ef database update` — Ventas ✅.
-- [x] Seed data en `configuracion.metodos_pago` (4 registros).
-- [x] Migrar FK de `ventas.pagos` → `configuracion.metodos_pago`.
-- [x] DROP `ventas.metodos_pago` (tabla legacy eliminada).
-- [x] Compilación global exitosa (0 errores).
+> [!IMPORTANT]
+> Este archivo es acumulativo. NUNCA borrar sesiones anteriores.
+> Las nuevas sesiones se agregan al final del archivo.
 
 ---
-
-## Fase 11: Cumplimiento SUNAT UBL 2.1 — EN PROGRESO 🚀
-
-> Plan de implementación completo en:
-> `C:\Users\prueb\.gemini\antigravity\brain\c85c92d8-330d-4c80-9b8b-3b753c8a0754\implementation_plan.md`
-
-### Fase 11-A: Base de Datos (Script SQL idempotente)
-- [ ] Crear schema `sunat` + tabla `cat_estado_cpe` con seed data (7 estados)
-- [ ] Crear tabla `sunat.log_envio_cpe` con soporte Ventas/NC/ND (constraint XOR)
-- [ ] Crear tabla `ventas.venta_cuota_pago` (cuotas de crédito)
-- [ ] INSERT registros faltantes en `configuracion.impuestos` (9995 Exportación, 9999 Gratuita)
-- [ ] INSERT registros faltantes en `catalogo.unidades_medida` (ZZ, MTQ, DZN, SET)
-- [ ] ALTER `ventas.ventas` — campos UBL: `id_tipo_operacion`, `forma_pago`, `hash_cdr`, `hash_cpe`, `xml_generado`, `subtotal_exonerado`, `subtotal_inafecto`, `id_estado_cpe`, `orden_compra_ref`, `id_empresa`, `numero_ticket_sunat`
-- [ ] ALTER `ventas.detalle_venta` — campos UBL: `id_afectacion_igv`, `id_tributo`, `id_unidad_medida` FK
-- [ ] ALTER `configuracion.tipo_afectacion_igv` — ADD `id_impuesto` FK
-- [ ] ALTER `configuracion.tipo_operacion_sunat` — ADD 4 booleans `aplica_*`
-- [ ] ALTER `ventas.nota_credito` — campos UBL: `id_tipo_operacion`, `hash_cpe`, `subtotal_gravado/exo/ina`, `id_empresa`, `numero_ticket_sunat`, `id_estado_cpe`
-- [ ] ALTER `ventas.nota_debito` — mismas columnas que nota_credito
-- [ ] ALTER `ventas.nota_credito_detalle` — campos UBL: `id_afectacion_igv`, `id_tributo`, `precio_unitario_base`, `valor_item`, `descuento_item`, `porcentaje_impuesto`, `numero_linea`, `id_unidad_medida`
-- [ ] ALTER `ventas.nota_debito_detalle` — mismas columnas
-- [ ] ADD CONSTRAINT `fk_nc_tipo_nota` → `configuracion.motivo_nota_credito(id_motivo)`
-- [ ] ADD CONSTRAINT `fk_nd_tipo_nota` → `configuracion.motivo_nota_debito(id_motivo)`
-- [ ] PAUSA: Reportar valores `SELECT DISTINCT estado` y `unidad_medida` antes de migrar
-
-### Fase 11-B: Backend (.NET) — Refactor completo
-- [ ] Actualizar 6 entidades C#: `Venta`, `DetalleVenta`, `NotaCredito`, `NotaDebito`, `NotaCreditoDetalle`, `NotaDebitoDetalle`
-- [ ] Crear 2 entidades nuevas: `VentaCuotaPago`, `EstadoCpe`
-- [ ] Corregir IGV hardcodeado `18.00m` en 6 archivos — leer desde `configuracion.impuestos`
-- [ ] **Refactorizar `CrearNotaCreditoManejador.cs`:**
-  - [ ] Implementar correlativo automático (`ObtenerSiguienteCorrelativoNCAsync`)
-  - [ ] Mover cálculos de montos al backend (subtotal_gravado/exo/ina, igv, total)
-  - [ ] Copiar datos del cliente desde la venta referenciada (Include → Cliente)
-  - [ ] Validar: venta existe + estado Completada + monto NC ≤ total venta
-  - [ ] Actualizar venta al crear NC tipo 01/06 (id_estado → Anulada, saldo → 0)
-- [ ] **Refactorizar `CrearNotaDebitoManejador.cs`** — mismo patrón que NC
-- [ ] Simplificar `NotaCreditoDto.cs` / `NotaDebitoDto.cs` (entrada liviana, salida completa)
-- [ ] Agregar endpoints lectura motivos NC/ND desde `configuracion.motivo_nota_*`
-- [ ] Agregar endpoints listado paginado NC y ND
-- [ ] Agregar endpoints CRUD Estado CPE + lectura Log Envío SUNAT
-- [ ] Migraciones EF Core para Ventas y Configuración
-- [ ] Compilar y verificar **0 errores**
-
-### Fase 11-C: Frontend (React/TypeScript) — Ventas UBL + NC/ND
-- [ ] Actualizar `ventas.types.ts` con campos UBL nuevos
-- [ ] Crear `notas.types.ts` con interfaces tipadas NC/ND (`NotaResumen`, `NotaFormData`, `NotaDetalle`)
-- [ ] Crear páginas configuración SUNAT (~15 archivos):
-  - [ ] `PaginaAfectacionIgv` — CRUD tipo afectación IGV
-  - [ ] `PaginaEstadoCpe` — CRUD estados CPE SUNAT
-  - [ ] `PaginaLogSunat` — Grid de solo lectura envíos SUNAT
-- [ ] Crear páginas listado NC/ND (~12 archivos):
-  - [ ] `PaginaNotasCredito` con `TablaNotasCredito` + hooks + servicios
-  - [ ] `PaginaNotasDebito` con `TablaNotasDebito` + hooks + servicios
-  - [ ] `ModalVistaNotaCredito` — vista previa de NC
-  - [ ] `useMotivosNota` — carga dinámica de motivos desde API
-- [ ] **Refactorizar `ModalCrearNotaSunat.tsx`:**
-  - [ ] Cargar motivos dinámicamente (los 13 NC y 6 ND del catálogo)
-  - [ ] Eliminar cálculos del payload (solo enviar idProducto + cantidad)
-  - [ ] No enviar serie/numero/cliente (el backend los asigna)
-  - [ ] Mostrar serie-número asignada por backend en toast
-- [ ] Actualizar `DialogoFinalizarVenta.tsx` (toggle Contado/Crédito, tipo operación, cuotas)
-- [ ] Actualizar `TablaVentas.tsx` (columnas Estado SUNAT + Forma Pago + indicador NC/ND)
-- [ ] Actualizar `ModalVistaPreviaVenta.tsx` (sección SUNAT + cuotas + IGV dinámico)
-- [ ] Tipar `servicioVentas.ts` — reemplazar `any` por interfaces reales en funciones NC/ND
-- [ ] Actualizar rutas, menú y navegación
-- [ ] Verificar compilación: `npx tsc --noEmit` → **0 errores**
+## Sesiones Previas (Resumen según Historial)
+- [x] Sincronización y Normalización del Kardex (2026-04-12)
+- [x] Ordenamiento Cronológico Permanente (2026-04-12)
+- [x] Secuencialidad y Formateo de Kardex (2026-04-12)
+- [x] Corrección de Ventana Horaria Estricta (2026-04-12)
+- [x] Corrección de Códigos SUNAT e Impacto de Notas (2026-04-12)
+- [x] Valorización de NC al Costo Promedio (2026-04-12)
 
 ---
-
-## Tareas Pendientes (Post Fase 11) 📋
-
-### Prioridad Alta
-- [ ] Realizar prueba de flujo completo: Crear Venta → Generar NC → Validar Stock y Estado.
-- [ ] Implementar recálculo retroactivo de saldos de Kardex tras anulación.
-
-### Prioridad Media
-- [ ] Crear archivo Maestro de Inicialización SQL (unificar scripts 01-14 en orden).
-- [ ] Implementar pruebas automatizadas (xUnit backend, Vitest frontend).
-- [ ] Habilitar Swagger/OpenAPI en todos los microservicios.
-
-### Prioridad Baja
-- [ ] Implementar CI/CD Pipelines (GitHub Actions o Azure DevOps).
-- [ ] Integración de SonarQube para análisis estático de código.
-- [ ] Documentación de API para consumo por terceros (Odoo, Android).
+## Sesión 2026-04-12 — Corrección Vista Previa Venta
+- [x] Investigar campos faltantes en DB y DTOs
+- [x] Definir cambios en Backend y Frontend
+- [x] Actualizar `VentaDetalleDto.cs` (DireccionCliente)
+- [x] Modificar `VentaRepositorio.cs` (SQL & COALESCE)
+- [x] Actualizar tipos en Frontend (`ventas.types.ts`)
+- [x] Corregir `ModalVistaPreviaVenta.tsx` (SUNAT & Cliente)
+- [x] Verificación final de la visualización
 
 ---
+## Sesión 2026-04-12 — Restauración de Reglas y Blindaje de Historial
+- [x] Restaurar protocolos de gestión de sesiones en `GEMINI.md`
+- [x] Blindar archivos de `tasks/` contra sobrescritura en `GEMINI.md`
+- [x] Re-formatear `todo.md` como registro acumulativo
+- [ ] Generar walkthrough final
 
-## Revisión Final
-- [x] Compilación total de la solución (Backend) — 0 errores.
-- [x] Verificación de persistencia en BD para eliminación de compras.
-- [x] Carga exitosa del módulo POS sin errores de importación dinámica.
-- [x] Sincronización visual de estados (Badges) basada en IDs oficiales.
-- [x] Tabla `metodos_pago` unificada en esquema `configuracion`.
+---
+## Sesión 2026-04-13 — Corrección de Cálculos en Guardado de Venta
+- [x] Investigar lógica de cálculo en `CrearVentaManejador.cs`
+- [x] Corregir asunción de "Precio con IGV" vs "Precio sin IGV"
+- [x] Validar acumulación de Subtotal, IGV y Total
+- [x] Verificar mapeo de columnas en la entidad `Venta`
+- [x] Pruebas de guardado y validación de resultados
+
+---
+## Sesión 2026-04-12 — Implementación de Tablas Maestras SUNAT (CRUD)
+- [x] Crear entidad `TipoAfectacionIgv` y `TipoTributo` (Backend)
+- [x] Implementar repositorios y endpoints Minimal API
+- [x] Desarrollar interfaz de usuario CRUD en el frontend
+- [x] Implementar sistema de inicialización automática de códigos SUNAT
+- [x] Registrar rutas y menú de navegación
+- [x] Generar documentación y walkthrough
+
+---
+## Sesión 2026-04-12 — Corrección de Componente Alert y Página de Tributos
+- [x] Investigar error en `PaginaTiposTributo.tsx` (Componente `Alert` faltante)
+- [x] Crear componente `Alert` faltante en `src/componentes/ui/alert.tsx`
+- [x] Verificar importación y renderizado en `PaginaTiposTributo.tsx`
+- [x] Verificar importación en `PaginaAfectacionIgv.tsx`
+- [x] Generar historial y walkthrough de la sesión
+
+---
+## Sesión 2026-04-12 — Integración SUNAT en Catálogo de Productos
+- [x] Actualizar entidad `Producto.cs` con campos `IdTipoAfectacionIgv` e `IdTipoTributo`
+- [x] Configurar mapeo EF Core en `CatalogoConfiguracion.cs`
+- [x] Actualizar DTOs de Lista y Detalle (`ProductoDto`, `ProductoListDto`, `ProductoDetalleDto`)
+- [x] Sincronizar consultas Dapper en `ProductoRepositorio.cs` con JOINS hacia esquema `configuracion`
+- [x] Crear y aplicar migración robusta `AsociacionSunatProducto` (con blindaje contra errores de constraints)
+- [x] Actualizar tipos de frontend en `catalogo.types.ts`
+- [x] Integrar selectores de SUNAT en `ProductoForm.tsx` con lógica de autoselección
+- [x] Verificación de compilación y persistencia de datos
+
+---
+## Sesión 2026-04-12 — Corrección de Mapeo SUNAT en Ventas
+- [x] Investigar causa raíz del error 42703 en logs de ventas
+- [x] Corregir mapeo de `TipoAfectacionIgvRef` (id -> id_afectacion)
+- [x] Implementar `TipoTributoRef` para completar soporte fiscal
+- [x] Actualizar `VentasDbContext` con nuevas referencias
+- [x] Verificar compilación de la solución
+
+---
+## Sesión 2026-04-13 — Estandarización Global de Fechas (Backend + Frontend)
+- [x] Diseñar arquitectura centralizada de fechas (Peru Time UTC-5)
+- [x] Implementar `DateTimeConstants` y `DateTimeHelper` en `Nucleo.Comun`
+- [x] Crear utilidad `datetime.ts` en Frontend
+- [x] Implementar componente `DatePicker` unificado
+- [x] Refactorizar microservicios para eliminar `DateTime.UtcNow` directo
+- [x] Refactorizar frontend para eliminar `new Date()` y formatos hardcodeados
+- [x] Configurar ESLint v9 restrictivo (Prohibir new Date())
+- [x] Verificación final cross-layer
+
+---
+## Sesión 2026-04-13 — Auditoría y Estandarización Global (Variables y Constantes)
+- [x] Análisis exhaustivo de hardcoding en la solución (18.00m, localhost:5000)
+- [x] Centralización Fiscal: Crear FiscalConstants (BE) y fiscal.config (FE)
+- [x] Refactorizar cálculos de IGV en microservicios y formularios web
+- [x] Configuración de Red: Implementar .env y refactorizar axios.ts con Vite
+- [x] Auditoría Centralizada: Implementar DbContextAuditHelper en Nucleo.Comun
+- [x] Refactorizar todos los DbContext para usar auditoría automática
+- [x] Limpieza Masiva: Eliminar UtcNow manual en Endpoints y Repositorios
+- [x] Verificación final e informes (Walkthrough y Task finalizados)
+
+---
+## Sesión 2026-04-13 — Estabilización Final y Compilación Total
+- [x] Ejecutar `dotnet build` global y corregir errores de sintaxis y namespaces
+- [x] Resolver advertencias de TypeScript en Frontend (`tsc`)
+- [x] Corregir desajustes de interfaces y modelos (`VentaResumen`, `ClienteResumen`)
+- [x] Refactorizar componente `DatePicker` con soporte para `disabled`
+- [x] Limpiar importaciones y variables obsoletas en toda la solución
+- [x] Validar compilación exitosa (0 errores BE / tsc exitoso FE)
+- [x] Actualizar documentación de Skill y Reglas Globales (GÈMINI.md)
+
+---
+## Sesión 2026-04-13 — Implementación de Notas de Crédito y Débito (Compras y Ventas)
+- [x] Backend: Ventas.API - Endpoints de Detalle (GET /api/notas/credito/{id})
+- [x] Backend: Ventas.API - Refactorizar CrearNotaDebitoManejador
+- [x] Backend: Compras.API - Listado de Notas (GET /api/compras/notas)
+- [x] Backend: Compras.API - Endpoints de Detalle (GET /api/compras/notas/credito/{id})
+- [x] Backend: Compras.API - Refactorizar CrearNotaCreditoCompraManejador
+- [x] Backend: Compras.API - Refactorizar CrearNotaDebitoCompraManejador
+- [x] Frontend: Componente VistaPreviaNotaSunat (Shared)
+- [x] Frontend: Ventas - Integración de Detalles en PaginaNotas
+- [x] Frontend: Compras - Servicio de Notas y PaginaNotasCompra
+- [x] Frontend: Navegación y Rutas para Compras
+- [x] Verificación de flujo completo y refactorización de cálculos
+
+---
+## Sesión 2026-04-15 — Análisis de Páginas del Módulo de Inventario
+- [x] Analizar `PaginaKardexPeriodos.tsx`
+- [x] Analizar `PaginaKardexReporte.tsx`
+- [x] Analizar `PaginaMovimientos.tsx`
+- [x] Analizar `PaginaStock.tsx`
+- [x] Analizar `PaginaTraslados.tsx`
+- [x] Presentar explicación detallada al usuario
+
+---
+## Sesión 2026-04-15 — Implementación del Módulo de Reportes (Fase 1)
+- [x] Planificar arquitectura del módulo de reportes
+- [x] Crear Hub de Reportes en el Frontend
+- [x] Fase 4: Reportes de Compras (Proveedores)
+    - [x] Backend: Implementar `ObtenerComprasPorProveedorAsync` en `CompraRepositorio` (Compras.API)
+    - [x] Backend: Exponer endpoint en `ReportesComprasEndpoints`
+    - [x] Frontend: Crear hook `useReporteComprasProveedor`
+    - [x] Frontend: Implementar `PaginaReporteComprasProveedor`
+    - [x] Frontend: Registrar rutas y actualizar `PaginaReportesHub`
+- [x] Implementar Reporte de Stock Crítico (Inventario)
+- [x] Implementar Reporte de Ranking de Productos (Ventas)
+- [x] Implementar Reporte de Top Clientes (Ventas)
+- [x] Corrección de errores de compilación backend y frontend
+- [x] Verificación de integridad total (Backend Build / Frontend Build)
+- [x] Generar walkthrough y actualizar historial
+- [x] Implementar Exportación a Excel en los Reportes
+    - [x] Instalar dependencia `xlsx`
+    - [x] Actualizar componente `ExportadorTabla.tsx` con soporte Excel
+    - [x] Integrar exportador en los reportes de Ventas e Inventario
+    - [x] Verificar funcionamiento y compilación
+
+---
+## Sesión 2026-04-16 — Limpieza y Unificación de Scripts de Base de Datos
+- [x] Analizar y clasificar todos los archivos `.sql` en `Codigo\BaseDeDatos\Scripts`
+- [x] Identificar scripts redundantes y candidatos a eliminación
+- [x] Unificar scripts de evolución recientes (15, 16, 17) en un nuevo script secuencial (03)
+- [x] Organizar herramientas de verificación en una carpeta de `mantenimiento/`
+- [x] Normalizar codificación UTF-8 de los archivos esenciales
+- [x] Actualizar la guía maestra `SCRIPTS_GUIDE.md`
+- [x] Ejecutar la limpieza (eliminación y movimiento de archivos)
+- [x] Generar reporte final de la estructura de base de datos
+
+---
+## Sesión 2026-04-16 — Implementación de Autenticación JWT y Módulo Vendedor
+### Fase 1: Identidad.API (JWT)
+- [x] Crear comandos y manejadores de Login y Refresh.
+- [x] Entidad RefreshToken e infraestructura JWT.
+- [x] Endpoints Minimal API (AuthEndpoints).
+
+### Fase 2: Gateway.API (Enforcement)
+- [x] Middleware YARP JWT y headers enrutamiento (`X-User-Id`, `X-User-Roles`).
+
+### Fase 3: Ventas.API (Turnos y Caja)
+- [x] Crear entidades TurnoVendedor y CierreTurno.
+- [x] Actualizar `Venta` vinculando `TurnoVendedorId`.
+- [x] Migración de base de datos en EF Core.
+- [x] Comandos y Query para abrir, cerrar y visualizar el turno actual.
+
+### Fase 4: Frontend (Auth y Vendedor)
+- [ ] Feature Auth (Token, Context, Redirects).
+- [ ] Feature Vendedor, layouts y protegido.
+- [ ] Rutas separadas y controladas.
+
+### Fase 5: Identidad.API (Administración)
+- [ ] CRUD y gestión de Roles, Usuarios y Trabajadores.
+---
+## Sesión 2026-04-16 — Estabilización del Módulo de Identidad
+- [x] Corregir enrutamiento en Gateway.API (YARP) para `/api/auth/`
+- [x] Refactorizar `LoginManejador` y `RefreshTokenManejador` para usar `IToReturn`
+- [x] Estandarizar respuestas en `AuthEndpoints.cs` (códigos 401, 200, 500)
+- [x] Sincronizar esquema de base de datos (Creación manual de `identidad.refresh_tokens`)
+- [x] Resetear contraseña de administrador a `Admin123!`
+- [x] Verificar flujo completo de login (Exitosa obtención de JWT y Refresh Token)
+- [x] Actualizar `authService.ts` en frontend para manejar el wrapper de respuesta
+- [x] Generar walkthrough y documentación de la sesión
+---
+## Sesión 2026-04-16 — Sincronización de Autenticación y Corrección de Error 401
+- [x] Identificar desajuste de `Issuer` y `Audience` en JWT
+- [x] Alinear configuración de JWT en `Identidad.API` y `Gateway.API`
+- [x] Refactorizar middleware de Gateway para devolver JSON (Corrección error parsing XML)
+- [x] Verificar acceso exitoso a `/api/usuarios` con token válido
+- [x] Generar walkthrough y actualizar historial
+
+---
+## Sesión 2026-04-16 — Reestructuración de Identidad y Autorización Granular
+- [x] Establecer relación obligatoria 1:1 Usuario-Trabajador (DB e Infra)
+- [x] Refactorizar `CrearUsuarioCommand` con validación de personal vinculable
+- [x] Implementar sistema de permisos granulares (MENU:ACCION)
+- [x] Actualizar Gateway con middleware de autorización dinámica y granular
+- [x] Desarrollar Matriz de Permisos en el Frontend (Menus vs Tipos)
+- [x] Implementar Diálogo de Creación de Usuario con selector de trabajador
+- [x] Corregir flujo de JWT para incluir reclamaciones de permisos aplanados
+- [x] Verificar compilación total de la solución (0 errores)
+- [x] Generar documentación, historial y walkthrough de la sesión

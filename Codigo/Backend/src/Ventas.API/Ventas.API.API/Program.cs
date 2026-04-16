@@ -71,5 +71,7 @@ app.MapCajaEndpoints();
 app.MapVentaEndpoints();
 app.MapCotizacionEndpoints();
 app.MapNotaSunatEndpoints();
+app.MapReportesVentasEndpoints();
+Ventas.API.API.Endpoints.TurnosEndpoints.MapTurnosEndpoints(app);
 
 app.Run();

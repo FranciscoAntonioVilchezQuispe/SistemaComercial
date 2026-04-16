@@ -90,6 +90,7 @@ export function PaginaCompras() {
   const tabsCompras = [
     { label: RUTAS_TITULOS["/proveedores/ordenes"], to: "/proveedores/ordenes" },
     { label: RUTAS_TITULOS["/compras/lista"], to: "/compras/lista" },
+    { label: RUTAS_TITULOS["/compras/notas"], to: "/compras/notas" },
     { label: RUTAS_TITULOS["/proveedores"], to: "/proveedores" },
   ];
 

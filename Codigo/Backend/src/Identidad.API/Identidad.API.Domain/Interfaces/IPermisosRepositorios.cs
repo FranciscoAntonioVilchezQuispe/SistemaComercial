@@ -43,6 +43,7 @@ namespace Identidad.API.Domain.Interfaces
         Task<IEnumerable<RolMenuPermiso>> ObtenerPorRolMenuAsync(long idRolMenu);
         Task<IEnumerable<RolMenuPermiso>> ObtenerPermisosPorRolYMenuAsync(long idRol, long idMenu);
         Task<bool> UsuarioTienePermisoAsync(long idUsuario, string codigoMenu, string codigoPermiso);
+        Task<IEnumerable<string>> ObtenerPermisosAplanadosPorUsuarioAsync(long idUsuario);
     }
 
     public interface IUsuarioRolRepositorio

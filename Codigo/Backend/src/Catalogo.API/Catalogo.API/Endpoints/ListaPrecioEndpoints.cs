@@ -49,7 +49,6 @@ namespace Catalogo.API.Endpoints
                 existente.EsBase = dto.EsBase;
                 existente.PorcentajeGananciaSugerido = dto.PorcentajeGananciaSugerido;
                 existente.UsuarioActualizacion = "SISTEMA";
-                existente.FechaActualizacion = DateTime.UtcNow;
 
                 await repo.ActualizarAsync(existente);
                 return Results.Ok(new ToReturn<ListaPrecio>(existente));

@@ -3,6 +3,7 @@ using Inventario.API.Application.Interfaces;
 using Inventario.API.Domain.Entidades;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Nucleo.Comun.Domain.Helpers;
 using System;
 using System.Linq;
 using System.Threading;
@@ -76,7 +77,7 @@ namespace Inventario.API.Application.Manejadores
 
             // 4. Actualizar Estado del Traslado
             traslado.Estado = "RECIBIDO";
-            traslado.FechaRecepcion = DateTime.UtcNow;
+            traslado.FechaRecepcion = DateTimeHelper.ObtenerAhoraLima();
             traslado.Observaciones = request.Observaciones;
 
             await _context.SaveChangesAsync(cancellationToken);

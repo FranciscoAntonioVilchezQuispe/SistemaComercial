@@ -4,12 +4,15 @@ using Inventario.API.Domain.Entidades.Kardex;
 using Inventario.API.Domain.Entidades.Referencias;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Nucleo.Comun.Domain.Helpers;
 
 namespace Inventario.API.Infrastructure.Datos
 {
     public class InventarioDbContext : DbContext, IInventarioDbContext
     {
         public InventarioDbContext(DbContextOptions<InventarioDbContext> options) : base(options) { }
+
+        // ... (resto de los DbSet y OnModelCreating omitidos para brevedad en el reemplazo si es necesario, pero aquí reemplazo la cabecera y el final)
 
         public DbSet<MovimientoInventario> MovimientosInventario { get; set; } = null!;
         public DbSet<Inventario.API.Domain.Entidades.Integracion.SyncCompra> SyncCompras { get; set; } = null!;
@@ -340,6 +343,14 @@ namespace Inventario.API.Infrastructure.Datos
             configurationBuilder
                 .Properties<DateTime?>()
                 .HaveConversion(typeof(NullableDateTimeToUtcConverter));
+        }
+
+        public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        {
+            // Aplicar auditoría centralizada (Estandarización Global)
+            DbContextAuditHelper.AplicarAuditoriaDirecta(ChangeTracker);
+
+            return base.SaveChangesAsync(cancellationToken);
         }
     }
 

@@ -11,14 +11,21 @@ namespace Catalogo.Domain.DTOs
         public long Id { get; set; }
         public string Codigo { get; set; } = null!;
         public string Nombre { get; set; } = null!;
+        public string? Sku { get; set; }
         public string CategoriaNombre { get; set; } = string.Empty;
         public string MarcaNombre { get; set; } = string.Empty;
         public string UnidadMedidaSigla { get; set; } = string.Empty;
         
         public decimal PrecioVentaPublico { get; set; }
+        public decimal PrecioVentaMayorista { get; set; }
+        public decimal PrecioVentaDistribuidor { get; set; }
         public decimal StockActual { get; set; }
+        public decimal StockMinimo { get; set; }
+        public decimal? StockMaximo { get; set; }
         
         public string? ImagenPrincipalUrl { get; set; }
+        public bool GravadoImpuesto { get; set; }
+        public decimal PorcentajeImpuesto { get; set; }
         public bool Activo { get; set; }
 
         // Propiedad técnica para PagedResponse

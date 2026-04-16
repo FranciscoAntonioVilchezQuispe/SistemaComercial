@@ -3,6 +3,7 @@ using Inventario.API.Domain.Interfaces;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Nucleo.Comun.Domain.Helpers;
 
 namespace Inventario.API.Application.Servicios
 {
@@ -29,7 +30,7 @@ namespace Inventario.API.Application.Servicios
         {
             // Opcional: Iniciar TransactionScope (o se asume transaccional desde el UnitOfWork del Controller)
 
-            var startTime = DateTime.UtcNow;
+            var startTime = DateTimeHelper.ObtenerAhoraLima();
 
             // PASO 1: Obtener saldo ANTERIOR al punto de quiebre
             var saldoBase = await _kardexRepo.ObtenerUltimoMovimientoAsync(almacenId, productoId, desdeFecha, desdeHora);
@@ -95,7 +96,7 @@ namespace Inventario.API.Application.Servicios
                 mov.SaldoCantidad = saldoAcumQty;
                 mov.SaldoCostoUnitario = saldoAcumCostoUnitario;
                 mov.SaldoCostoTotal = saldoAcumCostoTotal;
-                mov.RecalculadoAt = DateTime.UtcNow;
+                mov.RecalculadoAt = DateTimeHelper.ObtenerAhoraLima();
 
                 await _kardexRepo.ActualizarAsync(mov);
                 regsAfectados++;
@@ -105,7 +106,7 @@ namespace Inventario.API.Application.Servicios
             // if (producto.MetodoValuacion in ("PE", "UE")) -> ReconstruirLotesAsync(almacenId, productoId, desdeFecha);
 
             // PASO 5: Registrar la tabla de bitácora
-            var endTime = DateTime.UtcNow;
+            var endTime = DateTimeHelper.ObtenerAhoraLima();
             await _logRepo.AgregarAsync(new KardexRecalculoLog
             {
                 AlmacenId = (int)almacenId,

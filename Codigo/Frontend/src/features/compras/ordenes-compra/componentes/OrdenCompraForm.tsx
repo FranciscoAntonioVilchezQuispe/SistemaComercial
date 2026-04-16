@@ -2,9 +2,10 @@ import React from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { CalendarIcon, Trash2, Plus, ShoppingBag } from "lucide-react";
-import { format } from "date-fns";
+import { Trash2, Plus, ShoppingBag } from "lucide-react";
 import { toast } from "sonner";
+import { DatePicker } from "@/componentes/ui/date-picker";
+import { getCurrentDateTime } from "@/lib/datetime";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -17,12 +18,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { Calendar } from "@/components/ui/calendar";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 
@@ -32,7 +27,7 @@ import { useRegistrarOrdenCompra } from "../hooks/useOrdenesCompra";
 import { useProveedores } from "@/features/compras/proveedores/hooks/useProveedores";
 import { useAlmacenes } from "@/features/inventario/almacenes/hooks/useAlmacenes";
 import { useProductos } from "@/features/catalogo/hooks/useProductos";
-import { APP_LOCALE, limpiarDecimal } from "@compartido/utilidades";
+import { limpiarDecimal } from "@compartido/utilidades";
 import { SelectorProveedorV2 } from "@/compartido/componentes/formularios/SelectorProveedorV2";
 import { EstadoOrdenCompra } from "../../constantes";
 import { OrdenCompra } from "../types/ordenCompra.types";
@@ -118,7 +113,7 @@ export function OrdenCompraForm({
     resolver: zodResolver(ordenCompraSchema),
     defaultValues: {
       codigoOrden: "[AUTOGENERADO]",
-      fechaEmision: new Date(),
+      fechaEmision: getCurrentDateTime(),
       idEstado: EstadoOrdenCompra.Pendiente,
       idAlmacenDestino: 0,
       detalles: [
@@ -277,38 +272,11 @@ export function OrdenCompraForm({
             render={({ field }) => (
               <FormItem className="flex flex-col">
                 <FormLabel>Fecha Emisión</FormLabel>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <FormControl>
-                      <Button
-                        variant={"outline"}
-                        disabled={readOnly}
-                        className={cn(
-                          "w-full pl-3 text-left font-normal",
-                          !field.value && "text-muted-foreground",
-                        )}
-                      >
-                        {field.value ? (
-                          format(field.value, "PPP", { locale: APP_LOCALE })
-                        ) : (
-                          <span>Seleccione fecha</span>
-                        )}
-                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                      </Button>
-                    </FormControl>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={field.value}
-                      onSelect={field.onChange}
-                      locale={APP_LOCALE}
-                      disabled={(date) =>
-                        readOnly || date > new Date() || date < new Date("1900-01-01")
-                      }
-                    />
-                  </PopoverContent>
-                </Popover>
+                <DatePicker
+                  date={field.value}
+                  setDate={field.onChange}
+                  disabled={readOnly}
+                />
                 <FormMessage />
               </FormItem>
             )}
@@ -320,36 +288,11 @@ export function OrdenCompraForm({
             render={({ field }) => (
               <FormItem className="flex flex-col">
                 <FormLabel>Entrega Estimada</FormLabel>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <FormControl>
-                      <Button
-                        variant={"outline"}
-                        disabled={readOnly}
-                        className={cn(
-                          "w-full pl-3 text-left font-normal",
-                          !field.value && "text-muted-foreground",
-                        )}
-                      >
-                        {field.value ? (
-                          format(field.value, "PPP", { locale: APP_LOCALE })
-                        ) : (
-                          <span>Sin fecha</span>
-                        )}
-                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                      </Button>
-                    </FormControl>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={field.value}
-                      onSelect={field.onChange}
-                      locale={APP_LOCALE}
-                      disabled={readOnly}
-                    />
-                  </PopoverContent>
-                </Popover>
+                <DatePicker
+                  date={field.value}
+                  setDate={field.onChange}
+                  disabled={readOnly}
+                />
                 <FormMessage />
               </FormItem>
             )}

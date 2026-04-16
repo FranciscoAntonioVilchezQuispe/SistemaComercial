@@ -71,6 +71,8 @@ builder.Services.AddScoped<ITipoComprobanteRepositorio, TipoComprobanteRepositor
 builder.Services.AddScoped<ITipoOperacionSunatRepositorio, TipoOperacionSunatRepositorio>();
 builder.Services.AddScoped<IMatrizReglaSunatRepositorio, MatrizReglaSunatRepositorio>();
 builder.Services.AddScoped<IUbigeoRepository, UbigeoRepository>();
+builder.Services.AddScoped<ITipoAfectacionIgvRepositorio, TipoAfectacionIgvRepositorio>();
+builder.Services.AddScoped<ITipoTributoRepositorio, TipoTributoRepositorio>();
 
 builder.Services.AddScoped<IReglasDocumentoServicio, ReglasDocumentoServicio>();
 
@@ -107,6 +109,8 @@ app.MapTipoDocumentoEndpoints();
 app.MapReglasDocumentoEndpoints();
 app.MapMatrizSunatEndpoints();
 app.MapTipoOperacionSunatEndpoints();
+app.MapTipoAfectacionIgvEndpoints();
+app.MapTipoTributoEndpoints();
 
 app.MapTablaGeneralEndpoints();
 app.MapUbigeoEndpoints();

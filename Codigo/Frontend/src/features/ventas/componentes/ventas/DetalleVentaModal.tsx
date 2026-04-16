@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { formatearMoneda, formatearFechaHora } from "@compartido/utilidades";
 import { EstadoVenta } from "@compartido/enums";
+import { FISCAL_CONFIG } from "@compartido/configuracion/fiscal.config";
 
 const ESTADO_VENTA_COLORES: Record<number, string> = {
   [EstadoVenta.Completada]: "bg-green-100 text-green-700 border-green-200 hover:bg-green-100",
@@ -132,7 +133,9 @@ export function DetalleVentaModal({ venta }: Props) {
             </div>
           )}
           <div className="flex justify-between text-sm">
-            <span className="text-muted-foreground uppercase font-bold text-[10px]">I.G.V. (18%):</span>
+            <span className="text-muted-foreground uppercase font-bold text-[10px]">
+              {FISCAL_CONFIG.TRIBUTOS.IGV === "1000" ? "I.G.V." : "Impuesto"} ({FISCAL_CONFIG.PORCENTAJE_IGV}%):
+            </span>
             <span className="font-medium">{formatearMoneda(venta.totalImpuesto)}</span>
           </div>
           <Separator className="my-2" />

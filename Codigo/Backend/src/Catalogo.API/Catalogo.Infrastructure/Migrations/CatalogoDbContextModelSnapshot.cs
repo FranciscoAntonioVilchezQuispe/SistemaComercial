@@ -65,19 +65,21 @@ namespace Catalogo.Infrastructure.Migrations
                         .HasColumnName("nombre_categoria");
 
                     b.Property<string>("UsuarioActualizacion")
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
                         .HasColumnName("usuario_modificacion");
 
                     b.Property<string>("UsuarioCreacion")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
                         .HasColumnName("usuario_creacion");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("pk_categorias");
 
-                    b.HasIndex("IdCategoriaPadre");
+                    b.HasIndex("IdCategoriaPadre")
+                        .HasDatabaseName("ix_categorias_id_categoria_padre");
 
                     b.ToTable("categorias", "catalogo");
                 });
@@ -122,19 +124,21 @@ namespace Catalogo.Infrastructure.Migrations
                         .HasColumnName("url_imagen");
 
                     b.Property<string>("UsuarioActualizacion")
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
                         .HasColumnName("usuario_modificacion");
 
                     b.Property<string>("UsuarioCreacion")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
                         .HasColumnName("usuario_creacion");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("pk_imagenes_producto");
 
-                    b.HasIndex("IdProducto");
+                    b.HasIndex("IdProducto")
+                        .HasDatabaseName("ix_imagenes_producto_id_producto");
 
                     b.ToTable("imagenes_producto", "catalogo");
                 });
@@ -175,17 +179,18 @@ namespace Catalogo.Infrastructure.Migrations
                         .HasColumnName("porcentaje_ganancia_sugerido");
 
                     b.Property<string>("UsuarioActualizacion")
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
                         .HasColumnName("usuario_modificacion");
 
                     b.Property<string>("UsuarioCreacion")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
                         .HasColumnName("usuario_creacion");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("pk_listas_precios");
 
                     b.ToTable("listas_precios", "catalogo");
                 });
@@ -223,17 +228,18 @@ namespace Catalogo.Infrastructure.Migrations
                         .HasColumnName("pais_origen");
 
                     b.Property<string>("UsuarioActualizacion")
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
                         .HasColumnName("usuario_modificacion");
 
                     b.Property<string>("UsuarioCreacion")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
                         .HasColumnName("usuario_creacion");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("pk_marcas");
 
                     b.ToTable("marcas", "catalogo");
                 });
@@ -286,9 +292,17 @@ namespace Catalogo.Infrastructure.Migrations
                         .HasColumnType("bigint")
                         .HasColumnName("id_marca");
 
+                    b.Property<long?>("IdTipoAfectacionIgv")
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_afectacion_igv");
+
                     b.Property<long?>("IdTipoProducto")
                         .HasColumnType("bigint")
                         .HasColumnName("id_tipo_producto");
+
+                    b.Property<long?>("IdTipoTributo")
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_tipo_tributo");
 
                     b.Property<long>("IdUnidadMedida")
                         .HasColumnType("bigint")
@@ -360,26 +374,31 @@ namespace Catalogo.Infrastructure.Migrations
                         .HasColumnName("tiene_variantes");
 
                     b.Property<string>("UsuarioActualizacion")
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
                         .HasColumnName("usuario_modificacion");
 
                     b.Property<string>("UsuarioCreacion")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
                         .HasColumnName("usuario_creacion");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("pk_productos");
 
                     b.HasIndex("CodigoProducto")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("ix_productos_codigo_producto");
 
-                    b.HasIndex("IdCategoria");
+                    b.HasIndex("IdCategoria")
+                        .HasDatabaseName("ix_productos_id_categoria");
 
-                    b.HasIndex("IdMarca");
+                    b.HasIndex("IdMarca")
+                        .HasDatabaseName("ix_productos_id_marca");
 
-                    b.HasIndex("IdUnidadMedida");
+                    b.HasIndex("IdUnidadMedida")
+                        .HasDatabaseName("ix_productos_id_unidad");
 
                     b.ToTable("productos", "catalogo");
                 });
@@ -423,17 +442,18 @@ namespace Catalogo.Infrastructure.Migrations
                         .HasColumnName("simbolo");
 
                     b.Property<string>("UsuarioActualizacion")
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
                         .HasColumnName("usuario_modificacion");
 
                     b.Property<string>("UsuarioCreacion")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
                         .HasColumnName("usuario_creacion");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("pk_unidades_medida");
 
                     b.ToTable("unidades_medida", "catalogo");
                 });
@@ -489,19 +509,21 @@ namespace Catalogo.Infrastructure.Migrations
                         .HasColumnName("sku_variante");
 
                     b.Property<string>("UsuarioActualizacion")
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
                         .HasColumnName("usuario_modificacion");
 
                     b.Property<string>("UsuarioCreacion")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
                         .HasColumnName("usuario_creacion");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("pk_variantes_producto");
 
-                    b.HasIndex("IdProducto");
+                    b.HasIndex("IdProducto")
+                        .HasDatabaseName("ix_variantes_producto_id_producto");
 
                     b.ToTable("variantes_producto", "catalogo");
                 });
@@ -510,7 +532,8 @@ namespace Catalogo.Infrastructure.Migrations
                 {
                     b.HasOne("Catalogo.Domain.Entidades.Categoria", "CategoriaPadre")
                         .WithMany("SubCategorias")
-                        .HasForeignKey("IdCategoriaPadre");
+                        .HasForeignKey("IdCategoriaPadre")
+                        .HasConstraintName("fk_categorias_categorias_id_categoria_padre");
 
                     b.Navigation("CategoriaPadre");
                 });
@@ -521,7 +544,8 @@ namespace Catalogo.Infrastructure.Migrations
                         .WithMany("Imagenes")
                         .HasForeignKey("IdProducto")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_imagenes_producto_productos_id_producto");
 
                     b.Navigation("Producto");
                 });
@@ -532,19 +556,22 @@ namespace Catalogo.Infrastructure.Migrations
                         .WithMany()
                         .HasForeignKey("IdCategoria")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_productos_categorias_id_categoria");
 
                     b.HasOne("Catalogo.Domain.Entidades.Marca", "Marca")
                         .WithMany()
                         .HasForeignKey("IdMarca")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_productos_marcas_id_marca");
 
                     b.HasOne("Catalogo.Domain.Entidades.UnidadMedida", "UnidadMedida")
                         .WithMany()
                         .HasForeignKey("IdUnidadMedida")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_productos_unidades_medida_id_unidad");
 
                     b.Navigation("Categoria");
 
@@ -559,7 +586,8 @@ namespace Catalogo.Infrastructure.Migrations
                         .WithMany("Variantes")
                         .HasForeignKey("IdProducto")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_variantes_producto_productos_id_producto");
 
                     b.Navigation("Producto");
                 });

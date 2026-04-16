@@ -13,6 +13,50 @@ using Nucleo.Comun.Application.Paginacion;
 
 namespace Ventas.API.Endpoints
 {
+    public class NotaDetalleDto
+    {
+        public long Id { get; set; }
+        public string Serie { get; set; } = null!;
+        public long Numero { get; set; }
+        public string TipoComprobante { get; set; } = null!;
+        public DateTime FechaEmision { get; set; }
+        
+        public long IdVentaReferencia { get; set; }
+        public string SerieReferencia { get; set; } = null!;
+        public long NumeroReferencia { get; set; }
+        public string TipoDocReferencia { get; set; } = null!;
+
+        public long IdTipoNota { get; set; }
+        public string MotivoSustento { get; set; } = null!;
+
+        public string ClienteNroDoc { get; set; } = null!;
+        public string ClienteRazonSocial { get; set; } = null!;
+
+        public decimal Subtotal { get; set; }
+        public decimal Igv { get; set; }
+        public decimal Total { get; set; }
+        public string Moneda { get; set; } = "PEN";
+        public decimal? TipoCambio { get; set; }
+        public bool AfectaStock { get; set; }
+        public string Estado { get; set; } = null!;
+        public string? EstadoCpe { get; set; }
+
+        public List<NotaItemDetalleDto> Detalles { get; set; } = new();
+    }
+
+    public class NotaItemDetalleDto
+    {
+        public long Id { get; set; }
+        public long IdProducto { get; set; }
+        public string? Descripcion { get; set; }
+        public decimal Cantidad { get; set; }
+        public decimal PrecioUnitario { get; set; }
+        public decimal Subtotal { get; set; }
+        public decimal Igv { get; set; }
+        public decimal Total { get; set; }
+        public string? UnidadMedida { get; set; }
+    }
+
     public class NotaResumenDto
     {
         public long IdNota { get; set; }
@@ -71,9 +115,48 @@ namespace Ventas.API.Endpoints
                 var datos = await connection.QueryAsync<NotaResumenDto>(sql, new { Search = request.Search, PageSize = pageSize, Offset = offset });
                 var total = datos.FirstOrDefault()?.TotalFilas ?? 0;
 
-                var response = new PagedResponse<NotaResumenDto>(datos, request.PageNumber ?? 1, pageSize, total);
+                var response = new PagedResponse<NotaResumenDto>(datos, request.PageNumber ?? 1, pageSize, (int)total);
                 return Results.Ok(response);
             });
+
+            // Detalle de Nota de Crédito
+            grupo.MapGet("/credito/{id:long}", async (VentasDbContext db, long id) =>
+            {
+                var connection = db.Database.GetDbConnection();
+                if (connection.State != ConnectionState.Open) await connection.OpenAsync();
+
+                string sqlNota = @"
+                    SELECT 
+                        id_nota as Id, serie as Serie, numero as Numero, 
+                        tipo_comprobante as TipoComprobante, fecha_emision as FechaEmision,
+                        id_venta_referencia as IdVentaReferencia, serie_referencia as SerieReferencia,
+                        numero_referencia as NumeroReferencia, tipo_doc_referencia as TipoDocReferencia,
+                        id_tipo_nota as IdTipoNota, motivo_sustento as MotivoSustento,
+                        cliente_nro_doc as ClienteNroDoc, cliente_razon_social as ClienteRazonSocial,
+                        subtotal, igv, total, moneda, tipo_cambio as TipoCambio,
+                        afecta_stock as AfectaStock, estado, id_estado_cpe as EstadoCpe
+                    FROM ventas.nota_credito
+                    WHERE id_nota = @Id;
+                ";
+
+                var nota = await connection.QueryFirstOrDefaultAsync<NotaDetalleDto>(sqlNota, new { Id = id });
+                if (nota == null) return Results.NotFound();
+
+                string sqlDetalle = @"
+                    SELECT 
+                        id_detalle as Id, id_producto as IdProducto, descripcion,
+                        cantidad, precio_unitario as PrecioUnitario, subtotal, igv, total,
+                        unidad_medida as UnidadMedida
+                    FROM ventas.nota_credito_detalle
+                    WHERE id_nota_credito = @Id;
+                ";
+
+                var detalles = await connection.QueryAsync<NotaItemDetalleDto>(sqlDetalle, new { Id = id });
+                nota.Detalles = detalles.ToList();
+
+                return Results.Ok(nota);
+            });
+
 
             // Recrear POST original
             grupo.MapPost("/credito", async (NotaCreditoDto dto, IMediator mediator) =>
@@ -115,9 +198,48 @@ namespace Ventas.API.Endpoints
                 var datos = await connection.QueryAsync<NotaResumenDto>(sql, new { Search = request.Search, PageSize = pageSize, Offset = offset });
                 var total = datos.FirstOrDefault()?.TotalFilas ?? 0;
 
-                var response = new PagedResponse<NotaResumenDto>(datos, request.PageNumber ?? 1, pageSize, total);
+                var response = new PagedResponse<NotaResumenDto>(datos, request.PageNumber ?? 1, pageSize, (int)total);
                 return Results.Ok(response);
             });
+
+            // Detalle de Nota de Débito
+            grupo.MapGet("/debito/{id:long}", async (VentasDbContext db, long id) =>
+            {
+                var connection = db.Database.GetDbConnection();
+                if (connection.State != ConnectionState.Open) await connection.OpenAsync();
+
+                string sqlNota = @"
+                    SELECT 
+                        id_nota as Id, serie as Serie, numero as Numero, 
+                        tipo_comprobante as TipoComprobante, fecha_emision as FechaEmision,
+                        id_venta_referencia as IdVentaReferencia, serie_referencia as SerieReferencia,
+                        numero_referencia as NumeroReferencia, tipo_doc_referencia as TipoDocReferencia,
+                        id_tipo_nota as IdTipoNota, motivo_sustento as MotivoSustento,
+                        cliente_nro_doc as ClienteNroDoc, cliente_razon_social as ClienteRazonSocial,
+                        subtotal, igv, total, moneda, tipo_cambio as TipoCambio,
+                        afecta_stock as AfectaStock, estado, id_estado_cpe as EstadoCpe
+                    FROM ventas.nota_debito
+                    WHERE id_nota = @Id;
+                ";
+
+                var nota = await connection.QueryFirstOrDefaultAsync<NotaDetalleDto>(sqlNota, new { Id = id });
+                if (nota == null) return Results.NotFound();
+
+                string sqlDetalle = @"
+                    SELECT 
+                        id_detalle as Id, id_producto as IdProducto, descripcion,
+                        cantidad, precio_unitario as PrecioUnitario, subtotal, igv, total,
+                        unidad_medida as UnidadMedida
+                    FROM ventas.nota_debito_detalle
+                    WHERE id_nota_debito = @Id;
+                ";
+
+                var detalles = await connection.QueryAsync<NotaItemDetalleDto>(sqlDetalle, new { Id = id });
+                nota.Detalles = detalles.ToList();
+
+                return Results.Ok(nota);
+            });
+
 
             // Recrear POST original
             grupo.MapPost("/debito", async (NotaDebitoDto dto, IMediator mediator) =>

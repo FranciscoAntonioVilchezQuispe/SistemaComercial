@@ -1,13 +1,15 @@
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using Dapper;
 using Ventas.API.Domain.Entidades;
 using Ventas.API.Domain.Interfaces;
 using Ventas.API.Infrastructure.Datos;
-using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using System.Data;
-using Dapper;
-using System.Linq;
 using Ventas.API.Domain.DTOs;
+using Ventas.API.Domain.DTOs.Reportes;
 
 namespace Ventas.API.Infrastructure.Repositorios
 {
@@ -23,50 +25,35 @@ namespace Ventas.API.Infrastructure.Repositorios
         public async Task<VentaDetalleDto?> ObtenerDetallePorIdAsync(long id)
         {
             var connection = _context.Database.GetDbConnection();
-            if (connection.State != System.Data.ConnectionState.Open)
+            if (connection.State != ConnectionState.Open)
                 await connection.OpenAsync();
 
             var sql = @"
                 -- Cabecera
-                SELECT v.id_venta as Id, v.serie, v.numero, v.fecha_emision, v.total_venta, v.subtotal_gravado, v.subtotal_exonerado,
-                       v.subtotal_inafecto, v.total_impuesto, v.total_descuento_global, v.saldo_pendiente, v.observaciones,
-                       v.moneda, v.tipo_cambio, v.fecha_vencimiento_pago, v.id_empresa, v.id_almacen, v.id_caja, v.id_cliente,
-                       v.id_usuario_vendedor, v.id_cotizacion_origen, v.id_tipo_comprobante, v.id_estado, v.id_estado_pago,
-                       v.fecha_creacion,
-                       tc.nombre AS TipoComprobante,
-                       c.razon_social AS NombreCliente,
-                       c.numero_documento AS NumeroDocumentoCliente,
-                       tgd.nombre AS Estado,
-                       tgd2.nombre AS EstadoPago
+                SELECT v.id_venta as Id, v.serie as Serie, v.numero as Numero, v.fecha_emision as FechaEmision,
+                       v.id_cliente as IdCliente, c.razon_social as ClienteRazonSocial, c.numero_documento as ClienteNumeroDocumento,
+                       v.id_tipo_comprobante as IdTipoComprobante, tc.nombre as TipoComprobanteNombre,
+                       v.subtotal as Subtotal, v.igv as Igv, v.total_venta as TotalVenta,
+                       v.id_estado as IdEstado, tgd.nombre as EstadoNombre, v.id_almacen as IdAlmacen
                 FROM ventas.ventas v
-                INNER JOIN configuracion.tipo_comprobante tc ON tc.id_tipo_comprobante = v.id_tipo_comprobante
-                INNER JOIN clientes.clientes c ON c.id_cliente = v.id_cliente
+                INNER JOIN clientes.clientes c ON v.id_cliente = c.id_cliente
+                INNER JOIN configuracion.tipo_comprobante tc ON v.id_tipo_comprobante = tc.id_tipo_comprobante
                 LEFT JOIN configuracion.tablas_generales_detalle tgd ON tgd.id_tabla = 15 AND tgd.id_detalle = v.id_estado
-                LEFT JOIN configuracion.tablas_generales_detalle tgd2 ON tgd2.id_tabla = 13 AND tgd2.id_detalle = v.id_estado_pago
                 WHERE v.id_venta = @id;
 
                 -- Detalles
-                SELECT dv.id_detalle_venta as Id, dv.id_producto, dv.id_variante, NULLIF(p.nombre_producto, dv.descripcion_producto) as descripcion_producto,
-                       dv.cantidad, dv.precio_unitario, dv.precio_lista_original, dv.porcentaje_impuesto,
-                       dv.impuesto_item, dv.total_item
-                FROM ventas.detalle_venta dv
-                INNER JOIN catalogo.productos p ON p.id_producto = dv.id_producto
-                WHERE dv.id_venta = @id;
-
-                -- Pagos
-                SELECT p.id_pago as Id, p.fecha_pago, p.monto_pago, p.id_metodo_pago,
-                       mp.nombre AS MetodoPagoNombre
-                FROM ventas.pagos p
-                LEFT JOIN configuracion.metodos_pago mp  ON mp.id_metodo_pago = p.id_metodo_pago
-                WHERE p.id_venta = @id;";
+                SELECT d.id_detalle_venta as Id, d.id_producto as IdProducto, p.nombre_producto as NombreProducto,
+                       d.cantidad as Cantidad, d.precio_unitario as PrecioUnitario, d.total_item as TotalItem,
+                       d.id_afectacion_igv as IdAfectacionIgv
+                FROM ventas.detalle_venta d
+                INNER JOIN catalogo.productos p ON d.id_producto = p.id_producto
+                WHERE d.id_venta = @id;";
 
             using var multi = await connection.QueryMultipleAsync(sql, new { id });
-            
             var venta = await multi.ReadFirstOrDefaultAsync<VentaDetalleDto>();
             if (venta != null)
             {
                 venta.Detalles = (await multi.ReadAsync<DetalleVentaDto>()).ToList();
-                venta.Pagos = (await multi.ReadAsync<PagoDto>()).ToList();
             }
 
             return venta;
@@ -76,7 +63,6 @@ namespace Ventas.API.Infrastructure.Repositorios
         {
             return await _context.Ventas
                 .Include(v => v.Detalles)
-                .Include(v => v.Cliente)
                 .FirstOrDefaultAsync(v => v.Id == id);
         }
 
@@ -90,72 +76,95 @@ namespace Ventas.API.Infrastructure.Repositorios
         public async Task<IEnumerable<Venta>> ObtenerTodasAsync()
         {
             return await _context.Ventas
-                .Include(v => v.Cliente)
+                .Include(v => v.Detalles)
                 .ToListAsync();
         }
 
         public async Task<(IEnumerable<VentaListDto> Datos, int Total)> ObtenerPaginadoAsync(string? search, int pageNumber, int pageSize)
         {
             var connection = _context.Database.GetDbConnection();
-            if (connection.State != System.Data.ConnectionState.Open)
+            if (connection.State != ConnectionState.Open)
                 await connection.OpenAsync();
-            
-            var sqlSearch = string.IsNullOrEmpty(search) ? null : $"%{search}%";
-            var offset = (pageNumber - 1) * pageSize;
 
+            var offset = (pageNumber - 1) * pageSize;
             var sql = @"
-                SELECT v.id_venta AS Id, v.serie, v.numero, v.fecha_emision, v.total_venta,
-                       v.id_estado, v.id_estado_pago, v.fecha_creacion,
-                       tc.nombre AS tipo_comprobante_nombre,
-                       c.razon_social AS cliente_razon_social,
-                       c.numero_documento AS cliente_numero_documento,
-                       tgd.nombre AS estado_nombre,
-                       tgd2.nombre AS estado_pago_nombre,
-                       COUNT(*) OVER() AS total
+                SELECT v.id_venta as Id, v.serie as Serie, v.numero as Numero, v.fecha_emision as FechaEmision,
+                       c.razon_social as ClienteRazonSocial, tc.nombre as TipoComprobanteNombre,
+                       v.total_venta as TotalVenta, tgd.nombre as EstadoNombre,
+                       COUNT(*) OVER() AS Total
                 FROM ventas.ventas v
-                INNER JOIN configuracion.tipo_comprobante tc ON tc.id_tipo_comprobante = v.id_tipo_comprobante
-                INNER JOIN clientes.clientes c ON c.id_cliente = v.id_cliente
+                INNER JOIN clientes.clientes c ON v.id_cliente = c.id_cliente
+                INNER JOIN configuracion.tipo_comprobante tc ON v.id_tipo_comprobante = tc.id_tipo_comprobante
                 LEFT JOIN configuracion.tablas_generales_detalle tgd ON tgd.id_tabla = 15 AND tgd.id_detalle = v.id_estado
-                LEFT JOIN configuracion.tablas_generales_detalle tgd2 ON tgd2.id_tabla = 13 AND tgd2.id_detalle = v.id_estado_pago
-                WHERE (@search IS NULL 
-                   OR v.serie ILIKE @search 
-                   OR v.numero::text ILIKE @search 
-                   OR c.razon_social ILIKE @search
-                   OR c.numero_documento ILIKE @search)
-                ORDER BY v.fecha_emision DESC, v.id_venta DESC
+                WHERE (@search IS NULL OR v.serie ILIKE @search OR v.numero ILIKE @search OR c.razon_social ILIKE @search)
+                ORDER BY v.fecha_emision DESC
                 LIMIT @pageSize OFFSET @offset;";
 
-            var parameters = new { search = sqlSearch, pageSize, offset };
-
-            var rows = await connection.QueryAsync<VentaListDto>(sql, parameters);
+            var parameters = new { search = $"%{search}%", pageSize, offset };
+            var rows = (await connection.QueryAsync<VentaListDto>(sql, parameters)).ToList();
             
             var total = rows.FirstOrDefault()?.Total ?? 0;
-
             return (rows, total);
         }
 
         public async Task<long> ObtenerSiguienteCorrelativoAsync(long idAlmacen, long idTipoComprobante, string serie)
         {
-            using var tx = await _context.Database.BeginTransactionAsync();
-            try
-            {
-                var row = await _context.SeriesComprobantes
-                    .FromSqlRaw("SELECT * FROM configuracion.series_comprobantes WHERE id_almacen = {0} AND id_tipo_comprobante = {1} AND serie = {2} FOR UPDATE", 
-                        idAlmacen, idTipoComprobante, serie)
-                    .FirstOrDefaultAsync();
+            var maxNumero = await _context.Ventas
+                .Where(v => v.IdAlmacen == idAlmacen && v.IdTipoComprobante == idTipoComprobante && v.Serie == serie)
+                .MaxAsync(v => (long?)v.Numero) ?? 0;
 
-                if (row == null) throw new Exception($"Configuración de serie {serie} no encontrada.");
+            return maxNumero + 1;
+        }
 
-                row.CorrelativoActual++;
-                var next = row.CorrelativoActual;
+        // --- MÉTODOS DE REPORTE ---
 
-                _context.SeriesComprobantes.Update(row);
-                await _context.SaveChangesAsync();
-                await tx.CommitAsync();
+        public async Task<IEnumerable<RankingProductoDto>> ObtenerRankingProductosAsync(DateTime fechaInicio, DateTime fechaFin, int top)
+        {
+            var connection = _context.Database.GetDbConnection();
+            if (connection.State != ConnectionState.Open)
+                await connection.OpenAsync();
 
-                return next;
-            }
-            catch { await tx.RollbackAsync(); throw; }
+            var sql = @"
+                SELECT 
+                    d.id_producto AS IdProducto,
+                    p.codigo_producto AS CodigoProducto,
+                    p.nombre_producto AS NombreProducto,
+                    SUM(d.cantidad) AS CantidadVendida,
+                    SUM(d.total_item) AS TotalVendido
+                FROM ventas.detalle_venta d
+                INNER JOIN catalogo.productos p ON d.id_producto = p.id_producto
+                INNER JOIN ventas.ventas v ON d.id_venta = v.id_venta
+                WHERE v.fecha_emision BETWEEN @fechaInicio AND @fechaFin
+                  AND v.id_estado != 30 
+                GROUP BY d.id_producto, p.codigo_producto, p.nombre_producto
+                ORDER BY SUM(d.total_item) DESC
+                LIMIT @top;";
+
+            return await connection.QueryAsync<RankingProductoDto>(sql, new { fechaInicio, fechaFin, top });
+        }
+
+        public async Task<IEnumerable<TopClienteDto>> ObtenerTopClientesAsync(DateTime fechaInicio, DateTime fechaFin, int top)
+        {
+            var connection = _context.Database.GetDbConnection();
+            if (connection.State != ConnectionState.Open)
+                await connection.OpenAsync();
+
+            var sql = @"
+                SELECT 
+                    v.id_cliente AS IdCliente,
+                    c.razon_social AS RazonSocial,
+                    c.numero_documento AS NumeroDocumento,
+                    COUNT(v.id_venta) AS CantidadOperaciones,
+                    SUM(v.total_venta) AS TotalComprado
+                FROM ventas.ventas v
+                INNER JOIN clientes.clientes c ON v.id_cliente = c.id_cliente
+                WHERE v.fecha_emision BETWEEN @fechaInicio AND @fechaFin
+                  AND v.id_estado != 30
+                GROUP BY v.id_cliente, c.razon_social, c.numero_documento
+                ORDER BY SUM(v.total_venta) DESC
+                LIMIT @top;";
+
+            return await connection.QueryAsync<TopClienteDto>(sql, new { fechaInicio, fechaFin, top });
         }
     }
 
@@ -171,40 +180,41 @@ namespace Ventas.API.Infrastructure.Repositorios
         public async Task<CotizacionDetalleDto?> ObtenerDetallePorIdAsync(long id)
         {
             var connection = _context.Database.GetDbConnection();
-            if (connection.State != ConnectionState.Open) await connection.OpenAsync();
+            if (connection.State != ConnectionState.Open)
+                await connection.OpenAsync();
 
             var sql = @"
                 -- Cabecera
-                SELECT c.id_cotizacion as Id, c.serie, c.numero, c.id_cliente, 
-                       cli.razon_social as ClienteNombre, cli.numero_documento as ClienteNumeroDocumento,
-                       c.id_usuario_vendedor, c.fecha_emision, c.fecha_vencimiento, 
-                       c.id_estado, c.moneda, c.tipo_cambio, c.subtotal, c.impuesto, c.total, c.observaciones
+                SELECT c.id_cotizacion as Id, c.codigo_cotizacion as Codigo, c.fecha_emision as FechaEmision,
+                       c.id_cliente as IdCliente, cl.razon_social as ClienteRazonSocial, cl.numero_documento as ClienteNumeroDocumento,
+                       c.subtotal as Subtotal, c.igv as Igv, c.total as Total,
+                       c.id_estado as IdEstado, tgd.nombre as EstadoNombre, c.id_almacen as IdAlmacen
                 FROM ventas.cotizaciones c
-                INNER JOIN clientes.clientes cli ON cli.id_cliente = c.id_cliente
+                INNER JOIN clientes.clientes cl ON c.id_cliente = cl.id_cliente
+                LEFT JOIN configuracion.tablas_generales_detalle tgd ON tgd.id_tabla = 16 AND tgd.id_detalle = c.id_estado
                 WHERE c.id_cotizacion = @id;
 
                 -- Detalles
-                SELECT dc.id_detalle_cotizacion as Id, dc.id_producto, p.codigo_producto, p.nombre_producto as DescripcionProducto,
-                       dc.id_variante, dc.cantidad, dc.precio_unitario, dc.subtotal
-                FROM ventas.detalle_cotizacion dc
-                INNER JOIN catalogo.productos p ON p.id_producto = dc.id_producto
-                WHERE dc.id_cotizacion = @id;";
+                SELECT d.id_detalle_cotizacion as Id, d.id_producto as IdProducto, p.nombre_producto as NombreProducto,
+                       d.cantidad as Cantidad, d.precio_unitario as PrecioUnitario, d.subtotal as TotalItem
+                FROM ventas.detalle_cotizacion d
+                INNER JOIN catalogo.productos p ON d.id_producto = p.id_producto
+                WHERE d.id_cotizacion = @id;";
 
             using var multi = await connection.QueryMultipleAsync(sql, new { id });
-            var dto = await multi.ReadFirstOrDefaultAsync<CotizacionDetalleDto>();
-            if (dto != null)
+            var cotizacion = await multi.ReadFirstOrDefaultAsync<CotizacionDetalleDto>();
+            if (cotizacion != null)
             {
-                dto.Detalles = (await multi.ReadAsync<DetalleCotizacionItemDto>()).ToList();
+                cotizacion.Detalles = (await multi.ReadAsync<DetalleCotizacionItemDto>()).ToList();
             }
 
-            return dto;
+            return cotizacion;
         }
 
         public async Task<Cotizacion?> ObtenerPorIdAsync(long id)
         {
             return await _context.Cotizaciones
                 .Include(c => c.Detalles)
-                .Include(c => c.Cliente)
                 .FirstOrDefaultAsync(c => c.Id == id);
         }
 
@@ -218,33 +228,30 @@ namespace Ventas.API.Infrastructure.Repositorios
         public async Task<IEnumerable<Cotizacion>> ObtenerTodasAsync()
         {
             return await _context.Cotizaciones
-                .Include(c => c.Cliente)
+                .Include(c => c.Detalles)
                 .ToListAsync();
         }
 
         public async Task<(IEnumerable<CotizacionListDto> Datos, int Total)> ObtenerPaginadoAsync(string? search, int pageNumber, int pageSize)
         {
             var connection = _context.Database.GetDbConnection();
-            if (connection.State != ConnectionState.Open) await connection.OpenAsync();
+            if (connection.State != ConnectionState.Open)
+                await connection.OpenAsync();
 
             var offset = (pageNumber - 1) * pageSize;
             var sql = @"
-                SELECT c.id_cotizacion as Id, c.serie, c.numero, c.fecha_emision, c.fecha_vencimiento,
-                       cli.razon_social as ClienteNombre, c.moneda, c.total as TotalCotizacion, c.id_estado,
-                       tgd.nombre as EstadoNombre,
+                SELECT c.id_cotizacion as Id, c.codigo_cotizacion as Codigo, c.fecha_emision as FechaEmision,
+                       cl.razon_social as ClienteRazonSocial, c.total as Total, tgd.nombre as EstadoNombre,
                        COUNT(*) OVER() AS Total
                 FROM ventas.cotizaciones c
-                INNER JOIN clientes.clientes cli ON cli.id_cliente = c.id_cliente
-                LEFT JOIN configuracion.tablas_generales_detalle tgd ON tgd.id_tabla = 15 AND tgd.id_detalle = c.id_estado
-                WHERE (@search IS NULL OR 
-                       c.serie ILIKE '%' || @search || '%' OR 
-                       c.numero::text ILIKE '%' || @search || '%' OR
-                       cli.razon_social ILIKE '%' || @search || '%')
-                ORDER BY c.fecha_emision DESC, c.id_cotizacion DESC
+                INNER JOIN clientes.clientes cl ON c.id_cliente = cl.id_cliente
+                LEFT JOIN configuracion.tablas_generales_detalle tgd ON tgd.id_tabla = 16 AND tgd.id_detalle = c.id_estado
+                WHERE (@search IS NULL OR c.codigo_cotizacion ILIKE @search OR cl.razon_social ILIKE @search)
+                ORDER BY c.fecha_emision DESC
                 LIMIT @pageSize OFFSET @offset;";
 
-            var parameters = new { search, pageSize, offset };
-            var rows = await connection.QueryAsync<CotizacionListDto>(sql, parameters);
+            var parameters = new { search = $"%{search}%", pageSize, offset };
+            var rows = (await connection.QueryAsync<CotizacionListDto>(sql, parameters)).ToList();
             
             var total = rows.FirstOrDefault()?.Total ?? 0;
             return (rows, total);

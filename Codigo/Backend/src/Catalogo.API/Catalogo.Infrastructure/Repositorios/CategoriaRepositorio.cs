@@ -43,7 +43,6 @@ namespace Catalogo.Infrastructure.Repositorios
             {
                 categoria.Activado = !categoria.Activado;
                 categoria.UsuarioActualizacion = "SISTEMA";
-                categoria.FechaActualizacion = DateTime.UtcNow;
                 await _context.SaveChangesAsync();
             }
         }

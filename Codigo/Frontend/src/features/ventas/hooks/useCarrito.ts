@@ -4,6 +4,10 @@ import { ItemCarrito, Carrito } from "../tipos/ventas.types";
 import { calcularTotalesVenta } from "@compartido/utilidades/calculos";
 
 interface EstadoCarrito extends Carrito {
+  subtotalGravado: number;
+  subtotalExonerado: number;
+  subtotalInafecto: number;
+  totalGratuito: number;
   agregarProducto: (
     producto: Producto,
     cantidad: number,
@@ -21,12 +25,19 @@ const calcularTotales = (items: ItemCarrito[]): Omit<Carrito, "items"> => {
     precio: item.precioUnitario,
     cantidad: item.cantidad,
     porcentajeDescuento: item.descuento,
+    codigoAfectacion: item.producto.idTipoAfectacionIgv === 2 ? "20" : 
+                     item.producto.idTipoAfectacionIgv === 3 ? "30" : "10", // Fallback básico si no hay fetch de maestros
   }));
+
 
   const totales = calcularTotalesVenta(itemsParaCalculo);
 
   return {
     subtotal: totales.subtotal,
+    subtotalGravado: totales.subtotalGravado,
+    subtotalExonerado: totales.subtotalExonerado,
+    subtotalInafecto: totales.subtotalInafecto,
+    totalGratuito: totales.totalGratuito,
     descuento: totales.descuento,
     igv: totales.igv,
     total: totales.total,
@@ -36,6 +47,10 @@ const calcularTotales = (items: ItemCarrito[]): Omit<Carrito, "items"> => {
 export const useCarrito = create<EstadoCarrito>((set, get) => ({
   items: [],
   subtotal: 0,
+  subtotalGravado: 0,
+  subtotalExonerado: 0,
+  subtotalInafecto: 0,
+  totalGratuito: 0,
   descuento: 0,
   igv: 0,
   total: 0,
@@ -130,6 +145,10 @@ export const useCarrito = create<EstadoCarrito>((set, get) => ({
     set({
       items: [],
       subtotal: 0,
+      subtotalGravado: 0,
+      subtotalExonerado: 0,
+      subtotalInafecto: 0,
+      totalGratuito: 0,
       descuento: 0,
       igv: 0,
       total: 0,

@@ -65,7 +65,6 @@ namespace Catalogo.API.Endpoints
                 existente.NombreMarca = dto.Nombre;
                 existente.PaisOrigen = dto.PaisOrigen;
                 existente.UsuarioActualizacion = "SISTEMA";
-                existente.FechaActualizacion = DateTime.UtcNow;
 
                 await repo.ActualizarAsync(existente);
                 return Results.Ok(new ToReturn<Marca>(existente));

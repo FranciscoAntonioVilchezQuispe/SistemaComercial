@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Dapper;
 using Compras.API.Domain.DTOs;
 using System.Data;
+using Compras.API.Domain.DTOs.Reportes;
 
 namespace Compras.API.Infrastructure.Repositorios
 {
@@ -70,6 +71,14 @@ namespace Compras.API.Infrastructure.Repositorios
                 .FirstOrDefaultAsync(c => c.Id == id);
         }
 
+
+        public async Task<IEnumerable<Compra>> ObtenerTodosAsync()
+        {
+            return await _context.Compras
+                .Include(c => c.Proveedor)
+                .ToListAsync();
+        }
+
         public async Task<Compra> AgregarAsync(Compra compra)
         {
             _context.Compras.Add(compra);
@@ -77,11 +86,42 @@ namespace Compras.API.Infrastructure.Repositorios
             return compra;
         }
 
-        public async Task<IEnumerable<Compra>> ObtenerTodosAsync()
+        public async Task<(bool Exito, string Mensaje, long CompraId)> RegistrarCompraAsync(Compra compra)
         {
-            return await _context.Compras
-                .Include(c => c.Proveedor)
-                .ToListAsync();
+            try
+            {
+                _context.Compras.Add(compra);
+                await _context.SaveChangesAsync();
+                return (true, "Compra registrada exitosamente", compra.Id);
+            }
+            catch (System.Exception ex)
+            {
+                return (false, $"Error al registrar la compra: {ex.Message}", 0);
+            }
+        }
+
+        public async Task<IEnumerable<CompraProveedorDto>> ObtenerComprasPorProveedorAsync(DateTime fechaInicio, DateTime fechaFin, int top)
+        {
+            var connection = _context.GetDbConnection();
+            if (connection.State != ConnectionState.Open) await connection.OpenAsync();
+
+            var sql = @"
+                SELECT 
+                    p.id_proveedor AS IdProveedor,
+                    p.razon_social AS RazonSocial,
+                    p.numero_documento AS NumeroDocumento,
+                    COUNT(c.id_compra) AS CantidadFacturas,
+                    SUM(c.total) AS TotalComprado,
+                    MAX(c.fecha_emision) AS FechaUltimaCompra
+                FROM compras.proveedores p
+                INNER JOIN compras.compras c ON p.id_proveedor = c.id_proveedor
+                WHERE c.fecha_emision BETWEEN @fechaInicio AND @fechaFin
+                  AND c.id_estado != 30 -- ID de 'Anulada'
+                GROUP BY p.id_proveedor, p.razon_social, p.numero_documento
+                ORDER BY SUM(c.total) DESC
+                LIMIT @top;";
+
+            return await connection.QueryAsync<CompraProveedorDto>(sql, new { fechaInicio, fechaFin, top });
         }
 
         public async Task<IEnumerable<Compra>> ObtenerPorProveedorAsync(long idProveedor)

@@ -37,6 +37,8 @@ namespace Catalogo.Application.Comandos
         // Configuración fiscal
         bool GravadoImpuesto,
         decimal PorcentajeImpuesto,
+        long? IdTipoAfectacionIgv,
+        long? IdTipoTributo,
 
         // Imagen
         string? ImagenPrincipalUrl,

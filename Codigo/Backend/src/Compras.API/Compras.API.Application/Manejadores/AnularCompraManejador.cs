@@ -4,6 +4,7 @@ using Compras.API.Application.Comandos;
 using Compras.API.Application.Interfaces;
 using Microsoft.Extensions.Logging;
 using Nucleo.Comun.Domain.Enums;
+using Nucleo.Comun.Domain.Helpers;
 
 namespace Compras.API.Application.Manejadores
 {
@@ -36,18 +37,18 @@ namespace Compras.API.Application.Manejadores
 
                 // 1. Validar fecha (Política v1.0: 24 horas absolutas para anulación directa)
                 var limite24Horas = compra.FechaCreacion.AddHours(24);
-                if (DateTime.UtcNow > limite24Horas)
+                if (DateTimeHelper.ObtenerAhoraLima() > limite24Horas)
                     throw new Exception("Han pasado más de 24 horas desde el registro. No se puede anular directamente. Debe realizar una Nota de Crédito.");
 
                 // 2. Actualizar estados y campos v1.0
                 compra.IdEstado = (long)EstadoDocumento.AnuladoDirecto;
                 compra.IdEstadoPago = (long)EstadoPago.Anulado;
-                compra.FechaAnulacion = DateTime.UtcNow;
+                compra.FechaAnulacion = DateTimeHelper.ObtenerAhoraLima();
                 compra.MotivoAnulacion = request.Motivo;
                 compra.TipoAnulacion = "directo";
                 compra.UsuarioActualizacion = request.UsuarioId.ToString();
                 compra.EstadoSunat = "ANULADO";
-                compra.Observaciones += $"\n[ANULACIÓN DIRECTA] {DateTime.UtcNow} por {request.UsuarioId}: {request.Motivo}";
+                compra.Observaciones += $"\n[ANULACIÓN DIRECTA] {DateTimeHelper.ObtenerAhoraLima()} por {request.UsuarioId}: {request.Motivo}";
 
                 // 3. Solicitar reversión de stock (Salida de almacén por devolución integral)
                 _logger.LogInformation("Solicitando reversión de stock para Compra {CompraId}", compra.Id);
@@ -68,7 +69,7 @@ namespace Compras.API.Application.Manejadores
                     _logger.LogInformation("Liberando Orden de Compra {CodigoOrden} vinculada a Compra {CompraId}", orden.CodigoOrden, compra.Id);
                     orden.CompraId = null;
                     orden.IdEstado = (long)EstadoOrdenCompra.Aprobada; // Revertir a Aprobado
-                    orden.Observaciones += $"\n[LIBERACIÓN] {DateTime.UtcNow}: Compra {compra.SerieComprobante}-{compra.NumeroComprobante} anulada.";
+                    orden.Observaciones += $"\n[LIBERACIÓN] {DateTimeHelper.ObtenerAhoraLima()}: Compra {compra.SerieComprobante}-{compra.NumeroComprobante} anulada.";
                     _context.OrdenesCompra.Update(orden);
                 }
 

@@ -53,7 +53,6 @@ namespace Configuracion.API.Endpoints
                 impuesto.Porcentaje = dto.Porcentaje;
                 impuesto.EsPorcentaje = dto.EsPorcentaje;
                 impuesto.UsuarioActualizacion = "SISTEMA";
-                impuesto.FechaActualizacion = DateTime.UtcNow;
 
                 await repo.ActualizarAsync(impuesto);
                 return Results.Ok(new ToReturn<Impuesto>(impuesto));

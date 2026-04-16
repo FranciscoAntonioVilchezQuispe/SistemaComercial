@@ -84,7 +84,6 @@ namespace Clientes.API.Endpoints
 
                 if (dto.Activado.HasValue) existente.Activado = dto.Activado.Value;
                 existente.UsuarioActualizacion = "SISTEMA";
-                existente.FechaActualizacion = DateTime.UtcNow;
 
                 await repo.ActualizarAsync(existente);
                 return Results.Ok(new ToReturn<Cliente>(existente));

@@ -4,6 +4,7 @@ using System.Reflection;
 using Ventas.API.Domain.Entidades;
 using Ventas.API.Domain.Entidades.Referencias;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Nucleo.Comun.Domain.Helpers;
 
 namespace Ventas.API.Infrastructure.Datos
 {
@@ -22,6 +23,8 @@ namespace Ventas.API.Infrastructure.Datos
         public DbSet<Pago> Pagos { get; set; }
         public DbSet<MetodoPago> MetodosPago { get; set; }
         public DbSet<Cliente> Clientes { get; set; }
+        public DbSet<TurnoVendedor> TurnosVendedor { get; set; }
+        public DbSet<CierreTurno> CierresTurno { get; set; }
         public DbSet<Ventas.API.Domain.Entidades.Referencias.CatalogoReferencia> Catalogos { get; set; }
         public DbSet<SeriesComprobante> SeriesComprobantes { get; set; } = null!;
         public DbSet<NotaCredito> NotasCredito { get; set; } = null!;
@@ -35,6 +38,9 @@ namespace Ventas.API.Infrastructure.Datos
         public DbSet<VentaCuotaPago> CuotasPago { get; set; } = null!;
         public DbSet<Ventas.API.Domain.Entidades.Referencias.ReglaDocumentoReferencia> ReglasDocumentoRef { get; set; } = null!;
         public DbSet<Ventas.API.Domain.Entidades.Referencias.TipoDocumentoReferencia> TiposDocumentoRef { get; set; } = null!;
+        public DbSet<Ventas.API.Domain.Entidades.Referencias.ProductoRef> ProductosRef { get; set; } = null!;
+        public DbSet<Ventas.API.Domain.Entidades.Referencias.TipoAfectacionIgvRef> TiposAfectacionIgvRef { get; set; } = null!;
+        public DbSet<Ventas.API.Domain.Entidades.Referencias.TipoTributoRef> TiposTributoRef { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -49,6 +55,9 @@ namespace Ventas.API.Infrastructure.Datos
             modelBuilder.Entity<Ventas.API.Domain.Entidades.Referencias.ImpuestoReferencia>().ToTable("impuestos", "configuracion", t => t.ExcludeFromMigrations());
             modelBuilder.Entity<Ventas.API.Domain.Entidades.Referencias.ReglaDocumentoReferencia>().ToTable("regla_documento_comprobante", "configuracion", t => t.ExcludeFromMigrations());
             modelBuilder.Entity<Ventas.API.Domain.Entidades.Referencias.TipoDocumentoReferencia>().ToTable("tipo_documento", "configuracion", t => t.ExcludeFromMigrations());
+            modelBuilder.Entity<Ventas.API.Domain.Entidades.Referencias.ProductoRef>().ToTable("productos", "catalogo", t => t.ExcludeFromMigrations());
+            modelBuilder.Entity<Ventas.API.Domain.Entidades.Referencias.TipoAfectacionIgvRef>().ToTable("tipo_afectacion_igv", "configuracion", t => t.ExcludeFromMigrations());
+            modelBuilder.Entity<Ventas.API.Domain.Entidades.Referencias.TipoTributoRef>().ToTable("tipo_tributo", "configuracion", t => t.ExcludeFromMigrations());
             
             // Tablas SUNAT
             modelBuilder.Entity<EstadoCpe>().ToTable("cat_estado_cpe", "sunat", t => t.ExcludeFromMigrations());
@@ -70,27 +79,8 @@ namespace Ventas.API.Infrastructure.Datos
 
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
-            var entries = ChangeTracker.Entries()
-                .Where(e => e.State == EntityState.Added || e.State == EntityState.Modified);
-
-            foreach (var entry in entries)
-            {
-                // 1. Normalización de auditoría para EntidadBase
-                if (entry.Entity is Nucleo.Comun.Domain.EntidadBase baseEntity)
-                {
-                    if (entry.State == EntityState.Added)
-                    {
-                        baseEntity.FechaCreacion = DateTime.UtcNow;
-                        baseEntity.UsuarioCreacion = string.IsNullOrEmpty(baseEntity.UsuarioCreacion) ? "SISTEMA" : baseEntity.UsuarioCreacion;
-                        baseEntity.Activado = true;
-                    }
-                    else
-                    {
-                        baseEntity.FechaActualizacion = DateTime.UtcNow;
-                        baseEntity.UsuarioActualizacion = "SISTEMA";
-                    }
-                }
-            }
+            // Aplicar auditoría centralizada (Estandarización Global)
+            DbContextAuditHelper.AplicarAuditoriaDirecta(ChangeTracker);
 
             return base.SaveChangesAsync(cancellationToken);
         }

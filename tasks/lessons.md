@@ -84,3 +84,36 @@
 - **Integridad Referencial en Reconstrucciones**: Al reconstruir el Kardex desde tablas de integración (Compras/Ventas del ERP), SIEMPRE validar que los IDs secundarios (Almacén, Tipo Documento) existan en las tablas maestras del sistema actual.
     - **Patrón**: Implementar un remapeo de seguridad al **Almacén Principal** si el ID original es inválido o nulo. Esto evita errores `23503` (FK violation) que detienen procesos masivos de carga.
 - **Validaciones de Stock en Sincronización**: Los métodos de creación de movimientos (`CrearMovimientoInventarioManejador`) suelen tener validaciones de stock insuficiente. Estas validaciones deben ser omitibles mediante un flag (`PermitirStockNegativo`) durante sincronizaciones históricas, ya que el historial puede contener baches temporales de stock que se regularizan al final del proceso.
+
+## [2026-04-12] Ordenamiento Cronológico Permanente
+- **Lógica Comercial**: En el Kardex Valorizado, el orden de los eventos dentro de un mismo día es crítico. Para evitar saldos negativos ficticios y cumplir con la trazabilidad de SUNAT, se debe seguir el orden: Ingresos (08:00) -> Notas de Ingreso (09:00) -> Salidas (10:00) -> Notas de Salida (11:00).
+- **Centralización**: Esta lógica debe vivir en un servicio compartido (`IValidacionReglaSunatService`) para que sea aplicada tanto en sincronizaciones masivas como en registros individuales en tiempo real.
+
+## [2026-04-12] Compilación y Bloqueo de Archivos (IDE/Debugger)
+- **Error MSB3021/MSB3027**: En entornos de desarrollo con depuradores activos (ej: VS Code + C# Dev Kit), los archivos `.pdb` y `.dll` suelen quedar bloqueados por procesos como `netcoredbg.exe`.
+- **Solución**: Si el script `kill_ports.ps1` no es suficiente, ejecutar `taskkill /F /IM netcoredbg.exe` para liberar los archivos y permitir una compilación limpia.
+
+## [2026-04-12] Secuencialidad y Formateo de Kardex
+- **Secuencialidad por Desfase**: Cuando múltiples documentos (ventas) ocurren en la misma fecha sin marca de tiempo precisa, se puede inyectar el correlativo como segundos (`TimeSpan.FromSeconds(Numero % 60)`) para forzar un ordenamiento determinista en el Kardex.
+- **Estandarización de Formatos**: Para cumplimiento SUNAT y consistencia visual, los números de documento deben normalizarse (ej. `PadLeft(8, '0')`) en el punto de entrada del dominio (`Manejador`) para asegurar que tanto el registro físico como el Kardex valorizado presenten la misma numeración.
+
+## [2026-04-12] Normalización Horaria Estricta vs. Horas Reales
+- **El Problema**: Respetar la hora real de un documento (ej. 15:00) mientras otros se normalizan (ej. 10:00) rompe la secuencia comercial (Venta mañana < Compra tarde), causando saldos negativos en reportes que ordenan por fecha/hora.
+- **Solución Senior**: Forzar SIEMPRE la ventana horaria correspondiente (08:00, 09:00, 10:00, 11:00) independientemente de la hora que traiga el documento de origen. Esto garantiza que las compras SIEMPRE precedan a las ventas del mismo día, estabilizando el cálculo de saldos y costos promedios.
+
+## [2026-04-12] Impacto de Stock en Notas de Crédito y Débito
+- **Regla de Negocio**: Una Nota de Crédito no tiene un impacto de stock absoluto. Su efecto es **INVERSO** al documento que afecta:
+    - NC de Venta (Devolución de Cliente): Debe ser una **ENTRADA** (+) de stock.
+    - NC de Compra (Devolución a Proveedor): Debe ser una **SALIDA** (-) de stock.
+- **Implementación**: Utilizar una configuración `DEPENDIENTE` en la tabla de comprobantes y delegar en el manejador de inventario la decisión final basada en el `ReferenciaModulo` (VENTAS vs COMPRAS).
+
+## [2026-04-12] Robustez en Migraciones de PostgreSQL (Renames & Constraints)
+- **Problema**: EF Core intenta renombrar índices y restricciones (ej: `IX_...` -> `ix_...`) asumiendo que el estado previo coincide exactamente con su snapshot. Si los nombres ya están normalizados o difieren, la migración falla con errores `42704` (no existe restricción) o `42P01` (no existe relación).
+- **Lección**: Para migraciones que implican cambios masivos de convenciones de nombres (como pasar de PascalCase a snake_case), es más seguro:
+    1.  Usar comandos `Sql` con `DROP CONSTRAINT IF EXISTS` y `DROP INDEX IF EXISTS` para limpiar el terreno antes de recrear.
+    2.  Si el "ruido" de renombrado es excesivo y causa bloqueos, simplificar la migración manual en el archivo `.cs` para que solo contenga los cambios estructurales reales (ej: `AddColumn`), permitiendo una aplicación limpia mientras se estabiliza el snapshot.
+- **Prevención**: Verificar siempre los nombres físicos en PostgreSQL antes de confiar ciegamente en el scaffold automático de EF Core en proyectos con historiales de esquema complejos.
+## [2026-04-12] PostgreSQL - Error 42703 (Undefined Column) en Referencias Cruzadas
+- **Problema**: Al crear entidades de referencia para tablas de otros microservicios (usando `ExcludeFromMigrations`), es común heredar la suposición de que la PK se llama `id`. Si la tabla original usa una convención distinta (ej: `id_afectacion`), EF Core lanzará una excepción `42703` al intentar consultar.
+- **Lección**: Siempre verificar el DDL o la entidad original del microservicio dueño antes de definir el mapeo `[Column(...)]` en la entidad Ref. No asumir convenciones genéricas para PKs en sistemas con esquemas ya establecidos.
+- **Prevención**: Incluir un paso de verificación de "Nombres de Columna Físicos" en el plan de implementación al trabajar con `EntidadesRef`.

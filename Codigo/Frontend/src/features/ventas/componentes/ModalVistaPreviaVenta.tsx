@@ -20,8 +20,8 @@ import { Printer, Loader2, CheckCircle2, Receipt, AlertCircle, XCircle } from "l
 import { Venta } from "../tipos/ventas.types";
 import { servicioVentas } from "../servicios/servicioVentas";
 import { formatearMoneda, formatearFechaHora } from "@compartido/utilidades";
-import { toast } from "sonner";
 import { EstadoVenta } from "@compartido/enums";
+import { FISCAL_CONFIG } from "@compartido/configuracion/fiscal.config";
 
 interface ModalVistaPreviaVentaProps {
   idVenta: number | null;
@@ -103,7 +103,9 @@ export function ModalVistaPreviaVenta({
                 </p>
                 <div className="py-2 border-y border-dashed my-4">
                   <h3 className="font-bold text-sm uppercase">
-                    {venta.tipoComprobante || 'NOTA DE VENTA'}
+                    {(venta.tipoComprobante?.toUpperCase().includes('FACTURA') ? 'FACTURA ELECTRÓNICA' : 
+                      venta.tipoComprobante?.toUpperCase().includes('BOLETA') ? 'BOLETA DE VENTA ELECTRÓNICA' : 
+                      venta.tipoComprobante) || 'NOTA DE VENTA'}
                   </h3>
                   <p className="text-xl font-mono tracking-widest font-bold">
                     {venta.serie}-{venta.numeroFormateado}
@@ -112,14 +114,19 @@ export function ModalVistaPreviaVenta({
               </div>
 
               {/* Información del Cliente */}
-              <div className="grid grid-cols-2 gap-4 text-xs mb-6">
-                <div className="space-y-1">
-                  <p className="text-muted-foreground uppercase font-bold text-[10px]">Cliente</p>
+              <div className="grid grid-cols-2 gap-4 text-xs mb-6 border-b border-dashed pb-4">
+                <div className="space-y-1 col-span-2 sm:col-span-1">
+                  <p className="text-muted-foreground uppercase font-bold text-[10px]">Adquiriente / Cliente</p>
                   <p className="font-semibold uppercase">{venta.nombreCliente || "CLIENTE GENERAL"}</p>
+                  <p className="text-[10px] font-mono">{venta.numeroDocumentoCliente ? `RUC/DNI: ${venta.numeroDocumentoCliente}` : ""}</p>
+                  {venta.direccionCliente && (
+                    <p className="text-[9px] text-muted-foreground leading-tight italic max-w-[200px]">{venta.direccionCliente}</p>
+                  )}
                 </div>
-                <div className="space-y-1 text-right">
+                <div className="space-y-1 text-right col-span-2 sm:col-span-1">
                   <p className="text-muted-foreground uppercase font-bold text-[10px]">Fecha Emisión</p>
                   <p className="font-semibold">{formatearFechaHora(venta.fechaEmision)}</p>
+                  <p className="text-[10px]">Moneda: {venta.moneda === 'PEN' ? 'Soles (PEN)' : venta.moneda}</p>
                 </div>
               </div>
 
@@ -138,11 +145,11 @@ export function ModalVistaPreviaVenta({
                       <TableRow key={index} className="hover:bg-transparent border-dashed">
                         <TableCell className="py-2 px-0 text-xs font-medium">{item.cantidad}</TableCell>
                         <TableCell className="py-2 text-xs">
-                          <span className="font-medium block">{item.producto?.nombre || "Producto"}</span>
+                          <span className="font-medium block">{item.descripcionProducto || item.producto?.nombre || "Producto"}</span>
                           <span className="text-[10px] text-muted-foreground italic">P.Unit: {formatearMoneda(item.precioUnitario)}</span>
                         </TableCell>
                         <TableCell className="py-2 text-right px-0 text-xs font-bold">
-                          {formatearMoneda(item.subtotal)}
+                          {formatearMoneda(item.totalItem)}
                         </TableCell>
                       </TableRow>
                     ))}
@@ -157,7 +164,9 @@ export function ModalVistaPreviaVenta({
                   <span>{formatearMoneda(venta.subtotalGravado)}</span>
                 </div>
                 <div className="flex justify-between text-xs">
-                  <span className="text-muted-foreground text-[10px] font-bold">I.G.V. (18%):</span>
+                  <span className="text-muted-foreground text-[10px] font-bold">
+                    {FISCAL_CONFIG.TRIBUTOS.IGV === "1000" ? "I.G.V." : "Impuesto"} ({FISCAL_CONFIG.PORCENTAJE_IGV}%):
+                  </span>
                   <span>{formatearMoneda(venta.totalImpuesto)}</span>
                 </div>
                 <Separator className="my-2 border-dashed" />
@@ -189,7 +198,8 @@ export function ModalVistaPreviaVenta({
                 )}
                 <p className="text-[10px] text-muted-foreground italic">
                   Gracias por su compra. ¡Vuelva pronto!<br />
-                  Representación empresa de comprobante electrónico.
+                  Representación impresa de la {venta.tipoComprobante || 'Factura Electrónica'}.<br />
+                  Código Hash: <span className="font-mono text-[8px] opacity-70">A1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6Q7R8S9T0</span>
                 </p>
                 <div className="flex justify-center grayscale opacity-30 pt-2 pb-4">
                   {/* Simulación de código de barras/QR */}

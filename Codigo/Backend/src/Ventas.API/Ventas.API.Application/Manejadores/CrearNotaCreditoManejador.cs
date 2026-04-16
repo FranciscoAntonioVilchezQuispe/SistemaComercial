@@ -6,6 +6,8 @@ using Ventas.API.Application.Comandos;
 using Ventas.API.Application.DTOs;
 using Ventas.API.Application.Interfaces;
 using Ventas.API.Domain.Entidades;
+using Nucleo.Comun.Domain.Helpers;
+using Nucleo.Comun.Domain.Constants;
 
 namespace Ventas.API.Application.Manejadores
 {
@@ -39,8 +41,8 @@ namespace Ventas.API.Application.Manejadores
                 throw new Exception("La venta de referencia no existe.");
 
             // 2. Obtener Porcentaje IGV dinámicamente de BD
-            var impuesto = await _context.ImpuestosRef.FirstOrDefaultAsync(x => x.CodigoSunat == "1000", cancellationToken);
-            decimal porcentajeIgv = impuesto?.Porcentaje ?? 18.00m;
+            var impuesto = await _context.ImpuestosRef.FirstOrDefaultAsync(x => x.CodigoSunat == FiscalConstants.CODIGO_TRIBUTO_IGV, cancellationToken);
+            decimal porcentajeIgv = impuesto?.Porcentaje ?? FiscalConstants.PORCENTAJE_IGV;
 
             // 2.1 Obtener Tipo Documento del Cliente para SUNAT (Evitar nulos del DTO)
             var tipoDocCliente = await _context.TiposDocumentoRef.FirstOrDefaultAsync(x => x.Id == venta.Cliente.IdTipoDocumento, cancellationToken);
@@ -132,7 +134,7 @@ namespace Ventas.API.Application.Manejadores
                 PorcentajeIgv = porcentajeIgv,
                 
                 AfectaStock = dto.AfectaStock,
-                FechaEmision = DateTime.UtcNow,
+                FechaEmision = DateTimeHelper.ObtenerAhoraLima(),
                 Estado = "PENDIENTE",
                 IdEstadoCpe = "PENDIENTE",
                 IdEstado = (long)EstadoDocumento.Registrado, // Registrado
@@ -147,9 +149,9 @@ namespace Ventas.API.Application.Manejadores
             venta.IdEstado = (long)EstadoDocumento.AnuladoNotaCredito;
             venta.IdNotaCredito = nota.Id;
             venta.TipoAnulacion = "nota_credito";
-            venta.FechaAnulacion = DateTime.UtcNow;
+            venta.FechaAnulacion = DateTimeHelper.ObtenerAhoraLima();
             venta.MotivoAnulacion = nota.MotivoSustento;
-            venta.Observaciones += $"\n[ANULACIÓN NC] {DateTime.UtcNow}: Nota {nota.Serie}-{nota.Numero} generada.";
+            venta.Observaciones += $"\n[ANULACIÓN NC] {DateTimeHelper.ObtenerAhoraLima()}: Nota {nota.Serie}-{nota.Numero} generada.";
 
             _context.Ventas.Update(venta);
             await _context.SaveChangesAsync(cancellationToken);

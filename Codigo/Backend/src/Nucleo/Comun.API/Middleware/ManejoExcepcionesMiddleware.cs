@@ -5,6 +5,7 @@ using Nucleo.Comun.Domain;
 using System.Net;
 using System.Text.Json;
 using FluentValidation;
+using Nucleo.Comun.Domain.Helpers;
 
 namespace Nucleo.Comun.API.Middleware
 {
@@ -86,7 +87,7 @@ namespace Nucleo.Comun.API.Middleware
                 errors = exception is ValidationException ve 
                     ? ve.Errors.Select(e => new { property = e.PropertyName, error = e.ErrorMessage }) 
                     : null,
-                timestamp = DateTime.UtcNow
+                timestamp = DateTimeHelper.ObtenerAhoraLima()
             };
             
             var options = new JsonSerializerOptions

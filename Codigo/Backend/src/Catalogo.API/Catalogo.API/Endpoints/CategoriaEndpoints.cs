@@ -75,7 +75,6 @@ namespace Catalogo.API.Endpoints
                 existente.IdCategoriaPadre = dto.IdCategoriaPadre;
                 existente.ImagenUrl = dto.ImagenUrl;
                 existente.UsuarioActualizacion = "SISTEMA";
-                existente.FechaActualizacion = DateTime.UtcNow;
 
                 await repo.ActualizarAsync(existente);
                 return Results.Ok(new ToReturn<Categoria>(existente));

@@ -4,6 +4,7 @@ using Ventas.API.Application.Comandos;
 using Ventas.API.Application.Interfaces;
 using Microsoft.Extensions.Logging;
 using Nucleo.Comun.Domain.Enums;
+using Nucleo.Comun.Domain.Helpers;
 
 namespace Ventas.API.Application.Manejadores
 {
@@ -49,18 +50,18 @@ namespace Ventas.API.Application.Manejadores
 
                 // 2. Validar Fecha de Creación (Política v1.0: 24 horas absolutas para anulación directa)
                 var limite24Horas = venta.FechaCreacion.AddHours(24);
-                if (DateTime.UtcNow > limite24Horas)
+                if (DateTimeHelper.ObtenerAhoraLima() > limite24Horas)
                     throw new Exception("Han pasado más de 24 horas desde el registro. No se puede anular directamente. Debe realizar una Nota de Crédito.");
 
                 // 3. Actualizar estados y campos v1.0
                 venta.IdEstado = (long)EstadoDocumento.AnuladoDirecto;
                 venta.IdEstadoPago = (long)EstadoPago.Anulado;
-                venta.FechaAnulacion = DateTime.UtcNow;
+                venta.FechaAnulacion = DateTimeHelper.ObtenerAhoraLima();
                 venta.MotivoAnulacion = request.Motivo;
                 venta.TipoAnulacion = "directo";
                 venta.UsuarioActualizacion = request.UsuarioId.ToString();
                 venta.EstadoSunat = "ANULADO";
-                venta.Observaciones += $"\n[ANULACIÓN DIRECTA SUNAT] {DateTime.UtcNow} por {request.UsuarioId}: {request.Motivo}";
+                venta.Observaciones += $"\n[ANULACIÓN DIRECTA SUNAT] {DateTimeHelper.ObtenerAhoraLima()} por {request.UsuarioId}: {request.Motivo}";
 
                 // 4. Solicitar reversión de stock en Inventario.API
                 _logger.LogInformation("Solicitando reversión de stock para Anulación de Venta {VentaId}", venta.Id);

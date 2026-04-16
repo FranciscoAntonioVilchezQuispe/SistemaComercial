@@ -6,5 +6,6 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Identidad.API.Domain\Identidad.API.Domain.csproj" />
+    <ProjectReference Include="..\..\Nucleo\Nucleo.csproj" />
   </ItemGroup>
 </Project>

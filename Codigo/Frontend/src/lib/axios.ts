@@ -2,8 +2,7 @@
 import axios, {
   AxiosInstance,
   AxiosResponse,
-  InternalAxiosRequestConfig,
-  AxiosRequestConfig
+  InternalAxiosRequestConfig
 } from "axios";
 import { toast } from "sonner";
 
@@ -21,7 +20,7 @@ const createApiInstance = (baseURL: string): AxiosInstance => {
   // Interceptor para agregar token (si existe)
   instance.interceptors.request.use(
     (config: InternalAxiosRequestConfig) => {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("sc_token");
       if (token && config.headers) {
         config.headers.Authorization = `Bearer ${token}`;
       }
@@ -65,7 +64,8 @@ const createApiInstance = (baseURL: string): AxiosInstance => {
     },
     (error) => {
       if (error.response?.status === 401) {
-        localStorage.removeItem("token");
+        localStorage.removeItem("sc_token");
+        localStorage.removeItem("sc_refresh");
         if (window.location.pathname !== "/login") {
           window.location.href = "/login";
         }
@@ -115,10 +115,10 @@ const createApiInstance = (baseURL: string): AxiosInstance => {
   return instance;
 };
 
-// Instancias para microservicios específicos (APUNTANDO AL GATEWAY 5000)
+// Instancias para microservicios específicos (LEER DESDE .ENV)
 // Todas apuntan a la base /api del Gateway.
 // Las rutas específicas (ej: /proveedores, /marcas) se definen en los servicios y son rooteadas por YARP.
-const GATEWAY_BASE_URL = "http://localhost:5000/api";
+const GATEWAY_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
 export const apiIdentidad = createApiInstance(GATEWAY_BASE_URL);
 export const apiConfiguracion = createApiInstance(GATEWAY_BASE_URL);

@@ -69,3 +69,17 @@ export const useEliminarCompra = (): UseMutationResult<void, Error, number> => {
     },
   });
 };
+
+/**
+ * Hook para obtener el reporte de compras por proveedor
+ */
+export function useReporteComprasProveedor(
+  fechaInicio?: string,
+  fechaFin?: string,
+  top: number = 10,
+): UseQueryResult<any[], Error> {
+  return useQuery({
+    queryKey: [...QUERY_KEY, "reporte", "compras-proveedor", fechaInicio, fechaFin, top],
+    queryFn: () => servicio.obtenerReporteComprasProveedor(fechaInicio, fechaFin, top),
+  });
+}

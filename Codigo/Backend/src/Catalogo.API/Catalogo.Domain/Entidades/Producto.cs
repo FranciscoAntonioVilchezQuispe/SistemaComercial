@@ -1,4 +1,5 @@
 using Nucleo.Comun.Domain;
+using Nucleo.Comun.Domain.Constants;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -81,7 +82,13 @@ namespace Catalogo.Domain.Entidades
         public bool GravadoImpuesto { get; set; } = true;
 
         [Column("porcentaje_impuesto", TypeName = "decimal(5,2)")]
-        public decimal PorcentajeImpuesto { get; set; } = 18.00m;
+        public decimal PorcentajeImpuesto { get; set; } = FiscalConstants.PORCENTAJE_IGV;
+
+        [Column("id_afectacion_igv")]
+        public long? IdTipoAfectacionIgv { get; set; }
+
+        [Column("id_tipo_tributo")]
+        public long? IdTipoTributo { get; set; }
 
         [MaxLength(500)]
         [Column("imagen_principal_url")]

@@ -2,6 +2,7 @@ using Catalogo.Domain.Entidades;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using System.Reflection;
+using Nucleo.Comun.Domain.Helpers;
 
 namespace Catalogo.Infrastructure.Datos
 {
@@ -45,30 +46,8 @@ namespace Catalogo.Infrastructure.Datos
 
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
-            foreach (var entry in ChangeTracker.Entries<Nucleo.Comun.Domain.EntidadBase>())
-            {
-                switch (entry.State)
-                {
-                    case EntityState.Added:
-                        entry.Entity.FechaCreacion = DateTime.UtcNow;
-                        entry.Entity.UsuarioCreacion = "API_USER"; // TODO: Integrar con ICurrentUserService
-                        entry.Entity.Activado = true;
-                        break;
-
-                    case EntityState.Modified:
-                        entry.Entity.FechaActualizacion = DateTime.UtcNow;
-                        entry.Entity.UsuarioActualizacion = "API_USER";
-                        break;
-
-                    case EntityState.Deleted:
-                        // Soft Delete logic
-                        entry.State = EntityState.Modified;
-                        entry.Entity.Activado = false;
-                        entry.Entity.FechaActualizacion = DateTime.UtcNow;
-                        entry.Entity.UsuarioActualizacion = "API_USER";
-                        break;
-                }
-            }
+            // Aplicar auditoría centralizada con Soft Delete (Estandarización Global)
+            DbContextAuditHelper.AplicarAuditoriaDirecta(ChangeTracker, "API_USER", true);
 
             return base.SaveChangesAsync(cancellationToken);
         }

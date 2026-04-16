@@ -35,6 +35,7 @@ namespace Ventas.API.Application.DTOs
         public string Estado { get; set; } = string.Empty;
         public string TipoComprobante { get; set; } = string.Empty;
         public string? Observaciones { get; set; }
+        public long? IdTipoOperacion { get; set; }
 
         public List<DetalleVentaDto> Detalles { get; set; } = new();
         public List<PagoDto> Pagos { get; set; } = new();

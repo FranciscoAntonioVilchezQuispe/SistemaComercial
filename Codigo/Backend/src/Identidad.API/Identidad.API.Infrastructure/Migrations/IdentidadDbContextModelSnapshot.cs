@@ -33,13 +33,16 @@ namespace Identidad.API.Infrastructure.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
                     b.Property<bool>("Activado")
-                        .HasColumnType("boolean");
+                        .HasColumnType("boolean")
+                        .HasColumnName("activado");
 
                     b.Property<DateTime?>("FechaActualizacion")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fecha_modificacion");
 
                     b.Property<DateTime>("FechaCreacion")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fecha_creacion");
 
                     b.Property<string>("NombreArea")
                         .IsRequired()
@@ -48,13 +51,18 @@ namespace Identidad.API.Infrastructure.Migrations
                         .HasColumnName("nombre_area");
 
                     b.Property<string>("UsuarioActualizacion")
-                        .HasColumnType("text");
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("usuario_modificacion");
 
                     b.Property<string>("UsuarioCreacion")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("usuario_creacion");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("pk_areas");
 
                     b.ToTable("areas", "identidad");
                 });
@@ -69,13 +77,16 @@ namespace Identidad.API.Infrastructure.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
                     b.Property<bool>("Activado")
-                        .HasColumnType("boolean");
+                        .HasColumnType("boolean")
+                        .HasColumnName("activado");
 
                     b.Property<DateTime?>("FechaActualizacion")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fecha_modificacion");
 
                     b.Property<DateTime>("FechaCreacion")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fecha_creacion");
 
                     b.Property<long?>("IdArea")
                         .HasColumnType("bigint")
@@ -88,96 +99,99 @@ namespace Identidad.API.Infrastructure.Migrations
                         .HasColumnName("nombre_cargo");
 
                     b.Property<string>("UsuarioActualizacion")
-                        .HasColumnType("text");
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("usuario_modificacion");
 
                     b.Property<string>("UsuarioCreacion")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("usuario_creacion");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("pk_cargos");
 
-                    b.HasIndex("IdArea");
+                    b.HasIndex("IdArea")
+                        .HasDatabaseName("ix_cargos_id_area");
 
                     b.ToTable("cargos", "identidad");
                 });
 
-            modelBuilder.Entity("Identidad.API.Domain.Entidades.Empresa", b =>
+            modelBuilder.Entity("Identidad.API.Domain.Entidades.Menu", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
-                        .HasColumnName("id_empresa");
+                        .HasColumnName("id_menu");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
                     b.Property<bool>("Activado")
-                        .HasColumnType("boolean");
+                        .HasColumnType("boolean")
+                        .HasColumnName("activado");
 
-                    b.Property<string>("CorreoContacto")
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("correo_contacto");
-
-                    b.Property<string>("DireccionFiscal")
+                    b.Property<string>("Codigo")
                         .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)")
-                        .HasColumnName("direccion_fiscal");
-
-                    b.Property<DateTime?>("FechaActualizacion")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTime>("FechaCreacion")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("LogoUrl")
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)")
-                        .HasColumnName("logo_url");
-
-                    b.Property<string>("MonedaPrincipal")
-                        .IsRequired()
-                        .HasMaxLength(3)
-                        .HasColumnType("character varying(3)")
-                        .HasColumnName("moneda_principal");
-
-                    b.Property<string>("NombreComercial")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)")
-                        .HasColumnName("nombre_comercial");
-
-                    b.Property<string>("RazonSocial")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)")
-                        .HasColumnName("razon_social");
-
-                    b.Property<string>("Ruc")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)")
-                        .HasColumnName("ruc");
-
-                    b.Property<string>("SitioWeb")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)")
-                        .HasColumnName("sitio_web");
-
-                    b.Property<string>("Telefono")
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)")
-                        .HasColumnName("telefono");
+                        .HasColumnName("codigo");
+
+                    b.Property<string>("Descripcion")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
+                        .HasColumnName("descripcion");
+
+                    b.Property<DateTime?>("FechaActualizacion")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fecha_modificacion");
+
+                    b.Property<DateTime>("FechaCreacion")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fecha_creacion");
+
+                    b.Property<string>("Icono")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("icono");
+
+                    b.Property<long?>("IdMenuPadre")
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_menu_padre");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("nombre");
+
+                    b.Property<int>("Orden")
+                        .HasColumnType("integer")
+                        .HasColumnName("orden");
+
+                    b.Property<string>("Ruta")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
+                        .HasColumnName("ruta");
 
                     b.Property<string>("UsuarioActualizacion")
-                        .HasColumnType("text");
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("usuario_modificacion");
 
                     b.Property<string>("UsuarioCreacion")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("usuario_creacion");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("pk_menus");
 
-                    b.ToTable("empresa", "configuracion");
+                    b.HasIndex("IdMenuPadre")
+                        .HasDatabaseName("ix_menus_id_menu_padre");
+
+                    b.ToTable("menus", "identidad");
                 });
 
             modelBuilder.Entity("Identidad.API.Domain.Entidades.Permiso", b =>
@@ -190,7 +204,8 @@ namespace Identidad.API.Infrastructure.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
                     b.Property<bool>("Activado")
-                        .HasColumnType("boolean");
+                        .HasColumnType("boolean")
+                        .HasColumnName("activado");
 
                     b.Property<string>("CodigoPermiso")
                         .IsRequired()
@@ -204,10 +219,12 @@ namespace Identidad.API.Infrastructure.Migrations
                         .HasColumnName("descripcion");
 
                     b.Property<DateTime?>("FechaActualizacion")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fecha_modificacion");
 
                     b.Property<DateTime>("FechaCreacion")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fecha_creacion");
 
                     b.Property<string>("Modulo")
                         .HasMaxLength(50)
@@ -215,15 +232,79 @@ namespace Identidad.API.Infrastructure.Migrations
                         .HasColumnName("modulo");
 
                     b.Property<string>("UsuarioActualizacion")
-                        .HasColumnType("text");
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("usuario_modificacion");
 
                     b.Property<string>("UsuarioCreacion")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("usuario_creacion");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("pk_permisos");
 
                     b.ToTable("permisos", "identidad");
+                });
+
+            modelBuilder.Entity("Identidad.API.Domain.Entidades.RefreshToken", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_refresh_token");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<bool>("Activado")
+                        .HasColumnType("boolean")
+                        .HasColumnName("activado");
+
+                    b.Property<bool>("EsRevocado")
+                        .HasColumnType("boolean")
+                        .HasColumnName("es_revocado");
+
+                    b.Property<DateTime?>("FechaActualizacion")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fecha_modificacion");
+
+                    b.Property<DateTime>("FechaCreacion")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fecha_creacion");
+
+                    b.Property<DateTime>("FechaExpiracion")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fecha_expiracion");
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("token");
+
+                    b.Property<string>("UsuarioActualizacion")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("usuario_modificacion");
+
+                    b.Property<string>("UsuarioCreacion")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("usuario_creacion");
+
+                    b.Property<long>("UsuarioId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_usuario");
+
+                    b.HasKey("Id")
+                        .HasName("pk_refresh_tokens");
+
+                    b.HasIndex("UsuarioId")
+                        .HasDatabaseName("ix_refresh_tokens_id_usuario");
+
+                    b.ToTable("refresh_tokens", "identidad");
                 });
 
             modelBuilder.Entity("Identidad.API.Domain.Entidades.Rol", b =>
@@ -236,7 +317,8 @@ namespace Identidad.API.Infrastructure.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
                     b.Property<bool>("Activado")
-                        .HasColumnType("boolean");
+                        .HasColumnType("boolean")
+                        .HasColumnName("activado");
 
                     b.Property<string>("Descripcion")
                         .HasMaxLength(255)
@@ -244,10 +326,12 @@ namespace Identidad.API.Infrastructure.Migrations
                         .HasColumnName("descripcion");
 
                     b.Property<DateTime?>("FechaActualizacion")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fecha_modificacion");
 
                     b.Property<DateTime>("FechaCreacion")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fecha_creacion");
 
                     b.Property<string>("NombreRol")
                         .IsRequired()
@@ -256,15 +340,126 @@ namespace Identidad.API.Infrastructure.Migrations
                         .HasColumnName("nombre_rol");
 
                     b.Property<string>("UsuarioActualizacion")
-                        .HasColumnType("text");
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("usuario_modificacion");
 
                     b.Property<string>("UsuarioCreacion")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("usuario_creacion");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("pk_roles");
 
                     b.ToTable("roles", "identidad");
+                });
+
+            modelBuilder.Entity("Identidad.API.Domain.Entidades.RolMenu", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_rol_menu");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<bool>("Activado")
+                        .HasColumnType("boolean")
+                        .HasColumnName("activado");
+
+                    b.Property<DateTime?>("FechaActualizacion")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fecha_modificacion");
+
+                    b.Property<DateTime>("FechaCreacion")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fecha_creacion");
+
+                    b.Property<long>("IdMenu")
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_menu");
+
+                    b.Property<long>("IdRol")
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_rol");
+
+                    b.Property<string>("UsuarioActualizacion")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("usuario_modificacion");
+
+                    b.Property<string>("UsuarioCreacion")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("usuario_creacion");
+
+                    b.HasKey("Id")
+                        .HasName("pk_roles_menus");
+
+                    b.HasIndex("IdMenu")
+                        .HasDatabaseName("ix_roles_menus_id_menu");
+
+                    b.HasIndex("IdRol", "IdMenu")
+                        .IsUnique()
+                        .HasDatabaseName("ix_roles_menus_id_rol_id_menu");
+
+                    b.ToTable("roles_menus", "identidad");
+                });
+
+            modelBuilder.Entity("Identidad.API.Domain.Entidades.RolMenuPermiso", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_rol_menu_permiso");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<bool>("Activado")
+                        .HasColumnType("boolean")
+                        .HasColumnName("activado");
+
+                    b.Property<DateTime?>("FechaActualizacion")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fecha_modificacion");
+
+                    b.Property<DateTime>("FechaCreacion")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fecha_creacion");
+
+                    b.Property<long>("IdRolMenu")
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_rol_menu");
+
+                    b.Property<long>("IdTipoPermiso")
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_tipo_permiso");
+
+                    b.Property<string>("UsuarioActualizacion")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("usuario_modificacion");
+
+                    b.Property<string>("UsuarioCreacion")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("usuario_creacion");
+
+                    b.HasKey("Id")
+                        .HasName("pk_roles_menus_permisos");
+
+                    b.HasIndex("IdTipoPermiso")
+                        .HasDatabaseName("ix_roles_menus_permisos_id_tipo_permiso");
+
+                    b.HasIndex("IdRolMenu", "IdTipoPermiso")
+                        .IsUnique()
+                        .HasDatabaseName("ix_roles_menus_permisos_id_rol_menu_id_tipo_permiso");
+
+                    b.ToTable("roles_menus_permisos", "identidad");
                 });
 
             modelBuilder.Entity("Identidad.API.Domain.Entidades.RolPermiso", b =>
@@ -278,92 +473,54 @@ namespace Identidad.API.Infrastructure.Migrations
                         .HasColumnName("id_permiso");
 
                     b.Property<bool>("Activado")
-                        .HasColumnType("boolean");
+                        .HasColumnType("boolean")
+                        .HasColumnName("activado");
 
                     b.Property<DateTime?>("FechaActualizacion")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fecha_modificacion");
 
                     b.Property<DateTime>("FechaCreacion")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fecha_creacion");
 
                     b.Property<string>("UsuarioActualizacion")
-                        .HasColumnType("text");
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("usuario_modificacion");
 
                     b.Property<string>("UsuarioCreacion")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("usuario_creacion");
 
-                    b.HasKey("IdRol", "IdPermiso");
+                    b.HasKey("IdRol", "IdPermiso")
+                        .HasName("pk_roles_permisos");
 
-                    b.HasIndex("IdPermiso");
+                    b.HasIndex("IdPermiso")
+                        .HasDatabaseName("ix_roles_permisos_id_permiso");
 
                     b.ToTable("roles_permisos", "identidad");
                 });
 
-            modelBuilder.Entity("Identidad.API.Domain.Entidades.SerieComprobante", b =>
+            modelBuilder.Entity("Identidad.API.Domain.Entidades.TipoPermiso", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
-                        .HasColumnName("id_serie");
+                        .HasColumnName("id_tipo_permiso");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
                     b.Property<bool>("Activado")
-                        .HasColumnType("boolean");
-
-                    b.Property<long>("CorrelativoActual")
-                        .HasColumnType("bigint")
-                        .HasColumnName("correlativo_actual");
-
-                    b.Property<DateTime?>("FechaActualizacion")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTime>("FechaCreacion")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<long?>("IdAlmacen")
-                        .HasColumnType("bigint")
-                        .HasColumnName("id_almacen");
-
-                    b.Property<long>("IdTipoComprobante")
-                        .HasColumnType("bigint")
-                        .HasColumnName("id_tipo_comprobante");
-
-                    b.Property<string>("Serie")
-                        .IsRequired()
-                        .HasMaxLength(10)
-                        .HasColumnType("character varying(10)")
-                        .HasColumnName("serie");
-
-                    b.Property<string>("UsuarioActualizacion")
-                        .HasColumnType("text");
-
-                    b.Property<string>("UsuarioCreacion")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("series_comprobantes", "configuracion");
-                });
-
-            modelBuilder.Entity("Identidad.API.Domain.Entidades.TablaGeneral", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasColumnName("id_tabla");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
-
-                    b.Property<bool>("Activado")
-                        .HasColumnType("boolean");
+                        .HasColumnType("boolean")
+                        .HasColumnName("activado");
 
                     b.Property<string>("Codigo")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
                         .HasColumnName("codigo");
 
                     b.Property<string>("Descripcion")
@@ -371,15 +528,13 @@ namespace Identidad.API.Infrastructure.Migrations
                         .HasColumnType("character varying(255)")
                         .HasColumnName("descripcion");
 
-                    b.Property<bool>("EsSistema")
-                        .HasColumnType("boolean")
-                        .HasColumnName("es_sistema");
-
                     b.Property<DateTime?>("FechaActualizacion")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fecha_modificacion");
 
                     b.Property<DateTime>("FechaCreacion")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fecha_creacion");
 
                     b.Property<string>("Nombre")
                         .IsRequired()
@@ -388,76 +543,20 @@ namespace Identidad.API.Infrastructure.Migrations
                         .HasColumnName("nombre");
 
                     b.Property<string>("UsuarioActualizacion")
-                        .HasColumnType("text");
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("usuario_modificacion");
 
                     b.Property<string>("UsuarioCreacion")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("tablas_generales", "configuracion");
-                });
-
-            modelBuilder.Entity("Identidad.API.Domain.Entidades.TablaGeneralDetalle", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasColumnName("id_detalle");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
-
-                    b.Property<bool>("Activado")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("Codigo")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
-                        .HasColumnName("codigo");
-
-                    b.Property<bool>("Estado")
-                        .HasColumnType("boolean")
-                        .HasColumnName("estado");
-
-                    b.Property<DateTime?>("FechaActualizacion")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTime>("FechaCreacion")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<long>("IdTablaGeneral")
-                        .HasColumnType("bigint")
-                        .HasColumnName("id_tabla");
-
-                    b.Property<string>("Nombre")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)")
-                        .HasColumnName("nombre");
+                        .HasColumnName("usuario_creacion");
 
-                    b.Property<int>("Orden")
-                        .HasColumnType("integer")
-                        .HasColumnName("orden");
+                    b.HasKey("Id")
+                        .HasName("pk_tipos_permiso");
 
-                    b.Property<string>("UsuarioActualizacion")
-                        .HasColumnType("text");
-
-                    b.Property<string>("UsuarioCreacion")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("ValorAdicional")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)")
-                        .HasColumnName("valor_adicional");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("IdTablaGeneral");
-
-                    b.ToTable("tablas_generales_detalle", "configuracion");
+                    b.ToTable("tipos_permiso", "identidad");
                 });
 
             modelBuilder.Entity("Identidad.API.Domain.Entidades.Trabajador", b =>
@@ -470,7 +569,8 @@ namespace Identidad.API.Infrastructure.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
                     b.Property<bool>("Activado")
-                        .HasColumnType("boolean");
+                        .HasColumnType("boolean")
+                        .HasColumnName("activado");
 
                     b.Property<string>("Apellidos")
                         .IsRequired()
@@ -484,10 +584,12 @@ namespace Identidad.API.Infrastructure.Migrations
                         .HasColumnName("email_corporativo");
 
                     b.Property<DateTime?>("FechaActualizacion")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fecha_modificacion");
 
                     b.Property<DateTime>("FechaCreacion")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fecha_creacion");
 
                     b.Property<DateTime?>("FechaNacimiento")
                         .HasColumnType("timestamp with time zone")
@@ -500,10 +602,6 @@ namespace Identidad.API.Infrastructure.Migrations
                     b.Property<long>("IdTipoDocumento")
                         .HasColumnType("bigint")
                         .HasColumnName("id_tipo_documento");
-
-                    b.Property<long?>("IdUsuario")
-                        .HasColumnType("bigint")
-                        .HasColumnName("id_usuario");
 
                     b.Property<string>("Nombres")
                         .IsRequired()
@@ -523,17 +621,21 @@ namespace Identidad.API.Infrastructure.Migrations
                         .HasColumnName("telefono");
 
                     b.Property<string>("UsuarioActualizacion")
-                        .HasColumnType("text");
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("usuario_modificacion");
 
                     b.Property<string>("UsuarioCreacion")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("usuario_creacion");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("pk_trabajadores");
 
-                    b.HasIndex("IdCargo");
-
-                    b.HasIndex("IdUsuario");
+                    b.HasIndex("IdCargo")
+                        .HasDatabaseName("ix_trabajadores_id_cargo");
 
                     b.ToTable("trabajadores", "identidad");
                 });
@@ -548,7 +650,8 @@ namespace Identidad.API.Infrastructure.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
                     b.Property<bool>("Activado")
-                        .HasColumnType("boolean");
+                        .HasColumnType("boolean")
+                        .HasColumnName("activado");
 
                     b.Property<string>("Apellidos")
                         .IsRequired()
@@ -563,14 +666,16 @@ namespace Identidad.API.Infrastructure.Migrations
                         .HasColumnName("email");
 
                     b.Property<DateTime?>("FechaActualizacion")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fecha_modificacion");
 
                     b.Property<DateTime>("FechaCreacion")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fecha_creacion");
 
-                    b.Property<long>("IdRol")
+                    b.Property<long>("IdTrabajador")
                         .HasColumnType("bigint")
-                        .HasColumnName("id_rol");
+                        .HasColumnName("id_trabajador");
 
                     b.Property<string>("Nombres")
                         .IsRequired()
@@ -595,26 +700,151 @@ namespace Identidad.API.Infrastructure.Migrations
                         .HasColumnName("username");
 
                     b.Property<string>("UsuarioActualizacion")
-                        .HasColumnType("text");
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("usuario_modificacion");
 
                     b.Property<string>("UsuarioCreacion")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("usuario_creacion");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("pk_usuarios");
 
-                    b.HasIndex("IdRol");
+                    b.HasIndex("IdTrabajador")
+                        .IsUnique()
+                        .HasDatabaseName("ix_usuarios_id_trabajador");
 
                     b.ToTable("usuarios", "identidad");
+                });
+
+            modelBuilder.Entity("Identidad.API.Domain.Entidades.UsuarioRol", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_usuario_rol");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<bool>("Activado")
+                        .HasColumnType("boolean")
+                        .HasColumnName("activado");
+
+                    b.Property<DateTime?>("FechaActualizacion")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fecha_modificacion");
+
+                    b.Property<DateTime>("FechaCreacion")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fecha_creacion");
+
+                    b.Property<long>("IdRol")
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_rol");
+
+                    b.Property<long>("IdUsuario")
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_usuario");
+
+                    b.Property<string>("UsuarioActualizacion")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("usuario_modificacion");
+
+                    b.Property<string>("UsuarioCreacion")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("usuario_creacion");
+
+                    b.HasKey("Id")
+                        .HasName("pk_usuarios_roles");
+
+                    b.HasIndex("IdRol")
+                        .HasDatabaseName("ix_usuarios_roles_id_rol");
+
+                    b.HasIndex("IdUsuario", "IdRol")
+                        .IsUnique()
+                        .HasDatabaseName("ix_usuarios_roles_id_usuario_id_rol");
+
+                    b.ToTable("usuarios_roles", "identidad");
                 });
 
             modelBuilder.Entity("Identidad.API.Domain.Entidades.Cargo", b =>
                 {
                     b.HasOne("Identidad.API.Domain.Entidades.Area", "Area")
                         .WithMany("Cargos")
-                        .HasForeignKey("IdArea");
+                        .HasForeignKey("IdArea")
+                        .HasConstraintName("fk_cargos_areas_id_area");
 
                     b.Navigation("Area");
+                });
+
+            modelBuilder.Entity("Identidad.API.Domain.Entidades.Menu", b =>
+                {
+                    b.HasOne("Identidad.API.Domain.Entidades.Menu", "MenuPadre")
+                        .WithMany("SubMenus")
+                        .HasForeignKey("IdMenuPadre")
+                        .HasConstraintName("fk_menus_menus_id_menu_padre");
+
+                    b.Navigation("MenuPadre");
+                });
+
+            modelBuilder.Entity("Identidad.API.Domain.Entidades.RefreshToken", b =>
+                {
+                    b.HasOne("Identidad.API.Domain.Entidades.Usuario", "Usuario")
+                        .WithMany()
+                        .HasForeignKey("UsuarioId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_refresh_tokens_usuarios_id_usuario");
+
+                    b.Navigation("Usuario");
+                });
+
+            modelBuilder.Entity("Identidad.API.Domain.Entidades.RolMenu", b =>
+                {
+                    b.HasOne("Identidad.API.Domain.Entidades.Menu", "Menu")
+                        .WithMany("RolesMenus")
+                        .HasForeignKey("IdMenu")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_roles_menus_menus_id_menu");
+
+                    b.HasOne("Identidad.API.Domain.Entidades.Rol", "Rol")
+                        .WithMany("RolesMenus")
+                        .HasForeignKey("IdRol")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_roles_menus_roles_id_rol");
+
+                    b.Navigation("Menu");
+
+                    b.Navigation("Rol");
+                });
+
+            modelBuilder.Entity("Identidad.API.Domain.Entidades.RolMenuPermiso", b =>
+                {
+                    b.HasOne("Identidad.API.Domain.Entidades.RolMenu", "RolMenu")
+                        .WithMany("Permisos")
+                        .HasForeignKey("IdRolMenu")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_roles_menus_permisos_roles_menus_id_rol_menu");
+
+                    b.HasOne("Identidad.API.Domain.Entidades.TipoPermiso", "TipoPermiso")
+                        .WithMany("RolesMenusPermisos")
+                        .HasForeignKey("IdTipoPermiso")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_roles_menus_permisos_tipos_permiso_id_tipo_permiso");
+
+                    b.Navigation("RolMenu");
+
+                    b.Navigation("TipoPermiso");
                 });
 
             modelBuilder.Entity("Identidad.API.Domain.Entidades.RolPermiso", b =>
@@ -623,54 +853,62 @@ namespace Identidad.API.Infrastructure.Migrations
                         .WithMany("RolesPermisos")
                         .HasForeignKey("IdPermiso")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_roles_permisos_permisos_id_permiso");
 
                     b.HasOne("Identidad.API.Domain.Entidades.Rol", "Rol")
                         .WithMany("RolesPermisos")
                         .HasForeignKey("IdRol")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_roles_permisos_roles_id_rol");
 
                     b.Navigation("Permiso");
 
                     b.Navigation("Rol");
                 });
 
-            modelBuilder.Entity("Identidad.API.Domain.Entidades.TablaGeneralDetalle", b =>
-                {
-                    b.HasOne("Identidad.API.Domain.Entidades.TablaGeneral", "TablaGeneral")
-                        .WithMany("Detalles")
-                        .HasForeignKey("IdTablaGeneral")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("TablaGeneral");
-                });
-
             modelBuilder.Entity("Identidad.API.Domain.Entidades.Trabajador", b =>
                 {
                     b.HasOne("Identidad.API.Domain.Entidades.Cargo", "Cargo")
                         .WithMany("Trabajadores")
-                        .HasForeignKey("IdCargo");
-
-                    b.HasOne("Identidad.API.Domain.Entidades.Usuario", "Usuario")
-                        .WithMany()
-                        .HasForeignKey("IdUsuario");
+                        .HasForeignKey("IdCargo")
+                        .HasConstraintName("fk_trabajadores_cargos_id_cargo");
 
                     b.Navigation("Cargo");
-
-                    b.Navigation("Usuario");
                 });
 
             modelBuilder.Entity("Identidad.API.Domain.Entidades.Usuario", b =>
                 {
+                    b.HasOne("Identidad.API.Domain.Entidades.Trabajador", "Trabajador")
+                        .WithOne("Usuario")
+                        .HasForeignKey("Identidad.API.Domain.Entidades.Usuario", "IdTrabajador")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_usuarios_trabajadores_id_trabajador");
+
+                    b.Navigation("Trabajador");
+                });
+
+            modelBuilder.Entity("Identidad.API.Domain.Entidades.UsuarioRol", b =>
+                {
                     b.HasOne("Identidad.API.Domain.Entidades.Rol", "Rol")
-                        .WithMany("Usuarios")
+                        .WithMany("UsuariosRoles")
                         .HasForeignKey("IdRol")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_usuarios_roles_roles_id_rol");
+
+                    b.HasOne("Identidad.API.Domain.Entidades.Usuario", "Usuario")
+                        .WithMany("UsuariosRoles")
+                        .HasForeignKey("IdUsuario")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_usuarios_roles_usuarios_id_usuario");
 
                     b.Navigation("Rol");
+
+                    b.Navigation("Usuario");
                 });
 
             modelBuilder.Entity("Identidad.API.Domain.Entidades.Area", b =>
@@ -683,6 +921,13 @@ namespace Identidad.API.Infrastructure.Migrations
                     b.Navigation("Trabajadores");
                 });
 
+            modelBuilder.Entity("Identidad.API.Domain.Entidades.Menu", b =>
+                {
+                    b.Navigation("RolesMenus");
+
+                    b.Navigation("SubMenus");
+                });
+
             modelBuilder.Entity("Identidad.API.Domain.Entidades.Permiso", b =>
                 {
                     b.Navigation("RolesPermisos");
@@ -690,14 +935,31 @@ namespace Identidad.API.Infrastructure.Migrations
 
             modelBuilder.Entity("Identidad.API.Domain.Entidades.Rol", b =>
                 {
+                    b.Navigation("RolesMenus");
+
                     b.Navigation("RolesPermisos");
 
-                    b.Navigation("Usuarios");
+                    b.Navigation("UsuariosRoles");
                 });
 
-            modelBuilder.Entity("Identidad.API.Domain.Entidades.TablaGeneral", b =>
+            modelBuilder.Entity("Identidad.API.Domain.Entidades.RolMenu", b =>
                 {
-                    b.Navigation("Detalles");
+                    b.Navigation("Permisos");
+                });
+
+            modelBuilder.Entity("Identidad.API.Domain.Entidades.TipoPermiso", b =>
+                {
+                    b.Navigation("RolesMenusPermisos");
+                });
+
+            modelBuilder.Entity("Identidad.API.Domain.Entidades.Trabajador", b =>
+                {
+                    b.Navigation("Usuario");
+                });
+
+            modelBuilder.Entity("Identidad.API.Domain.Entidades.Usuario", b =>
+                {
+                    b.Navigation("UsuariosRoles");
                 });
 #pragma warning restore 612, 618
         }

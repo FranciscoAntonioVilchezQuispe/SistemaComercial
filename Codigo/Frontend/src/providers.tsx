@@ -34,13 +34,17 @@ if (typeof window !== 'undefined') {
   };
 }
 
+import { AuthProvider } from "./features/identidad/context/AuthContext";
+
 export const AppProviders = ({ children }: { children: React.ReactNode }) => {
   return (
     <React.StrictMode>
       <ErrorBoundary>
         <Provider store={store}>
           <QueryClientProvider client={queryClient}>
-            {children}
+            <AuthProvider>
+              {children}
+            </AuthProvider>
           </QueryClientProvider>
         </Provider>
       </ErrorBoundary>

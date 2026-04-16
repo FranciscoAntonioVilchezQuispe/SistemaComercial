@@ -1,3 +1,4 @@
+using Inventario.API.Domain.DTOs.Reportes;
 using Inventario.API.Domain.Entidades;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -12,5 +13,6 @@ namespace Inventario.API.Domain.Interfaces
         Task<IEnumerable<Stock>> ObtenerPorProductoAsync(long idProducto);
         Task<IEnumerable<Stock>> ObtenerTodoAsync();
         Task<(IEnumerable<Stock> stocks, int total)> ObtenerPaginadoAsync(long? idAlmacen, long? idProducto, int pagina, int elementosPorPagina);
+        Task<(IEnumerable<StockCriticoDto> Datos, int Total)> ObtenerStockCriticoPaginadoAsync(long? idAlmacen, int pagina, int elementosPorPagina);
     }
 }

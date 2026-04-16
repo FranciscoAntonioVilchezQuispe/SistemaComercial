@@ -57,6 +57,12 @@ namespace Catalogo.Application.Manejadores
             // Configuración fiscal
             producto.GravadoImpuesto = request.GravadoImpuesto;
             producto.PorcentajeImpuesto = request.PorcentajeImpuesto;
+            producto.IdTipoAfectacionIgv = (request.IdTipoAfectacionIgv.HasValue && request.IdTipoAfectacionIgv.Value > 0)
+                ? request.IdTipoAfectacionIgv
+                : null;
+            producto.IdTipoTributo = (request.IdTipoTributo.HasValue && request.IdTipoTributo.Value > 0)
+                ? request.IdTipoTributo
+                : null;
 
             // Imagen
             producto.ImagenPrincipalUrl = request.ImagenPrincipalUrl;

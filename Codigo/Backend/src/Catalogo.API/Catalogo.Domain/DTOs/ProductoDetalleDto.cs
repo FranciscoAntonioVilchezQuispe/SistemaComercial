@@ -45,6 +45,10 @@ namespace Catalogo.Domain.DTOs
         // Fiscal
         public bool GravadoImpuesto { get; set; }
         public decimal PorcentajeImpuesto { get; set; }
+        public long? IdTipoAfectacionIgv { get; set; }
+        public string? AfectacionNombre { get; set; }
+        public long? IdTipoTributo { get; set; }
+        public string? TributoNombre { get; set; }
 
         // Medios
         public string? ImagenPrincipalUrl { get; set; }

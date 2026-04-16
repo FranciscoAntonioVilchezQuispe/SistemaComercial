@@ -40,6 +40,14 @@ namespace Identidad.API.Domain.Entidades
         [Column("ultimo_acceso")]
         public DateTime? UltimoAcceso { get; set; }
 
+        [Required]
+        [Column("id_trabajador")]
+        public long IdTrabajador { get; set; }
+
+        // Navegación - Un usuario debe pertenecer a un trabajador
+        [ForeignKey("IdTrabajador")]
+        public virtual Trabajador Trabajador { get; set; } = null!;
+
         // Navegación - Un usuario puede tener múltiples roles
         public virtual ICollection<UsuarioRol> UsuariosRoles { get; set; } = new List<UsuarioRol>();
     }

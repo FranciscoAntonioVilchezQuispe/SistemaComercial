@@ -16,6 +16,7 @@ namespace Ventas.API.Domain.DTOs
         public long IdCliente { get; set; }
         public string NombreCliente { get; set; } = string.Empty;
         public string NumeroDocumentoCliente { get; set; } = string.Empty;
+        public string DireccionCliente { get; set; } = string.Empty;
         public long IdUsuarioVendedor { get; set; }
         public long? IdCotizacionOrigen { get; set; }
         public long IdTipoComprobante { get; set; }

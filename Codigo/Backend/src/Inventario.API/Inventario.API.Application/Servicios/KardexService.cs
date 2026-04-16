@@ -4,6 +4,7 @@ using Inventario.API.Domain.Entidades.Kardex;
 using Inventario.API.Domain.Interfaces;
 using System;
 using System.Threading.Tasks;
+using Nucleo.Comun.Domain.Helpers;
 
 namespace Inventario.API.Application.Servicios
 {
@@ -37,7 +38,7 @@ namespace Inventario.API.Application.Servicios
 
             mov.Anulado = true;
             mov.MotivoAnulacion = motivoAnulacion;
-            mov.FechaAnulacion = DateTime.UtcNow.Date;
+            mov.FechaAnulacion = DateTimeHelper.ObtenerAhoraLima().Date;
             mov.UsuarioAnulacionId = usuarioId;
 
             await _kardexRepo.ActualizarAsync(mov);

@@ -2,6 +2,7 @@ using Compras.API.Domain.Entidades;
 using Microsoft.EntityFrameworkCore;
 using Compras.API.Application.Interfaces;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Nucleo.Comun.Domain.Helpers;
 using System.Reflection;
 
 namespace Compras.API.Infrastructure.Datos
@@ -62,27 +63,9 @@ namespace Compras.API.Infrastructure.Datos
 
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
-            var entries = ChangeTracker.Entries()
-                .Where(e => e.State == EntityState.Added || e.State == EntityState.Modified);
+            // Aplicar auditoría centralizada (Estandarización Global)
+            DbContextAuditHelper.AplicarAuditoriaDirecta(ChangeTracker, "API_USER");
 
-            foreach (var entry in entries)
-            {
-                // 1. Auditoría para EntidadBase
-                if (entry.Entity is Nucleo.Comun.Domain.EntidadBase baseEntity)
-                {
-                    if (entry.State == EntityState.Added)
-                    {
-                        baseEntity.FechaCreacion = DateTime.UtcNow;
-                        baseEntity.UsuarioCreacion = "API_USER";
-                        baseEntity.Activado = true;
-                    }
-                    else
-                    {
-                        baseEntity.FechaActualizacion = DateTime.UtcNow;
-                        baseEntity.UsuarioActualizacion = "API_USER";
-                    }
-                }
-            }
             return base.SaveChangesAsync(cancellationToken);
         }
 

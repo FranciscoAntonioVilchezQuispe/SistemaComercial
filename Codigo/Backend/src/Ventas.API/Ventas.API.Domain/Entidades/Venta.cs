@@ -154,6 +154,12 @@ namespace Ventas.API.Domain.Entidades
         [ForeignKey("IdCaja")]
         public virtual Caja? Caja { get; set; }
 
+        [Column("id_turno_vendedor")]
+        public long? TurnoVendedorId { get; set; }
+
+        [ForeignKey("TurnoVendedorId")]
+        public virtual TurnoVendedor? TurnoVendedor { get; set; }
+
         public virtual ICollection<DetalleVenta> Detalles { get; set; } = new List<DetalleVenta>();
         public virtual ICollection<Pago> Pagos { get; set; } = new List<Pago>();
     }

@@ -41,6 +41,7 @@ export function PaginaCotizaciones() {
   const tabsVentas = [
     { label: RUTAS_TITULOS["/ventas/pos"], to: "/ventas/pos" },
     { label: RUTAS_TITULOS["/ventas/lista"], to: "/ventas/lista" },
+    { label: RUTAS_TITULOS["/ventas/notas"], to: "/ventas/notas" },
     { label: RUTAS_TITULOS["/ventas/cotizaciones"], to: "/ventas/cotizaciones" },
     { label: RUTAS_TITULOS["/clientes"], to: "/clientes" },
   ];

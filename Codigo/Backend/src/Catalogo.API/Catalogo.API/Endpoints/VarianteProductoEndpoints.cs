@@ -55,7 +55,6 @@ namespace Catalogo.API.Endpoints
                 existente.AtributosJson = dto.AtributosJson;
                 existente.PrecioAdicional = dto.PrecioAdicional;
                 existente.UsuarioActualizacion = "SISTEMA";
-                existente.FechaActualizacion = DateTime.UtcNow;
 
                 await repo.ActualizarAsync(existente);
                 return Results.Ok(new ToReturn<VarianteProducto>(existente));

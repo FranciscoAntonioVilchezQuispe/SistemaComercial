@@ -7,6 +7,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using Nucleo.Comun.Domain;
 using System;
+using Dapper;
+using System.Data;
+using Inventario.API.Domain.DTOs.Reportes;
 
 namespace Inventario.API.Infrastructure.Repositorios
 {
@@ -120,6 +123,47 @@ namespace Inventario.API.Infrastructure.Repositorios
                 Console.Error.WriteLine($"Detalle: Almacen={idAlmacen}, Producto={idProducto}, Pagina={pagina} | Mensaje: {ex.Message}");
                 Console.Error.WriteLine($"Stack: {ex.StackTrace}");
                 throw new AppException("StockRepositorio", "Error al realizar consulta paginada de stock", new { idAlmacen, idProducto, pagina, elementosPorPagina }, ex);
+            }
+        }
+        public async Task<(IEnumerable<StockCriticoDto> Datos, int Total)> ObtenerStockCriticoPaginadoAsync(long? idAlmacen, int pagina, int elementosPorPagina)
+        {
+            try
+            {
+                var connection = _context.Database.GetDbConnection();
+                if (connection.State != ConnectionState.Open)
+                    await connection.OpenAsync();
+
+                var offset = (pagina - 1) * elementosPorPagina;
+                
+                var sql = @"
+                    SELECT 
+                        s.id_producto AS IdProducto,
+                        p.codigo_producto AS CodigoProducto,
+                        p.nombre_producto AS NombreProducto,
+                        s.id_almacen AS IdAlmacen,
+                        a.nombre AS NombreAlmacen,
+                        s.cantidad_actual AS CantidadActual,
+                        p.stock_minimo AS StockMinimo,
+                        COUNT(*) OVER() AS Total
+                    FROM inventario.stock s
+                    INNER JOIN inventario.almacenes a ON s.id_almacen = a.id_almacen
+                    INNER JOIN catalogo.productos p ON s.id_producto = p.id_producto
+                    WHERE s.cantidad_actual <= p.stock_minimo
+                      AND (@idAlmacen IS NULL OR s.id_almacen = @idAlmacen)
+                    ORDER BY (s.cantidad_actual - p.stock_minimo) ASC
+                    LIMIT @pageSize OFFSET @offset;";
+
+                var parameters = new { idAlmacen, pageSize = elementosPorPagina, offset };
+                
+                var rows = await connection.QueryAsync<StockCriticoDto>(sql, parameters);
+                var total = rows.FirstOrDefault()?.Total ?? 0;
+
+                return (rows, total);
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"[ERROR] [StockRepositorio] [ObtenerStockCriticoPaginadoAsync] → Error al obtener reporte de stock crítico");
+                throw new AppException("StockRepositorio", "Error al obtener reporte de stock crítico", new { idAlmacen, pagina }, ex);
             }
         }
     }

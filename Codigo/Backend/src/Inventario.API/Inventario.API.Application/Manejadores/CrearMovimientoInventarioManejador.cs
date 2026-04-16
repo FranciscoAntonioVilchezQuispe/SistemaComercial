@@ -5,6 +5,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System;
 using Inventario.API.Application.DTOs;
+using Nucleo.Comun.Domain.Helpers;
 
 namespace Inventario.API.Application.Manejadores
 {
@@ -117,7 +118,7 @@ namespace Inventario.API.Application.Manejadores
                     CantidadActual = 0,
                     CantidadReservada = 0,
                     UsuarioCreacion = "SISTEMA",
-                    FechaCreacion = DateTime.UtcNow
+                    FechaCreacion = DateTimeHelper.ObtenerAhoraLima()
                 };
                 _context.Stocks.Add(stock);
             }
@@ -158,8 +159,10 @@ namespace Inventario.API.Application.Manejadores
             stock.ValorTotal = nuevoValorTotal;
             stock.CostoPromedio = nuevoCostoPromedio;
 
-            // 4. Crear Movimiento
-
+            // --- NORMALIZACIÓN DE HORA COMERCIAL (SUNAT REORDENAMIENTO) ---
+            TimeSpan horaComercial = _validacionSunat.ObtenerHoraComercial(request.ReferenciaModulo ?? "", tipoComprobanteSunat);
+            DateTime fechaFinal = (request.FechaMovimiento ?? DateTimeHelper.ObtenerAhoraLima()).Date.Add(horaComercial);
+            
             // 4. Crear Movimiento
             var movimiento = new MovimientoInventario
             {
@@ -176,12 +179,12 @@ namespace Inventario.API.Application.Manejadores
                 IdReferencia = request.IdReferencia,
                 Observaciones = request.Observaciones,
                 UsuarioCreacion = "SISTEMA",
-                FechaCreacion = request.FechaMovimiento ?? DateTime.UtcNow,
+                FechaCreacion = fechaFinal,  // Usar fecha normalizada
 
                 // Nuevos campos para Sincronización Total (SUNAT)
                 TipoDocumento = tipoComprobanteSunat,
                 SerieDocumento = request.SerieDocumento ?? string.Empty,
-                NumeroDocumento = request.NumeroDocumento ?? string.Empty,
+                NumeroDocumento = (request.NumeroDocumento ?? "0").PadLeft(8, '0'),
                 CodigoOperacionSunat = request.CodigoOperacionSunat ?? string.Empty
             };
 
@@ -230,7 +233,7 @@ namespace Inventario.API.Application.Manejadores
                 ModuloOrigen = request.ReferenciaModulo ?? "SISTEMA",
                 TipoDocumento = tipoComprobanteSunat,
                 SerieDocumento = string.IsNullOrWhiteSpace(request.SerieDocumento) ? "-" : request.SerieDocumento,
-                NumeroDocumento = string.IsNullOrWhiteSpace(request.NumeroDocumento) ? "0" : request.NumeroDocumento,
+                NumeroDocumento = (request.NumeroDocumento ?? "0").PadLeft(8, '0'),
                 TipoOperacion = factor > 0 ? "E" : "S",
                 MotivoTrasladoSunat = motivoSunat,
                 DescripcionMovimiento = request.Observaciones ?? tipoMovimiento.Nombre,
@@ -240,8 +243,8 @@ namespace Inventario.API.Application.Manejadores
                 ReferenciaId = request.IdReferencia,
                 ReferenciaTipo = request.ReferenciaModulo,
                 UsuarioRegistroId = 1,
-                FechaMovimiento = request.FechaMovimiento?.Date ?? DateTime.UtcNow,
-                HoraMovimiento = request.FechaMovimiento?.TimeOfDay ?? DateTime.UtcNow.TimeOfDay,
+                FechaMovimiento = fechaFinal.Date,
+                HoraMovimiento = fechaFinal.TimeOfDay,
                 Cantidad = request.Cantidad,
                 CostoUnitarioIngreso = factor > 0 ? costoUnitarioMovimiento : null,
                 CodigoOperacionSunat = request.CodigoOperacionSunat ?? (factor > 0 ? "02" : "01"), 

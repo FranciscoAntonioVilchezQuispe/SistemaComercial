@@ -20,6 +20,7 @@ export interface ClienteResumen {
   idListaPrecioAsignada?: number;
   diasCredito?: number;
   idTipoCliente: number;
+  limiteCredito?: number;
   activado: boolean;
 }
 

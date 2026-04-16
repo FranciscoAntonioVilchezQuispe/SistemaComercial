@@ -8,8 +8,10 @@ import { formatearMoneda, formatearFechaHora } from "@compartido/utilidades";
 import { Badge } from "@/components/ui/badge";
 import { NotaResumen } from "../tipos/notas.types";
 import { servicioVentas } from "../servicios/servicioVentas";
-import { toast } from "sonner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { Eye } from "lucide-react";
+import { ModalVistaPreviaNotaSunat } from "@/compartido/componentes/documentos/ModalVistaPreviaNotaSunat";
 
 import { EstadoDocumento } from "@compartido/enums";
 
@@ -37,6 +39,10 @@ export function PaginaNotas() {
   const [dataRe, setDataRe] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
 
+  // Estados para Vista Previa
+  const [idSeleccionado, setIdSeleccionado] = useState<number | null>(null);
+  const [mostrarVistaPrevia, setMostrarVistaPrevia] = useState(false);
+
   useEffect(() => {
     fetchNotas();
   }, [paginacion.pageNumber, paginacion.pageSize, paginacion.search, tipoRender]);
@@ -61,6 +67,11 @@ export function PaginaNotas() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleVerDetalle = (id: number) => {
+    setIdSeleccionado(id);
+    setMostrarVistaPrevia(true);
   };
 
   const tabsVentas = [
@@ -130,6 +141,19 @@ export function PaginaNotas() {
           {nota.estadoCpe}
         </Badge>
       ),
+    },
+    {
+      header: "Acciones",
+      cell: (nota: NotaResumen) => (
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          title="Ver Detalle"
+          onClick={() => handleVerDetalle(nota.idNota)}
+        >
+          <Eye className="h-4 w-4 text-primary" />
+        </Button>
+      ),
     }
   ];
 
@@ -147,6 +171,7 @@ export function PaginaNotas() {
           </TabsList>
         </div>
 
+        {/* NC Content */}
         <TabsContent value="credito">
           <Card>
             <CardContent className="p-6">
@@ -164,6 +189,7 @@ export function PaginaNotas() {
           </Card>
         </TabsContent>
         
+        {/* ND Content */}
         <TabsContent value="debito">
           <Card>
             <CardContent className="p-6">
@@ -181,6 +207,17 @@ export function PaginaNotas() {
           </Card>
         </TabsContent>
       </Tabs>
+
+      {/* Modal de Vista Previa Compartido */}
+      {idSeleccionado && (
+        <ModalVistaPreviaNotaSunat
+          id={idSeleccionado}
+          tipo={tipoRender === "CREDITO" ? "NC" : "ND"}
+          modulo="VENTAS"
+          open={mostrarVistaPrevia}
+          onOpenChange={setMostrarVistaPrevia}
+        />
+      )}
     </div>
   );
 }

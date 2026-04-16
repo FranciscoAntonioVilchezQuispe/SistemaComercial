@@ -13,6 +13,8 @@ namespace Ventas.API.Application.Interfaces
         DbSet<Ventas.API.Domain.Entidades.Pago> Pagos { get; set; }
         DbSet<Ventas.API.Domain.Entidades.MetodoPago> MetodosPago { get; set; }
         DbSet<Ventas.API.Domain.Entidades.Cliente> Clientes { get; set; }
+        DbSet<Ventas.API.Domain.Entidades.TurnoVendedor> TurnosVendedor { get; set; }
+        DbSet<Ventas.API.Domain.Entidades.CierreTurno> CierresTurno { get; set; }
         DbSet<Ventas.API.Domain.Entidades.Referencias.CatalogoReferencia> Catalogos { get; set; }
         DbSet<Ventas.API.Domain.Entidades.Referencias.SeriesComprobante> SeriesComprobantes { get; set; }
         DbSet<Ventas.API.Domain.Entidades.NotaCredito> NotasCredito { get; set; }
@@ -26,6 +28,8 @@ namespace Ventas.API.Application.Interfaces
         DbSet<Ventas.API.Domain.Entidades.VentaCuotaPago> CuotasPago { get; set; }
         DbSet<Ventas.API.Domain.Entidades.Referencias.ReglaDocumentoReferencia> ReglasDocumentoRef { get; set; }
         DbSet<Ventas.API.Domain.Entidades.Referencias.TipoDocumentoReferencia> TiposDocumentoRef { get; set; }
+        DbSet<Ventas.API.Domain.Entidades.Referencias.ProductoRef> ProductosRef { get; set; }
+        DbSet<Ventas.API.Domain.Entidades.Referencias.TipoAfectacionIgvRef> TiposAfectacionIgvRef { get; set; }
         Microsoft.EntityFrameworkCore.Infrastructure.DatabaseFacade Database { get; }
 
         Task<int> SaveChangesAsync(CancellationToken cancellationToken);

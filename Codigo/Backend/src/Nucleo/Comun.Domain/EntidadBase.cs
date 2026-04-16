@@ -14,7 +14,7 @@ namespace Nucleo.Comun.Domain
         public bool Activado { get; set; } = true;
 
         [Column("fecha_creacion")]
-        public DateTime FechaCreacion { get; set; } = DateTime.UtcNow;
+        public DateTime FechaCreacion { get; set; } = Helpers.DateTimeHelper.ObtenerAhoraLima();
 
         [MaxLength(100)]
         [Column("usuario_creacion")]

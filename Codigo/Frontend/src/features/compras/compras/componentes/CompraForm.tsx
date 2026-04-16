@@ -2,9 +2,7 @@ import React from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { format } from "date-fns";
-import { es } from "date-fns/locale";
-import { Search, CalendarIcon, Trash2, Plus, Check } from "lucide-react";
+import { Search, Check, Trash2, Plus } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -29,11 +27,13 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
-import { Calendar } from "@/components/ui/calendar";
-import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
+import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 
+import { DatePicker } from "@/componentes/ui/date-picker";
+import { FISCAL_CONFIG } from "@compartido/configuracion/fiscal.config";
+import { getCurrentDateTime } from "@/lib/datetime";
 import { useRegistrarCompra } from "../hooks/useCompras";
 import { SelectorTipoComprobante } from "@/compartido/componentes/formularios/SelectorTipoComprobante";
 import { SelectorCatalogo } from "@/compartido/componentes/formularios/SelectorCatalogo";
@@ -247,12 +247,6 @@ const ProductInput = ({
   );
 };
 
-// ... (imports consolidados arriba)
-
-// Eliminamos ProviderSelector local que estaba aquí
-
-// ... (imports existentes)
-
 export function CompraForm({
   onSuccess,
   onCancel,
@@ -280,7 +274,6 @@ export function CompraForm({
   const { data: qAlmacenes } = useAlmacenes();
   const almacenes = qAlmacenes?.datos || [];
   const { data: tiposOperacion = [] } = useTiposOperacionSunat();
-  // Se quitó la carga masiva inicial de productos
 
   const form = useForm<CompraFormValues>({
     resolver: zodResolver(compraSchema),
@@ -292,7 +285,7 @@ export function CompraForm({
       tipoComprobante: "",
       serieComprobante: "",
       numeroComprobante: "",
-      fechaEmision: new Date(),
+      fechaEmision: getCurrentDateTime(),
       fechaVencimiento: null,
       tipoCambio: 1.0,
       tipoOperacion: "0201", // Compra Interna (estándar para Ingresos)
@@ -370,7 +363,7 @@ export function CompraForm({
   React.useEffect(() => {
     if (datosIniciales) {
       form.reset({
-        fechaEmision: new Date(),
+        fechaEmision: getCurrentDateTime(),
         tipoCambio: 1.0,
         ...datosIniciales,
       });
@@ -449,7 +442,8 @@ export function CompraForm({
       else if (curr.afectacionIgv === "30") baseInafecta += sub;
     });
 
-    const impuesto = baseGravada * 0.18; // Asumiendo 18% para gravados
+    const igvRatio = FISCAL_CONFIG.PORCENTAJE_IGV / 100;
+    const impuesto = baseGravada * igvRatio; // Usando configuración fiscal centralizada
     const total = baseGravada + baseExonerada + baseInafecta + impuesto;
 
     // Construir payload que coincida con CompraDto del backend
@@ -663,51 +657,21 @@ export function CompraForm({
           </div>
 
           {/* Bloque Comprobante */}
-          <div className="md:col-span-1">
-            <FormField
-              control={form.control}
-              name="fechaEmision"
-              render={({ field }) => (
-                <FormItem className="flex flex-col">
-                  <FormLabel>Fecha Emisión</FormLabel>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <FormControl>
-                        <Button
-                          variant={"outline"}
-                          className={cn(
-                            "w-full pl-3 text-left font-normal",
-                            !field.value && "text-muted-foreground",
-                          )}
-                        >
-                          {field.value ? (
-                            format(field.value, "PPP", { locale: es })
-                          ) : (
-                            <span>Seleccione fecha</span>
-                          )}
-                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                        </Button>
-                      </FormControl>
-                    </PopoverTrigger>
-                    {!readOnly && (
-                      <PopoverContent className="w-auto p-0" align="start">
-                        <Calendar
-                          mode="single"
-                          selected={field.value}
-                          onSelect={field.onChange}
-                          disabled={(date) =>
-                            date > new Date() || date < new Date("1900-01-01")
-                          }
-                          initialFocus
-                        />
-                      </PopoverContent>
-                    )}
-                  </Popover>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
+              <FormField
+                control={form.control}
+                name="fechaEmision"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col">
+                    <FormLabel>Fecha Emisión</FormLabel>
+                    <DatePicker
+                      date={field.value}
+                      setDate={field.onChange}
+                      disabled={readOnly}
+                    />
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
           <div className="md:col-span-1">
             <FormField
@@ -716,36 +680,11 @@ export function CompraForm({
               render={({ field }) => (
                 <FormItem className="flex flex-col">
                   <FormLabel>Vencimiento (Opcional)</FormLabel>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <FormControl>
-                        <Button
-                          variant={"outline"}
-                          className={cn(
-                            "w-full pl-3 text-left font-normal",
-                            !field.value && "text-muted-foreground",
-                          )}
-                        >
-                          {field.value ? (
-                            format(field.value, "PPP", { locale: es })
-                          ) : (
-                            <span>Seleccione fecha</span>
-                          )}
-                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                        </Button>
-                      </FormControl>
-                    </PopoverTrigger>
-                    {!readOnly && (
-                      <PopoverContent className="w-auto p-0" align="start">
-                        <Calendar
-                          mode="single"
-                          selected={field.value ?? undefined}
-                          onSelect={field.onChange}
-                          initialFocus
-                        />
-                      </PopoverContent>
-                    )}
-                  </Popover>
+                  <DatePicker
+                    date={field.value ?? undefined}
+                    setDate={field.onChange}
+                    disabled={readOnly}
+                  />
                   <FormMessage />
                 </FormItem>
               )}
@@ -1114,7 +1053,7 @@ export function CompraForm({
               <span>{formatMoneda(subtotalCalc)}</span>
             </div>
             <div className="flex justify-end gap-4 text-muted-foreground w-48 border-b pb-2">
-              <span>IGV (18%):</span>
+              <span>IGV ({FISCAL_CONFIG.PORCENTAJE_IGV}%):</span>
               <span>{formatMoneda(impuestoCalc)}</span>
             </div>
             <div className="flex justify-end gap-4 text-xl font-bold w-48 pt-1">

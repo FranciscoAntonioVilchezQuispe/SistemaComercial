@@ -2,6 +2,7 @@ using Inventario.API.Application.Comandos.Kardex;
 using Inventario.API.Domain.Entidades.Kardex;
 using Inventario.API.Domain.Interfaces;
 using MediatR;
+using Nucleo.Comun.Domain.Helpers;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -34,9 +35,9 @@ namespace Inventario.API.Application.Manejadores.Kardex
                 {
                     Periodo = request.Periodo,
                     Estado = "C",
-                    FechaCierre = DateTime.UtcNow.Date,
+                    FechaCierre = DateTimeHelper.ObtenerAhoraLima().Date,
                     UsuarioCierreId = request.UsuarioId,
-                    CreatedAt = DateTime.UtcNow
+                    CreatedAt = DateTimeHelper.ObtenerAhoraLima()
                 };
                 await _periodoRepo.AgregarAsync(periodoActual);
             }
@@ -48,9 +49,9 @@ namespace Inventario.API.Application.Manejadores.Kardex
                 }
 
                 periodoActual.Estado = "C";
-                periodoActual.FechaCierre = DateTime.UtcNow.Date;
+                periodoActual.FechaCierre = DateTimeHelper.ObtenerAhoraLima().Date;
                 periodoActual.UsuarioCierreId = request.UsuarioId;
-                periodoActual.UpdatedAt = DateTime.UtcNow;
+                periodoActual.UpdatedAt = DateTimeHelper.ObtenerAhoraLima();
 
                 await _periodoRepo.ActualizarAsync(periodoActual);
             }

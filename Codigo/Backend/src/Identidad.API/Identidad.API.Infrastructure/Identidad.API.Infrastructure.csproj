@@ -13,4 +13,8 @@
     <ProjectReference Include="..\Identidad.API.Application\Identidad.API.Application.csproj" />
     <ProjectReference Include="..\Identidad.API.Domain\Identidad.API.Domain.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.0" />
+  </ItemGroup>
 </Project>

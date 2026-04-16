@@ -738,6 +738,82 @@ namespace Configuracion.API.Infrastructure.Migrations
                     b.ToTable("tablas_generales_detalle", "configuracion");
                 });
 
+            modelBuilder.Entity("Configuracion.API.Domain.Entidades.TipoAfectacionIgv", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_afectacion");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<bool>("Activado")
+                        .HasColumnType("boolean")
+                        .HasColumnName("activado");
+
+                    b.Property<string>("Codigo")
+                        .IsRequired()
+                        .HasMaxLength(2)
+                        .HasColumnType("character varying(2)")
+                        .HasColumnName("codigo_sunat");
+
+                    b.Property<string>("CodigoTributoDefault")
+                        .HasMaxLength(4)
+                        .HasColumnType("character varying(4)")
+                        .HasColumnName("codigo_tributo_default");
+
+                    b.Property<string>("Descripcion")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)")
+                        .HasColumnName("descripcion");
+
+                    b.Property<bool>("EsExonerado")
+                        .HasColumnType("boolean")
+                        .HasColumnName("es_exonerado");
+
+                    b.Property<bool>("EsGratuito")
+                        .HasColumnType("boolean")
+                        .HasColumnName("es_gratuito");
+
+                    b.Property<bool>("EsGravado")
+                        .HasColumnType("boolean")
+                        .HasColumnName("es_gravado");
+
+                    b.Property<bool>("EsInafecto")
+                        .HasColumnType("boolean")
+                        .HasColumnName("es_inafecto");
+
+                    b.Property<DateTime?>("FechaActualizacion")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fecha_modificacion");
+
+                    b.Property<DateTime>("FechaCreacion")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fecha_creacion");
+
+                    b.Property<string>("NombreTributoDefault")
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)")
+                        .HasColumnName("nombre_tributo_default");
+
+                    b.Property<string>("UsuarioActualizacion")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("usuario_modificacion");
+
+                    b.Property<string>("UsuarioCreacion")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("usuario_creacion");
+
+                    b.HasKey("Id")
+                        .HasName("pk_tipo_afectacion_igv");
+
+                    b.ToTable("tipo_afectacion_igv", "configuracion");
+                });
+
             modelBuilder.Entity("Configuracion.API.Domain.Entidades.TipoComprobante", b =>
                 {
                     b.Property<long>("Id")
@@ -878,6 +954,67 @@ namespace Configuracion.API.Infrastructure.Migrations
                         .HasName("pk_tipo_operacion_sunat");
 
                     b.ToTable("tipo_operacion_sunat", "configuracion");
+                });
+
+            modelBuilder.Entity("Configuracion.API.Domain.Entidades.TipoTributo", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_tributo");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<bool>("Activado")
+                        .HasColumnType("boolean")
+                        .HasColumnName("activado");
+
+                    b.Property<string>("Codigo")
+                        .IsRequired()
+                        .HasMaxLength(4)
+                        .HasColumnType("character varying(4)")
+                        .HasColumnName("codigo_sunat");
+
+                    b.Property<string>("CodigoInternacional")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)")
+                        .HasColumnName("codigo_internacional");
+
+                    b.Property<string>("Descripcion")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("descripcion");
+
+                    b.Property<DateTime?>("FechaActualizacion")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fecha_modificacion");
+
+                    b.Property<DateTime>("FechaCreacion")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fecha_creacion");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("nombre");
+
+                    b.Property<string>("UsuarioActualizacion")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("usuario_modificacion");
+
+                    b.Property<string>("UsuarioCreacion")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("usuario_creacion");
+
+                    b.HasKey("Id")
+                        .HasName("pk_tipo_tributo");
+
+                    b.ToTable("tipo_tributo", "configuracion");
                 });
 
             modelBuilder.Entity("Configuracion.API.Domain.Entidades.Ubigeo", b =>

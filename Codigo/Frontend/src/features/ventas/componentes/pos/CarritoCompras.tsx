@@ -10,6 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
+import { FISCAL_CONFIG } from "@compartido/configuracion/fiscal.config";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useCarrito } from "../../hooks/useCarrito";
 import { formatearMoneda } from "@compartido/utilidades/moneda";
@@ -21,10 +22,14 @@ import { toast } from "sonner";
 import { useCrearVenta } from "../../hooks/useVentas";
 import { VentaFormData, DetalleVentaFormData } from "../../tipos/ventas.types";
 
-export function CarritoCompras() {
+export function CarritoCompras({ turnoId }: { turnoId?: number }) {
   const {
     items,
     subtotal,
+    subtotalGravado,
+    subtotalExonerado,
+    subtotalInafecto,
+    totalGratuito,
     descuento,
     igv,
     total,
@@ -84,7 +89,8 @@ export function CarritoCompras() {
         cantidad: item.cantidad,
         precioUnitario: item.precioUnitario,
         descuento: item.descuento,
-        codigoAfectacionIgv: item.producto.gravadoImpuesto ? "10" : "20", // 10=Gravado, 20=Exonerado
+        codigoAfectacionIgv: item.producto.idTipoAfectacionIgv === 2 ? "20" : 
+                             item.producto.idTipoAfectacionIgv === 3 ? "30" : "10", 
         descripcionProducto: item.producto.nombre
       }));
 
@@ -97,9 +103,10 @@ export function CarritoCompras() {
         numero: numero,
         tipoCambio: 1, // TODO: Obtener tipo de cambio actual.
         moneda: "PEN", // Ahora enviamos el string que el backend espera
-        subtotalGravado: subtotal,
+        subtotalGravado: subtotalGravado,
         totalImpuesto: igv,
         totalVenta: total,
+        turnoVendedorId: turnoId || 0,
         observaciones: `Método de pago: ${metodoPagoSeleccionado.nombre}`,
         detalles,
         pagos: [
@@ -269,7 +276,9 @@ export function CarritoCompras() {
                 </div>
               )}
               <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">IGV (18%):</span>
+                <span className="text-muted-foreground">
+                  {FISCAL_CONFIG.TRIBUTOS.IGV === "1000" ? "IGV" : "Impuesto"} ({FISCAL_CONFIG.PORCENTAJE_IGV}%):
+                </span>
                 <span>{formatearMoneda(igv)}</span>
               </div>
               <Separator />
@@ -323,7 +332,10 @@ export function CarritoCompras() {
           }
         }
         metodoPago={metodoPagoSeleccionado}
-        subtotal={subtotal}
+        subtotalGravado={subtotalGravado}
+        subtotalExonerado={subtotalExonerado}
+        subtotalInafecto={subtotalInafecto}
+        totalGratuito={totalGratuito}
         descuento={descuento}
         igv={igv}
         total={total}

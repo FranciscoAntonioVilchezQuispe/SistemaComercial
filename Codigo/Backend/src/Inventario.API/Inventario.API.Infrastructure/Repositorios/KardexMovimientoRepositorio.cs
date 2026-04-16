@@ -111,7 +111,7 @@ namespace Inventario.API.Infrastructure.Repositorios
                 FROM inventario.inv_kardex_movimiento km
                 WHERE (@idAlmacen IS NULL OR km.almacen_id = @idAlmacen)
                   AND (@idProducto IS NULL OR km.producto_id = @idProducto)
-                ORDER BY km.fecha_movimiento DESC, km.id DESC
+                ORDER BY km.fecha_movimiento DESC, km.hora_movimiento DESC, km.id DESC
                 LIMIT @elementosPorPagina OFFSET @offset;";
 
             var parameters = new { idAlmacen, idProducto, elementosPorPagina, offset };

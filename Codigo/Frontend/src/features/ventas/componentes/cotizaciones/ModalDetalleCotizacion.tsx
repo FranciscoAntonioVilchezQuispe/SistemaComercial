@@ -4,11 +4,11 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+} from "@/componentes/ui/dialog";
+import { Button } from "@/componentes/ui/button";
 import { useCotizacion } from "../../hooks/useVentas";
-import { formatearMoneda, formatearFechaHora } from "@compartido/utilidades";
-import { Badge } from "@/components/ui/badge";
+import { formatearMoneda, formatearFechaHora } from "@/compartido/utilidades";
+import { Badge } from "@/componentes/ui/badge";
 import {
   Table,
   TableBody,
@@ -16,7 +16,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from "@/componentes/ui/table";
 import { Loader2, FileText, Printer, CheckCircle2 } from "lucide-react";
 
 interface Props {
@@ -101,7 +101,7 @@ export function ModalDetalleCotizacion({ id, isOpen, onClose, onConvertir }: Pro
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {cotizacion?.detalles.map((item) => (
+                  {cotizacion?.detalles.map((item: any) => (
                     <TableRow key={item.id}>
                       <TableCell className="max-w-[300px] truncate">
                         {item.descripcionProducto}

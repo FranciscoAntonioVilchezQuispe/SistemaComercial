@@ -30,6 +30,20 @@ export const servicioInventario = {
   },
 
   /**
+   * Obtiene el reporte de productos con stock crítico (bajo el mínimo)
+   */
+  obtenerReporteStockCritico: async (
+    paginacion?: PagedRequest,
+    idAlmacen?: number,
+  ): Promise<PagedResponse<any>> => {
+    const params = { ...paginacion, idAlmacen };
+    const response: any = await apiInventario.get(`${API_URL}/stock/reporte-critico`, {
+      params,
+    });
+    return response;
+  },
+
+  /**
    * Obtiene el stock de un producto específico por almacenes
    */
   obtenerStockPorProducto: async (idProducto: number) => {

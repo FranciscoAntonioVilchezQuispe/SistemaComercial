@@ -5,7 +5,6 @@ import { usuarioPermisoService } from "../servicios/servicioUsuarioPermiso";
 import type { UsuarioRol, Menu } from "@/types/permisos.types";
 import { UsuariosList } from "../components/usuarios/UsuariosList";
 import { RolesAsignados } from "../components/usuarios/RolesAsignados";
-import { toast } from "sonner";
 
 // Tipo temporal para Usuario (debería venir del módulo existente)
 interface Usuario {

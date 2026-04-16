@@ -1,6 +1,7 @@
 using Identidad.API.Domain.Entidades;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Nucleo.Comun.Domain.Helpers;
 
 namespace Identidad.API.Infrastructure.Datos
 {
@@ -8,6 +9,14 @@ namespace Identidad.API.Infrastructure.Datos
     {
         public IdentidadDbContext(DbContextOptions<IdentidadDbContext> options) : base(options)
         {
+        }
+
+        public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        {
+            // Aplicar auditoría centralizada (Estandarización Global)
+            DbContextAuditHelper.AplicarAuditoriaDirecta(ChangeTracker);
+
+            return base.SaveChangesAsync(cancellationToken);
         }
 
         public DbSet<Trabajador> Trabajadores { get; set; }
@@ -24,6 +33,7 @@ namespace Identidad.API.Infrastructure.Datos
         public DbSet<RolMenu> RolesMenus { get; set; }
         public DbSet<RolMenuPermiso> RolesMenusPermisos { get; set; }
         public DbSet<UsuarioRol> UsuariosRoles { get; set; }
+        public DbSet<RefreshToken> RefreshTokens { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -45,6 +55,13 @@ namespace Identidad.API.Infrastructure.Datos
                 .HasIndex(ur => new { ur.IdUsuario, ur.IdRol })
                 .IsUnique();
                 
+            // Relación 1:1 Usuario - Trabajador
+            modelBuilder.Entity<Usuario>()
+                .HasOne(u => u.Trabajador)
+                .WithOne(t => t.Usuario)
+                .HasForeignKey<Usuario>(u => u.IdTrabajador)
+                .OnDelete(DeleteBehavior.Restrict);
+
             // Índice único para RolMenu
             modelBuilder.Entity<RolMenu>()
                 .HasIndex(rm => new { rm.IdRol, rm.IdMenu })

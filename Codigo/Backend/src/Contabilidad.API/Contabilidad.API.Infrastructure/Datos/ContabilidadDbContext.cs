@@ -1,6 +1,7 @@
 using Contabilidad.API.Domain.Entidades;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Nucleo.Comun.Domain.Helpers;
 
 namespace Contabilidad.API.Infrastructure.Datos
 {
@@ -35,21 +36,9 @@ namespace Contabilidad.API.Infrastructure.Datos
 
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
-            foreach (var entry in ChangeTracker.Entries<Nucleo.Comun.Domain.EntidadBase>())
-            {
-                switch (entry.State)
-                {
-                    case EntityState.Added:
-                        entry.Entity.FechaCreacion = DateTime.UtcNow;
-                        entry.Entity.UsuarioCreacion = "API_USER";
-                        entry.Entity.Activado = true;
-                        break;
-                    case EntityState.Modified:
-                        entry.Entity.FechaActualizacion = DateTime.UtcNow;
-                        entry.Entity.UsuarioActualizacion = "API_USER";
-                        break;
-                }
-            }
+            // Aplicar auditoría centralizada (Estandarización Global)
+            DbContextAuditHelper.AplicarAuditoriaDirecta(ChangeTracker, "API_USER");
+
             return base.SaveChangesAsync(cancellationToken);
         }
 

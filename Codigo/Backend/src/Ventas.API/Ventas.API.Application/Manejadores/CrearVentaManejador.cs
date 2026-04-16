@@ -10,6 +10,10 @@ using Nucleo.Comun.Domain;
 using Nucleo.Comun.Domain.Enums;
 using System.Linq;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+using Nucleo.Comun.Domain.Helpers;
+using Nucleo.Comun.Domain.Constants;
 
 namespace Ventas.API.Application.Manejadores
 {
@@ -30,7 +34,12 @@ namespace Ventas.API.Application.Manejadores
         {
             var dto = request.Venta;
 
-            // 0. Validar Relación Tipo Documento vs Tipo Comprobante (Regla SUNAT)
+            // 0. Obtener Porcentaje IGV dinámicamente de BD
+            var impuestoRef = await _context.ImpuestosRef
+                .FirstOrDefaultAsync(x => x.CodigoSunat == FiscalConstants.CODIGO_TRIBUTO_IGV, cancellationToken);
+            decimal porcentajeIgv = impuestoRef?.Porcentaje ?? FiscalConstants.PORCENTAJE_IGV;
+
+            // 0.1 Validar Relación Tipo Documento vs Tipo Comprobante (Regla SUNAT)
             var clienteInfo = await _context.Clientes
                 .Where(c => c.Id == dto.IdCliente || (dto.IdCliente <= 0 && c.NumeroDocumento == "00000000"))
                 .Select(c => new { c.Id, c.IdTipoDocumento })
@@ -45,13 +54,11 @@ namespace Ventas.API.Application.Manejadores
 
                 if (!string.IsNullOrEmpty(codigoDocumento))
                 {
-                    // Verificar si existen reglas configuradas para este tipo de documento
                     var reglasConfiguradas = await _context.ReglasDocumentoRef
                         .Where(r => r.CodigoDocumento == codigoDocumento && r.Activado)
                         .Select(r => r.IdTipoComprobante)
                         .ToListAsync(cancellationToken);
 
-                    // Si hay reglas, el comprobante seleccionado DEBE estar en la lista
                     if (reglasConfiguradas.Any() && !reglasConfiguradas.Contains(dto.IdTipoComprobante))
                     {
                         var nombreComprobante = await _context.TiposComprobanteRef
@@ -67,42 +74,63 @@ namespace Ventas.API.Application.Manejadores
             // 1. Obtener siguiente correlativo de forma atómica
             long numeroDocumento = await _ventaRepositorio.ObtenerSiguienteCorrelativoAsync(dto.IdAlmacen, dto.IdTipoComprobante, dto.Serie);
 
+            // 1.1 Obtener configuración fiscal de todos los productos en la venta
+            var idsProductos = dto.Detalles.Select(d => d.IdProducto).Distinct().ToList();
+            var productosConfig = await _context.ProductosRef
+                .Where(p => idsProductos.Contains(p.Id))
+                .Join(_context.TiposAfectacionIgvRef, 
+                    p => p.IdTipoAfectacionIgv, 
+                    a => a.Id, 
+                    (p, a) => new { p.Id, a.CodigoSunat, a.EsGravado, a.EsExonerado, a.EsInafecto, a.EsGratuito })
+                .ToDictionaryAsync(x => x.Id, x => x, cancellationToken);
+
             // 2. Mapear a Entidad e implementar cálculos de negocio (SUNAT)
             var detalles = new List<DetalleVenta>();
             decimal subtotalGravado = 0;
             decimal subtotalExonerado = 0;
             decimal subtotalInafecto = 0;
             decimal totalImpuesto = 0;
+            decimal totalGratuito = 0;
 
             foreach (var d in dto.Detalles)
             {
-                // Regla: Porcentaje de impuesto viene del backend o config (hardcoded 18% para Gravados temporalmente)
-                decimal porcentajeImpuesto = d.CodigoAfectacionIgv == "10" ? 18.0m : 0m;
+                // Obtener configuración fiscal real del producto
+                if (!productosConfig.TryGetValue(d.IdProducto, out var config))
+                {
+                    throw new AppException("PRODUCTO_VALIDACION", $"No se encontró la configuración fiscal para el producto ID: {d.IdProducto}");
+                }
+
+                string afectacion = config.CodigoSunat;
+                bool esGravado = config.EsGravado;
+                bool esGratuito = config.EsGratuito;
                 
-                // Cálculo de Precio Unitario Base (Sin IGV)
-                decimal precioUnitarioBase = d.CodigoAfectacionIgv == "10" 
-                    ? d.PrecioUnitario / (1 + (porcentajeImpuesto / 100))
+                decimal tasa = esGravado ? porcentajeIgv : 0m;
+                
+                // Cálculo de Precio Unitario Base (Desglosando IGV si es gravado)
+                decimal precioUnitarioBase = esGravado 
+                    ? Math.Round(d.PrecioUnitario / (1 + (tasa / 100)), 4)
                     : d.PrecioUnitario;
 
                 // Valor Item = (Base * Cantidad) - Descuento
-                decimal valorItem = (precioUnitarioBase * d.Cantidad) - d.DescuentoItem;
+                decimal subtotalLineaOriginal = precioUnitarioBase * d.Cantidad;
+                decimal valorItem = Math.Round(subtotalLineaOriginal - d.DescuentoItem, 2);
                 
                 // Impuesto Item
-                decimal impuestoItem = d.CodigoAfectacionIgv == "10"
-                    ? valorItem * (porcentajeImpuesto / 100)
+                decimal impuestoItem = esGravado
+                    ? Math.Round(valorItem * (tasa / 100), 2)
                     : 0;
 
                 // Total Item
                 decimal totalItem = valorItem + impuestoItem;
 
                 // Consistencia de Tributo (Catalogo 05)
-                string codigoTributo = d.CodigoAfectacionIgv switch
+                string codigoTributo = afectacion switch
                 {
-                    "10" => "1000", // IGV
-                    "20" => "9997", // EXO
-                    "30" => "9998", // INA
-                    "40" => "9995", // EXP
-                    _ => "1000"
+                    var a when a.StartsWith("1") => FiscalConstants.CODIGO_TRIBUTO_IGV, // IGV
+                    var a when a.StartsWith("2") => "9997", // EXO
+                    var a when a.StartsWith("3") => "9998", // INA
+                    var a when a == "40" => "9995",         // EXP
+                    _ => FiscalConstants.CODIGO_TRIBUTO_IGV
                 };
 
                 detalles.Add(new DetalleVenta
@@ -116,26 +144,36 @@ namespace Ventas.API.Application.Manejadores
                     PrecioUnitarioBase = precioUnitarioBase,
                     DescuentoItem = d.DescuentoItem,
                     ValorItem = valorItem,
-                    PorcentajeImpuesto = porcentajeImpuesto,
+                    PorcentajeImpuesto = tasa,
                     ImpuestoItem = impuestoItem,
                     TotalItem = totalItem,
-                    CodigoAfectacionIgv = d.CodigoAfectacionIgv,
+                    CodigoAfectacionIgv = afectacion,
                     CodigoTributo = codigoTributo
                 });
 
-                // Acumuladores para cabecera
-                if (d.CodigoAfectacionIgv == "10") subtotalGravado += valorItem;
-                else if (d.CodigoAfectacionIgv == "20") subtotalExonerado += valorItem;
-                else subtotalInafecto += valorItem;
+                // Acumuladores de cabecera
+                if (esGratuito) 
+                {
+                    totalGratuito += totalItem;
+                }
+                else
+                {
+                    if (esGravado) subtotalGravado += valorItem;
+                    else if (config.EsExonerado) subtotalExonerado += valorItem;
+                    else subtotalInafecto += valorItem;
 
-                totalImpuesto += impuestoItem;
+                    totalImpuesto += impuestoItem;
+                }
             }
 
-            var totalVenta = subtotalGravado + subtotalExonerado + subtotalInafecto + totalImpuesto - dto.TotalDescuentoGlobal;
+            // Totales de cabecera
+            var subtotalTotal = subtotalGravado + subtotalExonerado + subtotalInafecto;
+            var totalVenta = subtotalTotal + totalImpuesto - dto.TotalDescuentoGlobal;
+            
             var totalPagado = dto.Pagos?.Sum(p => p.MontoPago) ?? 0;
             var saldoPendiente = totalVenta - totalPagado;
             
-            // Determinar estado de pago (Tabla 13)
+            // Determinar estado de pago
             long idEstadoPago = (long)EstadoPago.Pendiente;
             if (saldoPendiente <= 0) idEstadoPago = (long)EstadoPago.Pagado;
             else if (totalPagado > 0) idEstadoPago = (long)EstadoPago.Parcial;
@@ -151,41 +189,42 @@ namespace Ventas.API.Application.Manejadores
                 IdTipoComprobante = dto.IdTipoComprobante,
                 Serie = dto.Serie,
                 Numero = numeroDocumento,
-                FechaEmision = dto.FechaEmision == default ? DateTime.UtcNow : dto.FechaEmision,
+                FechaEmision = dto.FechaEmision == default ? DateTimeHelper.ObtenerAhoraLima() : dto.FechaEmision,
                 FechaVencimientoPago = dto.FechaVencimientoPago,
                 IdEstado = (long)EstadoVenta.Completada,
                 Moneda = string.IsNullOrWhiteSpace(dto.Moneda) ? "PEN" : dto.Moneda,
                 TipoCambio = dto.TipoCambio > 0 ? dto.TipoCambio : 1.0m,
+                
+                // Persistencia de Totales según Normas SUNAT
                 SubtotalGravado = Math.Round(subtotalGravado, 2),
                 SubtotalExonerado = Math.Round(subtotalExonerado, 2),
                 SubtotalInafecto = Math.Round(subtotalInafecto, 2),
                 TotalImpuesto = Math.Round(totalImpuesto, 2),
                 TotalDescuentoGlobal = dto.TotalDescuentoGlobal,
                 TotalVenta = Math.Round(totalVenta, 2),
+                TotalGratuito = Math.Round(totalGratuito, 2),
+                
                 SaldoPendiente = Math.Round(saldoPendiente < 0 ? 0 : saldoPendiente, 2),
                 IdEstadoPago = idEstadoPago,
                 Observaciones = dto.Observaciones,
                 Detalles = detalles,
+                
+                // ID de Operación: Default a 0101 si no viene (Mapeo a Venta Interna)
+                IdTipoOperacion = dto.IdTipoOperacion > 0 ? dto.IdTipoOperacion : (long?)null, 
+                
                 Pagos = dto.Pagos?.Select(p => new Pago
                 {
                     IdMetodoPago = p.IdMetodoPago,
                     MontoPago = p.MontoPago,
                     ReferenciaPago = p.ReferenciaPago,
-                    FechaPago = p.FechaPago == default ? DateTime.UtcNow : p.FechaPago
+                    FechaPago = p.FechaPago == default ? DateTimeHelper.ObtenerAhoraLima() : p.FechaPago
                 }).ToList() ?? new List<Pago>()
             };
 
-            // Manejar Cliente "Público General" si Id es 0 (Ya obtenido al inicio en clienteInfo)
-            if (venta.IdCliente <= 0 && clienteInfo != null)
+            // Cliente "Público General" Fallback
+            if (venta.IdCliente <= 0)
             {
-                venta.IdCliente = clienteInfo.Id;
-            }
-            else if (venta.IdCliente <= 0)
-            {
-                // Fallback de seguridad si no se encontró en la validación inicial
-                var clienteDefault = await _context.Clientes
-                    .FirstOrDefaultAsync(c => c.NumeroDocumento == "00000000", cancellationToken);
-                venta.IdCliente = clienteDefault?.Id ?? 1;
+                venta.IdCliente = clienteInfo?.Id ?? 1;
             }
 
             // 3. Persistir Venta
@@ -210,6 +249,11 @@ namespace Ventas.API.Application.Manejadores
             dto.SaldoPendiente = venta.SaldoPendiente;
             dto.IdEstadoPago = venta.IdEstadoPago;
             dto.IdEstado = venta.IdEstado;
+            dto.SubtotalGravado = venta.SubtotalGravado;
+            dto.SubtotalExonerado = venta.SubtotalExonerado;
+            dto.SubtotalInafecto = venta.SubtotalInafecto;
+            dto.TotalImpuesto = venta.TotalImpuesto;
+            dto.TotalVenta = venta.TotalVenta;
             
             return dto;
         }

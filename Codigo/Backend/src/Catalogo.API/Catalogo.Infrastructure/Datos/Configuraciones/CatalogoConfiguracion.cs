@@ -35,6 +35,8 @@ namespace Catalogo.Infrastructure.Datos.Configuraciones
             builder.Property(x => x.PorcentajeImpuesto).HasPrecision(5, 2);
             builder.Property(x => x.StockMinimo).HasPrecision(10, 3);
             builder.Property(x => x.StockMaximo).HasPrecision(10, 3);
+            builder.Property(x => x.IdTipoAfectacionIgv).HasColumnName("id_afectacion_igv");
+            builder.Property(x => x.IdTipoTributo).HasColumnName("id_tipo_tributo");
 
             // Relaciones
             builder.Property(x => x.IdUnidadMedida).HasColumnName("id_unidad");

@@ -66,6 +66,8 @@ const PaginaOperacionesSunat = lazy(() =>
   ),
 );
 const PaginaMatrizReglas = lazy(() => import("@/features/configuracion/paginas/PaginaMatrizReglas").then((m) => ({ default: m.PaginaMatrizReglas })));
+const PaginaAfectacionIgv = lazy(() => import("@/features/configuracion/paginas/PaginaAfectacionIgv").then((m) => ({ default: m.PaginaAfectacionIgv })));
+const PaginaTiposTributo = lazy(() => import("@/features/configuracion/paginas/PaginaTiposTributo").then((m) => ({ default: m.PaginaTiposTributo })));
 const PaginaUbigeos = lazy(() => import("@/features/configuracion/paginas/PaginaUbigeos").then((m) => ({ default: m.PaginaUbigeos })));
 
 const PaginaPOS = lazy(() =>
@@ -91,6 +93,11 @@ const PaginaCompras = lazy(() =>
   })),
 );
 const PaginaOrdenesCompra = lazy(() => import("@/features/compras/ordenes-compra/paginas/PaginaOrdenCompra"));
+const PaginaNotasCompra = lazy(() =>
+  import("@/features/compras/compras/paginas/PaginaNotasCompra").then((m) => ({
+    default: m.PaginaNotasCompra,
+  })),
+);
 const PaginaVentas = lazy(() =>
   import("@/features/ventas/paginas/PaginaVentas").then((m) => ({
     default: m.PaginaVentas,
@@ -153,8 +160,21 @@ const PaginaTraslados = lazy(() =>
     default: m.PaginaTraslados,
   })),
 );
+const PaginaReportesHub = lazy(() =>
+  import("@/features/reportes/paginas/PaginaReportesHub").then((m) => ({
+    default: m.PaginaReportesHub,
+  })),
+);
+const PaginaReporteStockCritico = lazy(() => import("@/features/reportes/paginas/PaginaReporteStockCritico").then((m) => ({ default: m.PaginaReporteStockCritico })));
+const PaginaReporteRankingProductos = lazy(() => import("@/features/reportes/paginas/PaginaReporteRankingProductos"));
+const PaginaReporteTopClientes = lazy(() => import("@/features/reportes/paginas/PaginaReporteTopClientes"));
+const PaginaReporteComprasProveedor = lazy(() => import("@/features/reportes/paginas/PaginaReporteComprasProveedor"));
 
-// Estado de carga base
+// Identidad / Seguridad
+const PaginaUsuarios = lazy(() => import("@/features/identidad/pages/PaginaUsuarios").then((m) => ({ default: m.PaginaUsuarios })));
+const PaginaRoles = lazy(() => import("@/features/identidad/pages/PaginaRoles").then((m) => ({ default: m.PaginaRoles })));
+const PaginaTrabajadores = lazy(() => import("@/features/identidad/pages/PaginaTrabajadores").then((m) => ({ default: m.PaginaTrabajadores })));
+
 const CargandoPagina = () => (
   <div className="flex h-[calc(100vh-80px)] w-full items-center justify-center">
     <div className="flex flex-col items-center gap-4">
@@ -166,11 +186,26 @@ const CargandoPagina = () => (
   </div>
 );
 
+const PaginaLogin = lazy(() => import("@/features/identidad/pages/PaginaLogin").then((m) => ({ default: m.PaginaLogin })));
+import { RutaProtegida } from "@/compartido/componentes/seguridad/RutaProtegida";
+
 export const ruteador = createBrowserRouter(
   [
     {
+      path: "/login",
+      element: (
+        <Suspense fallback={<CargandoPagina />}>
+          <PaginaLogin />
+        </Suspense>
+      ),
+    },
+    {
       path: "/",
-      element: <LayoutPrincipal />,
+      element: (
+        <RutaProtegida>
+          <LayoutPrincipal />
+        </RutaProtegida>
+      ),
       children: [
         {
           index: true,
@@ -257,6 +292,22 @@ export const ruteador = createBrowserRouter(
           ),
         },
         {
+          path: "configuracion/afectacion-igv",
+          element: (
+            <Suspense fallback={<CargandoPagina />}>
+              <PaginaAfectacionIgv />
+            </Suspense>
+          ),
+        },
+        {
+          path: "configuracion/tipos-tributo",
+          element: (
+            <Suspense fallback={<CargandoPagina />}>
+              <PaginaTiposTributo />
+            </Suspense>
+          ),
+        },
+        {
           path: "configuracion/metodos-pago",
           element: (
             <Suspense fallback={<CargandoPagina />}>
@@ -326,6 +377,14 @@ export const ruteador = createBrowserRouter(
           element: (
             <Suspense fallback={<CargandoPagina />}>
               <PaginaCompras />
+            </Suspense>
+          ),
+        },
+        {
+          path: "compras/notas",
+          element: (
+            <Suspense fallback={<CargandoPagina />}>
+              <PaginaNotasCompra />
             </Suspense>
           ),
         },
@@ -422,6 +481,71 @@ export const ruteador = createBrowserRouter(
           element: (
             <Suspense fallback={<CargandoPagina />}>
               <PaginaPOS />
+            </Suspense>
+          ),
+        },
+        {
+          path: "reportes",
+          element: (
+            <Suspense fallback={<CargandoPagina />}>
+              <PaginaReportesHub />
+            </Suspense>
+          ),
+        },
+        {
+          path: "reportes/stock-critico",
+          element: (
+            <Suspense fallback={<CargandoPagina />}>
+              <PaginaReporteStockCritico />
+            </Suspense>
+          ),
+        },
+        {
+          path: "reportes/ranking-productos",
+          element: (
+            <Suspense fallback={<CargandoPagina />}>
+              <PaginaReporteRankingProductos />
+            </Suspense>
+          ),
+        },
+        {
+          path: "reportes/top-clientes",
+          element: (
+            <Suspense fallback={<CargandoPagina />}>
+              <PaginaReporteTopClientes />
+            </Suspense>
+          ),
+        },
+        {
+          path: "reportes/compras-proveedor",
+          element: (
+            <Suspense fallback={<CargandoPagina />}>
+              <PaginaReporteComprasProveedor />
+            </Suspense>
+          ),
+        },
+        // Módulo de Seguridad e Identidad
+        {
+          path: "seguridad/usuarios",
+          element: (
+            <Suspense fallback={<CargandoPagina />}>
+              <PaginaUsuarios />
+            </Suspense>
+          ),
+        },
+        {
+          path: "seguridad/roles",
+          element: (
+            <Suspense fallback={<CargandoPagina />}>
+              <PaginaRoles />
+            </Suspense>
+          ),
+        },
+        {
+          path: "seguridad/trabajadores",
+          element: (
+            <Suspense fallback={<CargandoPagina />}>
+              <PaginaTrabajadores />
             </Suspense>
           ),
         },

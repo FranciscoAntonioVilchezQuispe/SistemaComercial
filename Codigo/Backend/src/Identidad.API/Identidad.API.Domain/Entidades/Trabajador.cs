@@ -44,13 +44,10 @@ namespace Identidad.API.Domain.Entidades
         [Column("id_cargo")]
         public long? IdCargo { get; set; }
 
-        [Column("id_usuario")]
-        public long? IdUsuario { get; set; }
-
         [ForeignKey("IdCargo")]
         public virtual Cargo? Cargo { get; set; }
 
-        [ForeignKey("IdUsuario")]
+        // Navegación inversa
         public virtual Usuario? Usuario { get; set; }
     }
 }

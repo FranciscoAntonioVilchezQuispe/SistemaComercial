@@ -87,5 +87,6 @@ app.MapProveedorEndpoints();
 app.MapOrdenCompraEndpoints();
 app.MapCompraEndpoints();
 app.MapNotaSunatCompraEndpoints();
+app.MapReportesComprasEndpoints();
 
 app.Run();

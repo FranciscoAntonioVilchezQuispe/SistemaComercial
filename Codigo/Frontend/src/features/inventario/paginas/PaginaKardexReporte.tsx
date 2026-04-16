@@ -7,15 +7,15 @@ import {
   RefreshCcw,
   Database,
 } from "lucide-react";
-import { format } from "date-fns";
+import { format, parseISO, startOfMonth } from "date-fns";
+import { es } from "date-fns/locale";
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
 } from "@/componentes/ui/card";
-import { Button } from "@/componentes/ui/button";
-import { Input } from "@/componentes/ui/input";
+import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
@@ -28,7 +28,9 @@ import { BuscadorProductoOscuro } from "../componentes/BuscadorProductoOscuro";
 import { kardexService } from "../servicios/servicioKardex";
 import { servicioInventario } from "../servicios/servicioInventario";
 import { KardexReporteDto } from "../tipos/kardex";
-import { formatearMoneda } from "@/compartido/utilidades";
+import { formatearMoneda } from "@compartido/utilidades";
+import { DatePicker } from "@/componentes/ui/date-picker";
+import { DATE_CONFIG, formatDateForAPI } from "@/lib/datetime";
 
 import { ModuleTabBar } from "@/componentes/shared/ModuleTabBar";
 import { RUTAS_TITULOS } from "@/config/rutasTitulos";
@@ -46,8 +48,8 @@ import {
 type FormBusqueda = {
   almacenId: number;
   productoId: number;
-  desde: string;
-  hasta: string;
+  desde: Date;
+  hasta: Date;
 };
 
 export function PaginaKardexReporte() {
@@ -64,15 +66,13 @@ export function PaginaKardexReporte() {
 
   // (Búsqueda de Productos manejada por BuscadorProductoOscuro)
 
-  const { register, handleSubmit, getValues, setValue, control, watch } =
+  const { handleSubmit, getValues, setValue, control, watch } =
     useForm<FormBusqueda>({
       defaultValues: {
         almacenId: 0,
         productoId: 0,
-        desde: new Date(new Date().getFullYear(), new Date().getMonth(), 1)
-          .toISOString()
-          .slice(0, 10),
-        hasta: new Date().toISOString().slice(0, 10),
+        desde: startOfMonth(new Date()),
+        hasta: new Date(),
       },
     });
 
@@ -112,8 +112,8 @@ export function PaginaKardexReporte() {
       const resultado = await kardexService.obtenerReporte(
         Number(data.almacenId),
         Number(data.productoId),
-        data.desde,
-        data.hasta,
+        formatDateForAPI(data.desde) || "",
+        formatDateForAPI(data.hasta) || "",
         page,
         size
       );
@@ -141,7 +141,7 @@ export function PaginaKardexReporte() {
       await kardexService.recalcular({
         almacenId: Number(data.almacenId),
         productoId: Number(data.productoId),
-        desdeFecha: data.desde,
+        desdeFecha: formatDateForAPI(data.desde) || "",
         motivo: "Recálculo manual desde UI",
         usuarioId: 1,
       });
@@ -234,17 +234,37 @@ export function PaginaKardexReporte() {
                 />
               </div>
 
-              <div className="w-full md:w-40">
+              <div className="w-full md:w-48">
                 <label className="text-sm font-medium mb-1 block">
                   Fecha Inicio
                 </label>
-                <Input type="date" {...register("desde", { required: true })} />
+                <Controller
+                  name="desde"
+                  control={control}
+                  rules={{ required: true }}
+                  render={({ field }) => (
+                    <DatePicker
+                      date={field.value}
+                      setDate={(d) => field.onChange(d)}
+                    />
+                  )}
+                />
               </div>
-              <div className="w-full md:w-40">
+              <div className="w-full md:w-48">
                 <label className="text-sm font-medium mb-1 block">
                   Fecha Fin
                 </label>
-                <Input type="date" {...register("hasta", { required: true })} />
+                <Controller
+                  name="hasta"
+                  control={control}
+                  rules={{ required: true }}
+                  render={({ field }) => (
+                    <DatePicker
+                      date={field.value}
+                      setDate={(d) => field.onChange(d)}
+                    />
+                  )}
+                />
               </div>
               <div className="flex gap-2">
                 <Button
@@ -453,7 +473,7 @@ export function PaginaKardexReporte() {
                           className="border-b hover:bg-slate-50 text-right font-mono text-xs"
                         >
                           <td className="px-2 py-2 text-center text-slate-800">
-                            {format(new Date(fila.fecha), "dd/MM/yyyy")}
+                            {format(parseISO(fila.fecha), DATE_CONFIG.displayFormat, { locale: es })}
                           </td>
                           <td className="px-2 py-2 text-center text-slate-600 border-l">
                             {fila.tipoDocumentoSunat}

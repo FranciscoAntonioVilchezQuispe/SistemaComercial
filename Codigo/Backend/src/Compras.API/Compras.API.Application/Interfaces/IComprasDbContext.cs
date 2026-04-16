@@ -14,6 +14,11 @@ namespace Compras.API.Application.Interfaces
         DbSet<Compras.API.Domain.Entidades.NotaCreditoDetalleCompra> NotasCreditoDetalles { get; set; }
         DbSet<Compras.API.Domain.Entidades.NotaDebitoCompra> NotasDebito { get; set; }
         DbSet<Compras.API.Domain.Entidades.NotaDebitoDetalleCompra> NotasDebitoDetalles { get; set; }
+        DbSet<Compras.API.Domain.Entidades.Referencias.TipoDocumentoReferencia> TiposDocumentoRef { get; set; }
+        DbSet<Compras.API.Domain.Entidades.Referencias.TipoComprobanteReferencia> TiposComprobanteRef { get; set; }
+        DbSet<Compras.API.Domain.Entidades.Referencias.AlmacenReferencia> AlmacenesRef { get; set; }
+        DbSet<Compras.API.Domain.Entidades.Referencias.ProductoReferencia> ProductosRef { get; set; }
+        DbSet<Compras.API.Domain.Entidades.Maestros.UnidadMedida> UnidadesMedidaRef { get; set; }
         DbSet<Compras.API.Domain.Entidades.Referencias.SerieComprobanteReferencia> SeriesComprobantesRef { get; set; }
 
         Task<int> SaveChangesAsync(CancellationToken cancellationToken);

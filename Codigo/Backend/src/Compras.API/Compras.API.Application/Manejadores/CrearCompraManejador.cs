@@ -6,6 +6,7 @@ using Compras.API.Domain.Entidades;
 using Compras.API.Application.Eventos;
 using Nucleo.Comun.Domain;
 using Nucleo.Comun.Domain.Enums;
+using Nucleo.Comun.Domain.Helpers;
 
 namespace Compras.API.Application.Manejadores
 {
@@ -47,9 +48,9 @@ namespace Compras.API.Application.Manejadores
                 IdTipoComprobante = dto.IdTipoComprobante,
                 SerieComprobante = dto.SerieComprobante,
                 NumeroComprobante = dto.NumeroComprobante,
-                FechaEmision = (dto.FechaEmision == default ? DateTime.UtcNow : dto.FechaEmision).ToUniversalTime(),
-                FechaContable = (dto.FechaContable == default ? DateTime.UtcNow : dto.FechaContable).ToUniversalTime(),
-                FechaVencimiento = dto.FechaVencimiento?.ToUniversalTime(),
+                FechaEmision = dto.FechaEmision == default ? DateTimeHelper.ObtenerAhoraLima() : dto.FechaEmision,
+                FechaContable = dto.FechaContable == default ? DateTimeHelper.ObtenerAhoraLima() : dto.FechaContable,
+                FechaVencimiento = dto.FechaVencimiento,
                 Moneda = dto.Moneda,
                 TipoCambio = dto.TipoCambio,
                 Subtotal = dto.Subtotal,

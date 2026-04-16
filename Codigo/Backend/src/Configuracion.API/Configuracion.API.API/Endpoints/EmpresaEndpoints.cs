@@ -36,7 +36,6 @@ namespace Configuracion.API.Endpoints
                 empresa.LogoUrl = dto.LogoUrl;
                 empresa.MonedaPrincipal = dto.MonedaPrincipal;
                 empresa.UsuarioActualizacion = "SISTEMA";
-                empresa.FechaActualizacion = DateTime.UtcNow;
 
                 await repo.ActualizarAsync(empresa);
                 return Results.Ok(new ToReturn<Empresa>(empresa));

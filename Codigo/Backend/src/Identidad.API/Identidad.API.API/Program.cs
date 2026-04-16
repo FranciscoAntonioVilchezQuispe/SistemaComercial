@@ -12,7 +12,8 @@ builder.AddCentralizedLogging();
 // Add services to the container.
 builder.Services.AddDbContext<IdentidadDbContext>(options =>
 {
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"),
+        x => x.MigrationsHistoryTable("__ef_migrations_history", "identidad"));
     options.UseSnakeCaseNamingConvention();
 });
 
@@ -20,6 +21,14 @@ builder.Services.AddDbContext<IdentidadDbContext>(options =>
 builder.Services.AddScoped<IUsuarioRepositorio, UsuarioRepositorio>();
 builder.Services.AddScoped<IRolRepositorio, RolRepositorio>();
 builder.Services.AddScoped<IPermisoRepositorio, PermisoRepositorio>();
+builder.Services.AddScoped<ITrabajadorRepositorio, TrabajadorRepositorio>();
+builder.Services.AddScoped<ICargoRepositorio, CargoRepositorio>();
+builder.Services.AddScoped<IAreaRepositorio, AreaRepositorio>();
+builder.Services.AddScoped<Identidad.API.Domain.Interfaces.IRefreshTokenRepositorio, RefreshTokenRepositorio>();
+
+builder.Services.AddScoped<Identidad.API.Application.Contratos.IPasswordHasher, Identidad.API.Infrastructure.Servicios.BCryptPasswordHasher>();
+builder.Services.AddScoped<Identidad.API.Application.Contratos.ITokenService, Identidad.API.Infrastructure.Servicios.JwtTokenService>();
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(AppDomain.CurrentDomain.GetAssemblies()));
 
 // Registros del sistema de permisos granulares
 builder.Services.AddScoped<IMenuRepositorio, MenuRepositorio>();
@@ -63,6 +72,8 @@ app.UseHttpsRedirection();
 app.MapUsuarioEndpoints();
 app.MapRolEndpoints();
 app.MapPermisoEndpoints();
+app.MapTrabajadorEndpoints();
+Identidad.API.API.Endpoints.AuthEndpoints.MapAuthEndpoints(app);
 
 // Map Endpoints del sistema de permisos granulares
 app.MapMenuEndpoints();

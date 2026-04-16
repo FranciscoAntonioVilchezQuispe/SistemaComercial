@@ -31,6 +31,16 @@ export const useStock = (
   });
 };
 
+export const useReporteStockCritico = (
+  paginacion?: PagedRequest,
+  idAlmacen?: number,
+): UseQueryResult<PagedResponse<any>, Error> => {
+  return useQuery({
+    queryKey: ["inventario", "reporte", "stock-critico", paginacion, idAlmacen],
+    queryFn: () => servicioInventario.obtenerReporteStockCritico(paginacion, idAlmacen),
+  });
+};
+
 export const useStockProducto = (
   idProducto: number,
 ): UseQueryResult<StockProducto[], Error> => {

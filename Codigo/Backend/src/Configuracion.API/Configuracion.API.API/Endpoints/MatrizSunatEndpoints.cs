@@ -55,8 +55,7 @@ namespace Configuracion.API.Endpoints
                     IdTipoComprobante = dto.IdTipoComprobante,
                     NivelObligatoriedad = dto.NivelObligatoriedad,
                     Activado = dto.Activo,
-                    UsuarioCreacion = "SISTEMA",
-                    FechaCreacion = DateTime.UtcNow
+                    UsuarioCreacion = "SISTEMA"
                 };
                 var creada = await repo.AgregarAsync(regla);
                 return Results.Created($"/api/configuracion/matriz-sunat/{creada.Id}", new ToReturn<MatrizReglaSunat>(creada));
@@ -73,7 +72,6 @@ namespace Configuracion.API.Endpoints
                 regla.NivelObligatoriedad = dto.NivelObligatoriedad;
                 regla.Activado = dto.Activo;
                 regla.UsuarioActualizacion = "SISTEMA";
-                regla.FechaActualizacion = DateTime.UtcNow;
 
                 await repo.ActualizarAsync(regla);
                 return Results.Ok(new ToReturn<MatrizReglaSunat>(regla));

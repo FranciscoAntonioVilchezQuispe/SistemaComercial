@@ -6,7 +6,6 @@ import { tipoPermisoService } from "../servicios/servicioTipoPermiso";
 import type { RolMenu, TipoPermiso } from "@/types/permisos.types";
 import { RolesList } from "../components/roles/RolesList";
 import { PermisosMatrix } from "../components/roles/PermisosMatrix";
-import { toast } from "sonner";
 
 // Tipo temporal para Rol (debería venir del módulo existente)
 interface Rol {

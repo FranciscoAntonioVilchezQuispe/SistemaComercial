@@ -26,10 +26,13 @@ import { Producto, ProductoFormData } from "../../tipos/catalogo.types";
 import { useCategorias } from "../../hooks/useCategorias";
 import { useMarcas } from "../../hooks/useMarcas";
 import { useUnidadesMedida } from "../../hooks/useUnidadesMedida";
+import { useAfectacionesIgv } from "@/features/configuracion/hooks/useAfectacionIgv";
+import { useTiposTributo } from "@/features/configuracion/hooks/useTipoTributo";
 import { useEffect } from "react";
 import { limpiarDecimal } from "@compartido/utilidades";
 import { toast } from "sonner";
 import { Loading } from "@compartido/componentes/feedback/Loading";
+import { FISCAL_CONFIG } from "@compartido/configuracion/fiscal.config";
 
 const formSchema = z.object({
   // Información básica
@@ -73,6 +76,8 @@ const formSchema = z.object({
   // Configuración fiscal
   gravadoImpuesto: z.boolean(),
   porcentajeImpuesto: z.coerce.number().min(0).max(100),
+  idTipoAfectacionIgv: z.coerce.number().optional().nullable(),
+  idTipoTributo: z.coerce.number().optional().nullable(),
 
   // Imagen
   imagenPrincipalUrl: z
@@ -112,8 +117,10 @@ export function ProductoForm({
     search: "",
   });
   const { data: unidadesData, isLoading: cargandoUnidades } = useUnidadesMedida(true);
+  const { data: afectacionesData, isLoading: cargandoAfectaciones } = useAfectacionesIgv();
+  const { data: tributosData, isLoading: cargandoTributos } = useTiposTributo();
 
-  const cargandoCatalogos = cargandoCategorias || cargandoMarcas || cargandoUnidades;
+  const cargandoCatalogos = cargandoCategorias || cargandoMarcas || cargandoUnidades || cargandoAfectaciones || cargandoTributos;
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -137,14 +144,16 @@ export function ProductoForm({
       permiteInventarioNegativo: false,
       metodoValuacion: "PE",
       gravadoImpuesto: true,
-      porcentajeImpuesto: 18,
+      porcentajeImpuesto: FISCAL_CONFIG.PORCENTAJE_IGV,
+      idTipoAfectacionIgv: undefined,
+      idTipoTributo: undefined,
       imagenPrincipalUrl: "",
       activo: true,
     },
   });
 
   useEffect(() => {
-    if (datosIniciales) {
+    if (datosIniciales && !cargandoCatalogos) {
       form.reset({
         codigo: datosIniciales.codigo,
         nombre: datosIniciales.nombre,
@@ -166,11 +175,32 @@ export function ProductoForm({
         metodoValuacion: datosIniciales.metodoValuacion || "PE",
         gravadoImpuesto: datosIniciales.gravadoImpuesto,
         porcentajeImpuesto: datosIniciales.porcentajeImpuesto,
+        idTipoAfectacionIgv: datosIniciales.idTipoAfectacionIgv,
+        idTipoTributo: datosIniciales.idTipoTributo,
         imagenPrincipalUrl: datosIniciales.imagenPrincipalUrl || "",
         activo: datosIniciales.activo,
       });
     }
   }, [datosIniciales, form, cargandoCatalogos]);
+
+  // Lógica de autoselección SUNAT
+  useEffect(() => {
+    const suscripcion = form.watch((value, { name }) => {
+      if (name === "gravadoImpuesto") {
+        if (value.gravadoImpuesto) {
+          const afectacionGravada = afectacionesData?.datos.find(a => a.codigo === "10");
+          const tributoIgv = tributosData?.datos.find(t => t.codigo === FISCAL_CONFIG.TRIBUTOS.IGV);
+
+          if (afectacionGravada) form.setValue("idTipoAfectacionIgv", afectacionGravada.id);
+          if (tributoIgv) form.setValue("idTipoTributo", tributoIgv.id);
+          form.setValue("porcentajeImpuesto", FISCAL_CONFIG.PORCENTAJE_IGV);
+        } else {
+          form.setValue("porcentajeImpuesto", 0);
+        }
+      }
+    });
+    return () => suscripcion.unsubscribe();
+  }, [form, afectacionesData?.datos, tributosData?.datos]);
 
   const gravadoImpuesto = form.watch("gravadoImpuesto");
 
@@ -659,6 +689,66 @@ export function ProductoForm({
                 )}
               />
 
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="idTipoAfectacionIgv"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Afectación IGV (Cat. 07)</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value ? field.value.toString() : undefined}
+                        disabled={cargandoCatalogos}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Seleccione afectación" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {afectacionesData?.datos.map((afect) => (
+                            <SelectItem key={afect.id} value={afect.id.toString()}>
+                              {afect.codigo} - {afect.descripcion}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="idTipoTributo"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Tipo de Tributo (Cat. 05)</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value ? field.value.toString() : undefined}
+                        disabled={cargandoCatalogos}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Seleccione tributo" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {tributosData?.datos.map((trib) => (
+                            <SelectItem key={trib.id} value={trib.id.toString()}>
+                              {trib.codigo} - {trib.nombre}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
               <FormField
                 control={form.control}
                 name="porcentajeImpuesto"
@@ -669,8 +759,8 @@ export function ProductoForm({
                       <Input
                         type="text"
                         inputMode="decimal"
-                        placeholder="18.00"
-                        disabled={!gravadoImpuesto}
+                        placeholder={FISCAL_CONFIG.PORCENTAJE_IGV.toFixed(2)}
+                        disabled={!gravadoImpuesto || cargandoCatalogos}
                         {...field}
                         value={field.value ?? ""}
                         onChange={(e) =>
@@ -679,7 +769,7 @@ export function ProductoForm({
                       />
                     </FormControl>
                     <FormDescription>
-                      Porcentaje de impuesto aplicable (ej: IGV 18%)
+                      Porcentaje aplicable (por defecto {FISCAL_CONFIG.PORCENTAJE_IGV}% para {FISCAL_CONFIG.TRIBUTOS.IGV === "1000" ? "IGV" : "Impuesto"})
                     </FormDescription>
                     <FormMessage />
                   </FormItem>

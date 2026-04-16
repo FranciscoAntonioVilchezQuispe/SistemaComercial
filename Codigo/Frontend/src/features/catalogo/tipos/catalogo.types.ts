@@ -16,19 +16,25 @@ export interface ProductoResumen {
   marcaNombre?: string;
   unidadMedidaNombre?: string;
   precioVentaPublico: number;
+  precioVentaMayorista: number;
+  precioVentaDistribuidor: number;
   stock: number;
   activo: boolean;
   imagenPrincipalUrl?: string;
   codigoBarras?: string;
+  sku?: string;
   permiteInventarioNegativo: boolean;
   gravadoImpuesto: boolean;
   porcentajeImpuesto: number;
+  idTipoAfectacionIgv?: number;
+  idTipoTributo?: number;
   idCategoria: number;
   idMarca: number;
   idUnidadMedida: number;
   idTipoProducto?: number;
   precioCompra: number;
   stockMinimo: number;
+  stockMaximo?: number;
   tieneVariantes: boolean;
   metodoValuacion: string;
   categoria?: Categoria;
@@ -75,6 +81,10 @@ export interface ProductoDetalle {
   // Configuración fiscal
   gravadoImpuesto: boolean;
   porcentajeImpuesto: number;
+  idTipoAfectacionIgv?: number;
+  afectacionNombre?: string;
+  idTipoTributo?: number;
+  tributoNombre?: string;
 
   // Media
   imagenPrincipalUrl?: string;
@@ -121,6 +131,8 @@ export interface ProductoFormData {
   // Configuración fiscal
   gravadoImpuesto: boolean;
   porcentajeImpuesto: number;
+  idTipoAfectacionIgv?: number | null;
+  idTipoTributo?: number | null;
 
   // Imagen
   imagenPrincipalUrl?: string;

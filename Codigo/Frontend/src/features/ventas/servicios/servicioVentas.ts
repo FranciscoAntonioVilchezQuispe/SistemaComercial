@@ -105,4 +105,31 @@ export const servicioVentas = {
     const response: any = await apiVentas.get("/notas/debito", { params });
     return response.datos ? response : (response.data || response);
   },
+
+  obtenerNotaCreditoPorId: async (id: number): Promise<any> => {
+    const response: any = await apiVentas.get(`/notas/credito/${id}`);
+    return response.datos || response.data;
+  },
+
+  obtenerNotaDebitoPorId: async (id: number): Promise<any> => {
+    const response: any = await apiVentas.get(`/notas/debito/${id}`);
+    return response.datos || response.data;
+  },
+
+  /**
+   * Reportes de Ventas
+   */
+  obtenerRankingProductos: async (fechaInicio?: string, fechaFin?: string, top: number = 10): Promise<any[]> => {
+    const response: any = await apiVentas.get(`${BASE_URL}/reportes/ranking-productos`, {
+      params: { fechaInicio, fechaFin, top },
+    });
+    return response.datos || response.data || response;
+  },
+
+  obtenerTopClientes: async (fechaInicio?: string, fechaFin?: string, top: number = 10): Promise<any[]> => {
+    const response: any = await apiVentas.get(`${BASE_URL}/reportes/top-clientes`, {
+      params: { fechaInicio, fechaFin, top },
+    });
+    return response.datos || response.data || response;
+  },
 };

@@ -2,6 +2,7 @@ using Inventario.API.Application.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.Threading;
 using System.Threading.Tasks;
+using Nucleo.Comun.Domain.Helpers;
 
 namespace Inventario.API.Application.Servicios
 {
@@ -48,6 +49,31 @@ namespace Inventario.API.Application.Servicios
 
             // 3. Retornar el nivel de obligatoriedad (0 si no se encuentra la combinación)
             return regla?.NivelObligatoriedad ?? 0;
+        }
+
+        public TimeSpan ObtenerHoraComercial(string modulo, string tipoComprobanteSunat)
+        {
+            string m = modulo?.ToUpper() ?? "";
+            
+            if (m.Contains("COMPRAS"))
+            {
+                // Notas de Crédito (07) o Débito (08) de Compras
+                if (tipoComprobanteSunat == "07" || tipoComprobanteSunat == "08")
+                    return new TimeSpan(9, 0, 0);
+                
+                return new TimeSpan(8, 0, 0);
+            }
+            
+            if (m.Contains("VENTAS"))
+            {
+                // Notas de Crédito (07) o Débito (08) de Ventas
+                if (tipoComprobanteSunat == "07" || tipoComprobanteSunat == "08")
+                    return new TimeSpan(11, 0, 0);
+                
+                return new TimeSpan(10, 0, 0);
+            }
+
+            return DateTimeHelper.ObtenerAhoraLima().TimeOfDay; // Default real time if unknown
         }
     }
 }

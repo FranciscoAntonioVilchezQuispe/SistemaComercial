@@ -10,7 +10,7 @@ namespace Inventario.API.Domain.Interfaces
     {
         Task<MovimientoDetalleDto?> ObtenerDetallePorIdAsync(long id);
         Task<KardexMovimiento?> ObtenerPorIdAsync(long id);
-        Task<KardexMovimiento> ObtenerUltimoMovimientoAsync(long almacenId, long productoId, DateTime hastaFecha, TimeSpan hastaHora);
+        Task<KardexMovimiento?> ObtenerUltimoMovimientoAsync(long almacenId, long productoId, DateTime hastaFecha, TimeSpan hastaHora);
         Task<List<KardexMovimiento>> ObtenerMovimientosDesdeAsync(long almacenId, long productoId, DateTime desdeFecha, TimeSpan desdeHora);
         Task<List<KardexMovimiento>> ObtenerPorReferenciaAsync(long referenciaId, string referenciaTipo);
         Task AgregarAsync(KardexMovimiento movimiento);

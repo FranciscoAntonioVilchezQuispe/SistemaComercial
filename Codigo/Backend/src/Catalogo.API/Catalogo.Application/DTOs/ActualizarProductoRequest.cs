@@ -31,6 +31,8 @@ namespace Catalogo.Application.DTOs
 
         public bool GravadoImpuesto { get; set; }
         public decimal PorcentajeImpuesto { get; set; }
+        public long? IdTipoAfectacionIgv { get; set; }
+        public long? IdTipoTributo { get; set; }
 
         public string? ImagenPrincipalUrl { get; set; }
         public bool Activo { get; set; } = true;

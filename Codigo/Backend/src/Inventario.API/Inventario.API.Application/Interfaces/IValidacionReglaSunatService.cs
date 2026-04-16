@@ -12,5 +12,12 @@ namespace Inventario.API.Application.Interfaces
         /// <param name="idTipoComprobante">ID del tipo de comprobante (Tabla 10)</param>
         /// <returns>Nivel de obligatoriedad: 0=Prohibido, 1=Opcional, 2=Obligatorio, 3=Recomendado</returns>
         Task<int> ValidarReglaAsync(string codigoOperacion, long idTipoComprobante, CancellationToken cancellationToken);
+
+        /// <summary>
+        /// Obtiene la hora comercial estandarizada para garantizar el ordenamiento cronológico del Kardex.
+        /// </summary>
+        /// <param name="modulo">Módulo origen (COMPRAS o VENTAS)</param>
+        /// <param name="tipoComprobanteSunat">Código SUNAT del comprobante</param>
+        TimeSpan ObtenerHoraComercial(string modulo, string tipoComprobanteSunat);
     }
 }

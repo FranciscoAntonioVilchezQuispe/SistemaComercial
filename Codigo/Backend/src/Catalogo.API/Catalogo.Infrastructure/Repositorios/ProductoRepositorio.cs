@@ -35,11 +35,15 @@ namespace Catalogo.Infrastructure.Repositorios
                        p.precio_compra, p.precio_venta_publico, p.precio_venta_mayorista, p.precio_venta_distribuidor,
                        p.stock_minimo, p.stock_maximo, p.tiene_variantes, p.permite_inventario_negativo,
                        p.metodo_valuacion, p.gravado_impuesto, p.porcentaje_impuesto, p.imagen_principal_url,
+                       p.id_afectacion_igv as IdTipoAfectacionIgv, a.descripcion as AfectacionNombre,
+                       p.id_tipo_tributo as IdTipoTributo, t.nombre as TributoNombre,
                        p.activado as Activo, p.fecha_creacion, p.fecha_modificacion as FechaModificacion
                 FROM catalogo.productos p
                 INNER JOIN catalogo.categorias c ON c.id_categoria = p.id_categoria
                 INNER JOIN catalogo.marcas m ON m.id_marca = p.id_marca
                 INNER JOIN catalogo.unidades_medida um ON um.id_unidad = p.id_unidad
+                LEFT JOIN configuracion.tipo_afectacion_igv a ON a.id_afectacion = p.id_afectacion_igv
+                LEFT JOIN configuracion.tipo_tributo t ON t.id_tributo = p.id_tipo_tributo
                 WHERE p.id_producto = @id;
 
                 -- Imágenes
@@ -105,9 +109,15 @@ namespace Catalogo.Infrastructure.Repositorios
 
             var offset = (pagina - 1) * elementosPorPagina;
             var sql = @"
-                SELECT p.id_producto as Id, p.codigo_producto as Codigo, p.nombre_producto as Nombre,
+                SELECT p.id_producto as Id, p.codigo_producto as Codigo, p.nombre_producto as Nombre, p.sku as Sku,
                        c.nombre_categoria as CategoriaNombre, m.nombre_marca as MarcaNombre, um.simbolo as UnidadMedidaSigla,
-                       p.precio_venta_publico as PrecioVentaPublico, p.imagen_principal_url, p.activado as Activo,
+                       p.precio_venta_publico as PrecioVentaPublico,
+                       p.precio_venta_mayorista as PrecioVentaMayorista,
+                       p.precio_venta_distribuidor as PrecioVentaDistribuidor,
+                       p.stock_minimo as StockMinimo,
+                       p.stock_maximo as StockMaximo,
+                       p.imagen_principal_url,
+                       p.gravado_impuesto, p.porcentaje_impuesto, p.activado as Activo,
                        COUNT(*) OVER() AS TotalRegistros
                 FROM catalogo.productos p
                 INNER JOIN catalogo.categorias c ON c.id_categoria = p.id_categoria

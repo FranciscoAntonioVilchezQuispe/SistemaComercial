@@ -12,6 +12,7 @@ import {
 import { Button } from "@/componentes/ui/button";
 import { Input } from "@/componentes/ui/input";
 import { kardexService } from "../servicios/servicioKardex";
+import { getCurrentPeriod } from "@/lib/datetime";
 
 type FormValues = {
   periodo: string;
@@ -31,7 +32,7 @@ export function PaginaKardexPeriodos() {
     watch,
   } = useForm<FormValues>({
     defaultValues: {
-      periodo: new Date().toISOString().slice(0, 7), // YYYY-MM
+      periodo: getCurrentPeriod(), // YYYY-MM
     },
   });
 

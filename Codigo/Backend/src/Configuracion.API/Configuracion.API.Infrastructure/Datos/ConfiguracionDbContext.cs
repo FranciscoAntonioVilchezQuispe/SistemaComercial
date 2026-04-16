@@ -1,6 +1,7 @@
 using Configuracion.API.Domain.Entidades;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Nucleo.Comun.Domain.Helpers;
 
 namespace Configuracion.API.Infrastructure.Datos
 {
@@ -8,6 +9,14 @@ namespace Configuracion.API.Infrastructure.Datos
     {
         public ConfiguracionDbContext(DbContextOptions<ConfiguracionDbContext> options) : base(options)
         {
+        }
+
+        public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        {
+            // Aplicar auditoría centralizada (Estandarización Global)
+            DbContextAuditHelper.AplicarAuditoriaDirecta(ChangeTracker);
+
+            return base.SaveChangesAsync(cancellationToken);
         }
 
         public DbSet<TablaGeneral> TablasGenerales { get; set; }
@@ -23,6 +32,8 @@ namespace Configuracion.API.Infrastructure.Datos
         public DbSet<DocumentoComprobanteRelacion> DocumentoComprobanteRelaciones { get; set; }
         public DbSet<TipoOperacionSunat> TiposOperacionSunat { get; set; } = null!;
         public DbSet<MatrizReglaSunat> MatrizReglasSunat { get; set; } = null!;
+        public DbSet<TipoAfectacionIgv> TiposAfectacionIgv { get; set; } = null!;
+        public DbSet<TipoTributo> TiposTributo { get; set; } = null!;
         public DbSet<Ubigeo> Ubigeos { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -46,6 +57,8 @@ namespace Configuracion.API.Infrastructure.Datos
             modelBuilder.Entity<DocumentoComprobanteRelacion>().ToTable("regla_documento_comprobante", "configuracion");
             modelBuilder.Entity<TipoOperacionSunat>().ToTable("tipo_operacion_sunat", "configuracion");
             modelBuilder.Entity<MatrizReglaSunat>().ToTable("matriz_regla_sunat", "configuracion");
+            modelBuilder.Entity<TipoAfectacionIgv>().ToTable("tipo_afectacion_igv", "configuracion");
+            modelBuilder.Entity<TipoTributo>().ToTable("tipo_tributo", "configuracion");
             modelBuilder.Entity<Ubigeo>().ToTable("ubigeos", "configuracion");
 
             // Configuración de Relaciones (Fluent API)

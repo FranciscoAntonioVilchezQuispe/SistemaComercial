@@ -251,6 +251,32 @@ namespace Identidad.API.Infrastructure.Repositorios
                     (rmp, tp) => tp)
                 .AnyAsync(tp => tp.Codigo == codigoPermiso);
         }
+
+        public async Task<IEnumerable<string>> ObtenerPermisosAplanadosPorUsuarioAsync(long idUsuario)
+        {
+            var permisos = await _context.UsuariosRoles
+                .Where(ur => ur.IdUsuario == idUsuario)
+                .Join(_context.RolesMenus,
+                    ur => ur.IdRol,
+                    rm => rm.IdRol,
+                    (ur, rm) => rm)
+                .Join(_context.Menus,
+                    rm => rm.IdMenu,
+                    m => m.Id,
+                    (rm, m) => new { RolMenu = rm, Menu = m })
+                .Join(_context.RolesMenusPermisos,
+                    x => x.RolMenu.Id,
+                    rmp => rmp.IdRolMenu,
+                    (x, rmp) => new { x.Menu, x.RolMenu, RolMenuPermiso = rmp })
+                .Join(_context.TiposPermiso,
+                    x => x.RolMenuPermiso.IdTipoPermiso,
+                    tp => tp.Id,
+                    (x, tp) => $"{x.Menu.Codigo}:{tp.Codigo}")
+                .Distinct()
+                .ToListAsync();
+
+            return permisos;
+        }
     }
 
     public class UsuarioRolRepositorio : IUsuarioRolRepositorio

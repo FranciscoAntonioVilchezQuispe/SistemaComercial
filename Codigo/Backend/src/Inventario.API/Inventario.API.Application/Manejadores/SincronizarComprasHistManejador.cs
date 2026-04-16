@@ -17,11 +17,13 @@ namespace Inventario.API.Application.Manejadores
     {
         private readonly IInventarioDbContext _context;
         private readonly IMediator _mediator;
+        private readonly IValidacionReglaSunatService _validacionSunat;
 
-        public SincronizarComprasHistManejador(IInventarioDbContext context, IMediator mediator)
+        public SincronizarComprasHistManejador(IInventarioDbContext context, IMediator mediator, IValidacionReglaSunatService validacionSunat)
         {
             _context = context;
             _mediator = mediator;
+            _validacionSunat = validacionSunat;
         }
 
         public async Task<string> Handle(SincronizarComprasHistComando request, CancellationToken cancellationToken)
@@ -115,12 +117,19 @@ namespace Inventario.API.Application.Manejadores
 
                 var eventos = new List<EventoSync>();
 
-                foreach (var c in compras) eventos.Add(new EventoSync(c.FechaEmision, c, "COMPRA", "08:00:00"));
-                foreach (var v in ventas) eventos.Add(new EventoSync(v.FechaEmision, v, "VENTA", "10:00:00"));
-                foreach (var n in ncCompras) eventos.Add(new EventoSync(n.FechaEmision, n, "NC_COMPRA", "12:00:00"));
-                foreach (var n in ndCompras) eventos.Add(new EventoSync(n.FechaEmision, n, "ND_COMPRA", "12:00:00"));
-                foreach (var n in ncVentas) eventos.Add(new EventoSync(n.FechaEmision, n, "NC_VENTA", "14:00:00"));
-                foreach (var n in ndVentas) eventos.Add(new EventoSync(n.FechaEmision, n, "ND_VENTA", "14:00:00"));
+                foreach (var c in compras) eventos.Add(new EventoSync(c.FechaEmision, c, "COMPRA", _validacionSunat.ObtenerHoraComercial("COMPRAS", c.IdTipoComprobante.ToString())));
+                foreach (var v in ventas) {
+                    var hora = _validacionSunat.ObtenerHoraComercial("VENTAS", v.IdTipoComprobante.ToString());
+                    // Aplicamos el número para los segundos (máx 59) para garantizar orden correlativo
+                    if (v.Numero > 0)
+                        hora = hora.Add(TimeSpan.FromSeconds(v.Numero % 60)); 
+                        
+                    eventos.Add(new EventoSync(v.FechaEmision, v, "VENTA", hora));
+                }
+                foreach (var n in ncCompras) eventos.Add(new EventoSync(n.FechaEmision, n, "NC_COMPRA", _validacionSunat.ObtenerHoraComercial("COMPRAS", "07")));
+                foreach (var n in ndCompras) eventos.Add(new EventoSync(n.FechaEmision, n, "ND_COMPRA", _validacionSunat.ObtenerHoraComercial("COMPRAS", "08")));
+                foreach (var n in ncVentas) eventos.Add(new EventoSync(n.FechaEmision, n, "NC_VENTA", _validacionSunat.ObtenerHoraComercial("VENTAS", "07")));
+                foreach (var n in ndVentas) eventos.Add(new EventoSync(n.FechaEmision, n, "ND_VENTA", _validacionSunat.ObtenerHoraComercial("VENTAS", "08")));
 
                 var eventosOrdenados = eventos
                     .OrderBy(e => e.FechaCompuesta)
@@ -169,14 +178,10 @@ namespace Inventario.API.Application.Manejadores
             }
         }
 
-        private async Task<bool> ProcesarDocumento(long idRef, string modulo, TipoMovimientoInventario tipo, long prodId, decimal cant, decimal precio, long almId, DateTime fecha, string? serie, string? num, long? idTipoDoc, string prefijo, CancellationToken ct)
+        private async Task<bool> ProcesarDocumento(long idRef, string modulo, TipoMovimientoInventario tipo, long prodId, decimal cant, decimal? precio, long almId, DateTime fecha, string? serie, string? num, long? idTipoDoc, string prefijo, CancellationToken ct)
         {
+            // La fecha ya viene normalizada por EventoSync o por el Inyeccion en CrearMovimientoInventarioManejador
             DateTime fechaFinal = fecha;
-            if (fecha.TimeOfDay == TimeSpan.Zero)
-            {
-                var horaEst = modulo == "COMPRAS" ? new TimeSpan(8, 0, 0) : new TimeSpan(10, 0, 0);
-                fechaFinal = fecha.Date.Add(horaEst);
-            }
 
             bool existe = await _context.MovimientosInventario.AnyAsync(m => m.IdReferencia == idRef && m.ReferenciaModulo == modulo && m.IdTipoMovimiento == (long)tipo && m.IdStock != 0 && m.Stock.IdProducto == prodId, ct);
             if (existe) return false;
@@ -207,25 +212,25 @@ namespace Inventario.API.Application.Manejadores
                 var n = (SyncNotaCreditoCompra)ev.Entidad;
                 long almId = setValidos.Contains(n.IdAlmacen) ? n.IdAlmacen : idPrincipal;
                 foreach(var det in n.Detalles) 
-                    await ProcesarDocumento(n.Id, "COMPRAS", TipoMovimientoInventario.DevolucionCompra, det.IdProducto, det.Cantidad, det.PrecioUnitario, almId, n.FechaEmision, n.Serie, n.Numero.ToString(), 7, "NC Compra", ct);
+                    await ProcesarDocumento(n.Id, "COMPRAS", TipoMovimientoInventario.DevolucionCompra, det.IdProducto, det.Cantidad, det.PrecioUnitario, almId, n.FechaEmision, n.Serie, n.Numero.ToString().PadLeft(8, '0'), 5, "NC Compra", ct);
             }
             else if (ev.Tipo == "NC_VENTA") {
                 var n = (SyncNotaCreditoVenta)ev.Entidad;
                 long almId = setValidos.Contains(n.IdAlmacen) ? n.IdAlmacen : idPrincipal;
                 foreach(var det in n.Detalles)
-                    await ProcesarDocumento(n.Id, "VENTAS", TipoMovimientoInventario.DevolucionVenta, det.IdProducto, det.Cantidad, det.PrecioUnitario, almId, n.FechaEmision, n.Serie, n.Numero.ToString(), 7, "NC Venta", ct);
+                    await ProcesarDocumento(n.Id, "VENTAS", TipoMovimientoInventario.DevolucionVenta, det.IdProducto, det.Cantidad, null, almId, n.FechaEmision, n.Serie, n.Numero.ToString().PadLeft(8, '0'), 5, "NC Venta", ct);
             }
             else if (ev.Tipo == "ND_COMPRA") {
                 var n = (SyncNotaDebitoCompra)ev.Entidad;
                 long almId = setValidos.Contains(n.IdAlmacen) ? n.IdAlmacen : idPrincipal;
                 foreach(var det in n.Detalles) 
-                    await ProcesarDocumento(n.Id, "COMPRAS", TipoMovimientoInventario.NotaDebitoCompra, det.IdProducto, det.Cantidad, det.PrecioUnitario, almId, n.FechaEmision, n.Serie, n.Numero.ToString(), 8, "ND Compra", ct);
+                    await ProcesarDocumento(n.Id, "COMPRAS", TipoMovimientoInventario.NotaDebitoCompra, det.IdProducto, det.Cantidad, det.PrecioUnitario, almId, n.FechaEmision, n.Serie, n.Numero.ToString().PadLeft(8, '0'), 6, "ND Compra", ct);
             }
             else if (ev.Tipo == "ND_VENTA") {
                 var n = (SyncNotaDebitoVenta)ev.Entidad;
                 long almId = setValidos.Contains(n.IdAlmacen) ? n.IdAlmacen : idPrincipal;
                 foreach(var det in n.Detalles)
-                    await ProcesarDocumento(n.Id, "VENTAS", TipoMovimientoInventario.NotaDebitoVenta, det.IdProducto, det.Cantidad, det.PrecioUnitario, almId, n.FechaEmision, n.Serie, n.Numero.ToString(), 8, "ND Venta", ct);
+                    await ProcesarDocumento(n.Id, "VENTAS", TipoMovimientoInventario.NotaDebitoVenta, det.IdProducto, det.Cantidad, null, almId, n.FechaEmision, n.Serie, n.Numero.ToString().PadLeft(8, '0'), 6, "ND Venta", ct);
             }
             return true;
         }
@@ -238,21 +243,23 @@ namespace Inventario.API.Application.Manejadores
             public DateTime FechaCompuesta { get; }
             public int PrioridadTipo { get; }
 
-            public EventoSync(DateTime fecha, object entidad, string tipo, string horaEstandar)
+            public EventoSync(DateTime fecha, object entidad, string tipo, TimeSpan horaComercial)
             {
                 FechaOriginal = fecha;
                 Entidad = entidad;
                 Tipo = tipo;
-                
-                if (fecha.TimeOfDay == TimeSpan.Zero)
-                    FechaCompuesta = fecha.Date.Add(TimeSpan.Parse(horaEstandar));
-                else
-                    FechaCompuesta = fecha;
+                // SIEMPRE forzamos la hora comercial/estándar para asegurar el ordenamiento por bloques
+                // Ingresos (08:00) siempre antes que Salidas (10:00) en el mismo día.
+                FechaCompuesta = fecha.Date.Add(horaComercial);
 
                 PrioridadTipo = tipo switch {
                     "COMPRA" => 1,
-                    "VENTA" => 2,
-                    _ => 3
+                    "NC_COMPRA" => 2,
+                    "ND_COMPRA" => 2,
+                    "VENTA" => 3,
+                    "NC_VENTA" => 4,
+                    "ND_VENTA" => 4,
+                    _ => 99
                 };
             }
         }

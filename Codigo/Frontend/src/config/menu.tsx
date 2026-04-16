@@ -63,6 +63,7 @@ export const menuItems: ItemMenu[] = [
     subItems: [
       { titulo: RUTAS_TITULOS["/ventas/pos"] || "Punto de Venta", icono: <Calculator className="h-6 w-6" />, ruta: "/ventas/pos" },
       { titulo: RUTAS_TITULOS["/ventas/lista"] || "Ventas", icono: <List className="h-6 w-6" />, ruta: "/ventas/lista" },
+      { titulo: RUTAS_TITULOS["/ventas/notas"] || "Notas SUNAT", icono: <FileText className="h-6 w-6" />, ruta: "/ventas/notas" },
       { titulo: RUTAS_TITULOS["/ventas/cotizaciones"] || "Cotizaciones", icono: <FileText className="h-6 w-6" />, ruta: "/ventas/cotizaciones" },
       { titulo: RUTAS_TITULOS["/clientes"] || "Clientes", icono: <Users className="h-6 w-6" />, ruta: "/clientes" },
     ],
@@ -85,6 +86,7 @@ export const menuItems: ItemMenu[] = [
     subItems: [
       { titulo: RUTAS_TITULOS["/proveedores/ordenes"] || "Órdenes de Compra", icono: <ClipboardList className="h-6 w-6" />, ruta: "/proveedores/ordenes" },
       { titulo: "Compras", icono: <ShoppingBag className="h-6 w-6" />, ruta: "/compras/lista" },
+      { titulo: RUTAS_TITULOS["/compras/notas"] || "Notas de Compra", icono: <FileText className="h-6 w-6" />, ruta: "/compras/notas" },
       { titulo: RUTAS_TITULOS["/proveedores"] || "Proveedores", icono: <Truck className="h-6 w-6" />, ruta: "/proveedores" },
     ],
   },
@@ -94,14 +96,23 @@ export const menuItems: ItemMenu[] = [
     ruta: "/reportes",
   },
   {
+    titulo: "Seguridad",
+    icono: <ShieldCheck className="h-5 w-5 text-emerald-600" />,
+    subItems: [
+      { titulo: "Usuarios", icono: <Users className="h-6 w-6" />, ruta: "/seguridad/usuarios" },
+      { titulo: "Roles y Permisos", icono: <UserCheck className="h-6 w-6" />, ruta: "/seguridad/roles" },
+      { titulo: "Personal", icono: <UserPlus className="h-6 w-6" />, ruta: "/seguridad/trabajadores" },
+    ],
+  },
+  {
     titulo: "Configuración",
     icono: <Settings className="h-5 w-5" />,
     subItems: [
-      { titulo: RUTAS_TITULOS["/configuracion/usuarios"] || "Usuarios", icono: <UserPlus className="h-6 w-6" />, ruta: "/configuracion/usuarios" },
-      { titulo: RUTAS_TITULOS["/configuracion/roles"] || "Roles", icono: <UserCheck className="h-6 w-6" />, ruta: "/configuracion/roles" },
       { titulo: RUTAS_TITULOS["/configuracion/empresa"] || "Empresa", icono: <Building2 className="h-6 w-6" />, ruta: "/configuracion/empresa" },
       { titulo: RUTAS_TITULOS["/configuracion/sucursales"] || "Sucursales", icono: <Home className="h-6 w-6" />, ruta: "/configuracion/sucursales" },
       { titulo: RUTAS_TITULOS["/configuracion/impuestos"] || "Impuestos", icono: <Percent className="h-6 w-6" />, ruta: "/configuracion/impuestos" },
+      { titulo: "Afectación IGV", icono: <ShieldCheck className="h-6 w-6" />, ruta: "/configuracion/afectacion-igv" },
+      { titulo: "Tipos de Tributo", icono: <Calculator className="h-6 w-6" />, ruta: "/configuracion/tipos-tributo" },
       { titulo: RUTAS_TITULOS["/configuracion/metodos-pago"] || "Métodos de Pago", icono: <CreditCard className="h-6 w-6" />, ruta: "/configuracion/metodos-pago" },
       { titulo: RUTAS_TITULOS["/configuracion/comprobantes"] || "Comprobantes", icono: <FileJson className="h-6 w-6" />, ruta: "/configuracion/comprobantes" },
       { titulo: RUTAS_TITULOS["/configuracion/reglas-sunat"] || "Reglas SUNAT", icono: <ShieldCheck className="h-6 w-6" />, ruta: "/configuracion/reglas-sunat" },

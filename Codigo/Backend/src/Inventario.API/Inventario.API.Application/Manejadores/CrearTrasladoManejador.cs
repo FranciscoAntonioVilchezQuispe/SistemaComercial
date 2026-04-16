@@ -3,6 +3,7 @@ using Inventario.API.Application.Interfaces;
 using Inventario.API.Domain.Entidades;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Nucleo.Comun.Domain.Helpers;
 using System;
 using System.Linq;
 using System.Threading;
@@ -33,15 +34,15 @@ namespace Inventario.API.Application.Manejadores
             // 2. Crear Cabecera de Traslado
             var traslado = new Traslado
             {
-                NumeroTraslado = $"TR-{DateTime.Now:yyyyMMdd}-{Guid.NewGuid().ToString().Substring(0, 4).ToUpper()}",
+                NumeroTraslado = $"TR-{DateTimeHelper.ObtenerAhoraLima():yyyyMMdd}-{Guid.NewGuid().ToString().Substring(0, 4).ToUpper()}",
                 AlmacenOrigenId = request.AlmacenOrigenId,
                 AlmacenDestinoId = request.AlmacenDestinoId,
                 Estado = "EN_TRANSITO", // Al crear se asume despacho inmediato en este flujo simplificado
-                FechaPedido = DateTime.UtcNow,
-                FechaDespacho = DateTime.UtcNow,
+                FechaPedido = DateTimeHelper.ObtenerAhoraLima(),
+                FechaDespacho = DateTimeHelper.ObtenerAhoraLima(),
                 Observaciones = request.Observaciones,
                 UsuarioCreacion = "SISTEMA",
-                FechaCreacion = DateTime.UtcNow
+                FechaCreacion = DateTimeHelper.ObtenerAhoraLima()
             };
 
             _context.Traslados.Add(traslado);

@@ -73,8 +73,8 @@ export function useAnularVenta() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, motivo }: { id: number; motivo: string }) =>
-      servicioVentas.anularVenta(id, motivo),
+    mutationFn: ({ id, motivo, usuarioId }: { id: number; motivo: string; usuarioId: number }) =>
+      servicioVentas.anularVenta(id, motivo, usuarioId || 1),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [QUERY_KEY] });
       toast.success("Venta anulada exitosamente");
@@ -123,12 +123,40 @@ export function useCotizaciones(
 }
 
 /**
- * Hook para obtener una cotización por ID (Detalle completo)
+ * Hook para obtener una cotización por ID
  */
 export function useCotizacion(id: number): UseQueryResult<CotizacionDetalle, Error> {
   return useQuery({
     queryKey: ["cotizaciones", id],
     queryFn: () => servicioVentas.obtenerCotizacionPorId(id),
     enabled: !!id,
+  });
+}
+
+/**
+ * Hook para obtener el ranking de productos más vendidos
+ */
+export function useRankingProductos(
+  fechaInicio?: string,
+  fechaFin?: string,
+  top: number = 10,
+): UseQueryResult<any[], Error> {
+  return useQuery({
+    queryKey: [QUERY_KEY, "reporte", "ranking-productos", fechaInicio, fechaFin, top],
+    queryFn: () => servicioVentas.obtenerRankingProductos(fechaInicio, fechaFin, top),
+  });
+}
+
+/**
+ * Hook para obtener el top de clientes
+ */
+export function useTopClientes(
+  fechaInicio?: string,
+  fechaFin?: string,
+  top: number = 10,
+): UseQueryResult<any[], Error> {
+  return useQuery({
+    queryKey: [QUERY_KEY, "reporte", "top-clientes", fechaInicio, fechaFin, top],
+    queryFn: () => servicioVentas.obtenerTopClientes(fechaInicio, fechaFin, top),
   });
 }

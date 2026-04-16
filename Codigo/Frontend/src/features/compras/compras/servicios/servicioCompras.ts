@@ -43,3 +43,13 @@ export const registrarNotaDebitoCompra = async (datos: any): Promise<any> => {
   const respuesta: any = await api.post("/compras/notas/debito", datos);
   return respuesta.datos || respuesta.data;
 };
+
+/**
+ * Reportes de Compras
+ */
+export const obtenerReporteComprasProveedor = async (fechaInicio?: string, fechaFin?: string, top: number = 10): Promise<any[]> => {
+  const respuesta: any = await api.get("/compras/reportes/compras-proveedor", {
+    params: { fechaInicio, fechaFin, top },
+  });
+  return respuesta.datos || respuesta.data || respuesta;
+};

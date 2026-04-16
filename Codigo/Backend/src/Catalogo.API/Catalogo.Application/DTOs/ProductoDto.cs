@@ -39,6 +39,8 @@ namespace Catalogo.Application.DTOs
         // Configuración fiscal
         public bool GravadoImpuesto { get; set; }
         public decimal PorcentajeImpuesto { get; set; }
+        public long? IdTipoAfectacionIgv { get; set; }
+        public long? IdTipoTributo { get; set; }
 
         // Imagen
         public string? ImagenPrincipalUrl { get; set; }

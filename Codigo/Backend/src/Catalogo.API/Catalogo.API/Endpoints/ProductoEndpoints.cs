@@ -80,6 +80,8 @@ namespace Catalogo.API.Endpoints
                         dto.PermiteInventarioNegativo,
                         dto.GravadoImpuesto,
                         dto.PorcentajeImpuesto,
+                        dto.IdTipoAfectacionIgv,
+                        dto.IdTipoTributo,
                         dto.ImagenPrincipalUrl,
                         dto.Activo
                     );

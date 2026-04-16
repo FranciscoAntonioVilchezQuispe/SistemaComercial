@@ -64,7 +64,6 @@ namespace Catalogo.API.Endpoints
                 existente.NombreUnidad = dto.Nombre;
                 existente.Simbolo = dto.Simbolo;
                 existente.UsuarioActualizacion = "SISTEMA";
-                existente.FechaActualizacion = DateTime.UtcNow;
 
                 await repo.ActualizarAsync(existente);
                 return Results.Ok(new ToReturn<UnidadMedida>(existente));

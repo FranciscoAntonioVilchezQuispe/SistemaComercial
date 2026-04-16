@@ -2,6 +2,7 @@ using Inventario.API.Application.Interfaces;
 using Inventario.API.Domain.Interfaces;
 using Inventario.API.Domain.Entidades;
 using Inventario.API.Application.DTOs;
+using Inventario.API.Domain.DTOs.Reportes;
 using Inventario.API.Application.Comandos;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -141,6 +142,21 @@ namespace Inventario.API.Endpoints
                 {
                     Console.Error.WriteLine($"[ERROR] [StockEndpoints] [GetStockPorAlmacen] → Error para Almacen={idAlmacen}");
                     throw new AppException("StockEndpoints", "Error al obtener stock del almacén", new { idAlmacen }, ex);
+                }
+            });
+
+            grupo.MapGet("/reporte-critico", async ([AsParameters] Nucleo.Comun.Application.Paginacion.PagedRequest request, long? idAlmacen, IStockRepositorio repo) =>
+            {
+                try 
+                {
+                    var (datos, total) = await repo.ObtenerStockCriticoPaginadoAsync(idAlmacen, request.PageNumber ?? 1, request.PageSize ?? 10);
+                    var response = new Nucleo.Comun.Application.Paginacion.PagedResponse<StockCriticoDto>(datos, request.PageNumber ?? 1, request.PageSize ?? 10, total);
+                    return Results.Ok(response);
+                }
+                catch (Exception ex)
+                {
+                    Console.Error.WriteLine($"[ERROR] [StockEndpoints] [GetStockCritico] → Error al obtener reporte");
+                    throw new AppException("StockEndpoints", "Error al obtener reporte de stock crítico", request, ex);
                 }
             });
         }

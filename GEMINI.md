@@ -116,10 +116,15 @@
 
 ## 🇵🇪 Reglas de Dominio Peruano
 
-- **IGV nunca hardcodeado** — siempre leerlo desde configuración o base de datos. Si no existe, usar el estándar `18.00m` pero marcado como pendiente de configuración.
+- **IGV nunca hardcodeado** — siempre leerlo desde constantes globales, configuración o base de datos.
+  - **Backend**: `Nucleo.Comun.Domain.Constants.FiscalConstants.PORCENTAJE_IGV`
+  - **Frontend**: `src/compartido/configuracion/fiscal.config.ts` (`FISCAL_CONFIG.PORCENTAJE_IGV`)
+  - Si no existe valor configurado, usar el estándar `18.00m` pero marcado como pendiente de configuración.
 - **Validar RUC** con algoritmo de dígito verificador antes de cualquier llamada a API externa y en `AbstractValidator`.
 - **Códigos UBL 2.1 Catálogo 51** son de exactamente 4 caracteres — no abreviar ni alterar.
 - **Fechas y horas** siempre en zona horaria `America/Lima` (UTC-5).
+  - **Backend**: Prohibido usar `DateTime.UtcNow` o `DateTime.Now` directo para lógica de negocio o auditoría. Usar siempre `DateTimeHelper.ObtenerAhoraLima()`.
+  - **Frontend**: Prohibido usar `new Date()` o `.toISOString()` directo. Usar las utilidades de `@/lib/datetime` (como `getCurrentDateTime()`) y el componente `DatePicker` unificado. Esta regla está protegida por ESLint.
 - **Series de comprobantes** siguen el formato oficial: `F001` (Factura), `B001` (Boleta), `FC01` (Nota Crédito Factura), `FD01` (Nota Débito Factura).
 - **Cálculos en Backend**: Subtotales, IGV y Totales se calculan SIEMPRE en el backend (Handlers/Services). El frontend solo los muestra.
 - Los montos monetarios se expresan en **soles (PEN)** salvo indicación explícitamente multimoneda.
@@ -136,6 +141,11 @@
 - **Migraciones Nucleares**: Usar bloques `DO $$ ... END $$` (PostgreSQL) para buscar y eliminar PKs/FKs dinámicamente si los nombres físicos no coinciden con el snapshot.
 - **Historial Aislado**: Configurar siempre `MigrationsHistoryTable("__ef_migrations_history", "esquema")` en `Program.cs` para evitar colisiones multiesquema.
 - **Normalización UTC**: Usar `ConfigureConventions` con `ValueConverter<DateTime, DateTime>` para forzar `DateTimeKind.Utc` globalmente.
+- **Auditoría Global**: Prohibido asignar manualmente campos de auditoría (`UsuarioCreacion`, `FechaCreacion`, etc.) en los Handlers si la entidad hereda de `AuditableEntity`. Usar siempre el helper centralizado en el `SaveChangesAsync` del DbContext:
+  ```csharp
+  // En el DbContext
+  _auditHelper.CargarAuditoria(ChangeTracker, _usuarioActualService.ObtenerUsuarioId());
+  ```
 - Las migraciones deben ser **reversibles** — toda migración destructiva requiere script de rollback previo.
 
 
@@ -536,17 +546,60 @@ public class VentaDetalleDto
 > todos los pasos de esta sección. Aplica a TODA tarea, sin importar su tamaño.
 > Una corrección de typo, un refactor, una migration, una consulta SQL —
 > todas siguen este protocolo. Sin excepción.
+---
+
+
+## 📋 Reglas de Escritura en tasks/ — NUNCA SOBREESCRIBIR
+
+> El agente tiene PROHIBIDO hacer DELETE o reemplazar el contenido
+> existente de cualquier archivo dentro de tasks/.
+> Todos los archivos de tasks/ son acumulativos y crecen con el tiempo.
+
+### todo.md — comportamiento obligatorio
+- NUNCA borrar ítems completados anteriores — marcarlos como `[x]` y dejarlos.
+- NUNCA reemplazar el archivo completo con solo la sesión actual.
+- SIEMPRE agregar las nuevas tareas AL FINAL del archivo bajo un
+  encabezado de sesión:
+```markdown
+  ---
+  ## Sesión YYYY-MM-DD — [descripción breve]
+  - [ ] Nueva tarea 1
+  - [ ] Nueva tarea 2
+```
+- El archivo debe crecer sesión a sesión — nunca reducirse.
+
+### lessons.md — comportamiento obligatorio
+- NUNCA borrar lecciones anteriores.
+- SIEMPRE agregar nuevas lecciones al final con fecha.
+- Este archivo es la memoria más valiosa del proyecto —
+  perderlo equivale a perder todo el aprendizaje acumulado.
+
+### decisions.md — comportamiento obligatorio
+- NUNCA modificar decisiones pasadas — son un registro histórico.
+- Si una decisión cambia, agregar una nueva entrada que referencie
+  la anterior y explique por qué cambió.
+
+### historial/ — comportamiento obligatorio
+- NUNCA editar archivos de sesiones pasadas.
+- Cada conversación genera su propio archivo nuevo.
+- Solo se actualiza el index.md para agregar la nueva referencia.
+
+### Lo que el agente NUNCA debe hacer
+- Abrir todo.md, borrar todo y escribir solo las tareas nuevas.
+- Interpretar "actualizar todo.md" como "reemplazar todo.md".
+- Reducir el tamaño de cualquier archivo de tasks/ por ningún motivo.
+- Eliminar tareas completadas `[x]` para "limpiar" el archivo.
 
 ---
 
 ### Estructura obligatoria de la carpeta tasks/
 tasks/
-├── todo.md          ← plan activo con checkboxes
-├── lessons.md       ← errores pasados y cómo evitarlos
-├── decisions.md     ← decisiones arquitectónicas y su justificación
+├── todo.md          ← plan activo con checkboxes (acumulativo)
+├── lessons.md       ← errores pasados y cómo evitarlos (acumulativo)
+├── decisions.md     ← decisiones arquitectónicas y su justificación (acumulativo)
 └── historial/
-├── YYYY-MM-DD_descripcion-breve.md   ← una entrada por sesión de trabajo
-└── index.md                          ← índice de todas las sesiones
+    ├── YYYY-MM-DD_descripcion-breve.md   ← una entrada por sesión de trabajo
+    └── index.md                          ← índice de todas las sesiones
 
 ---
 
@@ -557,7 +610,7 @@ El agente debe ejecutar estos pasos en orden antes de tocar cualquier archivo:
 1. Leer `tasks/todo.md` completo.
 2. Leer `tasks/lessons.md` completo — recordar errores previos.
 3. Leer `tasks/historial/index.md` para entender qué se hizo antes.
-4. Si `tasks/todo.md` no existe → crearlo con el plan detallado de la sesión.
+4. Agregar el plan detallado de la nueva sesión AL FINAL de `tasks/todo.md`.
 5. Confirmar el plan con el usuario antes de ejecutar cualquier acción.
 
 ---
@@ -565,30 +618,23 @@ El agente debe ejecutar estos pasos en orden antes de tocar cualquier archivo:
 ### Al COMPLETAR cualquier tarea o subtarea
 
 1. Marcar el ítem como `[x]` en `tasks/todo.md`.
-2. Agregar debajo del ítem una línea de resumen:
-→ Completado: [descripción de lo que se hizo] | Archivos: [lista]
-3. Crear o actualizar la entrada del historial de la sesión actual
-   en `tasks/historial/YYYY-MM-DD_descripcion-breve.md`.
-4. Actualizar `tasks/historial/index.md` con la referencia a esa entrada.
+2. Crear o actualizar la entrada del historial de la sesión actual en `tasks/historial/YYYY-MM-DD_descripcion-breve.md`.
+3. Actualizar `tasks/historial/index.md` con la referencia a esa entrada.
 
 ---
 
 ### Al recibir una CORRECCIÓN del usuario
 
-Inmediatamente, antes de continuar con cualquier otra acción:
-
-Agregar en `tasks/lessons.md`:
+Inmediatamente, antes de continuar con cualquier otra acción, agregar en `tasks/lessons.md`:
 ```markdown
 ---
 ## [YYYY-MM-DD] — [contexto breve de la corrección]
 **Error cometido:** descripción exacta de lo que el agente hizo mal
-**Causa raíz:** por qué ocurrió (no síntoma, sino causa)
+**Causa raíz:** por qué ocurrió
 **Regla para el futuro:** instrucción concreta en imperativo para evitarlo
 **Archivos afectados:** lista de archivos involucrados
-**Proyecto:** nombre del microservicio o módulo donde ocurrió
+**Proyecto:** nombre del microservicio o módulo
 ```
-
-Y también registrarlo en el historial de la sesión activa.
 
 ---
 
@@ -601,80 +647,38 @@ Registrar en `tasks/decisions.md` antes de implementar:
 **Decisión tomada:** qué se eligió y cómo se implementará
 **Alternativas descartadas:** qué otras opciones se evaluaron
 **Razón de la elección:** justificación técnica y/o de negocio
-**Impacto:** qué partes del proyecto afecta esta decisión
-**Reversible:** sí / no — y cómo revertirla si fuera necesario
-**Proyecto:** nombre del microservicio o módulo afectado
+**Impacto:** qué partes del proyecto afecta
 ```
 
 ---
 
-### Formato del historial de sesión
-
-Cada sesión genera un archivo `tasks/historial/YYYY-MM-DD_descripcion-breve.md`:
-
+### Formato del historial de sesión (historial/YYYY-MM-DD_*.md)
 ```markdown
 # Sesión: [descripción breve]
 **Fecha:** YYYY-MM-DD
-**Proyecto(s) involucrado(s):** [nombre del microservicio, módulo o app]
-**Modelo de IA usado:** [Gemini 3 Flash / Claude Sonnet / Claude Opus]
-
----
+**Proyecto(s) involucrado(s):** [nombre]
+**Modelo de IA usado:** [modelo]
 
 ## Objetivo de la sesión
-Descripción de qué se quería lograr al iniciar.
-
 ## Tareas completadas
-- [x] Tarea 1 — archivo afectado: `ruta/archivo.ext`
-- [x] Tarea 2 — archivo afectado: `ruta/archivo.ext`
-
-## Tareas pendientes (pasan al siguiente todo.md)
-- [ ] Tarea que quedó incompleta — motivo
-
+- [x] Tarea 1 — archivo: `ruta/archivo.ext`
+## Tareas pendientes
+- [ ] Tarea incompleta — motivo
 ## Cambios realizados
-| Archivo | Tipo de cambio | Descripción |
-|---------|---------------|-------------|
-| `ruta/archivo.ext` | CREATE / UPDATE / DELETE | qué se hizo |
-
-## Correcciones recibidas del usuario
-Dejar vacío si no hubo correcciones. Si las hubo, referenciar
-la entrada correspondiente en lessons.md.
-
-## Decisiones tomadas
-Dejar vacío si no hubo. Si las hubo, referenciar decisions.md.
-
-## Notas y observaciones
-Cualquier contexto relevante para la siguiente sesión.
+| Archivo | Tipo | Descripción |
+|---------|------|-------------|
 ```
 
 ---
 
-### Formato del índice de historial
-
-`tasks/historial/index.md` debe mantenerse siempre actualizado:
-
+### Formato del índice de historial (historial/index.md)
 ```markdown
 # Índice de Historial de Sesiones
 
 | Fecha | Descripción | Proyectos | Modelo usado |
 |-------|-------------|-----------|--------------|
-| 2025-01-15 | [Setup inicial del workspace](2025-01-15_setup-inicial.md) | todos | Claude Opus |
-| 2025-01-16 | [Repositorio Dapper ventas](2025-01-16_repo-dapper-ventas.md) | servicio-ventas | Claude Sonnet |
+| YYYY-MM-DD | [Título](archivo.md) | proyecto | modelo |
 ```
-
----
-
-### Lo que el agente NUNCA debe hacer
-
-- Terminar una sesión sin crear o actualizar el archivo de historial.
-- Recibir una corrección sin registrarla inmediatamente en `lessons.md`.
-- Tomar una decisión arquitectónica sin registrarla en `decisions.md`.
-- Omitir estos pasos argumentando que la tarea fue "pequeña" o "trivial".
-- Crear los archivos de tasks solo cuando el usuario lo solicite explícitamente.
-- Actualizar `todo.md` sin actualizar también el historial de la sesión.
-- Dejar `tasks/historial/index.md` desactualizado.
-- Comenzar a codificar sin haber leído `lessons.md` primero.
-
----
 
 ## 🔴 Manejo de Errores — Estándar Global
 
