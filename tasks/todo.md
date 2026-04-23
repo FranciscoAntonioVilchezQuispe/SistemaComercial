@@ -179,12 +179,13 @@
 - [x] Comandos y Query para abrir, cerrar y visualizar el turno actual.
 
 ### Fase 4: Frontend (Auth y Vendedor)
-- [ ] Feature Auth (Token, Context, Redirects).
-- [ ] Feature Vendedor, layouts y protegido.
-- [ ] Rutas separadas y controladas.
+- [x] Feature Auth (Token, Context, Redirects).
+- [x] Feature Vendedor, layouts y protegido.
+- [x] Rutas separadas y controladas.
 
 ### Fase 5: Identidad.API (Administración)
-- [ ] CRUD y gestión de Roles, Usuarios y Trabajadores.
+- [x] CRUD y gestión de Roles, Usuarios y Trabajadores.
+
 ---
 ## Sesión 2026-04-16 — Estabilización del Módulo de Identidad
 - [x] Corregir enrutamiento en Gateway.API (YARP) para `/api/auth/`
@@ -195,6 +196,7 @@
 - [x] Verificar flujo completo de login (Exitosa obtención de JWT y Refresh Token)
 - [x] Actualizar `authService.ts` en frontend para manejar el wrapper de respuesta
 - [x] Generar walkthrough y documentación de la sesión
+
 ---
 ## Sesión 2026-04-16 — Sincronización de Autenticación y Corrección de Error 401
 - [x] Identificar desajuste de `Issuer` y `Audience` en JWT
@@ -214,3 +216,65 @@
 - [x] Corregir flujo de JWT para incluir reclamaciones de permisos aplanados
 - [x] Verificar compilación total de la solución (0 errores)
 - [x] Generar documentación, historial y walkthrough de la sesión
+
+---
+## Sesión 2026-04-19 — Mejoras de Perfil y Sesión
+- [x] Crear páginas de Perfil y Configuración en Frontend.
+- [x] Integrar funcionalidad de Logout funcional en Header.
+- [x] Registrar rutas protegidas para la gestión de perfil de usuario.
+- [x] Verificar funcionamiento de AuthContext y redirecciones.
+
+---
+## Sesión 2026-04-19 — Resolución de Error 431 (Header Too Large)
+- [x] Identificar causa raíz: exceso de claims de permisos en el JWT.
+- [x] Implementar limpieza de claims innecesarios en `JwtTokenService.cs`.
+- [x] Verificar estabilidad del Gateway y acceso a endpoints protegidos.
+
+---
+## Sesión 2026-04-20 — Consolidación de Menús y Seguridad
+- [x] Desarrollar script `consolidar_menus.sql` para limpieza y normalización.
+- [x] Estandarizar tipos de permiso a español (VER, CREAR, EDITAR, ELIMINAR, ANULAR).
+- [x] Sincronizar jerarquía de menús en `menu.tsx` y base de datos.
+- [x] Reforzar autorización en Gateway.API mediante mapeo explícito de URLs.
+
+---
+## Sesión 2026-04-20 — Protección de Rutas y Permisos Frontend
+- [x] Implementar hook `usePermiso` y componente `RutaProtegida`.
+- [x] Habilitar filtrado dinámico de Sidebar según permisos decodificados del JWT.
+- [x] Implementar protección de Matriz de Roles y gestión de permisos.
+- [x] Corregir bloqueo de depuración Full Stack eliminando caracteres especiales en `tasks.json`.
+
+---
+## Sesión 2026-04-21 — Implementación Módulo Cajas y Turnos
+- [x] Tarea A: Modelos, DTOs y Servicios Backend (Cajas, Turnos).
+- [x] Tarea B: Handlers y Endpoints de Apertura/Cierre de Caja.
+- [x] Tarea C: Servicios Frontend y tipos de datos para Cajas.
+- [x] Tarea D: Implementar modales de Apertura, Cierre y Movimiento en POS.
+- [x] Tarea E: Páginas de Historial y Administración de Cajas.
+
+---
+## Sesión 2026-04-23 — Infraestructura de Tests Backend
+- [x] AGENTE-0: Infraestructura Nucleo.Tests (Shared, Pagination, Validators).
+- [x] AGENTE-1: Tests Identidad.API (Login, Refresh, Usuarios).
+- [x] AGENTE-2: Tests Configuracion.API (Empresa, Series).
+- [x] AGENTE-3: Tests Catalogo.API (Productos, Categorias).
+- [x] AGENTE-4: Tests Clientes.API (Clientes, Ubigeos).
+- [x] AGENTE-5: Tests Inventario.API (Kardex, Movimientos, Stock).
+- [x] AGENTE-6: Tests Compras.API (Registro, Anulación, Notas).
+- [x] AGENTE-7: Tests Ventas.API (Ventas, Turnos, Cajas, Eventos).
+- [x] AGENTE-8: Tests Contabilidad.API (Asientos, Plan Cuentas).
+- [x] AGENTE-9: Tests Gateway.API (E2E, Auth, Headers).
+- [x] Crear guía de ejecución de tests (`guia_ejecucion_tests.md`).
+
+---
+## Sesión 2026-04-23 — Implementación de Tests Frontend (Multi-Agente)
+- [x] AGENTE-FE-0: Setup de Testing + Tests de Utilidades (36 tests).
+- [x] AGENTE-FE-1: Identidad / Autenticación Tests (authService, AuthContext).
+- [x] AGENTE-FE-2: Catálogo Tests (useProductos).
+- [x] AGENTE-FE-3: Clientes Tests (useClientes).
+- [x] AGENTE-FE-4: Carrito de Ventas (Zustand) Tests.
+- [x] AGENTE-FE-5: Ventas Hooks Tests (useVentas).
+- [x] AGENTE-FE-6: Compras, Órdenes y Proveedores Tests.
+- [x] AGENTE-FE-7: Inventario y Almacenes Tests.
+- [x] AGENTE-FE-8: Configuración y Series Tests.
+- [x] AGENTE-FE-9: UI & Shared Components Tests (TablaPaginada, RutaProtegida).

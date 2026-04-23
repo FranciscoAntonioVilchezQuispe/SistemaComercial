@@ -45,6 +45,14 @@ namespace Nucleo.Comun.Application.Extensions
                     retainedFileCountLimit: 30,
                     fileSizeLimitBytes: 10_000_000,
                     rollOnFileSizeLimit: true)
+                // Réplica de Consola: captura Information en adelante para depuración remota
+                .WriteTo.File(
+                    path: Path.Combine(@"d:\Personal\Proyectos\SistemaComercial\Codigo\LogConsola", $"{nombreApp}.txt"),
+                    restrictedToMinimumLevel: LogEventLevel.Information,
+                    outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}",
+                    fileSizeLimitBytes: 5_000_000,
+                    rollOnFileSizeLimit: true,
+                    shared: true)
                 .CreateLogger();
 
             builder.Host.UseSerilog();

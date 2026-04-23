@@ -6,6 +6,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { ModuleTabBar } from "@/componentes/shared/ModuleTabBar";
 import { RUTAS_TITULOS } from "@/config/rutasTitulos";
@@ -203,6 +204,11 @@ export function PaginaProductos() {
             <DialogTitle>
               {idProductoAEditar ? "Editar Producto" : "Nuevo Producto"}
             </DialogTitle>
+            <DialogDescription>
+              {idProductoAEditar 
+                ? "Modifica los datos del producto seleccionado." 
+                : "Completa la información para registrar un nuevo producto en el catálogo."}
+            </DialogDescription>
           </DialogHeader>
           
           {idProductoAEditar && cargandoDetalle ? (

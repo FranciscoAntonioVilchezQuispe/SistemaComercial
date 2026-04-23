@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useAuth } from "@/features/identidad/context/AuthContext";
 import { Button } from "@/componentes/ui/button";
 import { Badge } from "@/componentes/ui/badge";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/componentes/ui/card";
@@ -28,6 +29,9 @@ import { ScrollArea } from "@/componentes/ui/scroll-area";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/componentes/ui/table";
 
 export function PaginaRoles() {
+    const { roles: rolesUsuario } = useAuth();
+    const esAdmin = rolesUsuario.includes("ADMINISTRADOR");
+
     const [roles, setRoles] = useState<RolDto[]>([]);
     const [menus, setMenus] = useState<Menu[]>([]);
     const [tiposPermiso, setTiposPermiso] = useState<TipoPermiso[]>([]);
@@ -107,6 +111,15 @@ export function PaginaRoles() {
         });
     };
 
+    const toggleFila = (idMenu: number, seleccionado: boolean) => {
+        setMatrizAccesos(prev => {
+            const nuevos = seleccionado 
+                ? tiposPermiso.map(tp => tp.id)
+                : [];
+            return { ...prev, [idMenu]: nuevos };
+        });
+    };
+
     const handleGuardar = async () => {
         if (!rolSeleccionado) return;
         setSaving(true);
@@ -120,8 +133,11 @@ export function PaginaRoles() {
 
             await identidadAdminService.actualizarAccesoRol(rolSeleccionado.id, accesosDto);
             toast.success("Accesos granulares actualizados exitosamente");
-        } catch (error) {
-            toast.error("Error al guardar la matriz de accesos");
+        } catch (error: any) {
+            const status = error?.response?.status;
+            if (status !== 403) {
+                toast.error("Error al guardar la matriz de accesos");
+            }
         } finally {
             setSaving(false);
         }
@@ -195,10 +211,11 @@ export function PaginaRoles() {
                                 </CardTitle>
                                 <CardDescription>Define permisos específicos por cada opción del menú.</CardDescription>
                             </div>
-                            <Button 
-                                onClick={handleGuardar} 
-                                disabled={saving || loadingAccesos}
+                            <Button
+                                onClick={handleGuardar}
+                                disabled={saving || loadingAccesos || !esAdmin}
                                 className="h-10 px-6 gap-2 shadow-lg shadow-primary/20"
+                                title={!esAdmin ? "Se requiere rol Administrador" : undefined}
                             >
                                 <Save className="h-4 w-4" /> {saving ? "Guardando..." : "Guardar Permisos"}
                             </Button>
@@ -214,7 +231,8 @@ export function PaginaRoles() {
                                     <Table>
                                         <TableHeader className="bg-slate-50/50 sticky top-0 z-20">
                                             <TableRow>
-                                                <TableHead className="w-[250px] font-bold">Módulo / Opción</TableHead>
+                                                <TableHead className="w-[40px] text-center"></TableHead>
+                                                <TableHead className="w-[210px] font-bold">Módulo / Opción</TableHead>
                                                 {tiposPermiso.map(tp => (
                                                     <TableHead key={tp.id} className="text-center font-bold">
                                                         <div className="flex flex-col items-center">
@@ -226,26 +244,39 @@ export function PaginaRoles() {
                                             </TableRow>
                                         </TableHeader>
                                         <TableBody>
-                                            {menus.map(m => (
-                                                <TableRow key={m.id} className="hover:bg-slate-50/30">
-                                                    <TableCell>
-                                                        <div className={`flex items-center gap-2 ${m.idMenuPadre ? "pl-8" : "font-bold"}`}>
-                                                            {!m.idMenuPadre && <Layers className="h-4 w-4 text-primary/50" />}
-                                                            <span className="text-sm">{m.nombre}</span>
-                                                            {m.codigo && <Badge variant="outline" className="text-[9px] px-1 h-4">{m.codigo}</Badge>}
-                                                        </div>
-                                                    </TableCell>
-                                                    {tiposPermiso.map(tp => (
-                                                        <TableCell key={`${m.id}-${tp.id}`} className="text-center">
+                                            {menus.map(m => {
+                                                const permisosFila = matrizAccesos[m.id] || [];
+                                                const someSelected = permisosFila.length > 0 && permisosFila.length < tiposPermiso.length;
+                                                const allSelected = permisosFila.length === tiposPermiso.length;
+                                                
+                                                return (
+                                                    <TableRow key={m.id} className="hover:bg-slate-50/30">
+                                                        <TableCell className="text-center">
                                                             <Checkbox 
-                                                                checked={(matrizAccesos[m.id] || []).includes(tp.id)}
-                                                                onCheckedChange={() => togglePermiso(m.id, tp.id)}
-                                                                className="mx-auto"
+                                                                checked={allSelected ? true : someSelected ? "indeterminate" : false}
+                                                                onCheckedChange={(checked) => toggleFila(m.id, !!checked)}
+                                                                className="h-4 w-4"
                                                             />
                                                         </TableCell>
-                                                    ))}
-                                                </TableRow>
-                                            ))}
+                                                        <TableCell>
+                                                            <div className={`flex items-center gap-2 ${m.idMenuPadre ? "pl-8" : "font-bold"}`}>
+                                                                {!m.idMenuPadre && <Layers className="h-4 w-4 text-primary/50" />}
+                                                                <span className="text-sm">{m.nombre}</span>
+                                                                {m.codigo && <Badge variant="outline" className="text-[9px] px-1 h-4">{m.codigo}</Badge>}
+                                                            </div>
+                                                        </TableCell>
+                                                        {tiposPermiso.map(tp => (
+                                                            <TableCell key={`${m.id}-${tp.id}`} className="text-center">
+                                                                <Checkbox 
+                                                                    checked={permisosFila.includes(tp.id)}
+                                                                    onCheckedChange={() => togglePermiso(m.id, tp.id)}
+                                                                    className="mx-auto"
+                                                                />
+                                                            </TableCell>
+                                                        ))}
+                                                    </TableRow>
+                                                );
+                                            })}
                                         </TableBody>
                                     </Table>
                                 )}

@@ -10,6 +10,7 @@ using Nucleo.Comun.API.Extensions;
 using Configuracion.API.Infrastructure.Servicios; // Added for IReglasDocumentoServicio
 
 var builder = WebApplication.CreateBuilder(args);
+builder.WebHost.ConfigureKestrelLimits();
 builder.AddCentralizedLogging();
 Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
 
@@ -18,10 +19,6 @@ builder.Services.AddDbContext<ConfiguracionDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"),
         o => o.MigrationsHistoryTable("__EFMigrationsHistory", "public"))
            .UseSnakeCaseNamingConvention());
-
-// Configuración de Controllers
-// Configuración de Controllers (Eliminado en refactorización)
-// builder.Services.AddControllers();
 
 // Configuración de Swagger
 builder.Services.AddEndpointsApiExplorer();
@@ -41,7 +38,6 @@ builder.Services.ConfigureHttpJsonOptions(options =>
     options.SerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
 });
 
-// Configuración de CORS
 // Configuración de CORS
 var frontendUrl = builder.Configuration.GetValue<string>("FrontendUrl") ?? "http://localhost:5180";
 
@@ -76,7 +72,6 @@ builder.Services.AddScoped<ITipoTributoRepositorio, TipoTributoRepositorio>();
 
 builder.Services.AddScoped<IReglasDocumentoServicio, ReglasDocumentoServicio>();
 
-
 // Registro de Manejadores
 builder.Services.AddScoped<ObtenerTodosCatalogosManejador>();
 builder.Services.AddScoped<ObtenerCatalogoPorCodigoManejador>();
@@ -94,15 +89,12 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseCors("AllowFrontend");
-
 app.UseAuthorization();
 
 app.MapEmpresaEndpoints();
 app.MapSucursalEndpoints();
 app.MapImpuestoEndpoints();
-
 app.MapMetodoPagoEndpoints();
-
 app.MapSerieComprobanteEndpoints();
 app.MapTipoComprobanteEndpoints();
 app.MapTipoDocumentoEndpoints();
@@ -111,10 +103,11 @@ app.MapMatrizSunatEndpoints();
 app.MapTipoOperacionSunatEndpoints();
 app.MapTipoAfectacionIgvEndpoints();
 app.MapTipoTributoEndpoints();
-
 app.MapTablaGeneralEndpoints();
 app.MapUbigeoEndpoints();
 
 app.MapGet("/", () => "Configuracion API Running - v1.0");
 
 app.Run();
+
+public partial class Program { }

@@ -7,6 +7,7 @@ using Nucleo.Comun.Application.Extensions;
 using Nucleo.Comun.API.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.WebHost.ConfigureKestrelLimits();
 builder.AddCentralizedLogging();
 
 // Add services to the container.
@@ -21,7 +22,6 @@ builder.Services.AddScoped<IPlanCuentaRepositorio, PlanCuentaRepositorio>();
 builder.Services.AddScoped<ICentroCostoRepositorio, CentroCostoRepositorio>();
 builder.Services.AddScoped<IAsientoRepositorio, AsientoRepositorio>();
 
-// CORS
 // CORS
 var frontendUrl = builder.Configuration.GetValue<string>("FrontendUrl") ?? "http://localhost:5180";
 
@@ -58,3 +58,5 @@ app.MapCentroCostoEndpoints();
 app.MapAsientoEndpoints();
 
 app.Run();
+
+public partial class Program { }

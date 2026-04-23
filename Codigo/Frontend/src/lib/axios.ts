@@ -32,17 +32,18 @@ const createApiInstance = (baseURL: string): AxiosInstance => {
     },
   );
 
+  // Variable para controlar el spam de mensajes de permisos (403)
+  let lastForbiddenToastTime = 0;
+  const FORBIDDEN_TOAST_COOLDOWN = 3000; // 3 segundos
+
   // Interceptor para manejar respuestas estandarizadas o errores
   instance.interceptors.response.use(
     (response: AxiosResponse) => {
       const data = response.data;
       
-      // Si la respuesta tiene un formato estandarizado con un status interno
-      // y ese status indica un error (distinto de 200 o 201), lanzamos error.
       if (data && typeof data.status === 'number' && ![200, 201].includes(data.status)) {
-        const mensajeError = data.message || "Error en la operación";
+        const mensajeError = data.message || "Lo sentimos, no pudimos completar esta operación.";
         
-        // Capturamos el error interno del negocio
         capturadorErrores.capturar(mensajeError, 'API', {
           metadata: { 
             statusInterno: data.status,
@@ -52,7 +53,7 @@ const createApiInstance = (baseURL: string): AxiosInstance => {
         });
 
         toast.error(mensajeError, {
-          description: `Código Interno: ${data.status}`,
+          description: `Referencia: ${data.status}`,
         });
         
         const error = new Error(mensajeError);
@@ -69,9 +70,12 @@ const createApiInstance = (baseURL: string): AxiosInstance => {
         if (window.location.pathname !== "/login") {
           window.location.href = "/login";
         }
-      }
-
-      // Registro sistemático del error de red
+        return Promise.reject(error);
+      } 
+      
+      const isForbidden = error.response?.status === 403;
+      
+      // Registro sistemático del error
       capturadorErrores.capturar(error, 'API', {
         metadata: {
           status: error.response?.status,
@@ -85,25 +89,36 @@ const createApiInstance = (baseURL: string): AxiosInstance => {
       const skipToast = (error.config as any)?._skipToast;
       
       if (!skipToast) {
-        const errorData = error.response?.data;
-        let mensaje =
-          errorData?.message ||
-          errorData?.Message ||
-          (typeof errorData === 'string' ? errorData : null) ||
-          error.message ||
-          "Ocurrió un error inesperado";
+        // Lógica de unificación para 403 (Permisos)
+        if (isForbidden) {
+          const now = Date.now();
+          if (now - lastForbiddenToastTime > FORBIDDEN_TOAST_COOLDOWN) {
+            toast.warning("Acceso restringido", {
+              description: "No tienes los permisos necesarios para algunas funciones de esta sección.",
+              duration: 5000
+            });
+            lastForbiddenToastTime = now;
+          }
+        } else {
+          const errorData = error.response?.data;
+          let mensaje =
+            errorData?.message ||
+            errorData?.Message ||
+            (typeof errorData === 'string' ? errorData : null) ||
+            error.message ||
+            "Ocurrió un inconveniente inesperado.";
 
-        if (errorData?.errors && typeof errorData.errors === 'object') {
-           // Si es un objeto de errores de validación (FluentValidation)
-           const primerError = Object.values(errorData.errors)[0];
-           if (Array.isArray(primerError) && primerError.length > 0) {
-             mensaje = primerError[0];
-           }
+          if (errorData?.errors && typeof errorData.errors === 'object') {
+             const primerError = Object.values(errorData.errors)[0];
+             if (Array.isArray(primerError) && primerError.length > 0) {
+               mensaje = primerError[0];
+             }
+          }
+
+          toast.error(mensaje, {
+            description: `Código de error: ${error.response?.status || 500}`,
+          });
         }
-
-        toast.error(mensaje, {
-          description: `Código: ${error.response?.status || 500}`,
-        });
 
         (error as any)._sentToast = true;
       }

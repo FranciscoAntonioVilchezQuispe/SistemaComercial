@@ -29,7 +29,7 @@ export const servicioProductos = {
 
   crearProducto: async (datos: ProductoFormData): Promise<ProductoDetalle> => {
     const response: any = await apiCatalogo.post(BASE_URL, datos);
-    return response.data.data; // ToReturn<T>
+    return response.data; // ToReturn<T>
   },
 
   actualizarProducto: async (
@@ -37,7 +37,7 @@ export const servicioProductos = {
     datos: ProductoFormData,
   ): Promise<ProductoDetalle> => {
     const response: any = await apiCatalogo.put(`${BASE_URL}/${id}`, datos);
-    return response.data.data; // ToReturn<T>
+    return response.data; // ToReturn<T>
   },
 
   eliminarProducto: async (id: number): Promise<void> => {
@@ -48,7 +48,7 @@ export const servicioProductos = {
     const response: any = await apiCatalogo.patch(`${BASE_URL}/${id}/stock`, {
       cantidad,
     });
-    return response.data.data;
+    return response.data;
   },
 
   buscarPorCodigoBarras: async (
@@ -57,6 +57,6 @@ export const servicioProductos = {
     const response: any = await apiCatalogo.get(
       `${BASE_URL}/codigo-barras/${codigoBarras}`,
     );
-    return response.data.data;
+    return response.data;
   },
 };

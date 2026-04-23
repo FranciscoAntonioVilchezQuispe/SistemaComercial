@@ -14,6 +14,9 @@ namespace Ventas.API.Domain.Entidades
         [Column("id_caja")]
         public long IdCaja { get; set; }
 
+        [Column("id_turno_vendedor")]
+        public long? IdTurnoVendedor { get; set; }
+
         [Required]
         [Column("id_tipo_movimiento")]
         public long IdTipoMovimiento { get; set; }
@@ -42,5 +45,8 @@ namespace Ventas.API.Domain.Entidades
 
         [ForeignKey("IdPagoRelacionado")]
         public virtual Pago? PagoRelacionado { get; set; }
+
+        [ForeignKey("IdTurnoVendedor")]
+        public virtual TurnoVendedor? TurnoVendedor { get; set; }
     }
 }

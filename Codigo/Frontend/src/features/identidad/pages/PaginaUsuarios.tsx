@@ -21,16 +21,20 @@ import {
     MoreVertical,
     Edit3
 } from "lucide-react";
-import { identidadAdminService, UsuarioDto, TrabajadorDto } from "../servicios/identidadAdminService";
+import { identidadAdminService, UsuarioDto } from "../servicios/identidadAdminService";
 import { toast } from "sonner";
 import { Loading } from "@compartido/componentes/feedback/Loading";
 import { CrearUsuarioDialog } from "../components/usuarios/CrearUsuarioDialog";
+import { EditarUsuarioDialog } from "../components/usuarios/EditarUsuarioDialog";
 
 export function PaginaUsuarios() {
     const [usuarios, setUsuarios] = useState<UsuarioDto[]>([]);
     const [loading, setLoading] = useState(true);
     const [filtro, setFiltro] = useState("");
     const [showCrearDialog, setShowCrearDialog] = useState(false);
+
+    const [usuarioParaEditar, setUsuarioParaEditar] = useState<UsuarioDto | null>(null);
+    const [showEditarDialog, setShowEditarDialog] = useState(false);
 
     useEffect(() => {
         cargarUsuarios();
@@ -46,6 +50,11 @@ export function PaginaUsuarios() {
         } finally {
             setLoading(false);
         }
+    };
+
+    const handleEditar = (u: UsuarioDto) => {
+        setUsuarioParaEditar(u);
+        setShowEditarDialog(true);
     };
 
     const usuariosFiltrados = usuarios.filter(u => 
@@ -76,6 +85,13 @@ export function PaginaUsuarios() {
                 open={showCrearDialog} 
                 onOpenChange={setShowCrearDialog} 
                 onSuccess={cargarUsuarios} 
+            />
+
+            <EditarUsuarioDialog
+                usuario={usuarioParaEditar}
+                open={showEditarDialog}
+                onOpenChange={setShowEditarDialog}
+                onSuccess={cargarUsuarios}
             />
 
             <Card className="border-none shadow-sm bg-white/50 backdrop-blur-sm">
@@ -149,7 +165,12 @@ export function PaginaUsuarios() {
                                                 </div>
                                             </TableCell>
                                             <TableCell className="text-right">
-                                                <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-primary">
+                                                <Button 
+                                                    variant="ghost" 
+                                                    size="icon" 
+                                                    className="h-8 w-8 text-slate-400 hover:text-primary"
+                                                    onClick={() => handleEditar(u)}
+                                                >
                                                     <Edit3 className="h-4 w-4" />
                                                 </Button>
                                                 <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400">

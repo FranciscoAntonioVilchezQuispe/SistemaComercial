@@ -65,4 +65,12 @@ namespace Configuracion.API.Application.DTOs
         public string CodigoInternacional { get; set; } = null!;
         public string? Descripcion { get; set; }
     }
+
+    public class SerieComprobanteDto
+    {
+        public long IdTipoComprobante { get; set; }
+        public string Serie { get; set; } = null!;
+        public long CorrelativoActual { get; set; }
+        public long? IdAlmacen { get; set; }
+    }
 }

@@ -1,4 +1,4 @@
-﻿
+
 -- ARCHIVO: 00_SISTEMA_COMERCIAL_UNIFICADO.sql
 -- *****************************************************************************
 -- SCRIPT MAESTRO UNIFICADO - SISTEMA COMERCIAL
@@ -3115,36 +3115,7 @@ INSERT INTO configuracion.tablas_generales_detalle VALUES (50, 13, 'ANU', 'Anula
 --
 -- TOC entry 5786 (class 0 OID 21093)
 -- Dependencies: 312
--- Data for Name: menus; Type: TABLE DATA; Schema: identidad; Owner: postgres
---
-
-INSERT INTO identidad.menus VALUES (1, 'DASHBOARD', 'Dashboard', 'Panel principal del sistema', '/dashboard', 'dashboard', 1, NULL, true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
-INSERT INTO identidad.menus VALUES (2, 'VENTAS', 'Ventas', 'MÃ³dulo de gestiÃ³n de ventas', '/ventas', 'shopping-cart', 2, NULL, true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
-INSERT INTO identidad.menus VALUES (3, 'COMPRAS', 'Compras', 'MÃ³dulo de gestiÃ³n de compras', '/compras', 'shopping-bag', 3, NULL, true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
-INSERT INTO identidad.menus VALUES (4, 'INVENTARIO', 'Inventario', 'MÃ³dulo de gestiÃ³n de inventario', '/inventario', 'warehouse', 4, NULL, true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
-INSERT INTO identidad.menus VALUES (5, 'CLIENTES', 'Clientes', 'MÃ³dulo de gestiÃ³n de clientes', '/clientes', 'users', 5, NULL, true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
-INSERT INTO identidad.menus VALUES (6, 'CATALOGO', 'CatÃ¡logo', 'MÃ³dulo de gestiÃ³n de productos', '/catalogo', 'book', 6, NULL, true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
-INSERT INTO identidad.menus VALUES (7, 'CONTABILIDAD', 'Contabilidad', 'MÃ³dulo de contabilidad', '/contabilidad', 'calculator', 7, NULL, true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
-INSERT INTO identidad.menus VALUES (8, 'CONFIGURACION', 'ConfiguraciÃ³n', 'ConfiguraciÃ³n del sistema', '/configuracion', 'settings', 8, NULL, true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
-INSERT INTO identidad.menus VALUES (9, 'IDENTIDAD', 'Identidad', 'GestiÃ³n de usuarios y permisos', '/identidad', 'shield', 9, NULL, true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
-INSERT INTO identidad.menus VALUES (10, 'VENTAS_LISTA', 'Lista de Ventas', 'Ver todas las ventas', '/ventas/lista', 'list', 1, 2, true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
-INSERT INTO identidad.menus VALUES (11, 'VENTAS_NUEVA', 'Nueva Venta', 'Registrar nueva venta', '/ventas/nueva', 'plus', 2, 2, true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
-INSERT INTO identidad.menus VALUES (12, 'VENTAS_COTIZACIONES', 'Cotizaciones', 'Gestionar cotizaciones', '/ventas/cotizaciones', 'file-text', 3, 2, true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
-INSERT INTO identidad.menus VALUES (13, 'VENTAS_CAJAS', 'Cajas', 'GestiÃ³n de cajas', '/ventas/cajas', 'credit-card', 4, 2, true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
-INSERT INTO identidad.menus VALUES (14, 'COMPRAS_LISTA', 'Lista de Compras', 'Ver todas las compras', '/compras/lista', 'list', 1, 3, true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
-INSERT INTO identidad.menus VALUES (15, 'COMPRAS_NUEVA', 'Nueva Compra', 'Registrar nueva compra', '/compras/nueva', 'plus', 2, 3, true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
-INSERT INTO identidad.menus VALUES (16, 'COMPRAS_ORDENES', 'Ã“rdenes de Compra', 'Gestionar Ã³rdenes', '/compras/ordenes', 'clipboard', 3, 3, true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
-INSERT INTO identidad.menus VALUES (17, 'COMPRAS_PROVEEDORES', 'Proveedores', 'GestiÃ³n de proveedores', '/compras/proveedores', 'truck', 4, 3, true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
-INSERT INTO identidad.menus VALUES (18, 'INVENTARIO_STOCK', 'Stock', 'Consultar stock disponible', '/inventario/stock', 'package', 1, 4, true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
-INSERT INTO identidad.menus VALUES (19, 'INVENTARIO_MOVIMIENTOS', 'Movimientos', 'Movimientos de inventario', '/inventario/movimientos', 'repeat', 2, 4, true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
-INSERT INTO identidad.menus VALUES (20, 'INVENTARIO_ALMACENES', 'Almacenes', 'GestiÃ³n de almacenes', '/inventario/almacenes', 'home', 3, 4, true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
-INSERT INTO identidad.menus VALUES (21, 'CATALOGO_PRODUCTOS', 'Productos', 'GestiÃ³n de productos', '/catalogo/productos', 'box', 1, 6, true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
-INSERT INTO identidad.menus VALUES (22, 'CATALOGO_CATEGORIAS', 'CategorÃ­as', 'GestiÃ³n de categorÃ­as', '/catalogo/categorias', 'folder', 2, 6, true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
-INSERT INTO identidad.menus VALUES (23, 'CATALOGO_MARCAS', 'Marcas', 'GestiÃ³n de marcas', '/catalogo/marcas', 'tag', 3, 6, true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
-INSERT INTO identidad.menus VALUES (24, 'CATALOGO_PRECIOS', 'Listas de Precios', 'GestiÃ³n de precios', '/catalogo/precios', 'dollar-sign', 4, 6, true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
-INSERT INTO identidad.menus VALUES (25, 'IDENTIDAD_USUARIOS', 'Usuarios', 'GestiÃ³n de usuarios', '/identidad/usuarios', 'user', 1, 9, true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
-INSERT INTO identidad.menus VALUES (26, 'IDENTIDAD_ROLES', 'Roles', 'GestiÃ³n de roles', '/identidad/roles', 'users', 2, 9, true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
-INSERT INTO identidad.menus VALUES (27, 'IDENTIDAD_PERMISOS', 'Permisos', 'AsignaciÃ³n de permisos', '/identidad/permisos', 'lock', 3, 9, true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
+-- Datos de menús eliminados por redundancia (administrados en la sección de inserciones iniciales)
 
 
 --
@@ -3197,15 +3168,18 @@ INSERT INTO identidad.roles VALUES (4, 'ALMACENERO', 'Acceso a inventarios y kar
 -- Data for Name: tipos_permiso; Type: TABLE DATA; Schema: identidad; Owner: postgres
 --
 
-INSERT INTO identidad.tipos_permiso VALUES (1, 'CREATE', 'Crear', 'Permite crear nuevos registros', true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
-INSERT INTO identidad.tipos_permiso VALUES (2, 'READ', 'Leer', 'Permite ver y consultar registros', true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
-INSERT INTO identidad.tipos_permiso VALUES (3, 'UPDATE', 'Actualizar', 'Permite modificar registros existentes', true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
-INSERT INTO identidad.tipos_permiso VALUES (4, 'DELETE', 'Eliminar', 'Permite eliminar registros', true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
-INSERT INTO identidad.tipos_permiso VALUES (5, 'EXPORT', 'Exportar', 'Permite exportar datos a archivos', true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
-INSERT INTO identidad.tipos_permiso VALUES (6, 'IMPORT', 'Importar', 'Permite importar datos desde archivos', true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
-INSERT INTO identidad.tipos_permiso VALUES (7, 'APPROVE', 'Aprobar', 'Permite aprobar transacciones o documentos', true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
-INSERT INTO identidad.tipos_permiso VALUES (8, 'PRINT', 'Imprimir', 'Permite imprimir documentos', true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
-INSERT INTO identidad.tipos_permiso VALUES (9, 'CANCEL', 'Anular', 'Permite anular documentos o transacciones', true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
+INSERT INTO identidad.tipos_permiso (codigo, nombre, descripcion, usuario_creacion) VALUES 
+    ('VER', 'Ver', 'Permite consultar registros', 'SISTEMA'),
+    ('CREAR', 'Crear', 'Permite crear nuevos registros', 'SISTEMA'),
+    ('EDITAR', 'Editar', 'Permite modificar registros existentes', 'SISTEMA'),
+    ('ELIMINAR', 'Eliminar', 'Permite eliminar registros', 'SISTEMA'),
+    ('EXPORTAR', 'Exportar', 'Permite exportar datos', 'SISTEMA'),
+    ('IMPORTAR', 'Importar', 'Permite importar datos', 'SISTEMA'),
+    ('APROBAR', 'Aprobar', 'Permite aprobar documentos', 'SISTEMA'),
+    ('IMPRIMIR', 'Imprimir', 'Permite imprimir documentos', 'SISTEMA'),
+    ('ANULAR', 'Anular', 'Permite anular documentos', 'SISTEMA')
+ON CONFLICT (codigo) DO NOTHING;
+
 
 
 --
@@ -5371,79 +5345,92 @@ CREATE INDEX IF NOT EXISTS idx_usuarios_roles_rol ON identidad.usuarios_roles(id
 -- 3. INSERTAR DATOS INICIALES - TIPOS DE PERMISO
 -- =====================================================
 
-INSERT INTO identidad.tipos_permiso (codigo, nombre, descripcion) 
-VALUES
-    ('CREATE', 'Crear', 'Permite crear nuevos registros'),
-    ('READ', 'Leer', 'Permite ver y consultar registros'),
-    ('UPDATE', 'Actualizar', 'Permite modificar registros existentes'),
-    ('DELETE', 'Eliminar', 'Permite eliminar registros'),
-    ('EXPORT', 'Exportar', 'Permite exportar datos a archivos'),
-    ('IMPORT', 'Importar', 'Permite importar datos desde archivos'),
-    ('APPROVE', 'Aprobar', 'Permite aprobar transacciones o documentos'),
-    ('PRINT', 'Imprimir', 'Permite imprimir documentos'),
-    ('CANCEL', 'Anular', 'Permite anular documentos o transacciones')
-ON CONFLICT (codigo) DO NOTHING;
+-- Los tipos de permiso ya se insertan en la sección inicial de Identidad
+
 
 -- =====================================================
 -- 4. INSERTAR DATOS INICIALES - MENÃšS
 -- =====================================================
 
 -- MenÃºs principales (sin padre)
+-- Menús principales (Nivel 0)
 INSERT INTO identidad.menus (codigo, nombre, descripcion, ruta, icono, orden) 
 VALUES
-    ('DASHBOARD', 'Dashboard', 'Panel principal del sistema', '/dashboard', 'dashboard', 1),
-    ('VENTAS', 'Ventas', 'MÃ³dulo de gestiÃ³n de ventas', '/ventas', 'shopping-cart', 2),
-    ('COMPRAS', 'Compras', 'MÃ³dulo de gestiÃ³n de compras', '/compras', 'shopping-bag', 3),
-    ('INVENTARIO', 'Inventario', 'MÃ³dulo de gestiÃ³n de inventario', '/inventario', 'warehouse', 4),
-    ('CLIENTES', 'Clientes', 'MÃ³dulo de gestiÃ³n de clientes', '/clientes', 'users', 5),
-    ('CATALOGO', 'CatÃ¡logo', 'MÃ³dulo de gestiÃ³n de productos', '/catalogo', 'book', 6),
-    ('CONTABILIDAD', 'Contabilidad', 'MÃ³dulo de contabilidad', '/contabilidad', 'calculator', 7),
-    ('CONFIGURACION', 'ConfiguraciÃ³n', 'ConfiguraciÃ³n del sistema', '/configuracion', 'settings', 8),
-    ('IDENTIDAD', 'Identidad', 'GestiÃ³n de usuarios y permisos', '/identidad', 'shield', 9)
-ON CONFLICT (codigo) DO NOTHING;
+    ('DASHBOARD', 'Dashboard', 'Panel principal del sistema', '/dashboard', 'layout-dashboard', 1),
+    ('CATALOGO', 'Catálogo', 'Módulo de gestión de productos', '/catalogo', 'package', 2),
+    ('VENTAS', 'Ventas', 'Módulo de gestión de ventas', '/ventas', 'shopping-cart', 3),
+    ('INVENTARIO', 'Inventario', 'Módulo de gestión de inventario', '/inventario', 'warehouse', 4),
+    ('COMPRAS', 'Compras', 'Módulo de gestión de compras', '/compras', 'shopping-bag', 5),
+    ('REPORTES', 'Reportes', 'Módulo de reportes y analítica', '/reportes', 'file-text', 6),
+    ('SEGURIDAD', 'Seguridad', 'Gestión de usuarios y permisos', '/seguridad', 'shield-check', 7),
+    ('CONFIGURACION', 'Configuración', 'Configuración general del sistema', '/configuracion', 'settings', 8)
+ON CONFLICT (codigo) DO UPDATE SET 
+    nombre = EXCLUDED.nombre,
+    ruta = EXCLUDED.ruta,
+    icono = EXCLUDED.icono;
 
--- SubmenÃºs de VENTAS
+-- Submenús de CATALOGO
 INSERT INTO identidad.menus (codigo, nombre, descripcion, ruta, icono, orden, id_menu_padre) 
 VALUES
-    ('VENTAS_LISTA', 'Lista de Ventas', 'Ver todas las ventas', '/ventas/lista', 'list', 1, (SELECT id_menu FROM identidad.menus WHERE codigo = 'VENTAS')),
-    ('VENTAS_NUEVA', 'Nueva Venta', 'Registrar nueva venta', '/ventas/nueva', 'plus', 2, (SELECT id_menu FROM identidad.menus WHERE codigo = 'VENTAS')),
-    ('VENTAS_COTIZACIONES', 'Cotizaciones', 'Gestionar cotizaciones', '/ventas/cotizaciones', 'file-text', 3, (SELECT id_menu FROM identidad.menus WHERE codigo = 'VENTAS')),
-    ('VENTAS_CAJAS', 'Cajas', 'GestiÃ³n de cajas', '/ventas/cajas', 'credit-card', 4, (SELECT id_menu FROM identidad.menus WHERE codigo = 'VENTAS'))
-ON CONFLICT (codigo) DO NOTHING;
+    ('CAT_PRODUCTOS', 'Productos', 'Gestión de catálogo de productos', '/catalogo/productos', 'box', 1, (SELECT id_menu FROM identidad.menus WHERE codigo = 'CATALOGO')),
+    ('CAT_CATEGORIAS', 'Categorías', 'Categorización de productos', '/catalogo/categorias', 'folder-tree', 2, (SELECT id_menu FROM identidad.menus WHERE codigo = 'CATALOGO')),
+    ('CAT_MARCAS', 'Marcas', 'Marcas de productos', '/catalogo/marcas', 'tags', 3, (SELECT id_menu FROM identidad.menus WHERE codigo = 'CATALOGO')),
+    ('CAT_UNIDADES', 'Unidades de Medida', 'Unidades de medida SUNAT', '/catalogo/unidades-medida', 'ruler', 4, (SELECT id_menu FROM identidad.menus WHERE codigo = 'CATALOGO')),
+    ('CAT_PRECIOS', 'Listas de Precios', 'Gestión de listas de precios', '/catalogo/listas-precios', 'dollar-sign', 5, (SELECT id_menu FROM identidad.menus WHERE codigo = 'CATALOGO'))
+ON CONFLICT (codigo) DO UPDATE SET 
+    nombre = EXCLUDED.nombre,
+    ruta = EXCLUDED.ruta,
+    icono = EXCLUDED.icono;
 
--- SubmenÃºs de COMPRAS
+-- Submenús de VENTAS
 INSERT INTO identidad.menus (codigo, nombre, descripcion, ruta, icono, orden, id_menu_padre) 
 VALUES
-    ('COMPRAS_LISTA', 'Lista de Compras', 'Ver todas las compras', '/compras/lista', 'list', 1, (SELECT id_menu FROM identidad.menus WHERE codigo = 'COMPRAS')),
-    ('COMPRAS_NUEVA', 'Nueva Compra', 'Registrar nueva compra', '/compras/nueva', 'plus', 2, (SELECT id_menu FROM identidad.menus WHERE codigo = 'COMPRAS')),
-    ('COMPRAS_ORDENES', 'Ã“rdenes de Compra', 'Gestionar Ã³rdenes', '/compras/ordenes', 'clipboard', 3, (SELECT id_menu FROM identidad.menus WHERE codigo = 'COMPRAS')),
-    ('COMPRAS_PROVEEDORES', 'Proveedores', 'GestiÃ³n de proveedores', '/compras/proveedores', 'truck', 4, (SELECT id_menu FROM identidad.menus WHERE codigo = 'COMPRAS'))
-ON CONFLICT (codigo) DO NOTHING;
+    ('VEN_POS', 'Punto de Venta', 'Terminal de ventas rápida', '/ventas/pos', 'calculator', 1, (SELECT id_menu FROM identidad.menus WHERE codigo = 'VENTAS')),
+    ('VEN_LISTA', 'Ventas', 'Listado y gestión de ventas', '/ventas/lista', 'list', 2, (SELECT id_menu FROM identidad.menus WHERE codigo = 'VENTAS')),
+    ('VEN_NOTAS', 'Notas SUNAT', 'Notas de crédito y débito', '/ventas/notas', 'file-text', 3, (SELECT id_menu FROM identidad.menus WHERE codigo = 'VENTAS')),
+    ('VEN_COTIZACIONES', 'Cotizaciones', 'Gestión de proformas y cotizaciones', '/ventas/cotizaciones', 'file-text', 4, (SELECT id_menu FROM identidad.menus WHERE codigo = 'VENTAS')),
+    ('VEN_CLIENTES', 'Clientes', 'Módulo de gestión de clientes', '/clientes', 'users', 5, (SELECT id_menu FROM identidad.menus WHERE codigo = 'VENTAS'))
+ON CONFLICT (codigo) DO UPDATE SET 
+    nombre = EXCLUDED.nombre,
+    ruta = EXCLUDED.ruta,
+    icono = EXCLUDED.icono;
 
--- SubmenÃºs de INVENTARIO
+-- Submenús de INVENTARIO
 INSERT INTO identidad.menus (codigo, nombre, descripcion, ruta, icono, orden, id_menu_padre) 
 VALUES
-    ('INVENTARIO_STOCK', 'Stock', 'Consultar stock disponible', '/inventario/stock', 'package', 1, (SELECT id_menu FROM identidad.menus WHERE codigo = 'INVENTARIO')),
-    ('INVENTARIO_MOVIMIENTOS', 'Movimientos', 'Movimientos de inventario', '/inventario/movimientos', 'repeat', 2, (SELECT id_menu FROM identidad.menus WHERE codigo = 'INVENTARIO')),
-    ('INVENTARIO_ALMACENES', 'Almacenes', 'GestiÃ³n de almacenes', '/inventario/almacenes', 'home', 3, (SELECT id_menu FROM identidad.menus WHERE codigo = 'INVENTARIO'))
-ON CONFLICT (codigo) DO NOTHING;
+    ('INV_STOCK', 'Stock', 'Consulta de existencias', '/inventario/stock', 'box', 1, (SELECT id_menu FROM identidad.menus WHERE codigo = 'INVENTARIO')),
+    ('INV_MOVIMIENTOS', 'Operaciones', 'Entradas y salidas de almacén', '/inventario/movimientos', 'arrow-left-right', 2, (SELECT id_menu FROM identidad.menus WHERE codigo = 'INVENTARIO')),
+    ('INV_TRASLADOS', 'Traslados', 'Transferencias entre almacenes', '/inventario/traslados', 'truck', 3, (SELECT id_menu FROM identidad.menus WHERE codigo = 'INVENTARIO')),
+    ('INV_KARDEX_REP', 'Reporte Kardex', 'Kardex valorizado SUNAT', '/inventario/kardex/reporte', 'bar-chart-3', 4, (SELECT id_menu FROM identidad.menus WHERE codigo = 'INVENTARIO')),
+    ('INV_KARDEX_PER', 'Periodos Kardex', 'Gestión de periodos de inventario', '/inventario/kardex/periodos', 'history', 5, (SELECT id_menu FROM identidad.menus WHERE codigo = 'INVENTARIO')),
+    ('INV_ALMACENES', 'Almacenes', 'Gestión de locales y almacenes', '/inventario/almacenes', 'home', 6, (SELECT id_menu FROM identidad.menus WHERE codigo = 'INVENTARIO'))
+ON CONFLICT (codigo) DO UPDATE SET 
+    nombre = EXCLUDED.nombre,
+    ruta = EXCLUDED.ruta,
+    icono = EXCLUDED.icono;
 
--- SubmenÃºs de CATALOGO
+-- Submenús de COMPRAS
 INSERT INTO identidad.menus (codigo, nombre, descripcion, ruta, icono, orden, id_menu_padre) 
 VALUES
-    ('CATALOGO_PRODUCTOS', 'Productos', 'GestiÃ³n de productos', '/catalogo/productos', 'box', 1, (SELECT id_menu FROM identidad.menus WHERE codigo = 'CATALOGO')),
-    ('CATALOGO_CATEGORIAS', 'CategorÃ­as', 'GestiÃ³n de categorÃ­as', '/catalogo/categorias', 'folder', 2, (SELECT id_menu FROM identidad.menus WHERE codigo = 'CATALOGO')),
-    ('CATALOGO_MARCAS', 'Marcas', 'GestiÃ³n de marcas', '/catalogo/marcas', 'tag', 3, (SELECT id_menu FROM identidad.menus WHERE codigo = 'CATALOGO')),
-    ('CATALOGO_PRECIOS', 'Listas de Precios', 'GestiÃ³n de precios', '/catalogo/precios', 'dollar-sign', 4, (SELECT id_menu FROM identidad.menus WHERE codigo = 'CATALOGO'))
-ON CONFLICT (codigo) DO NOTHING;
+    ('COM_ORDENES', 'Órdenes de Compra', 'Pedidos a proveedores', '/proveedores/ordenes', 'clipboard-list', 1, (SELECT id_menu FROM identidad.menus WHERE codigo = 'COMPRAS')),
+    ('COM_LISTA', 'Compras', 'Registro de compras y facturas', '/compras/lista', 'shopping-bag', 2, (SELECT id_menu FROM identidad.menus WHERE codigo = 'COMPRAS')),
+    ('COM_NOTAS', 'Notas de Compra', 'Notas de crédito/débito de compra', '/compras/notas', 'file-text', 3, (SELECT id_menu FROM identidad.menus WHERE codigo = 'COMPRAS')),
+    ('COM_PROVEEDORES', 'Proveedores', 'Gestión de proveedores', '/proveedores', 'truck', 4, (SELECT id_menu FROM identidad.menus WHERE codigo = 'COMPRAS'))
+ON CONFLICT (codigo) DO UPDATE SET 
+    nombre = EXCLUDED.nombre,
+    ruta = EXCLUDED.ruta,
+    icono = EXCLUDED.icono;
 
--- SubmenÃºs de IDENTIDAD
+-- Submenús de SEGURIDAD
 INSERT INTO identidad.menus (codigo, nombre, descripcion, ruta, icono, orden, id_menu_padre) 
 VALUES
-    ('IDENTIDAD_USUARIOS', 'Usuarios', 'GestiÃ³n de usuarios', '/identidad/usuarios', 'user', 1, (SELECT id_menu FROM identidad.menus WHERE codigo = 'IDENTIDAD')),
-    ('IDENTIDAD_ROLES', 'Roles', 'GestiÃ³n de roles', '/identidad/roles', 'users', 2, (SELECT id_menu FROM identidad.menus WHERE codigo = 'IDENTIDAD')),
-    ('IDENTIDAD_PERMISOS', 'Permisos', 'AsignaciÃ³n de permisos', '/identidad/permisos', 'lock', 3, (SELECT id_menu FROM identidad.menus WHERE codigo = 'IDENTIDAD'))
-ON CONFLICT (codigo) DO NOTHING;
+    ('SEG_USUARIOS', 'Usuarios', 'Gestión de cuentas de usuario', '/seguridad/usuarios', 'users', 1, (SELECT id_menu FROM identidad.menus WHERE codigo = 'SEGURIDAD')),
+    ('SEG_ROLES', 'Roles y Permisos', 'Configuración de accesos', '/seguridad/roles', 'user-check', 2, (SELECT id_menu FROM identidad.menus WHERE codigo = 'SEGURIDAD')),
+    ('SEG_TRABAJADORES', 'Personal', 'Gestión de personal/trabajadores', '/seguridad/trabajadores', 'user-plus', 3, (SELECT id_menu FROM identidad.menus WHERE codigo = 'SEGURIDAD'))
+ON CONFLICT (codigo) DO UPDATE SET 
+    nombre = EXCLUDED.nombre,
+    ruta = EXCLUDED.ruta,
+    icono = EXCLUDED.icono;
 
 -- =====================================================
 -- 5. VERIFICACIÃ“N
@@ -5460,8 +5447,30 @@ SELECT 'Roles-MenÃºs-Permisos', COUNT(*) FROM identidad.roles_menus_permisos
 UNION ALL
 SELECT 'Usuarios-Roles', COUNT(*) FROM identidad.usuarios_roles;
 
+-- Submenús de CONFIGURACIÓN
+INSERT INTO identidad.menus (codigo, nombre, descripcion, ruta, icono, orden, id_menu_padre) 
+VALUES
+    ('CONF_GENERAL', 'General', 'Configuración básica del sistema', '/configuracion/general', 'settings-2', 1, (SELECT id_menu FROM identidad.menus WHERE codigo = 'CONFIGURACION')),
+    ('CONF_FISCAL', 'Fiscal', 'Empresa, impuestos y SUNAT', '/configuracion/fiscal', 'building-2', 2, (SELECT id_menu FROM identidad.menus WHERE codigo = 'CONFIGURACION')),
+    ('CONF_COMPROBANTES', 'Series y Correlativos', 'Gestión de series de facturación', '/configuracion/comprobantes', 'hash', 3, (SELECT id_menu FROM identidad.menus WHERE codigo = 'CONFIGURACION'))
+ON CONFLICT (codigo) DO UPDATE SET 
+    nombre = EXCLUDED.nombre,
+    ruta = EXCLUDED.ruta,
+    icono = EXCLUDED.icono;
+
+-- Submenús de REPORTES
+INSERT INTO identidad.menus (codigo, nombre, descripcion, ruta, icono, orden, id_menu_padre) 
+VALUES
+    ('REP_VENTAS', 'Ventas por Fecha', 'Reporte detallado de ingresos', '/reportes/ventas', 'line-chart', 1, (SELECT id_menu FROM identidad.menus WHERE codigo = 'REPORTES')),
+    ('REP_INVENTARIO', 'Kardex Valorizado', 'Reporte de stock y valorización', '/reportes/inventario', 'pie-chart', 2, (SELECT id_menu FROM identidad.menus WHERE codigo = 'REPORTES')),
+    ('REP_AUDITORIA', 'Log de Accesos', 'Auditoría de actividad de usuarios', '/reportes/auditoria', 'activity', 3, (SELECT id_menu FROM identidad.menus WHERE codigo = 'REPORTES'))
+ON CONFLICT (codigo) DO UPDATE SET 
+    nombre = EXCLUDED.nombre,
+    ruta = EXCLUDED.ruta,
+    icono = EXCLUDED.icono;
+
 -- =====================================================
--- FIN DEL SCRIPT
+-- FIN DEL SCRIPT SECCIÓN IDENTIDAD
 -- =====================================================
 -- =====================================================
 -- Script de Datos Semilla (Datos de Prueba)
@@ -5727,58 +5736,7 @@ INSERT INTO configuracion.tablas_generales_detalle VALUES (47, 13, 'PAR', 'Parci
 INSERT INTO configuracion.tablas_generales_detalle VALUES (48, 13, 'CRE', 'A CrÃƒÂ©dito', NULL, 3, true, '2026-01-27 20:38:29.881027-05', 'SISTEMA', NULL, NULL, true);
 INSERT INTO configuracion.tablas_generales_detalle VALUES (49, 13, 'PEN', 'Pendiente', NULL, 4, true, '2026-01-27 20:38:29.881027-05', 'SISTEMA', NULL, NULL, true);
 INSERT INTO configuracion.tablas_generales_detalle VALUES (50, 13, 'ANU', 'Anulado', NULL, 5, true, '2026-01-27 20:38:29.881027-05', 'SISTEMA', NULL, NULL, true);
-INSERT INTO identidad.menus VALUES (1, 'DASHBOARD', 'Dashboard', 'Panel principal del sistema', '/dashboard', 'dashboard', 1, NULL, true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
-INSERT INTO identidad.menus VALUES (2, 'VENTAS', 'Ventas', 'MÃ³dulo de gestiÃ³n de ventas', '/ventas', 'shopping-cart', 2, NULL, true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
-INSERT INTO identidad.menus VALUES (3, 'COMPRAS', 'Compras', 'MÃ³dulo de gestiÃ³n de compras', '/compras', 'shopping-bag', 3, NULL, true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
-INSERT INTO identidad.menus VALUES (4, 'INVENTARIO', 'Inventario', 'MÃ³dulo de gestiÃ³n de inventario', '/inventario', 'warehouse', 4, NULL, true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
-INSERT INTO identidad.menus VALUES (5, 'CLIENTES', 'Clientes', 'MÃ³dulo de gestiÃ³n de clientes', '/clientes', 'users', 5, NULL, true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
-INSERT INTO identidad.menus VALUES (6, 'CATALOGO', 'CatÃ¡logo', 'MÃ³dulo de gestiÃ³n de productos', '/catalogo', 'book', 6, NULL, true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
-INSERT INTO identidad.menus VALUES (7, 'CONTABILIDAD', 'Contabilidad', 'MÃ³dulo de contabilidad', '/contabilidad', 'calculator', 7, NULL, true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
-INSERT INTO identidad.menus VALUES (8, 'CONFIGURACION', 'ConfiguraciÃ³n', 'ConfiguraciÃ³n del sistema', '/configuracion', 'settings', 8, NULL, true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
-INSERT INTO identidad.menus VALUES (9, 'IDENTIDAD', 'Identidad', 'GestiÃ³n de usuarios y permisos', '/identidad', 'shield', 9, NULL, true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
-INSERT INTO identidad.menus VALUES (10, 'VENTAS_LISTA', 'Lista de Ventas', 'Ver todas las ventas', '/ventas/lista', 'list', 1, 2, true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
-INSERT INTO identidad.menus VALUES (11, 'VENTAS_NUEVA', 'Nueva Venta', 'Registrar nueva venta', '/ventas/nueva', 'plus', 2, 2, true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
-INSERT INTO identidad.menus VALUES (12, 'VENTAS_COTIZACIONES', 'Cotizaciones', 'Gestionar cotizaciones', '/ventas/cotizaciones', 'file-text', 3, 2, true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
-INSERT INTO identidad.menus VALUES (13, 'VENTAS_CAJAS', 'Cajas', 'GestiÃ³n de cajas', '/ventas/cajas', 'credit-card', 4, 2, true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
-INSERT INTO identidad.menus VALUES (14, 'COMPRAS_LISTA', 'Lista de Compras', 'Ver todas las compras', '/compras/lista', 'list', 1, 3, true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
-INSERT INTO identidad.menus VALUES (15, 'COMPRAS_NUEVA', 'Nueva Compra', 'Registrar nueva compra', '/compras/nueva', 'plus', 2, 3, true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
-INSERT INTO identidad.menus VALUES (16, 'COMPRAS_ORDENES', 'Ã“rdenes de Compra', 'Gestionar Ã³rdenes', '/compras/ordenes', 'clipboard', 3, 3, true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
-INSERT INTO identidad.menus VALUES (17, 'COMPRAS_PROVEEDORES', 'Proveedores', 'GestiÃ³n de proveedores', '/compras/proveedores', 'truck', 4, 3, true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
-INSERT INTO identidad.menus VALUES (18, 'INVENTARIO_STOCK', 'Stock', 'Consultar stock disponible', '/inventario/stock', 'package', 1, 4, true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
-INSERT INTO identidad.menus VALUES (19, 'INVENTARIO_MOVIMIENTOS', 'Movimientos', 'Movimientos de inventario', '/inventario/movimientos', 'repeat', 2, 4, true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
-INSERT INTO identidad.menus VALUES (20, 'INVENTARIO_ALMACENES', 'Almacenes', 'GestiÃ³n de almacenes', '/inventario/almacenes', 'home', 3, 4, true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
-INSERT INTO identidad.menus VALUES (21, 'CATALOGO_PRODUCTOS', 'Productos', 'GestiÃ³n de productos', '/catalogo/productos', 'box', 1, 6, true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
-INSERT INTO identidad.menus VALUES (22, 'CATALOGO_CATEGORIAS', 'CategorÃ­as', 'GestiÃ³n de categorÃ­as', '/catalogo/categorias', 'folder', 2, 6, true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
-INSERT INTO identidad.menus VALUES (23, 'CATALOGO_MARCAS', 'Marcas', 'GestiÃ³n de marcas', '/catalogo/marcas', 'tag', 3, 6, true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
-INSERT INTO identidad.menus VALUES (24, 'CATALOGO_PRECIOS', 'Listas de Precios', 'GestiÃ³n de precios', '/catalogo/precios', 'dollar-sign', 4, 6, true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
-INSERT INTO identidad.menus VALUES (25, 'IDENTIDAD_USUARIOS', 'Usuarios', 'GestiÃ³n de usuarios', '/identidad/usuarios', 'user', 1, 9, true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
-INSERT INTO identidad.menus VALUES (26, 'IDENTIDAD_ROLES', 'Roles', 'GestiÃ³n de roles', '/identidad/roles', 'users', 2, 9, true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
-INSERT INTO identidad.menus VALUES (27, 'IDENTIDAD_PERMISOS', 'Permisos', 'AsignaciÃ³n de permisos', '/identidad/permisos', 'lock', 3, 9, true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
-INSERT INTO identidad.roles VALUES (1, 'ADMINISTRADOR', 'Acceso total al sistema', true, '2026-01-27 17:36:28.866902', 'SYSTEM', '2026-01-27 17:36:28.866902', NULL);
-INSERT INTO identidad.roles VALUES (2, 'VENDEDOR', 'Acceso a mÃ³dulo de ventas y clientes', true, '2026-01-27 17:36:28.866902', 'SYSTEM', '2026-01-27 17:36:28.866902', NULL);
-INSERT INTO identidad.roles VALUES (3, 'CAJERO', 'Acceso a apertura/cierre de caja y cobros', true, '2026-01-27 17:36:28.866902', 'SYSTEM', '2026-01-27 17:36:28.866902', NULL);
-INSERT INTO identidad.roles VALUES (4, 'ALMACENERO', 'Acceso a inventarios y kardex', true, '2026-01-27 17:36:28.866902', 'SYSTEM', '2026-01-27 17:36:28.866902', NULL);
-INSERT INTO identidad.tipos_permiso VALUES (1, 'CREATE', 'Crear', 'Permite crear nuevos registros', true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
-INSERT INTO identidad.tipos_permiso VALUES (2, 'READ', 'Leer', 'Permite ver y consultar registros', true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
-INSERT INTO identidad.tipos_permiso VALUES (3, 'UPDATE', 'Actualizar', 'Permite modificar registros existentes', true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
-INSERT INTO identidad.tipos_permiso VALUES (4, 'DELETE', 'Eliminar', 'Permite eliminar registros', true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
-INSERT INTO identidad.tipos_permiso VALUES (5, 'EXPORT', 'Exportar', 'Permite exportar datos a archivos', true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
-INSERT INTO identidad.tipos_permiso VALUES (6, 'IMPORT', 'Importar', 'Permite importar datos desde archivos', true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
-INSERT INTO identidad.tipos_permiso VALUES (7, 'APPROVE', 'Aprobar', 'Permite aprobar transacciones o documentos', true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
-INSERT INTO identidad.tipos_permiso VALUES (8, 'PRINT', 'Imprimir', 'Permite imprimir documentos', true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
-INSERT INTO identidad.tipos_permiso VALUES (9, 'CANCEL', 'Anular', 'Permite anular documentos o transacciones', true, '2026-01-28 10:38:51.065407', 'SYSTEM', NULL, NULL);
-INSERT INTO identidad.usuarios VALUES (1, 'admin', '$2a$12$R9h/cIPz0gi.URNNXRFXjOios9lnpSHkTE.oFw0kX8k.js9l0.y', 'admin@sistema.com', 'Administrador', 'Principal', 1, NULL, true, '2026-01-27 17:36:28.866902', 'SYSTEM', '2026-01-27 17:36:28.866902', NULL);
-INSERT INTO inventario.almacenes VALUES (1, 'ALMACEN CENTRAL', 'SEDE PRINCIPAL', true, true, '2026-01-27 17:36:28.866902', 'SYSTEM', '2026-01-27 17:36:28.866902', NULL);
-INSERT INTO public."__EFMigrationsHistory" VALUES ('20260127221140_Inicial', '8.0.8');
-INSERT INTO public."__EFMigrationsHistory" VALUES ('20260127221706_AjusteEsquema', '8.0.8');
-INSERT INTO public."__EFMigrationsHistory" VALUES ('20260129221256_AgregarTiposComprobante', '8.0.0');
-INSERT INTO ventas.metodos_pago VALUES (1, 'EFE', 'Efectivo', false, true, '2026-01-27 17:36:28.866902', 'SYSTEM', '2026-01-27 17:36:28.866902', NULL);
-INSERT INTO ventas.metodos_pago VALUES (2, 'TAR', 'Tarjeta CrÃ©dito/DÃ©bito', true, true, '2026-01-27 17:36:28.866902', 'SYSTEM', '2026-01-27 17:36:28.866902', NULL);
-INSERT INTO ventas.metodos_pago VALUES (3, 'TRA', 'Transferencia Bancaria', true, true, '2026-01-27 17:36:28.866902', 'SYSTEM', '2026-01-27 17:36:28.866902', NULL);
-INSERT INTO ventas.metodos_pago VALUES (4, 'YAP', 'Yape/Plin', true, true, '2026-01-27 17:36:28.866902', 'SYSTEM', '2026-01-27 17:36:28.866902', NULL);
--- Script para agregar menÃºs de CatÃ¡logo faltantes
--- Fecha: 2026-01-29
--- DescripciÃ³n: Agrega menÃºs para Unidades de Medida y Listas de Precios
+-- Datos de menús adicionales eliminados por redundancia
 
 -- Primero, obtener el ID del menÃº padre "CatÃ¡logo"
 -- Asumiendo que el cÃ³digo del menÃº CatÃ¡logo es 'CATALOGO'

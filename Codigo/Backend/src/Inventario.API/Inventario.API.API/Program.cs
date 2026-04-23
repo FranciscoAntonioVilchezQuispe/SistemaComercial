@@ -4,7 +4,6 @@ using Inventario.API.Domain.Interfaces;
 using Inventario.API.Infrastructure.Repositorios;
 using Inventario.API.Endpoints;
 using Inventario.API.Application.Interfaces;
-using Microsoft.OpenApi;
 
 using Nucleo.Comun.Application.Extensions;
 using Nucleo.Comun.API.Extensions;
@@ -13,16 +12,14 @@ AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.WebHost.ConfigureKestrelLimits();
 builder.AddCentralizedLogging();
 
-
-
 // Add services to the container.
-// builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Inventario.API", Version = "v1" });
+    c.SwaggerDoc("v1", new() { Title = "Inventario.API", Version = "v1" });
 });
 
 // DbContext e Interfaz
@@ -33,7 +30,7 @@ builder.Services.AddDbContext<InventarioDbContext>(options =>
     options.UseSnakeCaseNamingConvention();
 });
 
-// Importante: Registrar la interfaz para los manejadores de MediatR
+// Registrar la interfaz para los manejadores de MediatR
 builder.Services.AddScoped<IInventarioDbContext>(provider => provider.GetRequiredService<InventarioDbContext>());
 
 // Repositorios
@@ -48,13 +45,10 @@ builder.Services.AddScoped<Inventario.API.Application.Interfaces.IKardexService,
 builder.Services.AddScoped<Inventario.API.Application.Servicios.IKardexRecalculoService, Inventario.API.Application.Servicios.KardexRecalculoService>();
 builder.Services.AddScoped<Inventario.API.Application.Interfaces.IValidacionReglaSunatService, Inventario.API.Application.Servicios.ValidacionReglaSunatService>();
 
-// MediatR (Scan Application Assembly de forma segura)
+// MediatR
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Inventario.API.Application.Comandos.CrearMovimientoInventarioComando).Assembly));
 
 // CORS
-// CORS
-var frontendUrl = builder.Configuration.GetValue<string>("FrontendUrl") ?? "http://localhost:5180";
-
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend",
@@ -67,7 +61,6 @@ builder.Services.AddCors(options =>
         });
 });
 
-// Configuración de Autorización
 builder.Services.AddAuthorization();
 
 var app = builder.Build();
@@ -81,10 +74,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-// app.UseHttpsRedirection(); // Opcional en dev local
 app.UseCors("AllowFrontend");
 app.UseAuthorization();
-// app.MapControllers();
 
 // Map Endpoints
 app.MapAlmacenEndpoints();
@@ -94,3 +85,5 @@ app.MapKardexEndpoints();
 app.MapTrasladoEndpoints();
 
 app.Run();
+
+public partial class Program { }

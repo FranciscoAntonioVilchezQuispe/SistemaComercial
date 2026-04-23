@@ -74,6 +74,13 @@ namespace Identidad.API.Endpoints
                 var result = await mediator.Send(command);
                 return result.Status == 200 ? Results.Ok(result) : Results.BadRequest(result);
             });
+
+            grupo.MapPost("/{idRol}/acceso-granular", async (long idRol, Identidad.API.Application.Features.Roles.ActualizarAccesoRol.ActualizarAccesoRolCommand command, IMediator mediator) =>
+            {
+                if (idRol != command.IdRol) return Results.BadRequest("ID de rol no coincide.");
+                var result = await mediator.Send(command);
+                return result.Status == 200 ? Results.Ok(result) : Results.BadRequest(result);
+            });
         }
     }
 

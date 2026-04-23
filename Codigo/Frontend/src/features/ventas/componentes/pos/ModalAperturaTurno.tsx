@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { 
     Dialog, 
     DialogContent, 
@@ -12,8 +12,10 @@ import { Input } from '@/componentes/ui/input';
 import { Label } from '@/componentes/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/componentes/ui/select';
 import { turnoService, TurnoVendedorDto } from '../../servicios/turnoService';
+import { servicioCajas } from '../../servicios/servicioCajas';
+import { CajaListItem } from '../../tipos/ventas.types';
 import { toast } from 'sonner';
-import { Wallet, Store, ArrowRightCircle } from 'lucide-react';
+import { Wallet, Store, ArrowRightCircle, Loader2 } from 'lucide-react';
 
 interface ModalAperturaTurnoProps {
     isOpen: boolean;
@@ -21,11 +23,40 @@ interface ModalAperturaTurnoProps {
 }
 
 export const ModalAperturaTurno = ({ isOpen, onSuccess }: ModalAperturaTurnoProps) => {
-    const [cajaId, setCajaId] = useState<string>('1'); // Por simplicidad, caja 1 por defecto
+    const [cajaId, setCajaId] = useState<string>('');
     const [monto, setMonto] = useState<string>('0.00');
     const [loading, setLoading] = useState(false);
+    const [cajas, setCajas] = useState<CajaListItem[]>([]);
+    const [cargandoCajas, setCargandoCajas] = useState(false);
+
+    useEffect(() => {
+        if (isOpen) {
+            cargarCajas();
+        }
+    }, [isOpen]);
+
+    const cargarCajas = async () => {
+        setCargandoCajas(true);
+        try {
+            const data = await servicioCajas.obtenerTodas();
+            const cajasActivas = data.filter(c => c.activado);
+            setCajas(cajasActivas);
+            if (cajasActivas.length > 0) {
+                setCajaId(cajasActivas[0].id.toString());
+            }
+        } catch (error) {
+            console.error("Error al cargar cajas", error);
+        } finally {
+            setCargandoCajas(false);
+        }
+    };
 
     const handleAbrir = async () => {
+        if (!cajaId) {
+            toast.error("Debe seleccionar una caja");
+            return;
+        }
+
         setLoading(true);
         try {
             const m = parseFloat(monto);
@@ -38,7 +69,8 @@ export const ModalAperturaTurno = ({ isOpen, onSuccess }: ModalAperturaTurnoProp
             toast.success("Turno abierto exitosamente");
             onSuccess(turno);
         } catch (error: any) {
-            toast.error(error.response?.data || "Error al abrir turno");
+            // El interceptor ya maneja el toast si es error de API, 
+            // pero si es un error local o específico lo capturamos aquí.
         } finally {
             setLoading(false);
         }
@@ -59,20 +91,33 @@ export const ModalAperturaTurno = ({ isOpen, onSuccess }: ModalAperturaTurnoProp
                 <div className="grid gap-6 py-4">
                     <div className="space-y-2">
                         <Label htmlFor="caja">Seleccionar Caja</Label>
-                        <Select value={cajaId} onValueChange={setCajaId}>
+                        <Select value={cajaId} onValueChange={setCajaId} disabled={cargandoCajas}>
                             <SelectTrigger className="h-12 bg-slate-50 dark:bg-slate-900 border-slate-200">
-                                <SelectValue placeholder="Seleccione una caja" />
+                                {cargandoCajas ? (
+                                    <div className="flex items-center gap-2">
+                                        <Loader2 className="h-4 w-4 animate-spin" />
+                                        <span>Cargando cajas...</span>
+                                    </div>
+                                ) : (
+                                    <SelectValue placeholder="Seleccione una caja" />
+                                )}
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="1">Caja Principal - Central</SelectItem>
-                                <SelectItem value="2">Caja 02 - Pasillo A</SelectItem>
+                                {cajas.map(caja => (
+                                    <SelectItem key={caja.id} value={caja.id.toString()}>
+                                        {caja.nombreCaja}
+                                    </SelectItem>
+                                ))}
+                                {cajas.length === 0 && !cargandoCajas && (
+                                    <SelectItem value="0" disabled>No hay cajas activas</SelectItem>
+                                )}
                             </SelectContent>
                         </Select>
                     </div>
                     <div className="space-y-2">
                         <Label htmlFor="monto">Monto Inicial (Soles)</Label>
                         <div className="relative">
-                            <Wallet className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
+                            <span className="absolute left-3 top-3 font-semibold text-muted-foreground">S/</span>
                             <Input 
                                 id="monto" 
                                 type="number" 
@@ -87,10 +132,15 @@ export const ModalAperturaTurno = ({ isOpen, onSuccess }: ModalAperturaTurnoProp
                 <DialogFooter>
                     <Button 
                         onClick={handleAbrir} 
-                        className="w-full h-12 text-base" 
-                        disabled={loading}
+                        className="w-full h-12 text-base font-bold shadow-lg shadow-primary/20" 
+                        disabled={loading || cargandoCajas || cajas.length === 0}
                     >
-                        {loading ? "Abriendo..." : (
+                        {loading ? (
+                            <div className="flex items-center gap-2">
+                                <Loader2 className="h-5 w-5 animate-spin" />
+                                Abriendo...
+                            </div>
+                        ) : (
                             <div className="flex items-center gap-2">
                                 Iniciar Jornada <ArrowRightCircle className="h-5 w-5" />
                             </div>

@@ -93,6 +93,10 @@
 - **Error MSB3021/MSB3027**: En entornos de desarrollo con depuradores activos (ej: VS Code + C# Dev Kit), los archivos `.pdb` y `.dll` suelen quedar bloqueados por procesos como `netcoredbg.exe`.
 - **Solución**: Si el script `kill_ports.ps1` no es suficiente, ejecutar `taskkill /F /IM netcoredbg.exe` para liberar los archivos y permitir una compilación limpia.
 
+## [2026-04-19] Verificación de Compilación Obligatoria
+- **Error**: Entregar código TSX con errores de importación y tipos por no ejecutar el compilador.
+- **Lección**: NUNCA dar por terminada una tarea que involucre cambios de código sin ejecutar `tsc` (frontend) o `build` (backend). La "falsa sensación de completitud" es un riesgo para la calidad. He actualizado GEMINI.md para que esta verificación sea un paso obligatorio.
+
 ## [2026-04-12] Secuencialidad y Formateo de Kardex
 - **Secuencialidad por Desfase**: Cuando múltiples documentos (ventas) ocurren en la misma fecha sin marca de tiempo precisa, se puede inyectar el correlativo como segundos (`TimeSpan.FromSeconds(Numero % 60)`) para forzar un ordenamiento determinista en el Kardex.
 - **Estandarización de Formatos**: Para cumplimiento SUNAT y consistencia visual, los números de documento deben normalizarse (ej. `PadLeft(8, '0')`) en el punto de entrada del dominio (`Manejador`) para asegurar que tanto el registro físico como el Kardex valorizado presenten la misma numeración.
@@ -117,3 +121,92 @@
 - **Problema**: Al crear entidades de referencia para tablas de otros microservicios (usando `ExcludeFromMigrations`), es común heredar la suposición de que la PK se llama `id`. Si la tabla original usa una convención distinta (ej: `id_afectacion`), EF Core lanzará una excepción `42703` al intentar consultar.
 - **Lección**: Siempre verificar el DDL o la entidad original del microservicio dueño antes de definir el mapeo `[Column(...)]` en la entidad Ref. No asumir convenciones genéricas para PKs en sistemas con esquemas ya establecidos.
 - **Prevención**: Incluir un paso de verificación de "Nombres de Columna Físicos" en el plan de implementación al trabajar con `EntidadesRef`.
+
+---
+
+## [2026-04-19] Scripts SQL - RAISE NOTICE fuera de bloque DO
+**Error cometido:** Gemini Flash generó `RAISE NOTICE 'mensaje';` como sentencia SQL standalone en un script de diagnóstico.
+**Causa raíz:** `RAISE NOTICE` es PL/pgSQL, no SQL estándar. Solo es válido dentro de un bloque `DO $$ BEGIN ... END $$`. Fuera de ese bloque, PostgreSQL lanza `ERROR: syntax error at or near "RAISE"`.
+**Regla para el futuro:** Al generar scripts SQL de diagnóstico (`.sql`) que corren en DBeaver o psql, usar solo comentarios SQL (`-- texto`) para separadores entre queries. Si se necesita RAISE NOTICE para logging, envolver TODO el script en un `DO $$ BEGIN ... END $$`.
+**Archivos afectados:** `scripts/diagnostico_seguridad.sql`
+**Proyecto:** Identidad (scripts de BD)
+
+---
+
+## [2026-04-19] Prompts Multi-Agente - Pedir output completo del archivo
+**Error cometido:** Los agentes de Gemini Flash aplicaron correctamente todos los cambios, pero no crearon el archivo de plan en `tasks/planes/` (no se incluyó ese requerimiento en el prompt).
+**Causa raíz:** El prompt no especificó crear un archivo de plan — los agentes solo hacen lo que se les pide explícitamente.
+**Regla para el futuro:** En prompts para agentes de implementación, agregar siempre al final: "Crea un archivo `tasks/planes/YYYY-MM-DD_nombre.md` con el resumen de lo que implementaste." Esto habilita que `/revisar-implementacion` tenga contexto del plan original.
+**Archivos afectados:** `tasks/planes/` (vacío)
+**Proyecto:** General (proceso multi-agente)
+
+---
+## [2026-04-20] — Bloqueo de preLaunchTask por caracteres especiales
+**Error cometido:** La depuración Full Stack se bloqueaba esperando a que el servidor de desarrollo del Frontend estuviera listo.
+**Causa raíz:** El `endsPattern` del `problemMatcher` en `tasks.json` incluía el carácter especial `➜`, el cual se corrompía (`Ô×£`) al ser redireccionado por PowerShell a un archivo de log debido a la codificación UTF-16LE. Al no haber coincidencia exacta, VS Code esperaba indefinidamente.
+**Regla para el futuro:** Evitar el uso de caracteres especiales (flechas, símbolos ANSI) en las expresiones regulares de `problemMatchers` para tareas en segundo plano. Usar patrones de texto plano más genéricos y estables como `Local:\\s+http://localhost:\\d+/`.
+**Archivos afectados:** `.vscode/tasks.json`
+**Proyecto:** Frontend / VS Code Config
+
+
+---
+
+## [2026-04-19] Frontend — Doble Toast por Desconocimiento del Interceptor Global
+**Error cometido:** Al agregar manejo específico de error 403 en `PaginaRoles.tsx`, se generaba un doble toast: el interceptor Axios en `src/lib/axios.ts` ya muestra "No tienes permisos para realizar esta acción" para TODO error 403, y el componente añadía un segundo toast encima.
+**Causa raíz:** Flash no leyó el interceptor global antes de agregar lógica de manejo de errores al componente.
+**Regla para el futuro:** En planes que pidan manejo de errores HTTP en componentes frontend, incluir SIEMPRE `src/lib/axios.ts` en las referencias de código obligatorias. Si el interceptor ya maneja el código HTTP, el componente solo debe manejar errores que el interceptor NO cubra, o usar `_skipToast: true` para suprimir el toast global.
+**Archivos afectados:** `PaginaRoles.tsx`, `src/lib/axios.ts`
+**Proyecto:** Frontend
+
+---
+## [2026-04-20] — Filtrado dinámico de menús (rutas.tsx + RutaProtegida)
+
+**Error cometido 1:** Flash usó `codigoPermiso="PROVEEDORES"` para las rutas `proveedores/*` en `rutas.tsx`. Ese código no existe en el JWT — el Gateway mapea `/api/proveedores` al grupo `COMPRAS`.
+**Causa raíz:** Flash infirió el código desde el nombre de la URL en lugar de consultar el mapeo del Gateway.
+**Regla para el futuro:** Los planes que asignen `codigoPermiso` a rutas frontend DEBEN incluir una tabla explícita de "ruta URL → codigoPermiso correcto", derivada del bloque de mapeo en `Gateway.API/Program.cs`. No dejar que Flash infiera el código desde el nombre de la ruta.
+**Archivos afectados:** `rutas.tsx`
+**Proyecto:** Frontend
+
+**Error cometido 2:** `RutaProtegida.tsx` implementó el check de `codigoPermiso` solo con `permisos.includes(...)`, omitiendo el patrón de submenú `permisos.some(p => p.startsWith(...) && p.endsWith(":VER"))` que sí estaba en `usePermiso.ts` y `Sidebar.tsx`.
+**Causa raíz:** Flash copió la lógica exacta en Sidebar pero al reescribir `RutaProtegida` omitió la segunda condición.
+**Regla para el futuro:** Cuando el plan define una función de validación de permisos, incluir la nota: "La lógica de verificación DEBE ser idéntica en `usePermiso.ts`, `RutaProtegida.tsx` y `Sidebar.tsx`. Si una usa el patrón `tieneSubMenu`, todas deben usarlo."
+**Archivos afectados:** `RutaProtegida.tsx`
+**Proyecto:** Frontend
+
+**Error cometido 3:** Flash colocó `import { RutaProtegida }` en el medio del archivo `rutas.tsx` (después de todos los imports lazy), causando error TS2300 de identificador duplicado al intentar moverlo al tope.
+**Causa raíz:** Flash agregó el import donde le pareció conveniente en lugar de al tope del archivo.
+**Regla para el futuro:** Especificar en los planes que agreguen imports: "Todo import estático debe ir al tope del archivo, antes de cualquier declaración de constante o componente."
+**Archivos afectados:** `rutas.tsx`
+**Proyecto:** Frontend
+
+---
+## [2026-04-22] — Sistema de Permisos: Estructura real de la BD
+
+**Error cometido:** El plan asumió que los permisos en BD son `identidad.permisos (codigo, nombre, id_modulo)`. La tabla real tiene columnas diferentes y los permisos granulares vienen de `roles_menus` → `roles_menus_permisos` → `tipos_permiso`.
+**Causa raíz:** El plan generó SQL basado en supuestos del esquema sin verificar la estructura real.
+**Regla para el futuro:** El flujo real para agregar permisos es: (1) insertar en `identidad.menus` (codigo, nombre, descripcion, ruta, icono, orden, id_menu_padre) → (2) insertar en `identidad.roles_menus` (id_rol, id_menu) → (3) insertar en `identidad.roles_menus_permisos` (id_rol_menu, id_tipo_permiso) para tipos VER, CREAR, EDITAR, ELIMINAR. Los permisos del JWT se calculan como `{menu.codigo}:{tipo_permiso.codigo}`.
+**Archivos afectados:** `Codigo/BaseDeDatos/Scripts/permisos_cajas_turnos.sql`
+**Proyecto:** BD
+
+## [2026-04-22] — Gateway: Nuevas rutas de API requieren mapeo explícito
+
+**Error cometido:** Gemini Flash implementó correctamente el backend y el frontend pero no agregó el mapeo de `/api/turnos` y `/api/cajas` al middleware de permisos del Gateway.
+**Causa raíz:** El plan especificaba los códigos de permiso pero no recordó que el GATEWAY también necesita el mapeo explícito de URL a código de menú.
+**Regla para el futuro:** Cuando se creen nuevas rutas de API, SIEMPRE actualizar `Gateway.API/Program.cs` en la sección "Seguridad Granular Permisos" con el bloque `else if (pathLower.StartsWith("/api/nueva-ruta")) menuCodigo = "CODIGO";`. Sin este mapeo el endpoint queda sin protección granular.
+**Archivos afectados:** `Gateway.API/Program.cs`
+**Proyecto:** Gateway
+
+## [2026-04-23] Moq - CS0854 y Delegados de MediatR
+- **Error cometido:** Intentar usar Mock<RequestHandlerDelegate<T>> y verificar su invocaci�n con Verify(x => x()).
+- **Causa ra�z:** RequestHandlerDelegate en versiones recientes de MediatR tiene un par�metro CancellationToken opcional. Moq no puede generar �rboles de expresi�n con argumentos opcionales (Error CS0854). Adem�s, mocar delegados directamente es menos intuitivo que mocar interfaces.
+- **Regla para el futuro:** Para testear IPipelineBehavior, usar una lambda simple (ct) => { flag = true; return Task.FromResult(result); } como par�metro 
+ext. Es m�s robusto y evita errores de compilaci�n por argumentos opcionales.
+- **Archivos afectados:** ComportamientoValidacionTests.cs`r
+- **Proyecto:** Nucleo.Tests
+
+## [2026-04-23] Versiones de IdentityModel (Conflictos NU1605)
+- **Error cometido:** Usar versiones disparatadas (7.6.0 vs 8.14.0) de paquetes IdentityModel.
+- **Causa ra�z:** System.IdentityModel.Tokens.Jwt 7.x puede tener dependencias transitivas que exigen 8.x de Microsoft.IdentityModel.Tokens, causando Downgrade detectado.
+- **Regla para el futuro:** Al usar paquetes de identidad de Microsoft, asegurar que TODOS compartan la misma versi�n mayor (preferiblemente la m�s reciente estable, e.g., 8.14.0) para evitar conflictos de restauraci�n de NuGet.
+- **Archivos afectados:** Nucleo.Tests.Shared.csproj`r
+

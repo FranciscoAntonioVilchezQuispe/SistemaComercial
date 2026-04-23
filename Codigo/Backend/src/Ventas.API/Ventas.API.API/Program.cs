@@ -10,6 +10,7 @@ using Dapper;
 DefaultTypeMap.MatchNamesWithUnderscores = true;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.WebHost.ConfigureKestrelLimits();
 builder.AddCentralizedLogging();
 
 // DbContext e Interfaz
@@ -37,8 +38,6 @@ builder.Services.AddHttpClient<Ventas.API.Application.Interfaces.IInventarioServ
 });
 
 // CORS
-var frontendUrl = builder.Configuration.GetValue<string>("FrontendUrl") ?? "http://localhost:5180";
-
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend",
@@ -64,8 +63,6 @@ if (app.Environment.IsDevelopment())
 
 app.UseCors("AllowFrontend");
 
-app.UseHttpsRedirection();
-
 // Map Endpoints
 app.MapCajaEndpoints();
 app.MapVentaEndpoints();
@@ -75,3 +72,5 @@ app.MapReportesVentasEndpoints();
 Ventas.API.API.Endpoints.TurnosEndpoints.MapTurnosEndpoints(app);
 
 app.Run();
+
+public partial class Program { }

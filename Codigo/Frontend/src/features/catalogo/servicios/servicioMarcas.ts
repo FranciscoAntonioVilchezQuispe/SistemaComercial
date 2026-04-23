@@ -13,7 +13,7 @@ export const servicioMarcas = {
     if (req?.search) params.append("search", req.search);
     if (req?.activo !== undefined && req?.activo !== null)
       params.append("activo", req.activo.toString());
-    console.log(params.toString());
+
     const response: any = await apiCatalogo.get(
       `${BASE_URL}?${params.toString()}`,
     );

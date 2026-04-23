@@ -112,6 +112,10 @@ namespace Ventas.API.Infrastructure.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("cantidad_transacciones");
 
+                    b.Property<decimal>("DiferenciaArqueo")
+                        .HasColumnType("decimal(12,2)")
+                        .HasColumnName("diferencia_arqueo");
+
                     b.Property<string>("Estado")
                         .IsRequired()
                         .HasMaxLength(20)
@@ -130,6 +134,14 @@ namespace Ventas.API.Infrastructure.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("fecha_generacion");
 
+                    b.Property<decimal>("MontoEsperado")
+                        .HasColumnType("decimal(12,2)")
+                        .HasColumnName("monto_esperado");
+
+                    b.Property<decimal>("MontoFisicoContado")
+                        .HasColumnType("decimal(12,2)")
+                        .HasColumnName("monto_fisico_contado");
+
                     b.Property<string>("Observaciones")
                         .HasColumnType("text")
                         .HasColumnName("observaciones");
@@ -137,6 +149,14 @@ namespace Ventas.API.Infrastructure.Migrations
                     b.Property<decimal>("TotalEfectivo")
                         .HasColumnType("decimal(12,2)")
                         .HasColumnName("total_efectivo");
+
+                    b.Property<decimal>("TotalEgresosManualles")
+                        .HasColumnType("decimal(12,2)")
+                        .HasColumnName("total_egresos_manuales");
+
+                    b.Property<decimal>("TotalIngresosManualles")
+                        .HasColumnType("decimal(12,2)")
+                        .HasColumnName("total_ingresos_manuales");
 
                     b.Property<decimal>("TotalOtros")
                         .HasColumnType("decimal(12,2)")
@@ -892,6 +912,10 @@ namespace Ventas.API.Infrastructure.Migrations
                         .HasColumnType("bigint")
                         .HasColumnName("id_tipo_movimiento");
 
+                    b.Property<long?>("IdTurnoVendedor")
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_turno_vendedor");
+
                     b.Property<decimal>("Monto")
                         .HasColumnType("decimal(12,2)")
                         .HasColumnName("monto");
@@ -921,6 +945,9 @@ namespace Ventas.API.Infrastructure.Migrations
 
                     b.HasIndex("IdPagoRelacionado")
                         .HasDatabaseName("ix_movimientos_caja_id_pago_relacionado");
+
+                    b.HasIndex("IdTurnoVendedor")
+                        .HasDatabaseName("ix_movimientos_caja_id_turno_vendedor");
 
                     b.ToTable("movimientos_caja", "ventas");
                 });
@@ -2465,9 +2492,16 @@ namespace Ventas.API.Infrastructure.Migrations
                         .HasForeignKey("IdPagoRelacionado")
                         .HasConstraintName("fk_movimientos_caja_pagos_id_pago_relacionado");
 
+                    b.HasOne("Ventas.API.Domain.Entidades.TurnoVendedor", "TurnoVendedor")
+                        .WithMany()
+                        .HasForeignKey("IdTurnoVendedor")
+                        .HasConstraintName("fk_movimientos_caja_turno_vendedor_id_turno_vendedor");
+
                     b.Navigation("Caja");
 
                     b.Navigation("PagoRelacionado");
+
+                    b.Navigation("TurnoVendedor");
                 });
 
             modelBuilder.Entity("Ventas.API.Domain.Entidades.NotaCredito", b =>

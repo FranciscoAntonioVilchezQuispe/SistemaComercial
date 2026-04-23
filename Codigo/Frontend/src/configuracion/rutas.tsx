@@ -1,6 +1,7 @@
-import { Suspense, lazy } from "react";
+import { Suspense, lazy, ReactNode } from "react";
 import { createBrowserRouter, Navigate } from "react-router-dom";
 import { LayoutPrincipal } from "@/layouts/LayoutPrincipal/LayoutPrincipal";
+import { RutaProtegida } from "@/compartido/componentes/seguridad/RutaProtegida";
 
 // Carga perezosa de páginas para optimizar el rendimiento
 const PaginaDashboard = lazy(() =>
@@ -118,6 +119,16 @@ const PaginaCotizaciones = lazy(() =>
     default: m.PaginaCotizaciones,
   })),
 );
+const PaginaHistorialTurnos = lazy(() =>
+  import("@/features/ventas/paginas/PaginaHistorialTurnos").then((m) => ({
+    default: m.PaginaHistorialTurnos,
+  })),
+);
+const PaginaCajas = lazy(() =>
+  import("@/features/ventas/paginas/PaginaCajas").then((m) => ({
+    default: m.PaginaCajas,
+  })),
+);
 const PaginaUnidadesMedida = lazy(() =>
   import("@/features/catalogo/paginas/PaginaUnidadesMedida").then((m) => ({
     default: m.PaginaUnidadesMedida,
@@ -174,6 +185,8 @@ const PaginaReporteComprasProveedor = lazy(() => import("@/features/reportes/pag
 const PaginaUsuarios = lazy(() => import("@/features/identidad/pages/PaginaUsuarios").then((m) => ({ default: m.PaginaUsuarios })));
 const PaginaRoles = lazy(() => import("@/features/identidad/pages/PaginaRoles").then((m) => ({ default: m.PaginaRoles })));
 const PaginaTrabajadores = lazy(() => import("@/features/identidad/pages/PaginaTrabajadores").then((m) => ({ default: m.PaginaTrabajadores })));
+const PaginaPerfil = lazy(() => import("@/features/identidad/pages/PaginaPerfil").then((m) => ({ default: m.PaginaPerfil })));
+const PaginaConfiguracionUsuario = lazy(() => import("@/features/identidad/pages/PaginaConfiguracionUsuario").then((m) => ({ default: m.PaginaConfiguracionUsuario })));
 
 const CargandoPagina = () => (
   <div className="flex h-[calc(100vh-80px)] w-full items-center justify-center">
@@ -187,7 +200,10 @@ const CargandoPagina = () => (
 );
 
 const PaginaLogin = lazy(() => import("@/features/identidad/pages/PaginaLogin").then((m) => ({ default: m.PaginaLogin })));
-import { RutaProtegida } from "@/compartido/componentes/seguridad/RutaProtegida";
+
+const RutaConPermiso = ({ children, codigoPermiso }: { children: ReactNode; codigoPermiso: string }) => (
+  <RutaProtegida codigoPermiso={codigoPermiso}>{children}</RutaProtegida>
+);
 
 export const ruteador = createBrowserRouter(
   [
@@ -222,266 +238,352 @@ export const ruteador = createBrowserRouter(
         {
           path: "catalogo/productos",
           element: (
-            <Suspense fallback={<CargandoPagina />}>
-              <PaginaProductos />
-            </Suspense>
+            <RutaConPermiso codigoPermiso="CAT_PRODUCTOS">
+              <Suspense fallback={<CargandoPagina />}>
+                <PaginaProductos />
+              </Suspense>
+            </RutaConPermiso>
           ),
         },
         {
           path: "catalogo/categorias",
           element: (
-            <Suspense fallback={<CargandoPagina />}>
-              <PaginaCategorias />
-            </Suspense>
+            <RutaConPermiso codigoPermiso="CAT_CATEGORIAS">
+              <Suspense fallback={<CargandoPagina />}>
+                <PaginaCategorias />
+              </Suspense>
+            </RutaConPermiso>
           ),
         },
         {
           path: "catalogo/marcas",
           element: (
-            <Suspense fallback={<CargandoPagina />}>
-              <PaginaMarcas />
-            </Suspense>
+            <RutaConPermiso codigoPermiso="CAT_MARCAS">
+              <Suspense fallback={<CargandoPagina />}>
+                <PaginaMarcas />
+              </Suspense>
+            </RutaConPermiso>
           ),
         },
         {
           path: "catalogo/unidades-medida",
           element: (
-            <Suspense fallback={<CargandoPagina />}>
-              <PaginaUnidadesMedida />
-            </Suspense>
+            <RutaConPermiso codigoPermiso="CAT_UNIDADES">
+              <Suspense fallback={<CargandoPagina />}>
+                <PaginaUnidadesMedida />
+              </Suspense>
+            </RutaConPermiso>
           ),
         },
         {
           path: "catalogo/listas-precios",
           element: (
-            <Suspense fallback={<CargandoPagina />}>
-              <PaginaListasPrecios />
-            </Suspense>
+            <RutaConPermiso codigoPermiso="CAT_PRECIOS">
+              <Suspense fallback={<CargandoPagina />}>
+                <PaginaListasPrecios />
+              </Suspense>
+            </RutaConPermiso>
           ),
         },
         {
           path: "configuracion/tablas-generales",
           element: (
-            <Suspense fallback={<CargandoPagina />}>
-              <PaginaTablasGenerales />
-            </Suspense>
+            <RutaConPermiso codigoPermiso="CONF_GENERAL">
+              <Suspense fallback={<CargandoPagina />}>
+                <PaginaTablasGenerales />
+              </Suspense>
+            </RutaConPermiso>
           ),
         },
         {
           path: "configuracion/empresa",
           element: (
-            <Suspense fallback={<CargandoPagina />}>
-              <PaginaEmpresa />
-            </Suspense>
+            <RutaConPermiso codigoPermiso="CONFIGURACION">
+              <Suspense fallback={<CargandoPagina />}>
+                <PaginaEmpresa />
+              </Suspense>
+            </RutaConPermiso>
           ),
         },
         {
           path: "configuracion/sucursales",
           element: (
-            <Suspense fallback={<CargandoPagina />}>
-              <PaginaSucursales />
-            </Suspense>
+            <RutaConPermiso codigoPermiso="CONF_GENERAL">
+              <Suspense fallback={<CargandoPagina />}>
+                <PaginaSucursales />
+              </Suspense>
+            </RutaConPermiso>
           ),
         },
         {
           path: "configuracion/impuestos",
           element: (
-            <Suspense fallback={<CargandoPagina />}>
-              <PaginaImpuestos />
-            </Suspense>
+            <RutaConPermiso codigoPermiso="CONF_FISCAL">
+              <Suspense fallback={<CargandoPagina />}>
+                <PaginaImpuestos />
+              </Suspense>
+            </RutaConPermiso>
           ),
         },
         {
           path: "configuracion/afectacion-igv",
           element: (
-            <Suspense fallback={<CargandoPagina />}>
-              <PaginaAfectacionIgv />
-            </Suspense>
+            <RutaConPermiso codigoPermiso="CONF_FISCAL">
+              <Suspense fallback={<CargandoPagina />}>
+                <PaginaAfectacionIgv />
+              </Suspense>
+            </RutaConPermiso>
           ),
         },
         {
           path: "configuracion/tipos-tributo",
           element: (
-            <Suspense fallback={<CargandoPagina />}>
-              <PaginaTiposTributo />
-            </Suspense>
+            <RutaConPermiso codigoPermiso="CONF_FISCAL">
+              <Suspense fallback={<CargandoPagina />}>
+                <PaginaTiposTributo />
+              </Suspense>
+            </RutaConPermiso>
           ),
         },
         {
           path: "configuracion/metodos-pago",
           element: (
-            <Suspense fallback={<CargandoPagina />}>
-              <PaginaMetodosPago />
-            </Suspense>
+            <RutaConPermiso codigoPermiso="CONFIGURACION">
+              <Suspense fallback={<CargandoPagina />}>
+                <PaginaMetodosPago />
+              </Suspense>
+            </RutaConPermiso>
           ),
         },
         {
           path: "configuracion/comprobantes",
           element: (
-            <Suspense fallback={<CargandoPagina />}>
-              <PaginaComprobantes />
-            </Suspense>
+            <RutaConPermiso codigoPermiso="CONFIGURACION">
+              <Suspense fallback={<CargandoPagina />}>
+                <PaginaComprobantes />
+              </Suspense>
+            </RutaConPermiso>
           ),
         },
         {
           path: "configuracion/reglas-sunat",
           element: (
-            <Suspense fallback={<CargandoPagina />}>
-              <PaginaReglasDocumento />
-            </Suspense>
+            <RutaConPermiso codigoPermiso="CONFIGURACION">
+              <Suspense fallback={<CargandoPagina />}>
+                <PaginaReglasDocumento />
+              </Suspense>
+            </RutaConPermiso>
           ),
         },
         {
           path: "configuracion/operaciones-sunat",
           element: (
-            <Suspense fallback={<CargandoPagina />}>
-              <PaginaOperacionesSunat />
-            </Suspense>
+            <RutaConPermiso codigoPermiso="CONFIGURACION">
+              <Suspense fallback={<CargandoPagina />}>
+                <PaginaOperacionesSunat />
+              </Suspense>
+            </RutaConPermiso>
           ),
         },
         {
           path: "configuracion/matriz-sunat",
           element: (
-            <Suspense fallback={<CargandoPagina />}>
-              <PaginaMatrizReglas />
-            </Suspense>
+            <RutaConPermiso codigoPermiso="CONFIGURACION">
+              <Suspense fallback={<CargandoPagina />}>
+                <PaginaMatrizReglas />
+              </Suspense>
+            </RutaConPermiso>
           ),
         },
         {
           path: "configuracion/ubigeos",
           element: (
-            <Suspense fallback={<CargandoPagina />}>
-              <PaginaUbigeos />
-            </Suspense>
+            <RutaConPermiso codigoPermiso="CONFIGURACION">
+              <Suspense fallback={<CargandoPagina />}>
+                <PaginaUbigeos />
+              </Suspense>
+            </RutaConPermiso>
           ),
         },
         {
           path: "configuracion/sunat",
           element: (
-            <Suspense fallback={<CargandoPagina />}>
-              <PaginaCatalogosSunat />
-            </Suspense>
+            <RutaConPermiso codigoPermiso="CONFIGURACION">
+              <Suspense fallback={<CargandoPagina />}>
+                <PaginaCatalogosSunat />
+              </Suspense>
+            </RutaConPermiso>
           ),
         },
 
         {
           path: "clientes",
           element: (
-            <Suspense fallback={<CargandoPagina />}>
-              <PaginaClientes />
-            </Suspense>
+            <RutaConPermiso codigoPermiso="VEN_CLIENTES">
+              <Suspense fallback={<CargandoPagina />}>
+                <PaginaClientes />
+              </Suspense>
+            </RutaConPermiso>
           ),
         },
         {
           path: "compras/lista",
           element: (
-            <Suspense fallback={<CargandoPagina />}>
-              <PaginaCompras />
-            </Suspense>
+            <RutaConPermiso codigoPermiso="COM_LISTA">
+              <Suspense fallback={<CargandoPagina />}>
+                <PaginaCompras />
+              </Suspense>
+            </RutaConPermiso>
           ),
         },
         {
           path: "compras/notas",
           element: (
-            <Suspense fallback={<CargandoPagina />}>
-              <PaginaNotasCompra />
-            </Suspense>
+            <RutaConPermiso codigoPermiso="COM_NOTAS">
+              <Suspense fallback={<CargandoPagina />}>
+                <PaginaNotasCompra />
+              </Suspense>
+            </RutaConPermiso>
           ),
         },
         {
           path: "proveedores/ordenes",
           element: (
-            <Suspense fallback={<CargandoPagina />}>
-              <PaginaOrdenesCompra />
-            </Suspense>
+            <RutaConPermiso codigoPermiso="COM_ORDENES">
+              <Suspense fallback={<CargandoPagina />}>
+                <PaginaOrdenesCompra />
+              </Suspense>
+            </RutaConPermiso>
           ),
         },
         {
           path: "proveedores",
           element: (
-            <Suspense fallback={<CargandoPagina />}>
-              <PaginaProveedores />
-            </Suspense>
+            <RutaConPermiso codigoPermiso="COM_PROVEEDORES">
+              <Suspense fallback={<CargandoPagina />}>
+                <PaginaProveedores />
+              </Suspense>
+            </RutaConPermiso>
           ),
         },
         {
           path: "inventario/almacenes",
           element: (
-            <Suspense fallback={<CargandoPagina />}>
-              <PaginaAlmacenes />
-            </Suspense>
+            <RutaConPermiso codigoPermiso="INV_ALMACENES">
+              <Suspense fallback={<CargandoPagina />}>
+                <PaginaAlmacenes />
+              </Suspense>
+            </RutaConPermiso>
           ),
         },
         {
           path: "inventario/kardex/periodos",
           element: (
-            <Suspense fallback={<CargandoPagina />}>
-              <PaginaKardexPeriodos />
-            </Suspense>
+            <RutaConPermiso codigoPermiso="INV_KARDEX_PER">
+              <Suspense fallback={<CargandoPagina />}>
+                <PaginaKardexPeriodos />
+              </Suspense>
+            </RutaConPermiso>
           ),
         },
         {
           path: "inventario/kardex/reporte",
           element: (
-            <Suspense fallback={<CargandoPagina />}>
-              <PaginaKardexReporte />
-            </Suspense>
+            <RutaConPermiso codigoPermiso="INV_KARDEX_REP">
+              <Suspense fallback={<CargandoPagina />}>
+                <PaginaKardexReporte />
+              </Suspense>
+            </RutaConPermiso>
           ),
         },
         {
           path: "inventario/traslados",
           element: (
-            <Suspense fallback={<CargandoPagina />}>
-              <PaginaTraslados />
-            </Suspense>
+            <RutaConPermiso codigoPermiso="INV_TRASLADOS">
+              <Suspense fallback={<CargandoPagina />}>
+                <PaginaTraslados />
+              </Suspense>
+            </RutaConPermiso>
           ),
         },
         {
           path: "inventario/stock",
           element: (
-            <Suspense fallback={<CargandoPagina />}>
-              <PaginaStock />
-            </Suspense>
+            <RutaConPermiso codigoPermiso="INV_STOCK">
+              <Suspense fallback={<CargandoPagina />}>
+                <PaginaStock />
+              </Suspense>
+            </RutaConPermiso>
           ),
         },
         {
           path: "inventario/movimientos",
           element: (
-            <Suspense fallback={<CargandoPagina />}>
-              <PaginaMovimientos />
-            </Suspense>
+            <RutaConPermiso codigoPermiso="INV_MOVIMIENTOS">
+              <Suspense fallback={<CargandoPagina />}>
+                <PaginaMovimientos />
+              </Suspense>
+            </RutaConPermiso>
           ),
         },
         {
           path: "ventas/lista",
           element: (
-            <Suspense fallback={<CargandoPagina />}>
-              <PaginaVentas />
-            </Suspense>
+            <RutaConPermiso codigoPermiso="VEN_LISTA">
+              <Suspense fallback={<CargandoPagina />}>
+                <PaginaVentas />
+              </Suspense>
+            </RutaConPermiso>
           ),
         },
         {
           path: "ventas/cotizaciones",
           element: (
-            <Suspense fallback={<CargandoPagina />}>
-              <PaginaCotizaciones />
-            </Suspense>
+            <RutaConPermiso codigoPermiso="VEN_COTIZACIONES">
+              <Suspense fallback={<CargandoPagina />}>
+                <PaginaCotizaciones />
+              </Suspense>
+            </RutaConPermiso>
           ),
         },
         {
           path: "ventas/notas",
           element: (
-            <Suspense fallback={<CargandoPagina />}>
-              <PaginaNotas />
-            </Suspense>
+            <RutaConPermiso codigoPermiso="VEN_NOTAS">
+              <Suspense fallback={<CargandoPagina />}>
+                <PaginaNotas />
+              </Suspense>
+            </RutaConPermiso>
           ),
         },
         {
           path: "ventas/pos",
           element: (
-            <Suspense fallback={<CargandoPagina />}>
-              <PaginaPOS />
-            </Suspense>
+            <RutaConPermiso codigoPermiso="VEN_POS">
+              <Suspense fallback={<CargandoPagina />}>
+                <PaginaPOS />
+              </Suspense>
+            </RutaConPermiso>
+          ),
+        },
+        {
+          path: "ventas/turnos",
+          element: (
+            <RutaConPermiso codigoPermiso="VEN_TURNOS">
+              <Suspense fallback={<CargandoPagina />}>
+                <PaginaHistorialTurnos />
+              </Suspense>
+            </RutaConPermiso>
+          ),
+        },
+        {
+          path: "ventas/cajas",
+          element: (
+            <RutaConPermiso codigoPermiso="VEN_CAJAS">
+              <Suspense fallback={<CargandoPagina />}>
+                <PaginaCajas />
+              </Suspense>
+            </RutaConPermiso>
           ),
         },
         {
@@ -528,24 +630,46 @@ export const ruteador = createBrowserRouter(
         {
           path: "seguridad/usuarios",
           element: (
-            <Suspense fallback={<CargandoPagina />}>
-              <PaginaUsuarios />
-            </Suspense>
+            <RutaConPermiso codigoPermiso="SEG_USUARIOS">
+              <Suspense fallback={<CargandoPagina />}>
+                <PaginaUsuarios />
+              </Suspense>
+            </RutaConPermiso>
           ),
         },
         {
           path: "seguridad/roles",
           element: (
-            <Suspense fallback={<CargandoPagina />}>
-              <PaginaRoles />
-            </Suspense>
+            <RutaConPermiso codigoPermiso="SEG_ROLES">
+              <Suspense fallback={<CargandoPagina />}>
+                <PaginaRoles />
+              </Suspense>
+            </RutaConPermiso>
           ),
         },
         {
           path: "seguridad/trabajadores",
           element: (
+            <RutaConPermiso codigoPermiso="SEG_TRABAJADORES">
+              <Suspense fallback={<CargandoPagina />}>
+                <PaginaTrabajadores />
+              </Suspense>
+            </RutaConPermiso>
+          ),
+        },
+        {
+          path: "perfil",
+          element: (
             <Suspense fallback={<CargandoPagina />}>
-              <PaginaTrabajadores />
+              <PaginaPerfil />
+            </Suspense>
+          ),
+        },
+        {
+          path: "configuracion-usuario",
+          element: (
+            <Suspense fallback={<CargandoPagina />}>
+              <PaginaConfiguracionUsuario />
             </Suspense>
           ),
         },
@@ -565,6 +689,11 @@ export const ruteador = createBrowserRouter(
   {
     future: {
       v7_startTransition: true,
+      v7_relativeSplatPath: true,
+      v7_fetcherPersist: true,
+      v7_normalizeFormMethod: true,
+      v7_partialHydration: true,
+      v7_skipActionErrorRevalidation: true,
     },
   },
 );

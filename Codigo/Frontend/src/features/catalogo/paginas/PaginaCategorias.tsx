@@ -6,6 +6,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { ModuleTabBar } from "@/componentes/shared/ModuleTabBar";
 import { RUTAS_TITULOS } from "@/config/rutasTitulos";
@@ -168,6 +169,11 @@ export function PaginaCategorias() {
             <DialogTitle>
               {idCategoriaAModificar ? "Editar Categoría" : "Nueva Categoría"}
             </DialogTitle>
+            <DialogDescription>
+              {idCategoriaAModificar 
+                ? "Modifica los datos de la categoría seleccionada." 
+                : "Agrega una nueva categoría para organizar tus productos."}
+            </DialogDescription>
           </DialogHeader>
 
           {idCategoriaAModificar && cargandoDetalle ? (

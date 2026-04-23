@@ -7,7 +7,15 @@ using Nucleo.Comun.Application.Extensions;
 using Nucleo.Comun.API.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.WebHost.ConfigureKestrelLimits();
 builder.AddCentralizedLogging();
+
+// Configurar serialización JSON (Estandarización Global para evitar ciclos en relaciones 1:1)
+builder.Services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(options =>
+{
+    options.SerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+    options.SerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
+});
 
 // Add services to the container.
 builder.Services.AddDbContext<IdentidadDbContext>(options =>
@@ -82,3 +90,5 @@ app.MapRolMenuEndpoints();
 app.MapUsuarioPermisoEndpoints();
 
 app.Run();
+
+public partial class Program { }

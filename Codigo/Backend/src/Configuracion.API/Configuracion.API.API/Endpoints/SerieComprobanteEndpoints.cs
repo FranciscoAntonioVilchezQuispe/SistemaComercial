@@ -1,3 +1,4 @@
+using Configuracion.API.Application.DTOs;
 using Configuracion.API.Domain.Entidades;
 using Configuracion.API.Domain.Interfaces;
 using Microsoft.AspNetCore.Builder;
@@ -8,15 +9,6 @@ using System;
 
 namespace Configuracion.API.Endpoints
 {
-    // DTO para Serie
-    public class SerieComprobanteDto
-    {
-        public long IdTipoComprobante { get; set; }
-        public string Serie { get; set; } = null!;
-        public long CorrelativoActual { get; set; }
-        public long? IdAlmacen { get; set; }
-    }
-
     public static class SerieComprobanteEndpoints
     {
         public static void MapSerieComprobanteEndpoints(this IEndpointRouteBuilder app)
@@ -84,4 +76,3 @@ namespace Configuracion.API.Endpoints
         }
     }
 }
-

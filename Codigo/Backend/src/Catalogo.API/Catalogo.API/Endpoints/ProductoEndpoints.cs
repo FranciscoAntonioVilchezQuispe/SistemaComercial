@@ -78,6 +78,7 @@ namespace Catalogo.API.Endpoints
                         dto.StockMaximo,
                         dto.TieneVariantes,
                         dto.PermiteInventarioNegativo,
+                        dto.MetodoValuacion,
                         dto.GravadoImpuesto,
                         dto.PorcentajeImpuesto,
                         dto.IdTipoAfectacionIgv,

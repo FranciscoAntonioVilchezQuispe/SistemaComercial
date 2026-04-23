@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import { RUTAS_TITULOS } from "@/config/rutasTitulos";
+import { useAuth } from "@/features/identidad/context/AuthContext";
 
 interface PropiedadesHeader {
   alAlternarSidebar: () => void;
@@ -19,6 +20,7 @@ interface PropiedadesHeader {
 export function Header({ alAlternarSidebar }: PropiedadesHeader) {
   const { pathname } = useLocation();
   const navigate = useNavigate();
+  const { logout } = useAuth();
   const notificacionesPendientes = 3;
 
   // Obtener título dinámico del mapa de rutas
@@ -104,13 +106,20 @@ export function Header({ alAlternarSidebar }: PropiedadesHeader) {
                   <User className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
+               <DropdownMenuContent align="end">
                 <DropdownMenuLabel>Mi Cuenta</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>Perfil</DropdownMenuItem>
-                <DropdownMenuItem>Configuración</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate("/perfil")} className="cursor-pointer">
+                  Perfil
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate("/configuracion-usuario")} className="cursor-pointer">
+                  Configuración
+                </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem className="text-destructive font-medium">
+                <DropdownMenuItem 
+                  onClick={() => logout()}
+                  className="text-destructive font-bold cursor-pointer focus:bg-destructive/10"
+                >
                   Cerrar Sesión
                 </DropdownMenuItem>
               </DropdownMenuContent>

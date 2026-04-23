@@ -77,21 +77,27 @@ class CapturadorErrores {
 
   private mostrarEnConsola(entry: LogErrorEntry) {
     const colors = {
-      API: '#f87171',
-      RENDER: '#fb923c',
-      PROMISE: '#fbbf24',
-      GENERIC: '#94a3b8'
+      API: '#EF4444',     // Red-500
+      RENDER: '#F97316',  // Orange-500
+      PROMISE: '#F59E0B', // Amber-500
+      GENERIC: '#64748B'  // Slate-500
     };
 
+    const icon = entry.tipo === 'API' ? '🌐' : '⚠️';
+
     console.groupCollapsed(
-      `%c[🚨 Error ${entry.tipo}] %c${entry.mensaje}`,
-      `color: ${colors[entry.tipo]}; font-weight: bold;`,
+      `%c ${icon} [Error ${entry.tipo}] %c ${entry.mensaje}`,
+      `background: ${colors[entry.tipo]}; color: white; padding: 2px 4px; border-radius: 3px; font-weight: bold;`,
       'color: inherit; font-weight: normal;'
     );
-    console.error('Stack:', entry.stack);
-    console.log('Contexto:', entry.contexto);
-    console.log('URL:', entry.url);
-    console.log('Timestamp:', entry.timestamp);
+    
+    if (entry.stack) {
+      console.error('%c Stack Trace ', 'background: #334155; color: white; font-weight: bold;', entry.stack);
+    }
+    
+    console.log('%c Contexto ', 'color: #3B82F6; font-weight: bold;', entry.contexto);
+    console.log('%c URL      ', 'color: #3B82F6; font-weight: bold;', entry.url);
+    console.log('%c Time     ', 'color: #3B82F6; font-weight: bold;', entry.timestamp);
     console.groupEnd();
   }
 

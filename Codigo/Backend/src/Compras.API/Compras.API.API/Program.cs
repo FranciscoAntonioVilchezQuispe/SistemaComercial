@@ -14,6 +14,7 @@ AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.WebHost.ConfigureKestrelLimits();
 builder.AddCentralizedLogging();
 
 // DbContext e Interfaz
@@ -46,9 +47,6 @@ builder.Services.AddHttpClient<Compras.API.Application.Interfaces.IInventarioSer
 });
 
 // CORS
-// CORS
-var frontendUrl = builder.Configuration.GetValue<string>("FrontendUrl") ?? "http://localhost:5180";
-
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend",
@@ -80,8 +78,6 @@ if (app.Environment.IsDevelopment())
 
 app.UseCors("AllowFrontend");
 
-app.UseHttpsRedirection();
-
 // Map Endpoints
 app.MapProveedorEndpoints();
 app.MapOrdenCompraEndpoints();
@@ -90,3 +86,5 @@ app.MapNotaSunatCompraEndpoints();
 app.MapReportesComprasEndpoints();
 
 app.Run();
+
+public partial class Program { }

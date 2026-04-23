@@ -5,6 +5,10 @@ using Nucleo.Comun.Application.Wrappers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Hosting;
+using Identidad.API.Domain.Interfaces;
+using System.Linq;
 
 namespace Identidad.API.API.Endpoints
 {
@@ -46,6 +50,37 @@ namespace Identidad.API.API.Endpoints
                 return Results.Unauthorized();
             })
             .WithName("ObtenerUsuarioActual");
+
+            group.MapGet("/debug-token", async (
+                HttpContext context,
+                IWebHostEnvironment env,
+                IRolMenuPermisoRepositorio permisoRepo,
+                IUsuarioRepositorio usuarioRepo) =>
+            {
+                if (!env.IsDevelopment())
+                    return Results.NotFound();
+
+                if (!context.Request.Headers.TryGetValue("X-User-Id", out var userIdStr) ||
+                    !long.TryParse(userIdStr, out var userId))
+                    return Results.BadRequest(new { message = "Header X-User-Id requerido." });
+
+                var usuario = await usuarioRepo.ObtenerPorIdAsync(userId);
+                if (usuario == null)
+                    return Results.NotFound(new { message = "Usuario no encontrado." });
+
+                var permisos = await permisoRepo.ObtenerPermisosAplanadosPorUsuarioAsync(userId);
+
+                return Results.Ok(new
+                {
+                    userId,
+                    username = usuario.Username,
+                    roles = usuario.UsuariosRoles.Select(ur => ur.Rol.NombreRol).ToList(),
+                    permisos = permisos.OrderBy(p => p).ToList(),
+                    totalPermisos = permisos.Count()
+                });
+            })
+            .WithName("DebugToken");
+
         }
     }
 }

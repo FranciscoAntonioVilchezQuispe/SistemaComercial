@@ -3,6 +3,7 @@ using Identidad.API.Domain.Entidades;
 using Identidad.API.Domain.Interfaces;
 using MediatR;
 using Nucleo.Comun.Application.Wrappers;
+using Nucleo.Comun.Domain.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -45,7 +46,7 @@ namespace Identidad.API.Application.Features.Auth.Login
                 return new ToReturnError<LoginRespuesta>("Credenciales incorrectas.", 401);
             }
 
-            usuario.UltimoAcceso = DateTime.UtcNow; 
+            usuario.UltimoAcceso = DateTimeHelper.ObtenerAhoraLima(); 
             await _usuarioRepositorio.ActualizarAsync(usuario);
 
             var roles = usuario.UsuariosRoles.Select(ur => ur.Rol.NombreRol).ToList();
@@ -60,8 +61,8 @@ namespace Identidad.API.Application.Features.Auth.Login
             {
                 Token = refreshTokenString,
                 UsuarioId = usuario.Id,
-                FechaExpiracion = DateTime.UtcNow.AddDays(7),
-                FechaCreacion = DateTime.UtcNow,
+                FechaExpiracion = DateTimeHelper.ObtenerAhoraLima().AddDays(7),
+                FechaCreacion = DateTimeHelper.ObtenerAhoraLima(),
                 EsRevocado = false
             };
 

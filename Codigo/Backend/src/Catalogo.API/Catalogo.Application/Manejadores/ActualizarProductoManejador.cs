@@ -53,6 +53,9 @@ namespace Catalogo.Application.Manejadores
             // Configuración de inventario
             producto.TieneVariantes = request.TieneVariantes;
             producto.PermiteInventarioNegativo = request.PermiteInventarioNegativo;
+            producto.MetodoValuacion = string.IsNullOrWhiteSpace(request.MetodoValuacion) 
+                ? (string.IsNullOrWhiteSpace(producto.MetodoValuacion) ? "PP" : producto.MetodoValuacion)
+                : request.MetodoValuacion;
 
             // Configuración fiscal
             producto.GravadoImpuesto = request.GravadoImpuesto;

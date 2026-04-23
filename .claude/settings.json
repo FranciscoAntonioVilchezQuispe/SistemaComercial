@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls -la \"d:\\\\Personal\\\\Proyectos\\\\SistemaComercial\\\\Codigo\\\\Frontend\\\\src\\\\features\\\\ventas\\\\paginas\\\\\\\\\")",
+      "Bash(ls -la \"d:\\\\Personal\\\\Proyectos\\\\SistemaComercial\\\\Codigo\\\\Backend\\\\src\\\\Ventas.API\\\\Ventas.API.Application\\\\DTOs\\\\\\\\\")",
+      "Bash(ls -la \"d:\\\\Personal\\\\Proyectos\\\\SistemaComercial\\\\Codigo\\\\Backend\\\\src\\\\Ventas.API\\\\Ventas.API.Infrastructure\\\\Datos\\\\\\\\\")",
+      "Bash(ls -la \"d:\\\\Personal\\\\Proyectos\\\\SistemaComercial\\\\Codigo\\\\Backend\\\\src\\\\Ventas.API\\\\Ventas.API.Infrastructure\\\\Migrations\\\\\\\\\")",
+      "Bash(grep -v \"^$\")",
+      "Bash(dotnet ef *)",
+      "Bash(psql -h localhost -U postgres -d sistema_comercial -c ' *)",
+      "Bash(where psql *)",
+      "Read(//c/Program Files/PostgreSQL/**)",
+      "Bash('/c/Program Files/PostgreSQL/14/bin/psql.exe' -h localhost -U postgres -d sistema_comercial -c ' *)",
+      "Bash(PGPASSWORD=\"aaAA11++\" \"/c/Program Files/PostgreSQL/14/bin/psql.exe\" -h localhost -U postgres -d sistema_comercial -f \"d:/Personal/Proyectos/SistemaComercial/Codigo/BaseDeDatos/Scripts/permisos_cajas_turnos.sql\")",
+      "Bash(PGPASSWORD=\"aaAA11++\" \"/c/Program Files/PostgreSQL/14/bin/psql.exe\" -h localhost -U postgres -d sistema_comercial -c \"SELECT id_menu, codigo, nombre FROM identidad.menus WHERE codigo IN \\('VEN_TURNOS', 'VEN_CAJAS'\\);\")",
+      "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\('=== DEPS ==='\\); [print\\(f'  {k}: {v}'\\) for k,v in d.get\\('dependencies',{}\\).items\\(\\)]; print\\('=== DEV DEPS ==='\\); [print\\(f'  {k}: {v}'\\) for k,v in d.get\\('devDependencies',{}\\).items\\(\\)]; print\\('=== SCRIPTS ==='\\); [print\\(f'  {k}: {v}'\\) for k,v in d.get\\('scripts',{}\\).items\\(\\)]\")"
+    ],
+    "additionalDirectories": [
+      "d:\\Personal\\Proyectos\\SistemaComercial\\tasks\\planes"
+    ]
+  }
+}

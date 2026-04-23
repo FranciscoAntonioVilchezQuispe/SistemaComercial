@@ -1,0 +1,83 @@
+[18:22:14 INF] Now listening on: http://localhost:5005
+[18:22:14 INF] Application started. Press Ctrl+C to shut down.
+[18:22:14 INF] Hosting environment: Development
+[18:22:14 INF] Content root path: D:\Personal\Proyectos\SistemaComercial\Codigo\Backend\src\Ventas.API\Ventas.API.API
+[18:24:08 INF] Now listening on: http://localhost:5005
+[18:24:08 INF] Application started. Press Ctrl+C to shut down.
+[18:24:08 INF] Hosting environment: Development
+[18:24:08 INF] Content root path: D:\Personal\Proyectos\SistemaComercial\Codigo\Backend\src\Ventas.API\Ventas.API.API
+[18:25:20 INF] Now listening on: http://localhost:5005
+[18:25:20 INF] Application started. Press Ctrl+C to shut down.
+[18:25:20 INF] Hosting environment: Development
+[18:25:20 INF] Content root path: D:\Personal\Proyectos\SistemaComercial\Codigo\Backend\src\Ventas.API\Ventas.API.API
+[23:04:17 INF] Now listening on: http://localhost:5005
+[23:04:17 INF] Application started. Press Ctrl+C to shut down.
+[23:04:17 INF] Hosting environment: Development
+[23:04:17 INF] Content root path: D:\Personal\Proyectos\SistemaComercial\Codigo\Backend\src\Ventas.API\Ventas.API.API
+[23:05:16 WRN] Failed to determine the https port for redirect.
+[23:05:17 ERR] [GlobalMiddleware] [GET /api/ventas] 42883: el operador no existe: bigint ~~* text
+
+POSITION: 754
+Npgsql.PostgresException (0x80004005): 42883: el operador no existe: bigint ~~* text
+
+POSITION: 754
+   at Npgsql.Internal.NpgsqlConnector.ReadMessageLong(Boolean async, DataRowLoadingMode dataRowLoadingMode, Boolean readingNotifications, Boolean isReadingPrependedMessage)
+   at System.Runtime.CompilerServices.PoolingAsyncValueTaskMethodBuilder`1.StateMachineBox`1.System.Threading.Tasks.Sources.IValueTaskSource<TResult>.GetResult(Int16 token)
+   at Npgsql.NpgsqlDataReader.NextResult(Boolean async, Boolean isConsuming, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlDataReader.NextResult(Boolean async, Boolean isConsuming, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteReader(Boolean async, CommandBehavior behavior, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteReader(Boolean async, CommandBehavior behavior, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteDbDataReaderAsync(CommandBehavior behavior, CancellationToken cancellationToken)
+   at Dapper.SqlMapper.QueryAsync[T](IDbConnection cnn, Type effectiveType, CommandDefinition command) in /_/Dapper/SqlMapper.Async.cs:line 434
+   at Ventas.API.Infrastructure.Repositorios.VentaRepositorio.ObtenerPaginadoAsync(String search, Int32 pageNumber, Int32 pageSize) in D:\Personal\Proyectos\SistemaComercial\Codigo\Backend\src\Ventas.API\Ventas.API.Infrastructure\Repositorios\VentaRepositorio.cs:line 104
+   at Ventas.API.Endpoints.VentaEndpoints.<>c.<<MapVentaEndpoints>b__0_0>d.MoveNext() in D:\Personal\Proyectos\SistemaComercial\Codigo\Backend\src\Ventas.API\Ventas.API.API\Endpoints\VentaEndpoints.cs:line 26
+--- End of stack trace from previous location ---
+   at Microsoft.AspNetCore.Http.RequestDelegateFactory.ExecuteTaskResult[T](Task`1 task, HttpContext httpContext)
+   at Swashbuckle.AspNetCore.SwaggerUI.SwaggerUIMiddleware.Invoke(HttpContext httpContext)
+   at Swashbuckle.AspNetCore.Swagger.SwaggerMiddleware.Invoke(HttpContext httpContext, ISwaggerProvider swaggerProvider)
+   at Nucleo.Comun.API.Middleware.ManejoExcepcionesMiddleware.InvokeAsync(HttpContext context) in D:\Personal\Proyectos\SistemaComercial\Codigo\Backend\src\Nucleo\Comun.API\Middleware\ManejoExcepcionesMiddleware.cs:line 27
+  Exception data:
+    Severity: ERROR
+    SqlState: 42883
+    MessageText: el operador no existe: bigint ~~* text
+    Hint: Ningún operador coincide en el nombre y tipos de argumentos. Puede ser necesario agregar conversión explícita de tipos.
+    Position: 754
+    File: parse_oper.c
+    Line: 656
+    Routine: op_error
+[23:14:55 INF] Now listening on: http://localhost:5005
+[23:14:55 INF] Application started. Press Ctrl+C to shut down.
+[23:14:55 INF] Hosting environment: Development
+[23:14:55 INF] Content root path: D:\Personal\Proyectos\SistemaComercial\Codigo\Backend\src\Ventas.API\Ventas.API.API
+[23:20:31 INF] Now listening on: http://localhost:5005
+[23:20:31 INF] Application started. Press Ctrl+C to shut down.
+[23:20:31 INF] Hosting environment: Development
+[23:20:31 INF] Content root path: D:\Personal\Proyectos\SistemaComercial\Codigo\Backend\src\Ventas.API\Ventas.API.API
+[23:54:58 INF] Now listening on: http://localhost:5005
+[23:54:58 INF] Application started. Press Ctrl+C to shut down.
+[23:54:58 INF] Hosting environment: Development
+[23:54:58 INF] Content root path: D:\Personal\Proyectos\SistemaComercial\Codigo\Backend\src\Ventas.API\Ventas.API.API
+[10:17:46 INF] Now listening on: http://localhost:5005
+[10:17:46 INF] Application started. Press Ctrl+C to shut down.
+[10:17:46 INF] Hosting environment: Development
+[10:17:46 INF] Content root path: D:\Personal\Proyectos\SistemaComercial\Codigo\Backend\src\Ventas.API\Ventas.API.API
+[10:44:47 INF] Now listening on: http://localhost:5005
+[10:44:47 INF] Application started. Press Ctrl+C to shut down.
+[10:44:47 INF] Hosting environment: Development
+[10:44:47 INF] Content root path: D:\Personal\Proyectos\SistemaComercial\Codigo\Backend\src\Ventas.API\Ventas.API.API
+[11:31:38 INF] Now listening on: http://localhost:5005
+[11:31:38 INF] Application started. Press Ctrl+C to shut down.
+[11:31:38 INF] Hosting environment: Development
+[11:31:38 INF] Content root path: D:\Personal\Proyectos\SistemaComercial\Codigo\Backend\src\Ventas.API\Ventas.API.API
+[16:30:31 INF] Now listening on: http://localhost:5005
+[16:30:31 INF] Application started. Press Ctrl+C to shut down.
+[16:30:31 INF] Hosting environment: Development
+[16:30:31 INF] Content root path: D:\Personal\Proyectos\SistemaComercial\Codigo\Backend\src\Ventas.API\Ventas.API.API
+[16:31:25 INF] Now listening on: http://localhost:5005
+[16:31:25 INF] Application started. Press Ctrl+C to shut down.
+[16:31:25 INF] Hosting environment: Development
+[16:31:25 INF] Content root path: D:\Personal\Proyectos\SistemaComercial\Codigo\Backend\src\Ventas.API\Ventas.API.API
+[16:47:11 INF] Now listening on: http://localhost:5005
+[16:47:11 INF] Application started. Press Ctrl+C to shut down.
+[16:47:11 INF] Hosting environment: Development
+[16:47:11 INF] Content root path: D:\Personal\Proyectos\SistemaComercial\Codigo\Backend\src\Ventas.API\Ventas.API.API

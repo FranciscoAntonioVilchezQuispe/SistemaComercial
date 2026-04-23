@@ -2,6 +2,7 @@ using Identidad.API.Application.Contratos;
 using Identidad.API.Domain.Interfaces;
 using MediatR;
 using Nucleo.Comun.Application.Wrappers;
+using Nucleo.Comun.Domain.Helpers;
 using System;
 using System.Linq;
 using System.Threading;
@@ -15,17 +16,20 @@ namespace Identidad.API.Application.Features.Auth.Refresh
         private readonly ITokenService _tokenService;
         private readonly IUsuarioRepositorio _usuarioRepositorio;
         private readonly IPermisoRepositorio _permisoRepositorio;
+        private readonly IRolMenuPermisoRepositorio _rolMenuPermisoRepositorio;
 
         public RefreshTokenManejador(
             IRefreshTokenRepositorio refreshTokenRepositorio, 
             ITokenService tokenService, 
             IUsuarioRepositorio usuarioRepositorio,
-            IPermisoRepositorio permisoRepositorio)
+            IPermisoRepositorio permisoRepositorio,
+            IRolMenuPermisoRepositorio rolMenuPermisoRepositorio)
         {
             _refreshTokenRepositorio = refreshTokenRepositorio;
             _tokenService = tokenService;
             _usuarioRepositorio = usuarioRepositorio;
             _permisoRepositorio = permisoRepositorio;
+            _rolMenuPermisoRepositorio = rolMenuPermisoRepositorio;
         }
 
         public async Task<IToReturn<Login.LoginRespuesta>> Handle(RefreshTokenComando request, CancellationToken cancellationToken)
@@ -44,9 +48,9 @@ namespace Identidad.API.Application.Features.Auth.Refresh
             await _refreshTokenRepositorio.ActualizarAsync(storedRefreshToken);
 
             var roles = usuario.UsuariosRoles.Select(ur => ur.Rol.NombreRol).ToList();
-            var rolIds = usuario.UsuariosRoles.Select(ur => ur.IdRol).ToList();
             
-            var permisos = await _permisoRepositorio.ObtenerCodigosPorRolIdsAsync(rolIds);
+            // Obtener permisos en formato granular aplanado: "MENU:PERMISO"
+            var permisos = await _rolMenuPermisoRepositorio.ObtenerPermisosAplanadosPorUsuarioAsync(usuario.Id);
 
             var newToken = _tokenService.GenerarTokenJwt(usuario, roles, permisos.ToList());
             var newRefreshTokenString = _tokenService.GenerarRefreshToken();
@@ -55,8 +59,8 @@ namespace Identidad.API.Application.Features.Auth.Refresh
             {
                 Token = newRefreshTokenString,
                 UsuarioId = usuario.Id,
-                FechaExpiracion = DateTime.UtcNow.AddDays(7),
-                FechaCreacion = DateTime.UtcNow,
+                FechaExpiracion = DateTimeHelper.ObtenerAhoraLima().AddDays(7),
+                FechaCreacion = DateTimeHelper.ObtenerAhoraLima(),
                 EsRevocado = false
             };
 

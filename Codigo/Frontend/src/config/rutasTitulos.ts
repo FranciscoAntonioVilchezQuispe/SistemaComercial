@@ -50,4 +50,8 @@ export const RUTAS_TITULOS: Record<string, string> = {
   '/configuracion/permisos':       'Permisos',
   '/compras/lista':                'Compras',
   '/compras/notas':                'Notas de Compra',
+  '/perfil':                       'Mi Perfil',
+  '/configuracion-usuario':        'Configuración de Usuario',
+  '/ventas/turnos':                 'Historial de Turnos',
+  '/ventas/cajas':                  'Gestión de Cajas',
 }

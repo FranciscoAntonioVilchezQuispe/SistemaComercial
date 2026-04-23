@@ -1,0 +1,53 @@
+[18:22:14 INF] Now listening on: http://localhost:5010
+[18:22:14 INF] Application started. Press Ctrl+C to shut down.
+[18:22:14 INF] Hosting environment: Development
+[18:22:14 INF] Content root path: D:\Personal\Proyectos\SistemaComercial\Codigo\Backend\src\Compras.API\Compras.API.API
+[18:24:08 INF] Now listening on: http://localhost:5010
+[18:24:08 INF] Application started. Press Ctrl+C to shut down.
+[18:24:08 INF] Hosting environment: Development
+[18:24:08 INF] Content root path: D:\Personal\Proyectos\SistemaComercial\Codigo\Backend\src\Compras.API\Compras.API.API
+[18:25:20 INF] Now listening on: http://localhost:5010
+[18:25:20 INF] Application started. Press Ctrl+C to shut down.
+[18:25:20 INF] Hosting environment: Development
+[18:25:20 INF] Content root path: D:\Personal\Proyectos\SistemaComercial\Codigo\Backend\src\Compras.API\Compras.API.API
+[23:04:21 INF] Now listening on: http://localhost:5010
+[23:04:21 INF] Application started. Press Ctrl+C to shut down.
+[23:04:21 INF] Hosting environment: Development
+[23:04:21 INF] Content root path: D:\Personal\Proyectos\SistemaComercial\Codigo\Backend\src\Compras.API\Compras.API.API
+[23:05:18 WRN] Failed to determine the https port for redirect.
+[23:14:55 INF] Now listening on: http://localhost:5010
+[23:14:55 INF] Application started. Press Ctrl+C to shut down.
+[23:14:55 INF] Hosting environment: Development
+[23:14:55 INF] Content root path: D:\Personal\Proyectos\SistemaComercial\Codigo\Backend\src\Compras.API\Compras.API.API
+[23:20:31 INF] Now listening on: http://localhost:5010
+[23:20:31 INF] Application started. Press Ctrl+C to shut down.
+[23:20:31 INF] Hosting environment: Development
+[23:20:31 INF] Content root path: D:\Personal\Proyectos\SistemaComercial\Codigo\Backend\src\Compras.API\Compras.API.API
+[23:54:58 INF] Now listening on: http://localhost:5010
+[23:54:58 INF] Application started. Press Ctrl+C to shut down.
+[23:54:58 INF] Hosting environment: Development
+[23:54:58 INF] Content root path: D:\Personal\Proyectos\SistemaComercial\Codigo\Backend\src\Compras.API\Compras.API.API
+[10:17:46 INF] Now listening on: http://localhost:5010
+[10:17:46 INF] Application started. Press Ctrl+C to shut down.
+[10:17:46 INF] Hosting environment: Development
+[10:17:46 INF] Content root path: D:\Personal\Proyectos\SistemaComercial\Codigo\Backend\src\Compras.API\Compras.API.API
+[10:44:47 INF] Now listening on: http://localhost:5010
+[10:44:47 INF] Application started. Press Ctrl+C to shut down.
+[10:44:47 INF] Hosting environment: Development
+[10:44:47 INF] Content root path: D:\Personal\Proyectos\SistemaComercial\Codigo\Backend\src\Compras.API\Compras.API.API
+[11:31:37 INF] Now listening on: http://localhost:5010
+[11:31:37 INF] Application started. Press Ctrl+C to shut down.
+[11:31:37 INF] Hosting environment: Development
+[11:31:37 INF] Content root path: D:\Personal\Proyectos\SistemaComercial\Codigo\Backend\src\Compras.API\Compras.API.API
+[16:30:31 INF] Now listening on: http://localhost:5010
+[16:30:31 INF] Application started. Press Ctrl+C to shut down.
+[16:30:31 INF] Hosting environment: Development
+[16:30:31 INF] Content root path: D:\Personal\Proyectos\SistemaComercial\Codigo\Backend\src\Compras.API\Compras.API.API
+[16:31:25 INF] Now listening on: http://localhost:5010
+[16:31:25 INF] Application started. Press Ctrl+C to shut down.
+[16:31:25 INF] Hosting environment: Development
+[16:31:25 INF] Content root path: D:\Personal\Proyectos\SistemaComercial\Codigo\Backend\src\Compras.API\Compras.API.API
+[16:47:11 INF] Now listening on: http://localhost:5010
+[16:47:11 INF] Application started. Press Ctrl+C to shut down.
+[16:47:11 INF] Hosting environment: Development
+[16:47:11 INF] Content root path: D:\Personal\Proyectos\SistemaComercial\Codigo\Backend\src\Compras.API\Compras.API.API

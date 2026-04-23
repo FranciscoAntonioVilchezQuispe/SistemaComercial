@@ -5,6 +5,7 @@ using Nucleo.Comun.Application.Extensions;
 using Nucleo.Comun.API.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.WebHost.ConfigureKestrelLimits();
 builder.AddCentralizedLogging();
 
 // Fix for Npgsql Timestamp
@@ -54,7 +55,6 @@ builder.Services.ConfigureHttpJsonOptions(options =>
 });
 
 // Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -83,3 +83,5 @@ app.MapImagenProductoEndpoints();
 app.MapVarianteProductoEndpoints();
 
 app.Run();
+
+public partial class Program { }

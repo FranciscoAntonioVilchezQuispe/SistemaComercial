@@ -1,7 +1,17 @@
 {
   "permissions": {
     "allow": [
-      "Bash(find /d/Personal/Proyectos/SistemaComercial/Codigo/Backend/src -name \"*.csproj\" -type f -exec grep -l \"Dapper\" {} \\\\;)"
+      "Bash(find /d/Personal/Proyectos/SistemaComercial/Codigo/Backend/src -name \"*.csproj\" -type f -exec grep -l \"Dapper\" {} \\\\;)",
+      "Bash(xargs grep *)",
+      "Bash(dotnet build *)",
+      "Bash(npx tsc *)",
+      "Bash(ls -la \"d:\\\\Personal\\\\Proyectos\\\\SistemaComercial\\\\Codigo\\\\Backend\\\\src\\\\Ventas.API\\\\Ventas.API.Domain\\\\Entidades\\\\\\\\\")",
+      "Bash(ls -la \"d:\\\\Personal\\\\Proyectos\\\\SistemaComercial\\\\Codigo\\\\Backend\\\\src\\\\Ventas.API\\\\Ventas.API.API\\\\Endpoints\\\\\\\\\")",
+      "Bash(ls -la \"d:\\\\Personal\\\\Proyectos\\\\SistemaComercial\\\\Codigo\\\\Backend\\\\src\\\\Ventas.API\\\\Ventas.API.Application\\\\Features\\\\Turnos\\\\\\\\\")",
+      "Bash(ls -la \"d:\\\\Personal\\\\Proyectos\\\\SistemaComercial\\\\Codigo\\\\Backend\\\\src\\\\Ventas.API\\\\Ventas.API.Domain\\\\Interfaces\\\\\\\\\")",
+      "Bash(ls -la \"d:\\\\Personal\\\\Proyectos\\\\SistemaComercial\\\\Codigo\\\\Backend\\\\src\\\\Ventas.API\\\\Ventas.API.Infrastructure\\\\\\\\\")",
+      "Bash(ls -la \"d:\\\\Personal\\\\Proyectos\\\\SistemaComercial\\\\Codigo\\\\Backend\\\\src\\\\Ventas.API\\\\Ventas.API.Infrastructure\\\\Repositorios\\\\\\\\\")",
+      "Bash(ls -la \"d:\\\\Personal\\\\Proyectos\\\\SistemaComercial\\\\Codigo\\\\BaseDeDatos\\\\Scripts\\\\\\\\\")"
     ]
   }
 }

@@ -110,12 +110,9 @@ export const servicioTablaGeneral = {
   // DETALLES
 
   obtenerDetalles: async (idTabla: number): Promise<TablaGeneralDetalle[]> => {
-    console.log("ID tabla:", idTabla);
-    console.log("URL:", `${BASE_URL}/${idTabla}/detalles`);
     const response: any = await apiConfiguracion.get(
       `${BASE_URL}/${idTabla}/detalles`,
     );
-    console.log("Respuesta detalles:", response);
 
     const raw = response.data ?? response;
 

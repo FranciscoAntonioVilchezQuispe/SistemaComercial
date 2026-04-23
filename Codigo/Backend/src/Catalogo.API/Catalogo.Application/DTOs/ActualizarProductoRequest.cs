@@ -28,6 +28,7 @@ namespace Catalogo.Application.DTOs
 
         public bool TieneVariantes { get; set; }
         public bool PermiteInventarioNegativo { get; set; }
+        public string? MetodoValuacion { get; set; }
 
         public bool GravadoImpuesto { get; set; }
         public decimal PorcentajeImpuesto { get; set; }

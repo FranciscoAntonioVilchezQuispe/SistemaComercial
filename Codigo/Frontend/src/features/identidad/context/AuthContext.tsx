@@ -35,8 +35,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                     // Token expirado, intentar refresh (reemplazar por hook si es necesario)
                     authService.logout();
                 } else {
-                    const rolesIds = typeof decoded.roles === 'string' ? decoded.roles.split(',') : (decoded.roles || []);
-                    const permisosIds = typeof decoded.permisos === 'string' ? decoded.permisos.split(',') : (decoded.permisos || []);
+                    const rolesIds: string[] = Array.isArray(decoded.roles)
+                        ? decoded.roles
+                        : typeof decoded.roles === 'string'
+                            ? [decoded.roles]
+                            : [];
+                    const permisosIds: string[] = Array.isArray(decoded.permisos)
+                        ? decoded.permisos
+                        : typeof decoded.permisos === 'string'
+                            ? [decoded.permisos]
+                            : [];
                     
                     setRoles(rolesIds);
                     setPermisos(permisosIds);

@@ -7,6 +7,7 @@ using Nucleo.Comun.Application.Extensions;
 using Nucleo.Comun.API.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.WebHost.ConfigureKestrelLimits();
 builder.AddCentralizedLogging();
 Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
 
@@ -22,7 +23,6 @@ builder.Services.AddDbContext<ClientesDbContext>(options =>
 builder.Services.AddScoped<IClienteRepositorio, ClienteRepositorio>();
 builder.Services.AddScoped<IContactoClienteRepositorio, ContactoClienteRepositorio>();
 
-// CORS
 // CORS
 var frontendUrl = builder.Configuration.GetValue<string>("FrontendUrl") ?? "http://localhost:5180";
 
@@ -58,3 +58,5 @@ app.MapClienteEndpoints();
 app.MapContactoClienteEndpoints();
 
 app.Run();
+
+public partial class Program { }

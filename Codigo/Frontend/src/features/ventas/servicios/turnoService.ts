@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { apiGatewayURL } from '@/compartido/configuracion/entorno.config';
+import type { TurnoResumenPrevio, TurnoHistorialItem } from '../tipos/ventas.types';
 
 export interface TurnoVendedorDto {
     id: number;
@@ -24,6 +25,12 @@ export interface CierreTurnoDto {
     cantidadTransacciones: number;
     observaciones?: string;
     estado: string;
+    // Nuevos campos de arqueo:
+    totalIngresosManualles: number;
+    totalEgresosManualles: number;
+    montoEsperado: number;
+    montoFisicoContado: number;
+    diferenciaArqueo: number;
 }
 
 export const turnoService = {
@@ -49,12 +56,37 @@ export const turnoService = {
         return response.data;
     },
 
-    cerrarTurno: async (turnoVendedorId: number, observaciones?: string): Promise<CierreTurnoDto> => {
+    cerrarTurno: async (turnoVendedorId: number, montoFisicoContado: number, observaciones?: string): Promise<CierreTurnoDto> => {
         const token = localStorage.getItem('sc_token');
         const response = await axios.post<CierreTurnoDto>(`${apiGatewayURL}/api/turnos/cerrar`, 
-            { turnoVendedorId, observaciones },
+            { turnoVendedorId, montoFisicoContado, observaciones },
             { headers: { 'Authorization': `Bearer ${token}` } }
         );
+        return response.data;
+    },
+
+    obtenerResumenPrevioCierre: async (turnoId: number): Promise<TurnoResumenPrevio> => {
+        const token = localStorage.getItem('sc_token');
+        const response = await axios.get<TurnoResumenPrevio>(
+            `${apiGatewayURL}/api/turnos/resumen-previo/${turnoId}`,
+            { headers: { 'Authorization': `Bearer ${token}` } }
+        );
+        return response.data;
+    },
+
+    obtenerHistorialTurnos: async (params: {
+        pageNumber?: number;
+        pageSize?: number;
+        cajaId?: number;
+        estado?: string;
+        fechaDesde?: string;
+        fechaHasta?: string;
+    }): Promise<{ datos: TurnoHistorialItem[]; total: number; totalPages: number }> => {
+        const token = localStorage.getItem('sc_token');
+        const response = await axios.get(`${apiGatewayURL}/api/turnos/historial`, {
+            params,
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
         return response.data;
     }
 };

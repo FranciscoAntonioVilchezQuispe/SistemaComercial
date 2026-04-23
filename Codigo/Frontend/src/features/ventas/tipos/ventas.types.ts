@@ -219,6 +219,59 @@ export interface MovimientoCaja {
   fecha: string;
 }
 
+export interface MovimientoCajaDetalle {
+  id: number;
+  idCaja: number;
+  idTurnoVendedor?: number;
+  idTipoMovimiento: number;
+  tipoMovimientoNombre: string;
+  monto: number; // positivo = ingreso, negativo = egreso
+  concepto: string;
+  fechaMovimiento: string;
+  usuarioResponsable: string;
+}
+
+export interface TurnoHistorialItem {
+  id: number;
+  cajaId: number;
+  nombreCaja: string;
+  usuarioVendedorId: number;
+  nombreVendedor: string;
+  fechaInicio: string;
+  fechaFin?: string;
+  montoApertura: number;
+  montoCierre?: number;
+  estado: 'ABIERTO' | 'CERRADO';
+  totalVentas: number;
+  cantidadTransacciones: number;
+  total: number; // paginación
+}
+
+export interface TurnoResumenPrevio {
+  turnoId: number;
+  montoApertura: number;
+  totalVentas: number;
+  totalEfectivo: number;
+  totalTarjeta: number;
+  totalTransferencia: number;
+  totalOtros: number;
+  totalIngresosManualles: number;
+  totalEgresosManualles: number;
+  montoEsperadoEnCaja: number;
+  cantidadVentas: number;
+  movimientosManuales: MovimientoCajaDetalle[];
+}
+
+export interface CajaListItem {
+  id: number;
+  nombreCaja: string;
+  idAlmacen: number;
+  idEstado: number;
+  montoApertura: number;
+  montoActual: number;
+  activado: boolean;
+}
+
 // ============================================
 // COTIZACION
 // ============================================

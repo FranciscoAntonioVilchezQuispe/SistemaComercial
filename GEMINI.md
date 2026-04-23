@@ -47,11 +47,17 @@
 - Iterar sin piedad en estas lecciones hasta que la tasa de errores disminuya.
 - Revisar las lecciones al inicio de cada sesión del proyecto relevante.
 
-### 4. Verificación Antes de Terminar
+### 4. Verificación Antes de Terminar (OBLIGATORIA)
 - Nunca marcar una tarea como completa sin demostrar que funciona.
+- **COMPILACIÓN OBLIGATORIA**: Tras cualquier cambio en el código, DEBES ejecutar los comandos de validación correspondientes (`npm run build`, `npx tsc --noEmit` o `dotnet build`) y garantizar que el código compila sin errores.
 - Comparar el comportamiento entre la versión principal y los cambios cuando sea relevante.
 - Preguntarse: *"¿Un ingeniero senior aprobaría esto?"*
 - Ejecutar pruebas, revisar logs, demostrar corrección.
+
+### 5. Diagnóstico mediante Logs de Consola
+- Ante reportes de errores en tiempo de ejecución o problemas de integración entre servicios, el agente DEBE consultar los archivos de réplica de consola en `Codigo/LogConsola/*.txt`.
+- Estos archivos contienen el flujo `Information` y `Error` de todos los microservicios y el frontend (si se ejecuta con `dev:file`).
+- El agente debe usar `view_file` con `StartLine` y `EndLine` para leer las últimas líneas de estos archivos y correlacionar eventos mediante el `Timestamp`.
 
 ### 5. Exigir Elegancia (Balanceada)
 - Para cambios no triviales: pausar y preguntar *"¿hay una forma más elegante?"*

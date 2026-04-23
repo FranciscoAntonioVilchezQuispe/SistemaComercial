@@ -211,10 +211,10 @@ export function CrearUsuarioDialog({ open, onOpenChange, onSuccess }: CrearUsuar
                         </Button>
                         <Button 
                             type="submit" 
-                            disabled={saving || !form.idTrabajador}
+                            disabled={saving || loading || !form.idTrabajador}
                             className="bg-primary shadow-lg shadow-primary/20 h-11 px-8 rounded-xl font-bold"
                         >
-                            {saving ? "Creando..." : "Crear Usuario"}
+                            {saving ? "Creando..." : (loading ? "Cargando..." : "Crear Usuario")}
                         </Button>
                     </DialogFooter>
                 </form>

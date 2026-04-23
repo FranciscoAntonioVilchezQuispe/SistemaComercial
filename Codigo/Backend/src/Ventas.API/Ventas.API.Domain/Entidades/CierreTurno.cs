@@ -37,6 +37,21 @@ namespace Ventas.API.Domain.Entidades
         [Column("cantidad_transacciones")]
         public int CantidadTransacciones { get; set; }
 
+        [Column("total_ingresos_manuales", TypeName = "decimal(12,2)")]
+        public decimal TotalIngresosManualles { get; set; }
+
+        [Column("total_egresos_manuales", TypeName = "decimal(12,2)")]
+        public decimal TotalEgresosManualles { get; set; }
+
+        [Column("monto_esperado", TypeName = "decimal(12,2)")]
+        public decimal MontoEsperado { get; set; }
+
+        [Column("monto_fisico_contado", TypeName = "decimal(12,2)")]
+        public decimal MontoFisicoContado { get; set; }
+
+        [Column("diferencia_arqueo", TypeName = "decimal(12,2)")]
+        public decimal DiferenciaArqueo { get; set; }
+
         [Column("observaciones", TypeName = "text")]
         public string? Observaciones { get; set; }
 

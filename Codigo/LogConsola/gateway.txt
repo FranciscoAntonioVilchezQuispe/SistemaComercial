@@ -1,0 +1,507 @@
+[22:59:12 INF] Loading proxy data from config.
+[22:59:12 INF] Now listening on: http://localhost:5000
+[22:59:12 INF] Application started. Press Ctrl+C to shut down.
+[22:59:12 INF] Hosting environment: Development
+[22:59:12 INF] Content root path: D:\Personal\Proyectos\SistemaComercial\Codigo\Backend\src\Gateway.API
+[23:00:01 WRN] Failed to determine the https port for redirect.
+[23:00:01 INF] Proxying to http://localhost:5001/api/auth/login HTTP/2 RequestVersionOrLower 
+[23:00:03 INF] Received HTTP/1.1 response 200.
+[23:02:23 INF] Proxying to http://localhost:5002/api/tipos-comprobante?pageNumber=1&pageSize=100 HTTP/2 RequestVersionOrLower 
+[23:02:23 INF] Proxying to http://localhost:5005/api/ventas?pageNumber=1&pageSize=10&sortDirection=asc&search= HTTP/2 RequestVersionOrLower 
+[23:02:27 WRN] "RequestCanceled": The request was canceled before receiving a response.
+System.Threading.Tasks.TaskCanceledException: A task was canceled.
+   at System.Threading.Tasks.TaskCompletionSourceWithCancellation`1.WaitWithCancellationAsync(CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.SendWithVersionDetectionAndRetryAsync(HttpRequestMessage request, Boolean async, Boolean doRequestAuth, CancellationToken cancellationToken)
+   at System.Net.Http.DiagnosticsHandler.SendAsyncCore(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at Yarp.ReverseProxy.Forwarder.HttpForwarder.SendAsync(HttpContext context, String destinationPrefix, HttpMessageInvoker httpClient, ForwarderRequestConfig requestConfig, HttpTransformer transformer, CancellationToken cancellationToken)
+[23:02:27 WRN] "RequestCanceled": The request was canceled before receiving a response.
+System.Threading.Tasks.TaskCanceledException: A task was canceled.
+   at System.Threading.Tasks.TaskCompletionSourceWithCancellation`1.WaitWithCancellationAsync(CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.SendWithVersionDetectionAndRetryAsync(HttpRequestMessage request, Boolean async, Boolean doRequestAuth, CancellationToken cancellationToken)
+   at System.Net.Http.DiagnosticsHandler.SendAsyncCore(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at Yarp.ReverseProxy.Forwarder.HttpForwarder.SendAsync(HttpContext context, String destinationPrefix, HttpMessageInvoker httpClient, ForwarderRequestConfig requestConfig, HttpTransformer transformer, CancellationToken cancellationToken)
+[23:02:28 INF] Proxying to http://127.0.0.1:5010/api/compras?pageNumber=1&pageSize=10&sortDirection=asc&search= HTTP/2 RequestVersionOrLower 
+[23:02:30 WRN] "Request": An error was encountered before receiving a response.
+System.Net.Http.HttpRequestException: No se puede establecer una conexión ya que el equipo de destino denegó expresamente dicha conexión. (127.0.0.1:5010)
+ ---> System.Net.Sockets.SocketException (10061): No se puede establecer una conexión ya que el equipo de destino denegó expresamente dicha conexión.
+   at System.Net.Sockets.Socket.AwaitableSocketAsyncEventArgs.ThrowException(SocketError error, CancellationToken cancellationToken)
+   at System.Net.Sockets.Socket.AwaitableSocketAsyncEventArgs.System.Threading.Tasks.Sources.IValueTaskSource.GetResult(Int16 token)
+   at System.Net.Sockets.Socket.<ConnectAsync>g__WaitForConnectWithCancellation|285_0(AwaitableSocketAsyncEventArgs saea, ValueTask connectTask, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.ConnectToTcpHostAsync(String host, Int32 port, HttpRequestMessage initialRequest, Boolean async, CancellationToken cancellationToken)
+   --- End of inner exception stack trace ---
+   at System.Net.Http.HttpConnectionPool.ConnectToTcpHostAsync(String host, Int32 port, HttpRequestMessage initialRequest, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.ConnectAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.CreateHttp11ConnectionAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.AddHttp11ConnectionAsync(QueueItem queueItem)
+   at System.Threading.Tasks.TaskCompletionSourceWithCancellation`1.WaitWithCancellationAsync(CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.SendWithVersionDetectionAndRetryAsync(HttpRequestMessage request, Boolean async, Boolean doRequestAuth, CancellationToken cancellationToken)
+   at System.Net.Http.DiagnosticsHandler.SendAsyncCore(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at Yarp.ReverseProxy.Forwarder.HttpForwarder.SendAsync(HttpContext context, String destinationPrefix, HttpMessageInvoker httpClient, ForwarderRequestConfig requestConfig, HttpTransformer transformer, CancellationToken cancellationToken)
+[23:02:31 INF] Proxying to http://127.0.0.1:5010/api/compras?pageNumber=1&pageSize=10&sortDirection=asc&search= HTTP/2 RequestVersionOrLower 
+[23:02:33 WRN] "Request": An error was encountered before receiving a response.
+System.Net.Http.HttpRequestException: No se puede establecer una conexión ya que el equipo de destino denegó expresamente dicha conexión. (127.0.0.1:5010)
+ ---> System.Net.Sockets.SocketException (10061): No se puede establecer una conexión ya que el equipo de destino denegó expresamente dicha conexión.
+   at System.Net.Sockets.Socket.AwaitableSocketAsyncEventArgs.ThrowException(SocketError error, CancellationToken cancellationToken)
+   at System.Net.Sockets.Socket.AwaitableSocketAsyncEventArgs.System.Threading.Tasks.Sources.IValueTaskSource.GetResult(Int16 token)
+   at System.Net.Sockets.Socket.<ConnectAsync>g__WaitForConnectWithCancellation|285_0(AwaitableSocketAsyncEventArgs saea, ValueTask connectTask, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.ConnectToTcpHostAsync(String host, Int32 port, HttpRequestMessage initialRequest, Boolean async, CancellationToken cancellationToken)
+   --- End of inner exception stack trace ---
+   at System.Net.Http.HttpConnectionPool.ConnectToTcpHostAsync(String host, Int32 port, HttpRequestMessage initialRequest, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.ConnectAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.CreateHttp11ConnectionAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.AddHttp11ConnectionAsync(QueueItem queueItem)
+   at System.Threading.Tasks.TaskCompletionSourceWithCancellation`1.WaitWithCancellationAsync(CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.SendWithVersionDetectionAndRetryAsync(HttpRequestMessage request, Boolean async, Boolean doRequestAuth, CancellationToken cancellationToken)
+   at System.Net.Http.DiagnosticsHandler.SendAsyncCore(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at Yarp.ReverseProxy.Forwarder.HttpForwarder.SendAsync(HttpContext context, String destinationPrefix, HttpMessageInvoker httpClient, ForwarderRequestConfig requestConfig, HttpTransformer transformer, CancellationToken cancellationToken)
+[23:03:27 INF] Proxying to http://localhost:5001/api/auth/debug-token HTTP/2 RequestVersionOrLower 
+[23:03:27 INF] Received HTTP/1.1 response 400.
+[23:04:50 INF] Proxying to http://localhost:5001/api/auth/login HTTP/2 RequestVersionOrLower 
+[23:04:51 INF] Received HTTP/1.1 response 200.
+[23:05:15 INF] Proxying to http://localhost:5005/api/ventas?pageNumber=1&pageSize=10&sortDirection=asc&search= HTTP/2 RequestVersionOrLower 
+[23:05:15 INF] Proxying to http://localhost:5002/api/tipos-comprobante?pageNumber=1&pageSize=100 HTTP/2 RequestVersionOrLower 
+[23:05:17 INF] Received HTTP/1.1 response 500.
+[23:05:17 WRN] "RequestCanceled": The request was canceled before receiving a response.
+System.Threading.Tasks.TaskCanceledException: A task was canceled.
+   at System.Threading.Tasks.TaskCompletionSourceWithCancellation`1.WaitWithCancellationAsync(CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.SendWithVersionDetectionAndRetryAsync(HttpRequestMessage request, Boolean async, Boolean doRequestAuth, CancellationToken cancellationToken)
+   at System.Net.Http.DiagnosticsHandler.SendAsyncCore(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at Yarp.ReverseProxy.Forwarder.HttpForwarder.SendAsync(HttpContext context, String destinationPrefix, HttpMessageInvoker httpClient, ForwarderRequestConfig requestConfig, HttpTransformer transformer, CancellationToken cancellationToken)
+[23:05:18 INF] Proxying to http://127.0.0.1:5010/api/compras?pageNumber=1&pageSize=10&sortDirection=asc&search= HTTP/2 RequestVersionOrLower 
+[23:05:20 INF] Received HTTP/1.1 response 200.
+[23:06:22 INF] Proxying to http://localhost:5001/api/auth/debug-token HTTP/2 RequestVersionOrLower 
+[23:06:22 INF] Received HTTP/1.1 response 200.
+[23:06:44 INF] Proxying to http://localhost:5008/api/productos?pageNumber=1&pageSize=10 HTTP/2 RequestVersionOrLower 
+[23:06:45 WRN] "RequestCanceled": The request was canceled before receiving a response.
+System.Threading.Tasks.TaskCanceledException: A task was canceled.
+   at System.Threading.Tasks.TaskCompletionSourceWithCancellation`1.WaitWithCancellationAsync(CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.SendWithVersionDetectionAndRetryAsync(HttpRequestMessage request, Boolean async, Boolean doRequestAuth, CancellationToken cancellationToken)
+   at System.Net.Http.DiagnosticsHandler.SendAsyncCore(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at Yarp.ReverseProxy.Forwarder.HttpForwarder.SendAsync(HttpContext context, String destinationPrefix, HttpMessageInvoker httpClient, ForwarderRequestConfig requestConfig, HttpTransformer transformer, CancellationToken cancellationToken)
+[23:06:45 INF] Proxying to http://localhost:5003/api/inventario/stock?pageNumber=1&pageSize=10&sortDirection=asc&search= HTTP/2 RequestVersionOrLower 
+[23:06:45 INF] Proxying to http://localhost:5003/api/inventario/almacenes?pageNumber=1&pageSize=1000 HTTP/2 RequestVersionOrLower 
+[23:06:46 WRN] "RequestCanceled": The request was canceled before receiving a response.
+System.Threading.Tasks.TaskCanceledException: A task was canceled.
+   at System.Threading.Tasks.TaskCompletionSourceWithCancellation`1.WaitWithCancellationAsync(CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.SendWithVersionDetectionAndRetryAsync(HttpRequestMessage request, Boolean async, Boolean doRequestAuth, CancellationToken cancellationToken)
+   at System.Net.Http.DiagnosticsHandler.SendAsyncCore(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at Yarp.ReverseProxy.Forwarder.HttpForwarder.SendAsync(HttpContext context, String destinationPrefix, HttpMessageInvoker httpClient, ForwarderRequestConfig requestConfig, HttpTransformer transformer, CancellationToken cancellationToken)
+[23:06:46 WRN] "RequestCanceled": The request was canceled before receiving a response.
+System.Threading.Tasks.TaskCanceledException: A task was canceled.
+   at System.Threading.Tasks.TaskCompletionSourceWithCancellation`1.WaitWithCancellationAsync(CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.SendWithVersionDetectionAndRetryAsync(HttpRequestMessage request, Boolean async, Boolean doRequestAuth, CancellationToken cancellationToken)
+   at System.Net.Http.DiagnosticsHandler.SendAsyncCore(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at Yarp.ReverseProxy.Forwarder.HttpForwarder.SendAsync(HttpContext context, String destinationPrefix, HttpMessageInvoker httpClient, ForwarderRequestConfig requestConfig, HttpTransformer transformer, CancellationToken cancellationToken)
+[23:06:46 INF] Proxying to http://localhost:5001/api/usuarios HTTP/2 RequestVersionOrLower 
+[23:06:46 INF] Received HTTP/1.1 response 200.
+[23:06:46 INF] Proxying to http://localhost:5001/api/usuarios HTTP/2 RequestVersionOrLower 
+[23:06:46 INF] Received HTTP/1.1 response 200.
+[23:14:55 INF] Loading proxy data from config.
+[23:14:55 INF] Now listening on: http://localhost:5000
+[23:14:55 INF] Application started. Press Ctrl+C to shut down.
+[23:14:55 INF] Hosting environment: Development
+[23:14:55 INF] Content root path: D:\Personal\Proyectos\SistemaComercial\Codigo\Backend\src\Gateway.API
+[23:20:31 INF] Loading proxy data from config.
+[23:20:31 INF] Now listening on: http://localhost:5000
+[23:20:31 INF] Application started. Press Ctrl+C to shut down.
+[23:20:31 INF] Hosting environment: Development
+[23:20:31 INF] Content root path: D:\Personal\Proyectos\SistemaComercial\Codigo\Backend\src\Gateway.API
+[23:20:32 WRN] Failed to determine the https port for redirect.
+[23:20:32 INF] Proxying to http://localhost:5001/api/auth/login HTTP/2 RequestVersionOrLower 
+[23:20:34 INF] Received HTTP/1.1 response 200.
+[23:20:38 INF] Proxying to http://localhost:5008/api/productos?pageNumber=1&pageSize=10 HTTP/2 RequestVersionOrLower 
+[23:20:40 INF] Received HTTP/1.1 response 200.
+[23:20:41 INF] Proxying to http://localhost:5008/api/productos/8 HTTP/2 RequestVersionOrLower 
+[23:20:42 INF] Received HTTP/1.1 response 200.
+[23:20:42 INF] Proxying to http://localhost:5008/api/categorias?pageNumber=1&pageSize=100&search=&activo=true HTTP/2 RequestVersionOrLower 
+[23:20:42 INF] Proxying to http://localhost:5002/api/configuracion/tipo-afectacion HTTP/2 RequestVersionOrLower 
+[23:20:42 INF] Proxying to http://localhost:5008/api/unidades-medida?activo=true HTTP/2 RequestVersionOrLower 
+[23:20:42 INF] Proxying to http://localhost:5008/api/marcas?pageNumber=1&pageSize=100&activo=true HTTP/2 RequestVersionOrLower 
+[23:20:42 INF] Proxying to http://localhost:5002/api/configuracion/tipo-tributo HTTP/2 RequestVersionOrLower 
+[23:20:42 INF] Received HTTP/1.1 response 200.
+[23:20:42 INF] Received HTTP/1.1 response 200.
+[23:20:42 INF] Received HTTP/1.1 response 200.
+[23:20:44 INF] Received HTTP/1.1 response 200.
+[23:20:44 INF] Received HTTP/1.1 response 200.
+[23:21:02 INF] Proxying to http://localhost:5001/api/menus/jerarquicos HTTP/2 RequestVersionOrLower 
+[23:21:02 INF] Proxying to http://localhost:5001/api/roles HTTP/2 RequestVersionOrLower 
+[23:21:02 INF] Proxying to http://localhost:5001/api/menus/jerarquicos HTTP/2 RequestVersionOrLower 
+[23:21:02 INF] Proxying to http://localhost:5001/api/tipos-permiso HTTP/2 RequestVersionOrLower 
+[23:21:02 INF] Proxying to http://localhost:5001/api/tipos-permiso HTTP/2 RequestVersionOrLower 
+[23:21:02 INF] Proxying to http://localhost:5001/api/roles HTTP/2 RequestVersionOrLower 
+[23:21:02 INF] Received HTTP/1.1 response 200.
+[23:21:02 INF] Received HTTP/1.1 response 200.
+[23:21:02 INF] Received HTTP/1.1 response 200.
+[23:21:02 INF] Received HTTP/1.1 response 200.
+[23:21:02 INF] Received HTTP/1.1 response 200.
+[23:21:02 INF] Received HTTP/1.1 response 200.
+[23:21:02 INF] Proxying to http://localhost:5001/api/roles/1/menus HTTP/2 RequestVersionOrLower 
+[23:21:02 INF] Proxying to http://localhost:5001/api/roles/1/menus HTTP/2 RequestVersionOrLower 
+[23:21:02 INF] Received HTTP/1.1 response 200.
+[23:21:02 INF] Received HTTP/1.1 response 200.
+[23:32:36 INF] Proxying to http://localhost:5001/api/menus/jerarquicos HTTP/2 RequestVersionOrLower 
+[23:32:36 INF] Proxying to http://localhost:5001/api/roles HTTP/2 RequestVersionOrLower 
+[23:32:36 INF] Proxying to http://localhost:5001/api/tipos-permiso HTTP/2 RequestVersionOrLower 
+[23:32:36 INF] Proxying to http://localhost:5001/api/roles HTTP/2 RequestVersionOrLower 
+[23:32:36 INF] Proxying to http://localhost:5001/api/tipos-permiso HTTP/2 RequestVersionOrLower 
+[23:32:36 INF] Proxying to http://localhost:5001/api/menus/jerarquicos HTTP/2 RequestVersionOrLower 
+[23:32:36 INF] Received HTTP/1.1 response 200.
+[23:32:37 INF] Received HTTP/1.1 response 200.
+[23:32:37 INF] Received HTTP/1.1 response 200.
+[23:32:37 INF] Received HTTP/1.1 response 200.
+[23:32:37 INF] Received HTTP/1.1 response 200.
+[23:32:37 INF] Received HTTP/1.1 response 200.
+[23:32:37 INF] Proxying to http://localhost:5001/api/roles/1/menus HTTP/2 RequestVersionOrLower 
+[23:32:37 INF] Proxying to http://localhost:5001/api/roles/1/menus HTTP/2 RequestVersionOrLower 
+[23:32:37 INF] Received HTTP/1.1 response 200.
+[23:32:37 INF] Received HTTP/1.1 response 200.
+[23:36:42 INF] Proxying to http://localhost:5001/api/auth/login HTTP/2 RequestVersionOrLower 
+[23:36:42 INF] Received HTTP/1.1 response 200.
+[23:36:45 INF] Proxying to http://localhost:5001/api/roles HTTP/2 RequestVersionOrLower 
+[23:36:45 INF] Proxying to http://localhost:5001/api/menus/jerarquicos HTTP/2 RequestVersionOrLower 
+[23:36:45 INF] Proxying to http://localhost:5001/api/tipos-permiso HTTP/2 RequestVersionOrLower 
+[23:36:45 INF] Proxying to http://localhost:5001/api/roles HTTP/2 RequestVersionOrLower 
+[23:36:45 INF] Proxying to http://localhost:5001/api/menus/jerarquicos HTTP/2 RequestVersionOrLower 
+[23:36:45 INF] Proxying to http://localhost:5001/api/tipos-permiso HTTP/2 RequestVersionOrLower 
+[23:36:45 INF] Received HTTP/1.1 response 200.
+[23:36:45 INF] Received HTTP/1.1 response 200.
+[23:36:45 INF] Received HTTP/1.1 response 200.
+[23:36:45 INF] Received HTTP/1.1 response 200.
+[23:36:45 INF] Received HTTP/1.1 response 200.
+[23:36:45 INF] Received HTTP/1.1 response 200.
+[23:36:45 INF] Proxying to http://localhost:5001/api/roles/1/menus HTTP/2 RequestVersionOrLower 
+[23:36:45 INF] Proxying to http://localhost:5001/api/roles/1/menus HTTP/2 RequestVersionOrLower 
+[23:36:45 INF] Received HTTP/1.1 response 200.
+[23:36:45 INF] Received HTTP/1.1 response 200.
+[23:54:58 INF] Loading proxy data from config.
+[23:54:58 INF] Now listening on: http://localhost:5000
+[23:54:58 INF] Application started. Press Ctrl+C to shut down.
+[23:54:58 INF] Hosting environment: Development
+[23:54:58 INF] Content root path: D:\Personal\Proyectos\SistemaComercial\Codigo\Backend\src\Gateway.API
+[23:55:03 WRN] Failed to determine the https port for redirect.
+[23:55:03 INF] Proxying to http://localhost:5001/api/auth/login HTTP/2 RequestVersionOrLower 
+[23:55:05 INF] Received HTTP/1.1 response 200.
+[23:55:12 INF] Proxying to http://localhost:5001/api/tipos-permiso HTTP/2 RequestVersionOrLower 
+[23:55:12 INF] Proxying to http://localhost:5001/api/menus/jerarquicos HTTP/2 RequestVersionOrLower 
+[23:55:12 INF] Proxying to http://localhost:5001/api/roles HTTP/2 RequestVersionOrLower 
+[23:55:12 INF] Proxying to http://localhost:5001/api/tipos-permiso HTTP/2 RequestVersionOrLower 
+[23:55:12 INF] Proxying to http://localhost:5001/api/menus/jerarquicos HTTP/2 RequestVersionOrLower 
+[23:55:12 INF] Proxying to http://localhost:5001/api/roles HTTP/2 RequestVersionOrLower 
+[23:55:12 INF] Received HTTP/1.1 response 200.
+[23:55:12 INF] Received HTTP/1.1 response 200.
+[23:55:12 INF] Received HTTP/1.1 response 200.
+[23:55:12 INF] Received HTTP/1.1 response 200.
+[23:55:12 INF] Received HTTP/1.1 response 200.
+[23:55:12 INF] Received HTTP/1.1 response 200.
+[23:55:12 INF] Proxying to http://localhost:5001/api/roles/1/menus HTTP/2 RequestVersionOrLower 
+[23:55:12 INF] Proxying to http://localhost:5001/api/roles/1/menus HTTP/2 RequestVersionOrLower 
+[23:55:12 INF] Received HTTP/1.1 response 200.
+[23:55:12 INF] Received HTTP/1.1 response 200.
+[23:55:20 INF] Proxying to http://localhost:5001/api/roles/1/acceso-granular HTTP/2 RequestVersionOrLower 
+[23:55:20 INF] Received HTTP/1.1 response 200.
+[23:55:30 INF] Proxying to http://localhost:5001/api/auth/login HTTP/2 RequestVersionOrLower 
+[23:55:30 INF] Received HTTP/1.1 response 200.
+[23:55:36 INF] Proxying to http://localhost:5001/api/roles HTTP/2 RequestVersionOrLower 
+[23:55:36 INF] Proxying to http://localhost:5001/api/menus/jerarquicos HTTP/2 RequestVersionOrLower 
+[23:55:36 INF] Proxying to http://localhost:5001/api/tipos-permiso HTTP/2 RequestVersionOrLower 
+[23:55:36 INF] Proxying to http://localhost:5001/api/roles HTTP/2 RequestVersionOrLower 
+[23:55:36 INF] Proxying to http://localhost:5001/api/menus/jerarquicos HTTP/2 RequestVersionOrLower 
+[23:55:36 INF] Proxying to http://localhost:5001/api/tipos-permiso HTTP/2 RequestVersionOrLower 
+[23:55:36 INF] Received HTTP/1.1 response 200.
+[23:55:36 INF] Received HTTP/1.1 response 200.
+[23:55:36 INF] Received HTTP/1.1 response 200.
+[23:55:36 INF] Received HTTP/1.1 response 200.
+[23:55:36 INF] Received HTTP/1.1 response 200.
+[23:55:36 INF] Received HTTP/1.1 response 200.
+[23:55:36 INF] Proxying to http://localhost:5001/api/roles/1/menus HTTP/2 RequestVersionOrLower 
+[23:55:36 INF] Proxying to http://localhost:5001/api/roles/1/menus HTTP/2 RequestVersionOrLower 
+[23:55:36 INF] Received HTTP/1.1 response 200.
+[23:55:36 INF] Received HTTP/1.1 response 200.
+[23:55:42 INF] Proxying to http://localhost:5008/api/productos?pageNumber=1&pageSize=10 HTTP/2 RequestVersionOrLower 
+[23:55:43 INF] Received HTTP/1.1 response 200.
+[23:55:48 INF] Proxying to http://localhost:5008/api/categorias?pageNumber=1&pageSize=10&search= HTTP/2 RequestVersionOrLower 
+[23:55:48 INF] Received HTTP/1.1 response 200.
+[10:17:46 INF] Loading proxy data from config.
+[10:17:47 INF] Now listening on: http://localhost:5000
+[10:17:47 INF] Application started. Press Ctrl+C to shut down.
+[10:17:47 INF] Hosting environment: Development
+[10:17:47 INF] Content root path: D:\Personal\Proyectos\SistemaComercial\Codigo\Backend\src\Gateway.API
+[10:18:18 WRN] Failed to determine the https port for redirect.
+[10:18:18 INF] Proxying to http://localhost:5001/api/auth/login HTTP/2 RequestVersionOrLower 
+[10:18:21 INF] Received HTTP/1.1 response 200.
+[10:18:31 INF] Proxying to http://localhost:5001/api/roles HTTP/2 RequestVersionOrLower 
+[10:18:31 INF] Proxying to http://localhost:5001/api/tipos-permiso HTTP/2 RequestVersionOrLower 
+[10:18:31 INF] Proxying to http://localhost:5001/api/tipos-permiso HTTP/2 RequestVersionOrLower 
+[10:18:31 INF] Proxying to http://localhost:5001/api/menus/jerarquicos HTTP/2 RequestVersionOrLower 
+[10:18:31 INF] Proxying to http://localhost:5001/api/roles HTTP/2 RequestVersionOrLower 
+[10:18:31 INF] Proxying to http://localhost:5001/api/menus/jerarquicos HTTP/2 RequestVersionOrLower 
+[10:18:32 INF] Received HTTP/1.1 response 200.
+[10:18:32 INF] Received HTTP/1.1 response 200.
+[10:18:32 INF] Received HTTP/1.1 response 200.
+[10:18:32 INF] Received HTTP/1.1 response 200.
+[10:18:32 INF] Received HTTP/1.1 response 200.
+[10:18:32 INF] Received HTTP/1.1 response 200.
+[10:18:32 INF] Proxying to http://localhost:5001/api/roles/1/menus HTTP/2 RequestVersionOrLower 
+[10:18:32 INF] Proxying to http://localhost:5001/api/roles/1/menus HTTP/2 RequestVersionOrLower 
+[10:18:32 INF] Received HTTP/1.1 response 200.
+[10:18:32 INF] Received HTTP/1.1 response 200.
+[10:18:45 INF] Proxying to http://localhost:5008/api/categorias?pageNumber=1&pageSize=10&search= HTTP/2 RequestVersionOrLower 
+[10:18:46 INF] Received HTTP/1.1 response 200.
+[10:18:49 INF] Proxying to http://localhost:5008/api/productos?pageNumber=1&pageSize=10 HTTP/2 RequestVersionOrLower 
+[10:18:49 INF] Received HTTP/1.1 response 200.
+[10:18:51 INF] Proxying to http://localhost:5008/api/productos/5 HTTP/2 RequestVersionOrLower 
+[10:18:51 INF] Received HTTP/1.1 response 200.
+[10:18:51 INF] Proxying to http://localhost:5008/api/unidades-medida?activo=true HTTP/2 RequestVersionOrLower 
+[10:18:51 INF] Proxying to http://localhost:5008/api/marcas?pageNumber=1&pageSize=100&activo=true HTTP/2 RequestVersionOrLower 
+[10:18:51 INF] Proxying to http://localhost:5008/api/categorias?pageNumber=1&pageSize=100&search=&activo=true HTTP/2 RequestVersionOrLower 
+[10:18:51 INF] Proxying to http://localhost:5002/api/configuracion/tipo-afectacion HTTP/2 RequestVersionOrLower 
+[10:18:51 INF] Proxying to http://localhost:5002/api/configuracion/tipo-tributo HTTP/2 RequestVersionOrLower 
+[10:18:51 INF] Received HTTP/1.1 response 200.
+[10:18:51 INF] Received HTTP/1.1 response 200.
+[10:18:51 INF] Received HTTP/1.1 response 200.
+[10:18:52 INF] Received HTTP/1.1 response 200.
+[10:18:52 INF] Received HTTP/1.1 response 200.
+[10:18:59 INF] Proxying to http://localhost:5001/api/menus/jerarquicos HTTP/2 RequestVersionOrLower 
+[10:18:59 INF] Proxying to http://localhost:5001/api/roles HTTP/2 RequestVersionOrLower 
+[10:18:59 INF] Proxying to http://localhost:5001/api/menus/jerarquicos HTTP/2 RequestVersionOrLower 
+[10:18:59 INF] Proxying to http://localhost:5001/api/tipos-permiso HTTP/2 RequestVersionOrLower 
+[10:18:59 INF] Proxying to http://localhost:5001/api/roles HTTP/2 RequestVersionOrLower 
+[10:18:59 INF] Proxying to http://localhost:5001/api/tipos-permiso HTTP/2 RequestVersionOrLower 
+[10:18:59 INF] Received HTTP/1.1 response 200.
+[10:18:59 INF] Received HTTP/1.1 response 200.
+[10:18:59 INF] Received HTTP/1.1 response 200.
+[10:18:59 INF] Received HTTP/1.1 response 200.
+[10:18:59 INF] Received HTTP/1.1 response 200.
+[10:18:59 INF] Proxying to http://localhost:5001/api/roles/1/menus HTTP/2 RequestVersionOrLower 
+[10:18:59 INF] Received HTTP/1.1 response 200.
+[10:18:59 INF] Received HTTP/1.1 response 200.
+[10:18:59 INF] Proxying to http://localhost:5001/api/roles/1/menus HTTP/2 RequestVersionOrLower 
+[10:18:59 INF] Received HTTP/1.1 response 200.
+[10:44:47 INF] Loading proxy data from config.
+[10:44:47 INF] Now listening on: http://localhost:5000
+[10:44:47 INF] Application started. Press Ctrl+C to shut down.
+[10:44:47 INF] Hosting environment: Development
+[10:44:47 INF] Content root path: D:\Personal\Proyectos\SistemaComercial\Codigo\Backend\src\Gateway.API
+[11:31:38 INF] Loading proxy data from config.
+[11:31:38 INF] Now listening on: http://localhost:5000
+[11:31:38 INF] Application started. Press Ctrl+C to shut down.
+[11:31:38 INF] Hosting environment: Development
+[11:31:38 INF] Content root path: D:\Personal\Proyectos\SistemaComercial\Codigo\Backend\src\Gateway.API
+[11:32:46 WRN] Failed to determine the https port for redirect.
+[11:32:46 INF] Proxying to http://localhost:5001/api/auth/login HTTP/2 RequestVersionOrLower 
+[11:32:49 INF] Received HTTP/1.1 response 200.
+[11:32:57 INF] Proxying to http://localhost:5001/api/tipos-permiso HTTP/2 RequestVersionOrLower 
+[11:32:57 INF] Proxying to http://localhost:5001/api/menus/jerarquicos HTTP/2 RequestVersionOrLower 
+[11:32:57 INF] Proxying to http://localhost:5001/api/roles HTTP/2 RequestVersionOrLower 
+[11:32:57 INF] Proxying to http://localhost:5001/api/roles HTTP/2 RequestVersionOrLower 
+[11:32:57 INF] Proxying to http://localhost:5001/api/tipos-permiso HTTP/2 RequestVersionOrLower 
+[11:32:57 INF] Proxying to http://localhost:5001/api/menus/jerarquicos HTTP/2 RequestVersionOrLower 
+[11:32:57 INF] Received HTTP/1.1 response 200.
+[11:32:57 INF] Received HTTP/1.1 response 200.
+[11:32:57 INF] Received HTTP/1.1 response 200.
+[11:32:57 INF] Received HTTP/1.1 response 200.
+[11:32:57 INF] Received HTTP/1.1 response 200.
+[11:32:57 INF] Received HTTP/1.1 response 200.
+[11:32:57 INF] Proxying to http://localhost:5001/api/roles/1/menus HTTP/2 RequestVersionOrLower 
+[11:32:57 INF] Proxying to http://localhost:5001/api/roles/1/menus HTTP/2 RequestVersionOrLower 
+[11:32:57 INF] Received HTTP/1.1 response 200.
+[11:32:57 INF] Received HTTP/1.1 response 200.
+[11:33:03 INF] Proxying to http://localhost:5008/api/categorias?pageNumber=1&pageSize=10&search= HTTP/2 RequestVersionOrLower 
+[11:33:05 INF] Received HTTP/1.1 response 200.
+[11:33:08 INF] Proxying to http://localhost:5001/api/tipos-permiso HTTP/2 RequestVersionOrLower 
+[11:33:08 INF] Proxying to http://localhost:5001/api/menus/jerarquicos HTTP/2 RequestVersionOrLower 
+[11:33:08 INF] Proxying to http://localhost:5001/api/tipos-permiso HTTP/2 RequestVersionOrLower 
+[11:33:08 INF] Proxying to http://localhost:5001/api/roles HTTP/2 RequestVersionOrLower 
+[11:33:08 INF] Proxying to http://localhost:5001/api/roles HTTP/2 RequestVersionOrLower 
+[11:33:08 INF] Proxying to http://localhost:5001/api/menus/jerarquicos HTTP/2 RequestVersionOrLower 
+[11:33:08 INF] Received HTTP/1.1 response 200.
+[11:33:08 INF] Received HTTP/1.1 response 200.
+[11:33:08 INF] Received HTTP/1.1 response 200.
+[11:33:08 INF] Received HTTP/1.1 response 200.
+[11:33:08 INF] Received HTTP/1.1 response 200.
+[11:33:08 INF] Proxying to http://localhost:5001/api/roles/1/menus HTTP/2 RequestVersionOrLower 
+[11:33:08 INF] Received HTTP/1.1 response 200.
+[11:33:08 INF] Received HTTP/1.1 response 200.
+[11:33:08 INF] Proxying to http://localhost:5001/api/roles/1/menus HTTP/2 RequestVersionOrLower 
+[11:33:08 INF] Received HTTP/1.1 response 200.
+[11:41:56 INF] Proxying to http://localhost:5001/api/tipos-permiso HTTP/2 RequestVersionOrLower 
+[11:41:56 INF] Proxying to http://localhost:5001/api/roles HTTP/2 RequestVersionOrLower 
+[11:41:56 INF] Proxying to http://localhost:5001/api/roles HTTP/2 RequestVersionOrLower 
+[11:41:56 INF] Proxying to http://localhost:5001/api/menus/jerarquicos HTTP/2 RequestVersionOrLower 
+[11:41:56 INF] Proxying to http://localhost:5001/api/menus/jerarquicos HTTP/2 RequestVersionOrLower 
+[11:41:56 INF] Proxying to http://localhost:5001/api/tipos-permiso HTTP/2 RequestVersionOrLower 
+[11:41:56 INF] Received HTTP/1.1 response 200.
+[11:41:56 INF] Received HTTP/1.1 response 200.
+[11:41:56 INF] Received HTTP/1.1 response 200.
+[11:41:56 INF] Received HTTP/1.1 response 200.
+[11:41:56 INF] Received HTTP/1.1 response 200.
+[11:41:56 INF] Received HTTP/1.1 response 200.
+[11:41:56 INF] Proxying to http://localhost:5001/api/roles/1/menus HTTP/2 RequestVersionOrLower 
+[11:41:56 INF] Received HTTP/1.1 response 200.
+[11:41:56 INF] Proxying to http://localhost:5001/api/roles/1/menus HTTP/2 RequestVersionOrLower 
+[11:41:56 INF] Received HTTP/1.1 response 200.
+[16:30:31 INF] Loading proxy data from config.
+[16:30:32 INF] Now listening on: http://localhost:5000
+[16:30:32 INF] Application started. Press Ctrl+C to shut down.
+[16:30:32 INF] Hosting environment: Development
+[16:30:32 INF] Content root path: D:\Personal\Proyectos\SistemaComercial\Codigo\Backend\src\Gateway.API
+[16:31:24 INF] Loading proxy data from config.
+[16:31:25 INF] Now listening on: http://localhost:5000
+[16:31:25 INF] Application started. Press Ctrl+C to shut down.
+[16:31:25 INF] Hosting environment: Development
+[16:31:25 INF] Content root path: D:\Personal\Proyectos\SistemaComercial\Codigo\Backend\src\Gateway.API
+[16:31:32 WRN] Failed to determine the https port for redirect.
+[16:31:32 INF] Proxying to http://localhost:5001/api/auth/login HTTP/2 RequestVersionOrLower 
+[16:31:34 INF] Received HTTP/1.1 response 200.
+[16:31:48 INF] Proxying to http://localhost:5008/api/productos?pageNumber=1&pageSize=10 HTTP/2 RequestVersionOrLower 
+[16:31:49 INF] Received HTTP/1.1 response 200.
+[16:31:53 INF] Proxying to http://localhost:5001/api/menus/jerarquicos HTTP/2 RequestVersionOrLower 
+[16:31:53 INF] Proxying to http://localhost:5001/api/tipos-permiso HTTP/2 RequestVersionOrLower 
+[16:31:53 INF] Proxying to http://localhost:5001/api/menus/jerarquicos HTTP/2 RequestVersionOrLower 
+[16:31:53 INF] Proxying to http://localhost:5001/api/roles HTTP/2 RequestVersionOrLower 
+[16:31:53 INF] Proxying to http://localhost:5001/api/roles HTTP/2 RequestVersionOrLower 
+[16:31:53 INF] Proxying to http://localhost:5001/api/tipos-permiso HTTP/2 RequestVersionOrLower 
+[16:31:54 INF] Received HTTP/1.1 response 200.
+[16:31:54 INF] Received HTTP/1.1 response 200.
+[16:31:54 INF] Received HTTP/1.1 response 200.
+[16:31:54 INF] Received HTTP/1.1 response 200.
+[16:31:54 INF] Received HTTP/1.1 response 200.
+[16:31:54 INF] Received HTTP/1.1 response 200.
+[16:31:54 INF] Proxying to http://localhost:5001/api/roles/1/menus HTTP/2 RequestVersionOrLower 
+[16:31:54 INF] Proxying to http://localhost:5001/api/roles/1/menus HTTP/2 RequestVersionOrLower 
+[16:31:54 INF] Received HTTP/1.1 response 200.
+[16:31:54 INF] Received HTTP/1.1 response 200.
+[16:32:06 INF] Proxying to http://localhost:5001/api/roles/1/acceso-granular HTTP/2 RequestVersionOrLower 
+[16:32:06 INF] Received HTTP/1.1 response 200.
+[16:32:17 INF] Proxying to http://localhost:5001/api/auth/login HTTP/2 RequestVersionOrLower 
+[16:32:17 INF] Received HTTP/1.1 response 200.
+[16:32:31 INF] Proxying to http://localhost:5001/api/roles HTTP/2 RequestVersionOrLower 
+[16:32:31 INF] Proxying to http://localhost:5001/api/menus/jerarquicos HTTP/2 RequestVersionOrLower 
+[16:32:31 INF] Proxying to http://localhost:5001/api/roles HTTP/2 RequestVersionOrLower 
+[16:32:31 INF] Proxying to http://localhost:5001/api/tipos-permiso HTTP/2 RequestVersionOrLower 
+[16:32:31 INF] Proxying to http://localhost:5001/api/menus/jerarquicos HTTP/2 RequestVersionOrLower 
+[16:32:31 INF] Proxying to http://localhost:5001/api/tipos-permiso HTTP/2 RequestVersionOrLower 
+[16:32:31 INF] Received HTTP/1.1 response 200.
+[16:32:31 INF] Received HTTP/1.1 response 200.
+[16:32:31 INF] Received HTTP/1.1 response 200.
+[16:32:31 INF] Received HTTP/1.1 response 200.
+[16:32:31 INF] Received HTTP/1.1 response 200.
+[16:32:31 INF] Received HTTP/1.1 response 200.
+[16:32:31 INF] Proxying to http://localhost:5001/api/roles/1/menus HTTP/2 RequestVersionOrLower 
+[16:32:31 INF] Proxying to http://localhost:5001/api/roles/1/menus HTTP/2 RequestVersionOrLower 
+[16:32:31 INF] Received HTTP/1.1 response 200.
+[16:32:31 INF] Received HTTP/1.1 response 200.
+[16:32:42 INF] Proxying to http://localhost:5001/api/roles/1/acceso-granular HTTP/2 RequestVersionOrLower 
+[16:32:42 INF] Received HTTP/1.1 response 200.
+[16:32:50 INF] Proxying to http://localhost:5001/api/auth/login HTTP/2 RequestVersionOrLower 
+[16:32:50 INF] Received HTTP/1.1 response 200.
+[16:32:54 INF] Proxying to http://localhost:5008/api/productos?pageNumber=1&pageSize=10 HTTP/2 RequestVersionOrLower 
+[16:32:54 INF] Received HTTP/1.1 response 200.
+[16:32:56 INF] Proxying to http://localhost:5002/api/configuracion/tipo-afectacion HTTP/2 RequestVersionOrLower 
+[16:32:56 INF] Proxying to http://localhost:5002/api/configuracion/tipo-tributo HTTP/2 RequestVersionOrLower 
+[16:32:57 INF] Received HTTP/1.1 response 200.
+[16:32:57 INF] Received HTTP/1.1 response 200.
+[16:33:18 INF] Proxying to http://localhost:5002/api/configuracion/tipo-afectacion HTTP/2 RequestVersionOrLower 
+[16:33:18 INF] Proxying to http://localhost:5002/api/configuracion/tipo-tributo HTTP/2 RequestVersionOrLower 
+[16:33:18 INF] Received HTTP/1.1 response 200.
+[16:33:18 INF] Received HTTP/1.1 response 200.
+[16:35:21 INF] Proxying to http://localhost:5008/api/productos?pageNumber=1&pageSize=10 HTTP/2 RequestVersionOrLower 
+[16:35:21 INF] Received HTTP/1.1 response 200.
+[16:35:25 INF] Proxying to http://localhost:5008/api/productos/5 HTTP/2 RequestVersionOrLower 
+[16:35:25 INF] Received HTTP/1.1 response 200.
+[16:35:25 INF] Proxying to http://localhost:5002/api/configuracion/tipo-afectacion HTTP/2 RequestVersionOrLower 
+[16:35:25 INF] Proxying to http://localhost:5002/api/configuracion/tipo-tributo HTTP/2 RequestVersionOrLower 
+[16:35:25 INF] Received HTTP/1.1 response 200.
+[16:35:25 INF] Received HTTP/1.1 response 200.
+[16:38:58 INF] Proxying to http://localhost:5008/api/productos?pageNumber=1&pageSize=10 HTTP/2 RequestVersionOrLower 
+[16:38:58 INF] Proxying to http://localhost:5008/api/productos/5 HTTP/2 RequestVersionOrLower 
+[16:38:58 INF] Received HTTP/1.1 response 200.
+[16:38:58 INF] Received HTTP/1.1 response 200.
+[16:39:09 INF] Proxying to http://localhost:5008/api/productos?pageNumber=1&pageSize=10 HTTP/2 RequestVersionOrLower 
+[16:39:09 INF] Received HTTP/1.1 response 200.
+[16:39:19 INF] Proxying to http://localhost:5008/api/productos?pageNumber=1&pageSize=10 HTTP/2 RequestVersionOrLower 
+[16:39:19 INF] Received HTTP/1.1 response 200.
+[16:39:23 INF] Proxying to http://localhost:5008/api/productos?pageNumber=1&pageSize=10 HTTP/2 RequestVersionOrLower 
+[16:39:23 INF] Received HTTP/1.1 response 200.
+[16:40:15 INF] Proxying to http://localhost:5008/api/productos?pageNumber=1&pageSize=10 HTTP/2 RequestVersionOrLower 
+[16:40:15 INF] Received HTTP/1.1 response 200.
+[16:41:30 INF] Proxying to http://localhost:5008/api/productos?pageNumber=1&pageSize=10 HTTP/2 RequestVersionOrLower 
+[16:41:30 INF] Received HTTP/1.1 response 200.
+[16:41:34 INF] Proxying to http://localhost:5008/api/productos?pageNumber=1&pageSize=10 HTTP/2 RequestVersionOrLower 
+[16:41:34 INF] Received HTTP/1.1 response 200.
+[16:41:43 INF] Proxying to http://localhost:5008/api/productos?pageNumber=1&pageSize=10 HTTP/2 RequestVersionOrLower 
+[16:41:43 INF] Received HTTP/1.1 response 200.
+[16:41:46 INF] Proxying to http://localhost:5008/api/productos?pageNumber=1&pageSize=10 HTTP/2 RequestVersionOrLower 
+[16:41:46 INF] Received HTTP/1.1 response 200.
+[16:42:15 INF] Proxying to http://localhost:5008/api/productos?pageNumber=1&pageSize=10 HTTP/2 RequestVersionOrLower 
+[16:42:15 INF] Received HTTP/1.1 response 200.
+[16:42:19 INF] Proxying to http://localhost:5008/api/productos?pageNumber=1&pageSize=10 HTTP/2 RequestVersionOrLower 
+[16:42:19 INF] Received HTTP/1.1 response 200.
+[16:47:11 INF] Loading proxy data from config.
+[16:47:11 INF] Now listening on: http://localhost:5000
+[16:47:11 INF] Application started. Press Ctrl+C to shut down.
+[16:47:11 INF] Hosting environment: Development
+[16:47:11 INF] Content root path: D:\Personal\Proyectos\SistemaComercial\Codigo\Backend\src\Gateway.API
+[16:47:54 WRN] Failed to determine the https port for redirect.
+[16:47:54 INF] Proxying to http://localhost:5001/api/auth/login HTTP/2 RequestVersionOrLower 
+[16:47:57 INF] Received HTTP/1.1 response 200.
+[16:48:07 INF] Proxying to http://localhost:5008/api/productos?pageNumber=1&pageSize=10 HTTP/2 RequestVersionOrLower 
+[16:48:08 INF] Received HTTP/1.1 response 200.
+[16:48:11 INF] Proxying to http://localhost:5002/api/configuracion/tipo-afectacion HTTP/2 RequestVersionOrLower 
+[16:48:11 INF] Proxying to http://localhost:5002/api/configuracion/tipo-tributo HTTP/2 RequestVersionOrLower 
+[16:48:12 INF] Received HTTP/1.1 response 200.
+[16:48:12 INF] Received HTTP/1.1 response 200.
+[16:48:19 INF] Proxying to http://localhost:5008/api/productos/5 HTTP/2 RequestVersionOrLower 
+[16:48:19 INF] Received HTTP/1.1 response 200.
+[16:48:19 INF] Proxying to http://localhost:5002/api/configuracion/tipo-tributo HTTP/2 RequestVersionOrLower 
+[16:48:19 INF] Proxying to http://localhost:5002/api/configuracion/tipo-afectacion HTTP/2 RequestVersionOrLower 
+[16:48:19 INF] Received HTTP/1.1 response 200.
+[16:48:19 INF] Received HTTP/1.1 response 200.
+[16:48:41 INF] Proxying to http://localhost:5002/api/configuracion/tipo-afectacion HTTP/2 RequestVersionOrLower 
+[16:48:41 INF] Proxying to http://localhost:5002/api/configuracion/tipo-tributo HTTP/2 RequestVersionOrLower 
+[16:48:41 INF] Received HTTP/1.1 response 200.
+[16:48:41 INF] Received HTTP/1.1 response 200.
+[16:48:45 INF] Proxying to http://localhost:5008/api/productos?pageNumber=1&pageSize=10 HTTP/2 RequestVersionOrLower 
+[16:48:45 INF] Received HTTP/1.1 response 200.
+[16:49:48 INF] Proxying to http://localhost:5001/api/trabajadores HTTP/2 RequestVersionOrLower 
+[16:49:48 INF] Proxying to http://localhost:5001/api/trabajadores HTTP/2 RequestVersionOrLower 
+[16:49:48 INF] Received HTTP/1.1 response 200.
+[16:49:48 INF] Received HTTP/1.1 response 200.
+[15:07:17 INF] Loading proxy data from config.
+[15:07:18 WRN] Failed to determine the https port for redirect.
+[15:07:18 INF] Proxying to http://localhost:5001/api/usuarios HTTP/2 RequestVersionOrLower 
+[15:07:22 WRN] "Request": An error was encountered before receiving a response.
+System.Net.Http.HttpRequestException: No se puede establecer una conexión ya que el equipo de destino denegó expresamente dicha conexión. (localhost:5001)
+ ---> System.Net.Sockets.SocketException (10061): No se puede establecer una conexión ya que el equipo de destino denegó expresamente dicha conexión.
+   at System.Net.Sockets.Socket.AwaitableSocketAsyncEventArgs.ThrowException(SocketError error, CancellationToken cancellationToken)
+   at System.Net.Sockets.Socket.AwaitableSocketAsyncEventArgs.System.Threading.Tasks.Sources.IValueTaskSource.GetResult(Int16 token)
+   at System.Net.Sockets.Socket.<ConnectAsync>g__WaitForConnectWithCancellation|285_0(AwaitableSocketAsyncEventArgs saea, ValueTask connectTask, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.ConnectToTcpHostAsync(String host, Int32 port, HttpRequestMessage initialRequest, Boolean async, CancellationToken cancellationToken)
+   --- End of inner exception stack trace ---
+   at System.Net.Http.HttpConnectionPool.ConnectToTcpHostAsync(String host, Int32 port, HttpRequestMessage initialRequest, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.ConnectAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.CreateHttp11ConnectionAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.AddHttp11ConnectionAsync(QueueItem queueItem)
+   at System.Threading.Tasks.TaskCompletionSourceWithCancellation`1.WaitWithCancellationAsync(CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.SendWithVersionDetectionAndRetryAsync(HttpRequestMessage request, Boolean async, Boolean doRequestAuth, CancellationToken cancellationToken)
+   at System.Net.Http.DiagnosticsHandler.SendAsyncCore(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at Yarp.ReverseProxy.Forwarder.HttpForwarder.SendAsync(HttpContext context, String destinationPrefix, HttpMessageInvoker httpClient, ForwarderRequestConfig requestConfig, HttpTransformer transformer, CancellationToken cancellationToken)
+[15:08:17 INF] Loading proxy data from config.
+[15:08:17 WRN] Failed to determine the https port for redirect.
+[15:08:18 INF] Proxying to http://localhost:5001/api/usuarios HTTP/2 RequestVersionOrLower 
+[15:08:22 WRN] "Request": An error was encountered before receiving a response.
+System.Net.Http.HttpRequestException: No se puede establecer una conexión ya que el equipo de destino denegó expresamente dicha conexión. (localhost:5001)
+ ---> System.Net.Sockets.SocketException (10061): No se puede establecer una conexión ya que el equipo de destino denegó expresamente dicha conexión.
+   at System.Net.Sockets.Socket.AwaitableSocketAsyncEventArgs.ThrowException(SocketError error, CancellationToken cancellationToken)
+   at System.Net.Sockets.Socket.AwaitableSocketAsyncEventArgs.System.Threading.Tasks.Sources.IValueTaskSource.GetResult(Int16 token)
+   at System.Net.Sockets.Socket.<ConnectAsync>g__WaitForConnectWithCancellation|285_0(AwaitableSocketAsyncEventArgs saea, ValueTask connectTask, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.ConnectToTcpHostAsync(String host, Int32 port, HttpRequestMessage initialRequest, Boolean async, CancellationToken cancellationToken)
+   --- End of inner exception stack trace ---
+   at System.Net.Http.HttpConnectionPool.ConnectToTcpHostAsync(String host, Int32 port, HttpRequestMessage initialRequest, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.ConnectAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.CreateHttp11ConnectionAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.AddHttp11ConnectionAsync(QueueItem queueItem)
+   at System.Threading.Tasks.TaskCompletionSourceWithCancellation`1.WaitWithCancellationAsync(CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.SendWithVersionDetectionAndRetryAsync(HttpRequestMessage request, Boolean async, Boolean doRequestAuth, CancellationToken cancellationToken)
+   at System.Net.Http.DiagnosticsHandler.SendAsyncCore(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at Yarp.ReverseProxy.Forwarder.HttpForwarder.SendAsync(HttpContext context, String destinationPrefix, HttpMessageInvoker httpClient, ForwarderRequestConfig requestConfig, HttpTransformer transformer, CancellationToken cancellationToken)

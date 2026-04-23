@@ -158,7 +158,7 @@
     {
       "label": "npm: dev - Frontend",
       "type": "npm",
-      "script": "dev",
+      "script": "dev:file",
       "path": "Codigo/Frontend/",
       "isBackground": true,
       "dependsOrder": "sequence",
@@ -181,7 +181,7 @@
             "regexp": "^\\s*VITE\\s+v"
           },
           "endsPattern": {
-            "regexp": "^\\s*➜\\s+Local:\\s+http://localhost:\\d+/"
+            "regexp": "Local:\\s+http://localhost:\\d+/"
           }
         }
       }

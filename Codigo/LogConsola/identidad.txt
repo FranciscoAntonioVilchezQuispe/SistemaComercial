@@ -1,0 +1,82 @@
+[18:22:15 INF] Now listening on: http://localhost:5001
+[18:22:15 INF] Application started. Press Ctrl+C to shut down.
+[18:22:15 INF] Hosting environment: Development
+[18:22:15 INF] Content root path: D:\Personal\Proyectos\SistemaComercial\Codigo\Backend\src\Identidad.API\Identidad.API.API
+[18:24:08 INF] Now listening on: http://localhost:5001
+[18:24:08 INF] Application started. Press Ctrl+C to shut down.
+[18:24:08 INF] Hosting environment: Development
+[18:24:08 INF] Content root path: D:\Personal\Proyectos\SistemaComercial\Codigo\Backend\src\Identidad.API\Identidad.API.API
+[18:25:20 INF] Now listening on: http://localhost:5001
+[18:25:20 INF] Application started. Press Ctrl+C to shut down.
+[18:25:20 INF] Hosting environment: Development
+[18:25:20 INF] Content root path: D:\Personal\Proyectos\SistemaComercial\Codigo\Backend\src\Identidad.API\Identidad.API.API
+[21:35:24 WRN] Failed to determine the https port for redirect.
+[21:35:24 WRN] You do not have a valid license key for the Lucky Penny software MediatR. This is allowed for development and testing scenarios. If you are running in production you are required to have a licensed version. Please visit https://luckypennysoftware.com to obtain a valid license.
+[22:59:09 INF] Now listening on: http://localhost:5001
+[22:59:09 INF] Application started. Press Ctrl+C to shut down.
+[22:59:09 INF] Hosting environment: Development
+[22:59:09 INF] Content root path: D:\Personal\Proyectos\SistemaComercial\Codigo\Backend\src\Identidad.API\Identidad.API.API
+[23:00:01 WRN] Failed to determine the https port for redirect.
+[23:00:01 WRN] You do not have a valid license key for the Lucky Penny software MediatR. This is allowed for development and testing scenarios. If you are running in production you are required to have a licensed version. Please visit https://luckypennysoftware.com to obtain a valid license.
+[23:14:55 INF] Now listening on: http://localhost:5001
+[23:14:55 INF] Application started. Press Ctrl+C to shut down.
+[23:14:55 INF] Hosting environment: Development
+[23:14:55 INF] Content root path: D:\Personal\Proyectos\SistemaComercial\Codigo\Backend\src\Identidad.API\Identidad.API.API
+[23:20:31 INF] Now listening on: http://localhost:5001
+[23:20:31 INF] Application started. Press Ctrl+C to shut down.
+[23:20:31 INF] Hosting environment: Development
+[23:20:31 INF] Content root path: D:\Personal\Proyectos\SistemaComercial\Codigo\Backend\src\Identidad.API\Identidad.API.API
+[23:20:32 WRN] Failed to determine the https port for redirect.
+[23:20:32 WRN] You do not have a valid license key for the Lucky Penny software MediatR. This is allowed for development and testing scenarios. If you are running in production you are required to have a licensed version. Please visit https://luckypennysoftware.com to obtain a valid license.
+[23:54:59 INF] Now listening on: http://localhost:5001
+[23:54:59 INF] Application started. Press Ctrl+C to shut down.
+[23:54:59 INF] Hosting environment: Development
+[23:54:59 INF] Content root path: D:\Personal\Proyectos\SistemaComercial\Codigo\Backend\src\Identidad.API\Identidad.API.API
+[23:55:03 WRN] Failed to determine the https port for redirect.
+[23:55:03 WRN] You do not have a valid license key for the Lucky Penny software MediatR. This is allowed for development and testing scenarios. If you are running in production you are required to have a licensed version. Please visit https://luckypennysoftware.com to obtain a valid license.
+[10:17:47 INF] Now listening on: http://localhost:5001
+[10:17:47 INF] Application started. Press Ctrl+C to shut down.
+[10:17:47 INF] Hosting environment: Development
+[10:17:47 INF] Content root path: D:\Personal\Proyectos\SistemaComercial\Codigo\Backend\src\Identidad.API\Identidad.API.API
+[10:18:19 WRN] Failed to determine the https port for redirect.
+[10:18:19 WRN] You do not have a valid license key for the Lucky Penny software MediatR. This is allowed for development and testing scenarios. If you are running in production you are required to have a licensed version. Please visit https://luckypennysoftware.com to obtain a valid license.
+[10:44:48 INF] Now listening on: http://localhost:5001
+[10:44:48 INF] Application started. Press Ctrl+C to shut down.
+[10:44:48 INF] Hosting environment: Development
+[10:44:48 INF] Content root path: D:\Personal\Proyectos\SistemaComercial\Codigo\Backend\src\Identidad.API\Identidad.API.API
+[11:31:38 INF] Now listening on: http://localhost:5001
+[11:31:38 INF] Application started. Press Ctrl+C to shut down.
+[11:31:38 INF] Hosting environment: Development
+[11:31:38 INF] Content root path: D:\Personal\Proyectos\SistemaComercial\Codigo\Backend\src\Identidad.API\Identidad.API.API
+[11:32:46 WRN] Failed to determine the https port for redirect.
+[11:32:46 WRN] You do not have a valid license key for the Lucky Penny software MediatR. This is allowed for development and testing scenarios. If you are running in production you are required to have a licensed version. Please visit https://luckypennysoftware.com to obtain a valid license.
+[16:30:32 INF] Now listening on: http://localhost:5001
+[16:30:32 INF] Application started. Press Ctrl+C to shut down.
+[16:30:32 INF] Hosting environment: Development
+[16:30:32 INF] Content root path: D:\Personal\Proyectos\SistemaComercial\Codigo\Backend\src\Identidad.API\Identidad.API.API
+[16:31:25 INF] Now listening on: http://localhost:5001
+[16:31:25 INF] Application started. Press Ctrl+C to shut down.
+[16:31:25 INF] Hosting environment: Development
+[16:31:25 INF] Content root path: D:\Personal\Proyectos\SistemaComercial\Codigo\Backend\src\Identidad.API\Identidad.API.API
+[16:31:32 WRN] Failed to determine the https port for redirect.
+[16:31:32 WRN] You do not have a valid license key for the Lucky Penny software MediatR. This is allowed for development and testing scenarios. If you are running in production you are required to have a licensed version. Please visit https://luckypennysoftware.com to obtain a valid license.
+[16:47:11 INF] Now listening on: http://localhost:5001
+[16:47:11 INF] Application started. Press Ctrl+C to shut down.
+[16:47:11 INF] Hosting environment: Development
+[16:47:11 INF] Content root path: D:\Personal\Proyectos\SistemaComercial\Codigo\Backend\src\Identidad.API\Identidad.API.API
+[16:47:54 WRN] Failed to determine the https port for redirect.
+[16:47:55 WRN] You do not have a valid license key for the Lucky Penny software MediatR. This is allowed for development and testing scenarios. If you are running in production you are required to have a licensed version. Please visit https://luckypennysoftware.com to obtain a valid license.
+[14:28:59 WRN] Failed to determine the https port for redirect.
+[14:28:59 WRN] You do not have a valid license key for the Lucky Penny software MediatR. This is allowed for development and testing scenarios. If you are running in production you are required to have a licensed version. Please visit https://luckypennysoftware.com to obtain a valid license.
+[14:29:28 WRN] Failed to determine the https port for redirect.
+[14:29:28 WRN] Failed to determine the https port for redirect.
+[14:29:28 WRN] You do not have a valid license key for the Lucky Penny software MediatR. This is allowed for development and testing scenarios. If you are running in production you are required to have a licensed version. Please visit https://luckypennysoftware.com to obtain a valid license.
+[14:29:29 WRN] Failed to determine the https port for redirect.
+[14:35:55 WRN] Failed to determine the https port for redirect.
+[14:35:55 WRN] Failed to determine the https port for redirect.
+[14:35:55 WRN] You do not have a valid license key for the Lucky Penny software MediatR. This is allowed for development and testing scenarios. If you are running in production you are required to have a licensed version. Please visit https://luckypennysoftware.com to obtain a valid license.
+[14:35:56 WRN] Failed to determine the https port for redirect.
+[15:08:24 WRN] Failed to determine the https port for redirect.
+[15:08:24 WRN] Failed to determine the https port for redirect.
+[15:08:24 WRN] You do not have a valid license key for the Lucky Penny software MediatR. This is allowed for development and testing scenarios. If you are running in production you are required to have a licensed version. Please visit https://luckypennysoftware.com to obtain a valid license.
+[15:08:25 WRN] Failed to determine the https port for redirect.
